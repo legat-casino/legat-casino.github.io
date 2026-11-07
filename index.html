@@ -1,0 +1,962 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Legat Casino</title>
+<meta name="theme-color" content="#17110d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Legat Casino">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icon-512.png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,700&family=Manrope:wght@400;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: a single felt table under a wooden rail; tabs switch Tisch / Spieler / Konto. One dark "casino at night" look. */
+:root{
+  --felt:#0f3d2f; --felt-deep:#0a2a20; --rail:#17110d; --rail-2:#231a14;
+  --brass:#d1ad62; --brass-dim:#8f7643; --ink:#f2ebdd; --muted:#a3b7ab;
+  --card:#fbf8f1; --card-ink:#1b1b1f; --suit-red:#c4382a;
+  --win:#79d8a2; --lose:#ec8a78; --push:#e7cf8f;
+  --line:rgba(209,173,98,.28);
+  --f-display:"Bodoni Moda", "Didot", Georgia, serif;
+  --f-body:"Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-num:"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  color-scheme:dark;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{min-height:100%}
+body{margin:0;background:var(--rail);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.45;
+  background-image:radial-gradient(120% 70% at 50% 0%, var(--rail-2), var(--rail) 70%);-webkit-tap-highlight-color:transparent}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--rail)}
+button{font:inherit;color:inherit;cursor:pointer}
+input{font:inherit}
+:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+.wrap{max-width:1040px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px 40px}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--rail);border-bottom:1px solid var(--line)}
+.top-in{max-width:1040px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:10px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.logo{font-family:var(--f-display);font-weight:700;font-size:22px;letter-spacing:.02em;margin-right:auto;white-space:nowrap}
+.logo span{color:var(--brass)}
+.purse{display:flex;flex-direction:column;align-items:flex-end;line-height:1.1}
+.purse small{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.purse b{font-family:var(--f-num);font-size:19px;color:var(--brass);transition:color .3s}
+.purse b.up{color:var(--win)} .purse b.down{color:var(--lose)}
+nav.tabs{display:flex;gap:4px;width:100%;}
+nav.tabs button{flex:1;background:none;border:0;border-bottom:2px solid transparent;padding:8px 6px;color:var(--muted);font-weight:600;letter-spacing:.04em}
+nav.tabs button[aria-selected="true"]{color:var(--ink);border-color:var(--brass)}
+
+.panel{background:var(--rail-2);border:1px solid var(--line);border-radius:10px;padding:16px}
+h2{font-family:var(--f-display);font-weight:500;font-size:24px;margin:0 0 4px;text-wrap:balance}
+h3{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0 0 10px;font-weight:700}
+p{margin:0}
+.muted{color:var(--muted)}
+.stack{display:flex;flex-direction:column;gap:14px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+
+.btn{border:1px solid var(--brass-dim);background:transparent;border-radius:999px;padding:9px 18px;font-weight:700;letter-spacing:.02em}
+.btn:hover{border-color:var(--brass)}
+.btn.gold{background:var(--brass);color:#1b140a;border-color:var(--brass)}
+.btn.gold:hover{filter:brightness(1.08)}
+.btn:disabled{opacity:.4;cursor:not-allowed;filter:none}
+.btn.sm{padding:6px 12px;font-size:13px}
+.field{display:flex;flex-direction:column;gap:4px;min-width:0}
+.field label{font-size:12px;color:var(--muted);font-weight:600}
+.field input{background:var(--rail);border:1px solid var(--line);border-radius:8px;padding:9px 11px;color:var(--ink);min-width:0;width:100%}
+.code{font-family:var(--f-num);font-size:22px;letter-spacing:.14em;color:var(--brass)}
+.note{border-left:3px solid var(--brass);padding:8px 12px;background:rgba(209,173,98,.08);border-radius:0 8px 8px 0}
+.note.bad{border-color:var(--lose);background:rgba(236,138,120,.08)}
+.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--rail);padding:10px 16px;border-radius:999px;font-weight:700;z-index:20;max-width:calc(100% - 32px);text-align:center}
+
+/* login */
+.login{max-width:440px;margin:6vh auto 0;text-align:center;display:flex;flex-direction:column;gap:18px;align-items:center}
+.login h1{font-family:var(--f-display);font-size:40px;font-weight:700;margin:0;line-height:1.05}
+.login h1 span{color:var(--brass)}
+.gbtn{display:inline-flex;align-items:center;gap:10px;background:#fff;color:#1f1f1f;border:0;border-radius:999px;padding:12px 22px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.35)}
+.gbtn svg{width:20px;height:20px}
+.fan{display:flex;justify-content:center;height:110px;position:relative;width:200px}
+.fan .c{position:absolute;top:10px;transform-origin:50% 120%}
+
+/* table */
+.felt{position:relative;background:radial-gradient(110% 90% at 50% 10%, #175a45, var(--felt) 45%, var(--felt-deep));border-radius:28px 28px 14px 14px;border:10px solid #3a2617;box-shadow:inset 0 0 0 2px var(--brass-dim), 0 20px 40px rgba(0,0,0,.45);padding:18px 14px 20px;overflow:hidden}
+.felt-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap;position:relative;z-index:1}
+.tcode{font-family:var(--f-num);font-size:12px;color:var(--muted)}
+.tcode b{color:var(--brass);letter-spacing:.12em;font-size:15px}
+.shoe{position:absolute;right:18px;top:58px;width:46px;height:64px;border-radius:6px;background:repeating-linear-gradient(45deg,#7d2a22 0 6px,#6a221c 6px 12px);border:3px solid var(--card);box-shadow:3px 3px 0 -1px var(--card),6px 6px 0 -2px var(--card),0 8px 14px rgba(0,0,0,.4);transform:rotate(8deg)}
+.arc{font-family:var(--f-display);text-align:center;color:rgba(242,235,221,.55);font-size:13px;letter-spacing:.18em;text-transform:uppercase;margin:6px 0 2px;padding-inline:52px}
+.arc em{font-style:normal;color:var(--brass)}
+.dealer{display:flex;flex-direction:column;align-items:center;gap:6px;min-height:150px;justify-content:center}
+.who{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.status{min-height:24px;text-align:center;font-weight:700;color:var(--push)}
+.hand{display:flex;justify-content:center}
+.cards{display:flex;min-height:20px}
+.cards .c + .c{margin-left:-22px}
+
+/* a card: outer box flies, inner box flips */
+.c{width:60px;height:86px;position:relative;flex:none;perspective:700px;font-family:var(--f-display);font-weight:700}
+.ci{position:absolute;inset:0;transform-style:preserve-3d;transition:none}
+.c.down .ci{transform:rotateY(180deg)}
+.cf,.cb{position:absolute;inset:0;border-radius:7px;backface-visibility:hidden;-webkit-backface-visibility:hidden;box-shadow:0 3px 8px rgba(0,0,0,.35)}
+.cf{background:var(--card);color:var(--card-ink)}
+.cb{transform:rotateY(180deg);background:repeating-linear-gradient(45deg,#7d2a22 0 6px,#6a221c 6px 12px);border:3px solid var(--card)}
+.c.red .cf{color:var(--suit-red)}
+.cf .r{position:absolute;top:4px;left:6px;font-size:19px;line-height:1}
+.cf .s{position:absolute;top:22px;left:6px;font-size:15px;line-height:1}
+.cf .big{position:absolute;right:6px;bottom:2px;font-size:30px;line-height:1}
+.score{font-family:var(--f-num);font-size:13px;background:rgba(0,0,0,.35);border-radius:999px;padding:2px 9px}
+
+.seats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:14px}
+.seat{border:1px dashed rgba(242,235,221,.22);border-radius:12px;padding:10px;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;transition:box-shadow .3s}
+.seat.me{border-style:solid;border-color:var(--brass)}
+.seat.turn{box-shadow:0 0 0 2px var(--brass),0 0 22px rgba(209,173,98,.35)}
+.seat .nm{font-weight:700;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.seat .sub{font-size:12px;color:var(--muted)}
+.seat .c{width:44px;height:63px}
+.seat .cf .r{font-size:15px}.seat .cf .s{font-size:12px;top:19px}.seat .cf .big{font-size:21px}
+.seat .cards .c + .c{margin-left:-20px}
+.seat.me .c{width:60px;height:86px}
+.seat.me .cf .r{font-size:19px}.seat.me .cf .s{font-size:15px;top:22px}.seat.me .cf .big{font-size:30px}
+.hands{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.hbox{display:flex;flex-direction:column;align-items:center;gap:4px;padding:4px;border-radius:8px}
+.hbox.active{background:rgba(209,173,98,.14)}
+.hbox.won .cards{animation:glow 1.4s ease-out 1}
+@keyframes glow{0%{filter:drop-shadow(0 0 0 rgba(121,216,162,0))}40%{filter:drop-shadow(0 0 14px rgba(121,216,162,.9))}100%{filter:drop-shadow(0 0 0 rgba(121,216,162,0))}}
+.chip-bet{font-family:var(--f-num);font-size:12px;color:var(--brass)}
+.res{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;animation:pop .35s ease-out both}
+.res.win,.res.bj{color:var(--win)} .res.lose{color:var(--lose)} .res.push{color:var(--push)}
+@keyframes pop{from{transform:scale(.4);opacity:0}to{transform:none;opacity:1}}
+.net{font-size:20px;font-weight:700;animation:pop .45s cubic-bezier(.2,1.6,.4,1) both}
+
+.controls{margin-top:14px;display:flex;flex-direction:column;gap:12px;align-items:center}
+.chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.chip{width:54px;height:54px;border-radius:50%;border:4px dashed rgba(255,255,255,.75);font-family:var(--f-num);font-weight:600;font-size:12px;color:#fff;box-shadow:0 3px 6px rgba(0,0,0,.4),inset 0 0 0 3px rgba(0,0,0,.15);display:grid;place-items:center;transition:transform .12s}
+.chip:active{transform:translateY(2px) scale(.96)}
+.chip:disabled{opacity:.35;cursor:not-allowed}
+.ch100{background:#3d6fb6}.ch500{background:#7b3fa0}.ch1k{background:#b8432f}.ch5k{background:#2f8a55}.ch10k{background:#1f1f24}.ch25k{background:#b48a2c}
+.betline{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:center}
+.betval{font-family:var(--f-num);font-size:24px;color:var(--brass);min-width:7ch;text-align:center}
+.acts{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.acts .btn{min-width:110px}
+.timer{font-family:var(--f-num);font-size:12px;color:var(--muted)}
+
+/* players */
+table.board{width:100%;border-collapse:collapse;font-size:14px}
+.board th{text-align:left;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700;padding:8px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+.board td{padding:10px 8px;border-bottom:1px solid rgba(209,173,98,.12);white-space:nowrap}
+.board td.r,.board th.r{text-align:right}
+.board tr.me td{background:rgba(209,173,98,.07)}
+.scroll{overflow-x:auto}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#55625b;margin-right:7px;vertical-align:1px}
+.dot.on{background:var(--win);box-shadow:0 0 6px var(--win)}
+.rank{font-family:var(--f-display);color:var(--brass);font-size:17px}
+.pill{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.pill.bad{color:var(--lose);border-color:rgba(236,138,120,.45)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.seg button{background:none;border:0;padding:6px 14px;color:var(--muted);font-weight:600}
+.seg button[aria-pressed="true"]{background:var(--brass);color:#1b140a}
+.statgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}
+.stat{border:1px solid var(--line);border-radius:8px;padding:10px}
+.stat small{display:block;font-size:11px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+.stat b{font-family:var(--f-num);font-size:18px}
+.lobby-item{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1px solid var(--line);border-radius:8px;padding:10px 12px;flex-wrap:wrap}
+
+@media (max-width:520px){
+  .c{width:50px;height:72px}.cf .r{font-size:16px}.cf .s{font-size:13px;top:19px}.cf .big{font-size:24px}
+  .seat.me .c{width:52px;height:75px}
+  .chip{width:48px;height:48px;font-size:11px}
+  .acts .btn{min-width:0;flex:1 1 40%}
+  .felt{border-width:7px;padding:14px 8px 16px}
+  .shoe{right:10px;top:52px;width:36px;height:50px}
+  .logo{font-size:19px}
+}
+</style>
+</head>
+<body>
+<header class="top" id="top" hidden>
+  <div class="top-in">
+    <div class="logo">Legat <span>Casino</span></div>
+    <div class="purse"><small id="pname">Konto</small><b id="pbal">–</b></div>
+    <nav class="tabs" role="tablist">
+      <button id="tab-table" role="tab" aria-selected="true" data-tab="table">Tisch</button>
+      <button id="tab-players" role="tab" aria-selected="false" data-tab="players">Spieler</button>
+      <button id="tab-account" role="tab" aria-selected="false" data-tab="account">Konto</button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section id="view-login" class="login" hidden>
+    <div class="fan" aria-hidden="true">
+      <div class="c" style="transform:rotate(-14deg) translateX(-34px)"><div class="ci"><div class="cf"><span class="r">A</span><span class="s">♠</span><span class="big">♠</span></div><div class="cb"></div></div></div>
+      <div class="c red" style="transform:rotate(14deg) translateX(34px)"><div class="ci"><div class="cf"><span class="r">K</span><span class="s">♥</span><span class="big">♥</span></div><div class="cb"></div></div></div>
+    </div>
+    <h1>Legat <span>Casino</span></h1>
+    <p class="muted">Blackjack mit deinen Freunden. Du startest mit 2.000 Legats.</p>
+    <button class="gbtn" id="glogin" type="button">
+      <svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>
+      Mit Google anmelden
+    </button>
+    <p class="muted" style="font-size:12px">Tipp fürs Handy: Über „Teilen → Zum Home-Bildschirm“ wird das Casino zur App.</p>
+  </section>
+  <section id="view-setup" hidden></section>
+  <section id="view-table" hidden></section>
+  <section id="view-players" hidden></section>
+  <section id="view-account" hidden></section>
+</main>
+<div id="toast" class="toast" hidden></div>
+
+<script type="module">
+import { firebaseConfig } from './firebase-config.js';
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut }
+  from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import { initializeFirestore, doc, collection, query, where, onSnapshot, setDoc, getDoc, getDocs, updateDoc, deleteDoc, runTransaction }
+  from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+/* ---------- constants ---------- */
+const START = 2000, MIN_BET = 100, MAX_BET = 50000, MAX_SEATS = 5, TURN_MS = 30000, BET_MS = 15000, ONLINE_MS = 100000;
+const CHIPS = [[100,'ch100','100'],[500,'ch500','500'],[1000,'ch1k','1K'],[5000,'ch5k','5K'],[10000,'ch10k','10K'],[25000,'ch25k','25K']];
+const SUIT = {S:'♠',H:'♥',D:'♦',C:'♣'};
+const fmt = n => Math.round(n).toLocaleString('de-DE');
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const $ = id => document.getElementById(id);
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- cards ---------- */
+function rnd(n){ const a = new Uint32Array(1); crypto.getRandomValues(a); return a[0] % n; }
+function newShoe(decks = 6){
+  const s = [];
+  for (let d=0; d<decks; d++) for (const r of 'A23456789TJQK') for (const su of 'SHDC') s.push(r+su);
+  for (let i=s.length-1; i>0; i--){ const j = rnd(i+1); [s[i],s[j]] = [s[j],s[i]]; }
+  return s;
+}
+const cval = c => c[0]==='A' ? 11 : ('TJQK'.includes(c[0]) ? 10 : +c[0]);
+function score(cards){
+  let t=0, a=0;
+  for (const c of cards){ t += cval(c); if (c[0]==='A') a++; }
+  while (t>21 && a){ t-=10; a--; }
+  return { t, soft: a>0 };
+}
+const scoreLabel = cards => { const s = score(cards); return (s.soft && s.t<21 ? (s.t-10)+'/' : '') + s.t; };
+
+/* ---------- setup check ---------- */
+if (!firebaseConfig || !firebaseConfig.apiKey || firebaseConfig.apiKey.includes('HIER')){
+  const el = $('view-setup'); el.hidden = false;
+  el.innerHTML = `<div class="panel stack" style="max-width:560px;margin:8vh auto 0"><h2>Fast fertig</h2>
+    <p class="muted">Trage in der Datei <b>firebase-config.js</b> die Werte deines Firebase-Projekts ein. Die Anleitung steht in <b>ANLEITUNG.md</b>.</p></div>`;
+  throw new Error('firebase-config.js ist noch nicht ausgefüllt');
+}
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const fs = initializeFirestore(app, { ignoreUndefinedProperties: true });
+
+/* ---------- state ---------- */
+let uid=null, authUser=null;
+let P=null, players={}, T=null, tid=null, seats={};
+let unsubT=null, unsubS=null, unsubP=null;
+let amHost=false, hostBusy=false;
+let tab='table', boardMode='friends';
+let bet = 1000, pendingAct=false, confirmLeave=false;
+let lastBal = null;
+
+/* ---------- write queues (one write at a time per doc) ---------- */
+let qPlayer = Promise.resolve();
+function withPlayer(fn){
+  qPlayer = qPlayer.then(async () => {
+    if (!P) return;
+    const draft = structuredClone(P);
+    if (!fn(draft)) return;
+    draft.updated = Date.now(); draft.seen = Date.now();
+    P = draft; renderAll();
+    try { await setDoc(doc(fs,'players',uid), draft); } catch(e){ handleWriteErr(e); }
+  });
+  return qPlayer;
+}
+let qSeat = Promise.resolve();
+function seatWrite(data, mode='update'){
+  qSeat = qSeat.then(async () => {
+    const ref = doc(fs,'seats',uid);
+    try { mode==='delete' ? await deleteDoc(ref) : mode==='set' ? await setDoc(ref, data) : await updateDoc(ref, data); }
+    catch(e){ handleWriteErr(e); }
+  });
+  return qSeat;
+}
+function handleWriteErr(e){
+  console.warn(e);
+  if (e?.code==='permission-denied') toast('Keine Berechtigung. Prüfe die Sicherheitsregeln in Firebase.');
+  else if (e?.code==='resource-exhausted') toast('Das kostenlose Tageslimit von Firebase ist erreicht.');
+  else toast('Speichern fehlgeschlagen, bitte nochmal versuchen.');
+}
+
+let toastT;
+function toast(msg){ const el=$('toast'); el.textContent=msg; el.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>el.hidden=true, 3200); }
+
+/* ---------- helpers ---------- */
+function genCode(len, alpha='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'){ let s=''; for(let i=0;i<len;i++) s+=alpha[rnd(alpha.length)]; return s; }
+const nameOf = id => (id===uid ? P?.name : players[id]?.name) || 'Spieler';
+const isOnline = id => id===uid || (players[id] && Date.now() - (players[id].seen||0) < ONLINE_MS);
+function friendIds(){
+  if (!P) return [];
+  const s = new Set(P.friends||[]);
+  for (const [id,p] of Object.entries(players)) if ((p.friends||[]).includes(uid)) s.add(id);
+  s.delete(uid);
+  return [...s].filter(id => players[id]);
+}
+function limitState(){
+  const L = P?.limits; if (!L || (!L.win && !L.loss)) return null;
+  const profit = P.balance - L.base;
+  if (L.win && profit >= L.win) return {hit:'win', profit};
+  if (L.loss && -profit >= L.loss) return {hit:'loss', profit};
+  return {hit:null, profit};
+}
+const inRound = () => !!(P?.ledger && !P.ledger.settled);
+const isBroke = () => P && P.balance < MIN_BET && !inRound();
+
+/* ---------- auth ---------- */
+$('glogin').addEventListener('click', async () => {
+  const provider = new GoogleAuthProvider();
+  provider.setCustomParameters({ prompt: 'select_account' });
+  try { await signInWithPopup(auth, provider); }
+  catch(e){
+    if (['auth/popup-blocked','auth/operation-not-supported-in-this-environment','auth/cancelled-popup-request'].includes(e.code)) return signInWithRedirect(auth, provider);
+    if (e.code==='auth/popup-closed-by-user') return;
+    if (e.code==='auth/unauthorized-domain') return toast('Diese Adresse ist in Firebase noch nicht freigegeben (Authentication → Einstellungen → Autorisierte Domains).');
+    toast('Anmeldung fehlgeschlagen: '+(e.code||e.message));
+  }
+});
+getRedirectResult(auth).catch(e => console.warn(e));
+
+onAuthStateChanged(auth, u => {
+  authUser = u;
+  if (!u){ stopAll(); uid=null; P=null; $('top').hidden = true; for (const v of ['table','players','account']) $('view-'+v).hidden = true; $('view-login').hidden = false; return; }
+  uid = u.uid; $('view-login').hidden = true; $('top').hidden = false; setTab(tab); startData();
+});
+
+/* ---------- data ---------- */
+let heartbeat=null, intervals=[];
+function startData(){
+  unsubP = onSnapshot(collection(fs,'players'), snap => {
+    const next = {}; snap.docs.forEach(d => next[d.id] = d.data());
+    players = next;
+    const mine = next[uid];
+    if (mine && !snap.metadata.hasPendingWrites && (!P || (mine.updated||0) >= (P.updated||0))) P = structuredClone(mine);
+    if (!snap.metadata.fromCache && !mine && !P) createPlayer();
+    if (P && P.table && !tid) openTable(P.table);
+    reconcile(); renderAll();
+  }, e => { console.warn(e); toast('Keine Verbindung zur Datenbank. Prüfe die Sicherheitsregeln.'); });
+  const beat = () => { if (P && document.visibilityState==='visible') updateDoc(doc(fs,'players',uid), { seen: Date.now() }).catch(()=>{}); };
+  heartbeat = setInterval(beat, 45000);
+  document.addEventListener('visibilitychange', beat);
+  intervals = [setInterval(leaseLoop, 4000), setInterval(hostTick, 350), setInterval(tickTimers, 500), setInterval(renderAll, 30000)];
+}
+function stopAll(){
+  unsubP && unsubP(); unsubP=null; closeTable();
+  clearInterval(heartbeat); intervals.forEach(clearInterval); intervals=[];
+}
+async function createPlayer(){
+  if (P) return;
+  let name = (authUser?.displayName || '').split(' ')[0] || 'Spieler';
+  name = name.slice(0,20);
+  let code; const taken = new Set(Object.values(players).map(p=>p.code));
+  do { code = genCode(6); } while (taken.has(code));
+  const d = { name, code, balance: START, friends: [], table: null, ledger: null,
+    limits: { win: null, loss: null, base: START },
+    stats: { hands:0, wins:0, losses:0, pushes:0, bj:0, bankrupts:0, net:0, best:0 },
+    created: Date.now(), updated: Date.now(), seen: Date.now() };
+  P = d; renderAll();
+  try { await setDoc(doc(fs,'players',uid), d); } catch(e){ handleWriteErr(e); }
+}
+
+/* ---------- tables ---------- */
+function openTable(id){
+  if (tid === id) return;
+  closeTable();
+  tid = id; T = null; seats = {}; anim.prime = true;
+  setTimeout(leaseLoop, 300);
+  unsubT = onSnapshot(doc(fs,'tables',id), s => {
+    if (!s.exists()){ if (!s.metadata.fromCache && tid===id){ T=null; renderAll(); } return; }
+    T = s.data(); pendingAct = false; reconcile(); renderAll();
+  }, e => console.warn(e));
+  unsubS = onSnapshot(query(collection(fs,'seats'), where('table','==',id)), s => {
+    const n = {}; s.docs.forEach(d => n[d.id] = d.data()); seats = n; renderAll();
+  }, e => console.warn(e));
+}
+function closeTable(){
+  unsubT && unsubT(); unsubS && unsubS(); unsubT = unsubS = null;
+  tid=null; T=null; seats={}; amHost=false;
+}
+async function createTable(){
+  let id;
+  for (let i=0;i<5;i++){ id = genCode(5); const s = await getDoc(doc(fs,'tables',id)); if (!s.exists()) break; }
+  const t = { name: (P?.name||'Spieler')+'s Tisch', phase:'betting', round:1, shoe:newShoe(), dealer:[], hands:{}, order:[],
+    turn:null, history:{}, acts:{}, reveal:false, betUntil:null, created:Date.now() };
+  try { await setDoc(doc(fs,'tables',id), t); } catch(e){ return handleWriteErr(e); }
+  await sitAt(id);
+}
+async function joinByCode(code){
+  code = (code||'').trim().toUpperCase().replace(/[^A-Z0-9]/g,'');
+  if (code.length !== 5) return toast('Ein Tisch-Code hat 5 Zeichen.');
+  const s = await getDoc(doc(fs,'tables',code));
+  if (!s.exists()) return toast('Kein Tisch mit diesem Code gefunden.');
+  const c = await getDocs(query(collection(fs,'seats'), where('table','==',code)));
+  const active = c.docs.filter(d => d.id!==uid && isOnline(d.id) && players[d.id]?.table===code).length;
+  if (active >= MAX_SEATS) return toast('Der Tisch ist voll (5 Plätze).');
+  await sitAt(code);
+}
+async function sitAt(id){
+  await seatWrite({ table:id, joined:Date.now(), ready:false, round:-1, bet:0, act:null }, 'set');
+  await withPlayer(d => { d.table = id; return true; });
+  openTable(id); setTab('table');
+}
+async function leaveTable(){
+  const mid = T && T.hands && T.hands[uid] && T.phase!=='betting' && T.phase!=='done';
+  if (mid && !confirmLeave){ confirmLeave = true; renderAll(); return; }
+  confirmLeave = false;
+  await seatWrite(null,'delete');
+  await withPlayer(d => { d.table = null; return true; });
+  closeTable(); renderAll();
+}
+
+/* ---------- player actions ---------- */
+async function placeBet(){
+  if (!T || T.phase!=='betting') return;
+  const lim = limitState();
+  if (lim?.hit) return toast(lim.hit==='win' ? 'Gewinnziel erreicht. Starte im Konto eine neue Session.' : 'Stop-Loss erreicht. Starte im Konto eine neue Session.');
+  if (bet < MIN_BET || bet > MAX_BET) return toast('Einsatz zwischen 100 und 50.000 Legats.');
+  if (bet > P.balance) return toast('Nicht genug Legats.');
+  await seatWrite({ ready:true, round:T.round, bet });
+}
+async function unBet(){ await seatWrite({ ready:false }); }
+async function act(type){
+  if (!T || T.phase!=='playing' || !T.turn || T.turn.u!==uid || pendingAct) return;
+  const H = T.hands[uid][T.turn.h];
+  if ((type==='double' || type==='split') && P.balance < H.bet) return toast('Nicht genug Legats für '+(type==='double'?'Verdoppeln':'Teilen')+'.');
+  pendingAct = true; renderAll();
+  await seatWrite({ act: { type, h:T.turn.h, round:T.round, seq:Date.now() } });
+  setTimeout(()=>{ if(pendingAct){ pendingAct=false; renderAll(); } }, 4000);
+}
+
+/* ---------- money: reconcile my balance with the table ---------- */
+function applyResult(d, r){
+  d.balance += r.pay;
+  const st = d.stats;
+  st.hands += r.n; st.wins += r.w; st.losses += r.l; st.pushes += r.p; st.bj += r.bj;
+  st.net += r.pay - r.bet; st.best = Math.max(st.best||0, r.pay - r.bet);
+}
+function reconcile(){
+  if (!P || !T || !tid) return;
+  withPlayer(d => {
+    let changed = false;
+    const key = tid+':'+T.round;
+    const L = d.ledger;
+    if (L && !L.settled && L.key !== key){
+      const [lt, lr] = L.key.split(':');
+      const h = lt===tid ? T.history?.[lr]?.[uid] : null;
+      if (h) applyResult(d, h);
+      else { d.stats.hands += 1; d.stats.losses += 1; d.stats.net -= L.committed; }
+      d.ledger = { ...L, settled:true }; changed = true;
+    }
+    const mine = T.hands?.[uid];
+    if (mine && T.phase!=='betting'){
+      const committed = mine.reduce((s,h)=>s+h.bet, 0);
+      if (!d.ledger || d.ledger.key !== key){ d.ledger = { key, committed:0, settled:false }; changed = true; }
+      if (!d.ledger.settled && committed > d.ledger.committed){
+        d.balance = Math.max(0, d.balance - (committed - d.ledger.committed)); d.ledger.committed = committed; changed = true;
+      }
+      if (T.phase==='done' && !d.ledger.settled){
+        const h = T.history?.[T.round]?.[uid];
+        if (h){ applyResult(d, h); d.ledger.settled = true; changed = true; }
+      }
+    }
+    return changed;
+  });
+}
+
+/* ---------- dealer: one browser at the table runs it (lease) ---------- */
+async function leaseLoop(){
+  if (!tid || !uid){ amHost=false; return; }
+  const ref = doc(fs,'locks',tid);
+  try {
+    amHost = await runTransaction(fs, async tx => {
+      const s = await tx.get(ref); const d = s.exists() ? s.data() : {}; const now = Date.now();
+      if (!d.holder || d.holder===uid || (d.exp||0) < now){
+        if (d.holder===uid && (d.exp||0) - now > 8000) return true;   // still fresh, skip a write
+        tx.set(ref, { holder: uid, exp: now + 15000 }); return true;
+      }
+      return false;
+    });
+  } catch(e){ amHost = false; }
+}
+function presentSeat(u){ return !!seats[u] && isOnline(u) && (u===uid || players[u]?.table===tid); }
+function draw(nt){ if (!nt.shoe.length) nt.shoe = newShoe(); return nt.shoe.pop(); }
+function nextTurn(nt, fromU, fromH, now){
+  const order = nt.order; let i = fromU ? order.indexOf(fromU) : 0;
+  for (; i<order.length; i++){
+    const u = order[i], hs = nt.hands[u];
+    for (let h = (u===fromU ? fromH+1 : 0); h<hs.length; h++){
+      const H = hs[h];
+      if (H.st !== 'play') continue;
+      if (H.c.length===1) H.c.push(draw(nt));
+      if (score(H.c).t >= 21){ H.st = score(H.c).t>21 ? 'bust' : 'stand'; continue; }
+      return { u, h, until: now + TURN_MS };
+    }
+  }
+  return null;
+}
+function advance(nt, now){
+  const t = nextTurn(nt, nt.turn?.u, nt.turn?.h ?? -1, now);
+  if (t) nt.turn = t; else { nt.turn = null; nt.phase = 'dealer'; nt.dAt = now; }
+}
+function dealDuration(n){ return reduceMotion ? 0 : (2*(n+1))*170 + 500; }
+function deal(nt, ready, now){
+  if (nt.shoe.length < 80){ nt.shoe = newShoe(); nt.shuffledAt = nt.round; }
+  ready.sort((a,b)=>(a[1].joined||0)-(b[1].joined||0));
+  nt.order = ready.map(r=>r[0]);
+  nt.hands = {}; for (const [u,s] of ready) nt.hands[u] = [{ c:[], bet:s.bet, st:'play' }];
+  nt.dealer = [];
+  for (let k=0;k<2;k++){ for (const u of nt.order) nt.hands[u][0].c.push(draw(nt)); nt.dealer.push(draw(nt)); }
+  for (const u of nt.order){ const H = nt.hands[u][0]; if (score(H.c).t===21) H.st='bj'; }
+  nt.betUntil = null; nt.reveal = false; nt.turn = null;
+  const wait = dealDuration(nt.order.length);
+  const peek = cval(nt.dealer[0]) >= 10 && score(nt.dealer).t === 21;
+  if (peek){ nt.phase='dealer'; nt.dAt=now + wait; return; }
+  nt.phase = 'playing'; nt.turn = { u:null, h:-1 };
+  const t = nextTurn(nt, null, -1, now + wait);
+  if (t) nt.turn = t; else { nt.turn=null; nt.phase='dealer'; nt.dAt=now + wait; }
+}
+function applyAct(nt, type, now){
+  const { u, h } = nt.turn, hs = nt.hands[u], H = hs[h];
+  if (type==='hit'){
+    H.c.push(draw(nt)); const t = score(H.c).t;
+    if (t>21) H.st='bust'; else if (t===21) H.st='stand';
+    if (H.st!=='play') advance(nt, now); else nt.turn.until = now + TURN_MS;
+  } else if (type==='stand'){
+    H.st='stand'; advance(nt, now);
+  } else if (type==='double'){
+    if (H.c.length!==2 || H.sa) return;
+    H.bet *= 2; H.dbl = true; H.c.push(draw(nt));
+    H.st = score(H.c).t>21 ? 'bust' : 'stand'; advance(nt, now);
+  } else if (type==='split'){
+    if (H.c.length!==2 || H.sa || hs.length>=4 || cval(H.c[0])!==cval(H.c[1])) return;
+    const aces = H.c[0][0]==='A';
+    const H2 = { c:[H.c.pop()], bet:H.bet, st:'play', sp:true };
+    H.sp = true; hs.splice(h+1, 0, H2);
+    H.c.push(draw(nt));
+    if (aces){ H2.c.push(draw(nt)); H.st = H2.st = 'stand'; H.sa = H2.sa = true; advance(nt, now); }
+    else if (score(H.c).t===21){ H.st='stand'; advance(nt, now); }
+    else nt.turn.until = now + TURN_MS;
+  }
+}
+function settle(nt){
+  const d = score(nt.dealer).t, dBJ = nt.dealer.length===2 && d===21;
+  const hist = {};
+  for (const u of nt.order){
+    const r = { pay:0, bet:0, n:0, w:0, l:0, p:0, bj:0 };
+    for (const H of nt.hands[u]){
+      const s = score(H.c).t, nat = H.st==='bj';
+      if (H.st==='bust'){ H.res='lose'; H.pay=0; }
+      else if (nat && !dBJ){ H.res='bj'; H.pay=Math.floor(H.bet*2.5); }
+      else if (dBJ){ H.res = nat?'push':'lose'; H.pay = nat?H.bet:0; }
+      else if (d>21 || s>d){ H.res='win'; H.pay=H.bet*2; }
+      else if (s===d){ H.res='push'; H.pay=H.bet; }
+      else { H.res='lose'; H.pay=0; }
+      r.pay += H.pay; r.bet += H.bet; r.n++;
+      if (H.res==='win') r.w++; else if (H.res==='bj'){ r.w++; r.bj++; } else if (H.res==='push') r.p++; else r.l++;
+    }
+    hist[u] = r;
+  }
+  nt.history = nt.history || {};
+  nt.history[nt.round] = hist;
+  for (const k of Object.keys(nt.history)) if (+k < nt.round - 8) delete nt.history[k];
+}
+function step(nt, now){
+  const seatList = Object.entries(seats);
+  switch (nt.phase){
+    case 'betting': {
+      const present = seatList.filter(([u]) => presentSeat(u));
+      const ready = present.filter(([,s]) => s.ready && s.round===nt.round && s.bet>=MIN_BET && s.bet<=MAX_BET);
+      if (!ready.length){ if (nt.betUntil){ nt.betUntil=null; return true; } return false; }
+      if (!nt.betUntil){ nt.betUntil = now + BET_MS; if (ready.length < present.length) return true; }
+      if (ready.length === present.length || now >= nt.betUntil){ deal(nt, ready, now); return true; }
+      return false;
+    }
+    case 'playing': {
+      const t = nt.turn; if (!t){ nt.phase='dealer'; nt.dAt=now; return true; }
+      const s = seats[t.u]; nt.acts = nt.acts || {};
+      if (s && s.act && s.act.round===nt.round && s.act.seq > (nt.acts[t.u]||0)){
+        nt.acts[t.u] = s.act.seq;
+        if (s.act.h === t.h) applyAct(nt, s.act.type, now);
+        return true;
+      }
+      if (now > t.until || !seats[t.u]){ nt.hands[t.u][t.h].st='stand'; advance(nt, now); return true; }
+      return false;
+    }
+    case 'dealer': {
+      if (now - (nt.dAt||0) < 800) return false;
+      if (!nt.reveal){ nt.reveal = true; nt.dAt = now; return true; }
+      const live = nt.order.some(u => nt.hands[u].some(H => H.st==='stand'));
+      if (live && score(nt.dealer).t < 17){ nt.dealer.push(draw(nt)); nt.dAt = now; return true; }
+      settle(nt); nt.phase='done'; nt.doneAt=now; return true;
+    }
+    case 'done': {
+      if (now - (nt.doneAt||0) < 5500) return false;
+      nt.phase='betting'; nt.round += 1; nt.hands={}; nt.dealer=[]; nt.order=[]; nt.turn=null; nt.reveal=false; nt.betUntil=null;
+      return true;
+    }
+  }
+  return false;
+}
+async function hostTick(){
+  if (!amHost || hostBusy || !T || !tid) return;
+  hostBusy = true;
+  try {
+    const nt = structuredClone(T);
+    if (step(nt, Date.now())){
+      T = nt; reconcile(); renderAll();
+      await setDoc(doc(fs,'tables',tid), nt);
+    }
+  } catch(e){ console.warn(e); }
+  finally { hostBusy = false; }
+}
+
+/* ---------- card animation: cards fly out of the shoe and flip ---------- */
+const anim = { seen: new Map(), prime: false };
+const FLY_MS = 520, FLIP_MS = 420, STAGGER = 170;
+function cardHTML(c, key, down, ord){
+  const r = c[0]==='T' ? '10' : c[0], s = SUIT[c[1]], red = c[1]==='H'||c[1]==='D';
+  return `<div class="c${red?' red':''}${down?' down':''}" data-k="${key}" data-o="${ord ?? 999}" aria-label="${down?'verdeckte Karte':r+s}">
+    <div class="ci"><div class="cf">${down?'':`<span class="r">${r}</span><span class="s">${s}</span><span class="big">${s}</span>`}</div><div class="cb"></div></div></div>`;
+}
+function animateCards(root){
+  const els = [...root.querySelectorAll('.c[data-k]')];
+  const now = performance.now();
+  const shoe = root.querySelector('.shoe');
+  if (anim.prime && T){ for (const el of els) anim.seen.set(el.dataset.k, { t0:-1e9, delay:0, down: el.classList.contains('down') }); anim.prime = false; return; }
+  const fresh = els.filter(el => !anim.seen.has(el.dataset.k)).sort((a,b)=>(+a.dataset.o)-(+b.dataset.o));
+  fresh.forEach((el,i) => anim.seen.set(el.dataset.k, { t0: now, delay: i*STAGGER, down: el.classList.contains('down'), fresh:true }));
+  if (reduceMotion) return;
+  const sr = shoe?.getBoundingClientRect();
+  for (const el of els){
+    const a = anim.seen.get(el.dataset.k);
+    const down = el.classList.contains('down');
+    const elapsed = now - a.t0;
+    if (a.fresh && elapsed < a.delay + FLY_MS + FLIP_MS){
+      const r = el.getBoundingClientRect();
+      const dx = sr ? (sr.left + sr.width/2) - (r.left + r.width/2) : 0, dy = sr ? (sr.top + sr.height/2) - (r.top + r.height/2) : -60;
+      const fly = el.animate([
+        { transform:`translate(${dx}px,${dy}px) rotate(-28deg) scale(.82)`, offset:0 },
+        { transform:'translate(0,0) rotate(0) scale(1)' }
+      ], { duration: FLY_MS, delay: a.delay, easing:'cubic-bezier(.18,.82,.26,1)', fill:'backwards' });
+      fly.currentTime = elapsed;
+      if (!down){
+        const flip = el.firstElementChild.animate([
+          { transform:'rotateY(180deg)' }, { transform:'rotateY(180deg)', offset:.5 }, { transform:'rotateY(0deg)' }
+        ], { duration: FLY_MS + FLIP_MS*.6, delay: a.delay, easing:'ease-out', fill:'backwards' });
+        flip.currentTime = elapsed;
+      }
+    }
+    if (a.down && !down && !a.flipT0) a.flipT0 = now;      // hole card turned over
+    a.down = down;
+    if (a.flipT0 && now - a.flipT0 < FLIP_MS + 60){
+      const f = el.firstElementChild.animate([{ transform:'rotateY(180deg) scale(1.08)' }, { transform:'rotateY(0deg) scale(1)' }], { duration: FLIP_MS, easing:'ease-out' });
+      f.currentTime = now - a.flipT0;
+    }
+  }
+  if (anim.seen.size > 400){ const keep = new Set(els.map(e=>e.dataset.k)); for (const k of anim.seen.keys()) if (!keep.has(k)) anim.seen.delete(k); }
+}
+
+/* ---------- rendering ---------- */
+const RES = { win:'Gewonnen', bj:'Blackjack!', lose:'Verloren', push:'Unentschieden' };
+function renderTop(){
+  const b = $('pbal');
+  if (P && lastBal !== null && P.balance !== lastBal){
+    b.classList.remove('up','down'); void b.offsetWidth; b.classList.add(P.balance > lastBal ? 'up' : 'down');
+    setTimeout(()=>b.classList.remove('up','down'), 1200);
+  }
+  lastBal = P ? P.balance : null;
+  b.textContent = P ? fmt(P.balance)+' ℒ' : '–';
+  $('pname').textContent = P ? P.name : 'Konto';
+}
+function renderLobby(){
+  const fr = friendIds().filter(id => players[id].table && isOnline(id));
+  const tables = {};
+  for (const id of fr) (tables[players[id].table] ||= []).push(id);
+  const list = Object.entries(tables).map(([t, ids]) => `
+    <div class="lobby-item"><div><b>${ids.map(i=>esc(nameOf(i))).join(', ')}</b> <span class="muted">am Tisch</span> <span class="num">${esc(t)}</span></div>
+    <button class="btn sm gold" data-act="join" data-id="${esc(t)}">Mitspielen</button></div>`).join('');
+  return `<div class="stack">
+    <div class="felt"><div class="arc">Blackjack zahlt <em>3 zu 2</em> · Dealer steht auf allen <em>17</em></div>
+      <div class="dealer"><p class="muted" style="text-align:center;max-width:46ch">Eröffne einen Tisch und gib den Code an deine Freunde weiter, oder setz dich an einen bestehenden Tisch. Allein spielen geht auch. Bis zu 5 Spieler pro Tisch.</p></div>
+    </div>
+    ${isBroke() ? reviveBox() : ''}
+    <div class="grid2">
+      <div class="panel stack"><h3>Neuer Tisch</h3><p class="muted">Du bekommst einen 5-stelligen Code für deine Freunde.</p>
+        <div><button class="btn gold" data-act="create" ${!P?'disabled':''}>Tisch eröffnen</button></div></div>
+      <div class="panel stack"><h3>Mit Code beitreten</h3>
+        <div class="row"><div class="field" style="flex:1"><label for="tcode">Tisch-Code</label><input id="tcode" maxlength="5" placeholder="z. B. K7QXM" autocomplete="off" autocapitalize="characters" style="text-transform:uppercase"></div>
+        <button class="btn" data-act="joincode" style="align-self:flex-end" ${!P?'disabled':''}>Beitreten</button></div></div>
+    </div>
+    <div class="panel stack"><h3>Freunde am Tisch</h3>${list || '<p class="muted">Gerade sitzt keiner deiner Freunde an einem Tisch.</p>'}</div>
+  </div>`;
+}
+function reviveBox(){
+  return `<div class="note bad stack"><p><b>Du bist pleite.</b> Du kannst dich wiederbeleben und bekommst ${fmt(START)} Legats. Das zählt als Niederlage in deiner Statistik und deine Freunde sehen es.</p>
+  <div><button class="btn gold" data-act="revive">Wiederbeleben (+${fmt(START)} ℒ)</button></div></div>`;
+}
+function handsHTML(u){
+  const hs = T.hands?.[u]; if (!hs) return '';
+  const n = T.order.length, i0 = T.order.indexOf(u);
+  return `<div class="hands">${hs.map((H,i)=>{
+    const active = T.phase==='playing' && T.turn?.u===u && T.turn?.h===i && hs.length>1;
+    const res = H.res ? `<span class="res ${H.res}">${RES[H.res]}${H.pay>H.bet?' +'+fmt(H.pay-H.bet):''}</span>` :
+      H.st==='bust' ? '<span class="res lose">Überkauft</span>' : H.st==='bj' ? '<span class="res bj">Blackjack</span>' : '';
+    const won = H.res==='win' || H.res==='bj';
+    return `<div class="hbox${active?' active':''}${won?' won':''}"><div class="cards">${H.c.map((c,k)=>cardHTML(c, `${tid}-${T.round}-${u}-${i}-${k}`, false, (i===0 && k<2 && !H.sp) ? k*(n+1)+i0 : 999)).join('')}</div>
+      <div class="row" style="justify-content:center;gap:6px"><span class="score">${scoreLabel(H.c)}</span><span class="chip-bet">${fmt(H.bet)}${H.dbl?' ×2':''}</span></div>${res}</div>`;
+  }).join('')}</div>`;
+}
+function renderTableView(){
+  if (!T) return `<div class="panel stack"><p class="muted">Tisch ${esc(tid)} wird geladen …</p><div><button class="btn sm" data-act="leave">Zurück zur Lobby</button></div></div>`;
+  const showHole = T.reveal || T.phase==='done';
+  const n = T.order.length;
+  const dScore = T.dealer.length ? (showHole ? scoreLabel(T.dealer) : scoreLabel([T.dealer[0]])) : '';
+  const dealerCards = T.dealer.map((c,i)=>cardHTML(c, `${tid}-${T.round}-d-${i}`, i===1 && !showHole, i<2 ? i*(n+1)+n : 999)).join('');
+  let status = '';
+  if (T.phase==='betting') status = T.betUntil ? `Karten kommen in <span class="num" data-until="${T.betUntil}"></span> s` : 'Einsätze bitte';
+  else if (T.phase==='playing' && T.turn) status = T.turn.u===uid ? 'Du bist dran' : `${esc(nameOf(T.turn.u))} ist dran`;
+  else if (T.phase==='dealer') status = showHole ? 'Dealer zieht …' : 'Dealer deckt auf …';
+  else if (T.phase==='done'){ const d = score(T.dealer).t; status = d>21 ? 'Dealer überkauft' : (T.dealer.length===2&&d===21 ? 'Dealer hat Blackjack' : 'Dealer hat '+d); }
+
+  const ids = Object.keys(seats).filter(u => u===uid || presentSeat(u) || T.hands?.[u]).sort((a,b)=>(seats[a].joined||0)-(seats[b].joined||0));
+  if (!ids.includes(uid)) ids.unshift(uid);
+  const seatHTML = ids.map(u => {
+    const s = seats[u] || {}, me = u===uid, turn = T.phase==='playing' && T.turn?.u===u;
+    let sub = '';
+    if (T.phase==='betting') sub = s.ready && s.round===T.round ? `Setzt <span class="num">${fmt(s.bet)}</span>` : 'Überlegt …';
+    else if (!T.hands?.[u]) sub = 'Wartet auf die nächste Runde';
+    const t = turn ? `<span class="timer">noch <span data-until="${T.turn.until}"></span> s</span>` : '';
+    return `<div class="seat${me?' me':''}${turn?' turn':''}"><div class="nm"><span class="dot${isOnline(u)?' on':''}"></span>${esc(nameOf(u))}${me?' (du)':''}</div>
+      ${handsHTML(u)}<div class="sub">${sub}</div>${t}</div>`;
+  }).join('');
+
+  const lim = limitState();
+  let controls = '';
+  if (isBroke()) controls = reviveBox();
+  else if (T.phase==='betting'){
+    const mySeat = seats[uid];
+    const ready = mySeat?.ready && mySeat.round===T.round;
+    const max = Math.min(MAX_BET, P?.balance||0);
+    if (lim?.hit) controls = `<div class="note">${lim.hit==='win'?'Dein Gewinnziel ist erreicht':'Dein Stop-Loss ist erreicht'} (${lim.profit>=0?'+':''}${fmt(lim.profit)} ℒ). Im Konto kannst du eine neue Session starten oder das Limit ändern.</div>`;
+    else if (ready) controls = `<p>Dein Einsatz: <b class="num">${fmt(mySeat.bet)} ℒ</b>. Warte auf die anderen …</p><button class="btn sm" data-act="unbet">Einsatz zurückziehen</button>`;
+    else controls = `
+      <div class="chips">${CHIPS.map(([v,cl,l])=>`<button class="chip ${cl}" data-act="chip" data-v="${v}" ${bet+v>max?'disabled':''} aria-label="${fmt(v)} hinzufügen">${l}</button>`).join('')}</div>
+      <div class="betline"><button class="btn sm" data-act="betclear">Löschen</button><span class="betval">${fmt(bet)}</span><button class="btn sm" data-act="betmax">Max</button></div>
+      <button class="btn gold" data-act="bet" ${bet<MIN_BET||bet>max?'disabled':''}>Setzen</button>
+      <p class="muted" style="font-size:12px">Einsatz 100 – 50.000 Legats</p>`;
+  } else if (T.phase==='playing' && T.turn?.u===uid){
+    const H = T.hands[uid][T.turn.h];
+    const canDbl = H.c.length===2 && !H.sa && P.balance>=H.bet;
+    const canSplit = H.c.length===2 && !H.sa && T.hands[uid].length<4 && cval(H.c[0])===cval(H.c[1]) && P.balance>=H.bet;
+    const dis = pendingAct ? 'disabled' : '';
+    controls = `<div class="acts">
+      <button class="btn gold" data-act="hit" ${dis}>Karte</button>
+      <button class="btn gold" data-act="stand" ${dis}>Halten</button>
+      <button class="btn" data-act="double" ${dis} ${canDbl?'':'disabled'}>Verdoppeln</button>
+      <button class="btn" data-act="split" ${dis} ${canSplit?'':'disabled'}>Teilen</button></div>`;
+  } else if (T.phase==='done' && T.history?.[T.round]?.[uid]){
+    const r = T.history[T.round][uid], net = r.pay - r.bet;
+    controls = `<p class="net" style="color:${net>0?'var(--win)':net<0?'var(--lose)':'var(--push)'}">${net>0?'+':''}${fmt(net)} ℒ</p>`;
+  }
+  const leaveTxt = confirmLeave ? 'Wirklich gehen? Laufender Einsatz ist verloren' : 'Tisch verlassen';
+  return `<div class="felt">
+    <div class="shoe" aria-hidden="true"></div>
+    <div class="felt-head"><div class="tcode">Tisch-Code <b>${esc(tid)}</b> <button class="btn sm" data-act="copytable" style="margin-left:6px">Kopieren</button></div>
+      <button class="btn sm" data-act="leave">${leaveTxt}</button></div>
+    <div class="arc">Blackjack zahlt <em>3 zu 2</em> · Dealer steht auf allen <em>17</em></div>
+    <div class="dealer"><div class="who">Dealer</div><div class="hand"><div class="cards">${dealerCards}</div></div>${dScore?`<span class="score">${dScore}</span>`:''}</div>
+    <div class="status">${status}</div>
+    <div class="seats">${seatHTML}</div>
+    <div class="controls">${controls}</div>
+  </div>
+  <p class="muted" style="font-size:12px;margin-top:10px">6 Decks · Verdoppeln auf zwei Karten · Teilen bis zu 4 Hände (Asse nur einmal, je eine Karte) · Dealer prüft bei Ass/10 auf Blackjack · 30 s Bedenkzeit, danach wird gehalten.</p>`;
+}
+let lastTableHTML = '';
+function renderTable(){
+  const el = $('view-table');
+  let html;
+  if (!P) html = `<div class="panel"><p class="muted">Dein Konto wird geladen …</p></div>`;
+  else html = tid ? renderTableView() : renderLobby();
+  if (html === lastTableHTML) return;        // nothing changed: keep running animations untouched
+  lastTableHTML = html;
+  const keep = $('tcode')?.value;
+  el.innerHTML = html;
+  if (keep && $('tcode')) $('tcode').value = keep;
+  animateCards(el);
+}
+function renderPlayers(){
+  const el = $('view-players');
+  if (!P){ el.innerHTML = `<div class="panel"><p class="muted">Lädt …</p></div>`; return; }
+  const ids = boardMode==='friends' ? [uid, ...friendIds()] : [...new Set([uid, ...Object.keys(players)])];
+  const rows = ids.map(id => [id, id===uid ? P : players[id]]).filter(r=>r[1]).sort((a,b)=>b[1].balance-a[1].balance);
+  const tr = rows.map(([id,p],i)=>{
+    const s = p.stats||{};
+    return `<tr class="${id===uid?'me':''}"><td class="rank">${i+1}</td>
+      <td><span class="dot${isOnline(id)?' on':''}"></span><b>${esc(p.name)}</b>${id===uid?' <span class="muted">(du)</span>':''}${p.table && isOnline(id)?` <span class="pill">am Tisch</span>`:''}</td>
+      <td class="r num"><b style="color:var(--brass)">${fmt(p.balance)}</b></td>
+      <td class="r num">${s.hands||0}</td>
+      <td class="r num">${s.wins||0} / ${s.losses||0} / ${s.pushes||0}</td>
+      <td class="r num">${s.bankrupts ? `<span class="pill bad">${s.bankrupts}× pleite</span>` : '0'}</td>
+      <td class="r num" style="color:${(s.net||0)>=0?'var(--win)':'var(--lose)'}">${(s.net||0)>=0?'+':''}${fmt(s.net||0)}</td></tr>`;
+  }).join('');
+  const keep = $('fcode')?.value;
+  el.innerHTML = `<div class="stack">
+    <div class="panel stack">
+      <div class="row" style="justify-content:space-between"><h2>Rangliste</h2>
+      <div class="seg"><button data-act="mode" data-v="friends" aria-pressed="${boardMode==='friends'}">Freunde</button><button data-act="mode" data-v="all" aria-pressed="${boardMode==='all'}">Alle</button></div></div>
+      <div class="scroll"><table class="board"><thead><tr><th>#</th><th>Spieler</th><th class="r">Legats</th><th class="r">Hände</th><th class="r">S / N / U</th><th class="r">Pleiten</th><th class="r">Bilanz</th></tr></thead>
+      <tbody>${tr}</tbody></table></div>
+      ${boardMode==='friends' && rows.length<2 ? '<p class="muted">Noch keine Freunde. Tausche unten eure Freundescodes aus.</p>' : ''}
+      <p class="muted" style="font-size:12px">S / N / U = gewonnene / verlorene / unentschiedene Hände. Jede Pleite mit Wiederbelebung zählt als Niederlage.</p>
+    </div>
+    <div class="grid2">
+      <div class="panel stack"><h3>Dein Freundescode</h3><div class="row"><span class="code">${esc(P.code)}</span><button class="btn sm" data-act="copycode">Kopieren</button></div>
+        <p class="muted">Gib diesen Code an Freunde. Sobald einer von euch den Code des anderen eingibt, seid ihr befreundet.</p></div>
+      <div class="panel stack"><h3>Freund hinzufügen</h3>
+        <div class="row"><div class="field" style="flex:1"><label for="fcode">Freundescode</label><input id="fcode" maxlength="6" placeholder="z. B. 7KD2QX" autocomplete="off" autocapitalize="characters" style="text-transform:uppercase"></div>
+        <button class="btn gold" data-act="addfriend" style="align-self:flex-end">Hinzufügen</button></div></div>
+    </div>
+  </div>`;
+  if (keep && $('fcode')) $('fcode').value = keep;
+}
+function renderAccount(){
+  const el = $('view-account');
+  if (!P){ el.innerHTML = `<div class="panel"><p class="muted">Lädt …</p></div>`; return; }
+  const L = P.limits||{}, lim = limitState();
+  el.innerHTML = `<div class="stack">
+    ${isBroke() ? reviveBox() : ''}
+    <div class="panel stack"><div class="row" style="justify-content:space-between"><h2>${esc(P.name)}</h2><button class="btn sm" data-act="logout">Abmelden</button></div>
+      <p class="muted" style="font-size:12px">Angemeldet als ${esc(authUser?.email||'')}</p><div id="acc-stats"></div></div>
+    <div class="grid2">
+      <div class="panel stack"><h3>Spielername</h3>
+        <div class="row"><div class="field" style="flex:1"><label for="aname">So sehen dich deine Freunde</label><input id="aname" maxlength="20" value="${esc(P.name)}"></div>
+        <button class="btn" data-act="savename" style="align-self:flex-end">Speichern</button></div></div>
+      <div class="panel stack"><h3>Gewinnziel &amp; Stop-Loss</h3>
+        <p class="muted">Freiwillig. Gemessen ab Session-Start (<span class="num">${fmt(L.base ?? P.balance)} ℒ</span>). Ist ein Limit erreicht, kannst du nicht mehr setzen, bis du eine neue Session startest.</p>
+        <div class="row"><div class="field" style="flex:1 1 120px"><label for="lwin">Gewinnziel (+ℒ)</label><input id="lwin" type="number" min="100" step="100" inputmode="numeric" placeholder="aus" value="${L.win||''}"></div>
+        <div class="field" style="flex:1 1 120px"><label for="lloss">Stop-Loss (−ℒ)</label><input id="lloss" type="number" min="100" step="100" inputmode="numeric" placeholder="aus" value="${L.loss||''}"></div></div>
+        <div class="row"><button class="btn gold" data-act="savelimits">Speichern</button><button class="btn" data-act="newsession">Neue Session starten</button></div>
+        ${lim ? `<p class="${lim.hit?'note':''}">Session: <b class="num" style="color:${lim.profit>=0?'var(--win)':'var(--lose)'}">${lim.profit>=0?'+':''}${fmt(lim.profit)} ℒ</b>${lim.hit? ' · '+(lim.hit==='win'?'Gewinnziel erreicht':'Stop-Loss erreicht'):''}</p>`:''}
+      </div>
+    </div>
+  </div>`;
+  renderAccountStats();
+}
+function renderAccountStats(){
+  const box = $('acc-stats'); if (!box || !P) return; const s = P.stats;
+  const q = s.hands ? Math.round((s.wins/s.hands)*100) : 0;
+  box.innerHTML = `<div class="statgrid">
+    <div class="stat"><small>Kontostand</small><b style="color:var(--brass)">${fmt(P.balance)}</b></div>
+    <div class="stat"><small>Hände</small><b>${s.hands}</b></div>
+    <div class="stat"><small>Gewonnen</small><b style="color:var(--win)">${s.wins}</b></div>
+    <div class="stat"><small>Verloren</small><b style="color:var(--lose)">${s.losses}</b></div>
+    <div class="stat"><small>Unentschieden</small><b>${s.pushes}</b></div>
+    <div class="stat"><small>Blackjacks</small><b>${s.bj}</b></div>
+    <div class="stat"><small>Siegquote</small><b>${q}%</b></div>
+    <div class="stat"><small>Größter Gewinn</small><b>${fmt(s.best||0)}</b></div>
+    <div class="stat"><small>Bilanz</small><b style="color:${s.net>=0?'var(--win)':'var(--lose)'}">${s.net>=0?'+':''}${fmt(s.net)}</b></div>
+    <div class="stat"><small>Pleiten (Niederlagen)</small><b style="color:${s.bankrupts?'var(--lose)':'inherit'}">${s.bankrupts}</b></div>
+  </div>`;
+}
+let rq = false;
+function renderAll(){
+  if (rq || !uid) return; rq = true;
+  requestAnimationFrame(() => {
+    rq=false; renderTop();
+    const typing = v => { const a=document.activeElement; return a && a.tagName==='INPUT' && $('view-'+v).contains(a); };
+    if (tab==='table' && !typing('table')) renderTable();
+    if (tab==='players' && !typing('players')) renderPlayers();
+    if (tab==='account'){ if (typing('account')) renderAccountStats(); else renderAccount(); }
+    tickTimers();
+  });
+}
+function tickTimers(){
+  for (const el of document.querySelectorAll('[data-until]')) el.textContent = Math.max(0, Math.ceil((+el.dataset.until - Date.now())/1000));
+}
+function setTab(t){
+  tab = t;
+  for (const b of document.querySelectorAll('nav.tabs button')) b.setAttribute('aria-selected', b.dataset.tab===t);
+  for (const v of ['table','players','account']) $('view-'+v).hidden = v!==t;
+  if (t==='table') { lastTableHTML = ''; anim.prime = true; }
+  renderAll();
+}
+
+/* ---------- events ---------- */
+async function copy(text, label){
+  try { await navigator.clipboard.writeText(text); toast(label+' kopiert'); } catch { toast(label+': '+text); }
+}
+document.addEventListener('click', async e => {
+  const tb = e.target.closest('[data-tab]'); if (tb){ setTab(tb.dataset.tab); return; }
+  const b = e.target.closest('[data-act]'); if (!b || b.disabled) return;
+  const a = b.dataset.act;
+  if (a!=='leave') confirmLeave = false;
+  switch (a){
+    case 'create': b.disabled = true; await createTable(); break;
+    case 'join': await sitAt(b.dataset.id); break;
+    case 'joincode': await joinByCode($('tcode').value); break;
+    case 'leave': await leaveTable(); break;
+    case 'copytable': copy(tid, 'Tisch-Code'); break;
+    case 'copycode': copy(P.code, 'Freundescode'); break;
+    case 'chip': bet = Math.min(MAX_BET, P.balance, (bet<MIN_BET?0:bet) + +b.dataset.v); renderAll(); break;
+    case 'betclear': bet = 0; renderAll(); break;
+    case 'betmax': bet = Math.max(0, Math.min(MAX_BET, Math.floor(P.balance/100)*100)); renderAll(); break;
+    case 'bet': await placeBet(); break;
+    case 'unbet': await unBet(); break;
+    case 'hit': case 'stand': case 'double': case 'split': await act(a); break;
+    case 'revive':
+      if (!isBroke()) return;
+      await withPlayer(d => { d.balance = START; d.stats.bankrupts += 1; d.limits = { ...(d.limits||{}), base: START }; d.ledger = null; return true; });
+      bet = 1000; toast('Wiederbelebt: 2.000 Legats'); break;
+    case 'mode': boardMode = b.dataset.v; renderAll(); break;
+    case 'addfriend': {
+      const code = $('fcode').value.trim().toUpperCase();
+      const hit = Object.entries(players).find(([id,p]) => p.code===code);
+      if (!hit) return toast('Kein Spieler mit diesem Code.');
+      if (hit[0]===uid) return toast('Das ist dein eigener Code.');
+      if (friendIds().includes(hit[0])) return toast('Ihr seid schon befreundet.');
+      await withPlayer(d => { d.friends = [...new Set([...(d.friends||[]), hit[0]])]; return true; });
+      $('fcode').value=''; document.activeElement?.blur(); toast('Du bist jetzt mit '+hit[1].name+' befreundet'); break;
+    }
+    case 'savename': {
+      const n = $('aname').value.trim().slice(0,20);
+      if (!n) return toast('Bitte gib einen Namen ein.');
+      await withPlayer(d => { if (d.name===n) return false; d.name = n; return true; });
+      document.activeElement?.blur(); toast('Name gespeichert'); renderAll(); break;
+    }
+    case 'savelimits': {
+      const w = parseInt($('lwin').value,10), l = parseInt($('lloss').value,10);
+      if ((w && w<100) || (l && l<100)) return toast('Limits ab 100 Legats, oder leer lassen.');
+      await withPlayer(d => { d.limits = { win: w>0?w:null, loss: l>0?l:null, base: d.limits?.base ?? d.balance }; return true; });
+      document.activeElement?.blur(); toast('Limits gespeichert'); renderAll(); break;
+    }
+    case 'newsession':
+      await withPlayer(d => { d.limits = { ...(d.limits||{}), base: d.balance }; return true; });
+      toast('Neue Session ab '+fmt(P.balance)+' ℒ'); renderAll(); break;
+    case 'logout': await signOut(auth); break;
+  }
+});
+document.addEventListener('keydown', e => {
+  if (e.key!=='Enter') return;
+  if (e.target.id==='tcode') joinByCode(e.target.value);
+  if (e.target.id==='fcode') document.querySelector('[data-act="addfriend"]')?.click();
+});
+</script>
+</body>
+</html>
