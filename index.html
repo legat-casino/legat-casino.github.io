@@ -15,7 +15,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,700&family=Manrope:wght@400;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
 <style>
-/* Layout: a single felt table under a wooden rail; tabs switch Tisch / Spieler / Konto. One dark "casino at night" look. */
+/* Layout: a single felt table under a wooden rail; tabs switch Tisch / Spieler / Shop / Konto. One dark "casino at night" look. */
 :root{
   --felt:#0f3d2f; --felt-deep:#0a2a20; --rail:#17110d; --rail-2:#231a14;
   --brass:#d1ad62; --brass-dim:#8f7643; --ink:#f2ebdd; --muted:#a3b7ab;
@@ -44,19 +44,21 @@ header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background
 .top-in{max-width:1040px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:10px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .logo{font-family:var(--f-display);font-weight:700;font-size:22px;letter-spacing:.02em;margin-right:auto;white-space:nowrap}
 .logo span{color:var(--brass)}
+.iconbtn{background:none;border:1px solid var(--line);border-radius:999px;width:36px;height:36px;display:grid;place-items:center;font-size:16px}
 .purse{display:flex;flex-direction:column;align-items:flex-end;line-height:1.1}
-.purse small{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.purse small{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);max-width:40vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .purse b{font-family:var(--f-num);font-size:19px;color:var(--brass);transition:color .3s}
 .purse b.up{color:var(--win)} .purse b.down{color:var(--lose)}
 nav.tabs{display:flex;gap:4px;width:100%;}
-nav.tabs button{flex:1;background:none;border:0;border-bottom:2px solid transparent;padding:8px 6px;color:var(--muted);font-weight:600;letter-spacing:.04em}
+nav.tabs button{flex:1;background:none;border:0;border-bottom:2px solid transparent;padding:8px 4px;color:var(--muted);font-weight:600;letter-spacing:.04em}
 nav.tabs button[aria-selected="true"]{color:var(--ink);border-color:var(--brass)}
 
-.panel{background:var(--rail-2);border:1px solid var(--line);border-radius:10px;padding:16px}
+.panel{background:var(--rail-2);border:1px solid var(--line);border-radius:10px;padding:16px;min-width:0}
 h2{font-family:var(--f-display);font-weight:500;font-size:24px;margin:0 0 4px;text-wrap:balance}
 h3{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0 0 10px;font-weight:700}
 p{margin:0}
 .muted{color:var(--muted)}
+.small{font-size:12px}
 .stack{display:flex;flex-direction:column;gap:14px}
 .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
@@ -73,7 +75,19 @@ p{margin:0}
 .code{font-family:var(--f-num);font-size:22px;letter-spacing:.14em;color:var(--brass)}
 .note{border-left:3px solid var(--brass);padding:8px 12px;background:rgba(209,173,98,.08);border-radius:0 8px 8px 0}
 .note.bad{border-color:var(--lose);background:rgba(236,138,120,.08)}
-.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--rail);padding:10px 16px;border-radius:999px;font-weight:700;z-index:20;max-width:calc(100% - 32px);text-align:center}
+.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--rail);padding:10px 16px;border-radius:999px;font-weight:700;z-index:30;max-width:calc(100% - 32px);text-align:center}
+.switch{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:14px;cursor:pointer;user-select:none;flex-wrap:wrap;justify-content:center}
+.switch input{appearance:none;-webkit-appearance:none;width:38px;height:22px;border-radius:999px;background:#3b332b;position:relative;margin:0;cursor:pointer;transition:background .2s;flex:none}
+.switch input::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:var(--ink);transition:transform .2s}
+.switch input:checked{background:var(--brass)}
+.switch input:checked::after{transform:translateX(16px)}
+
+/* daily bonus banner */
+.daily{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:space-between;background:linear-gradient(90deg,rgba(209,173,98,.22),rgba(209,173,98,.06));border:1px solid var(--brass-dim);border-radius:10px;padding:10px 14px;margin-bottom:14px}
+.daily b{color:var(--brass)}
+.streak{display:flex;gap:4px}
+.streak i{width:10px;height:10px;border-radius:50%;background:#3b332b;display:block}
+.streak i.on{background:var(--brass)}
 
 /* login */
 .login{max-width:440px;margin:6vh auto 0;text-align:center;display:flex;flex-direction:column;gap:18px;align-items:center}
@@ -85,11 +99,13 @@ p{margin:0}
 .fan .c{position:absolute;top:10px;transform-origin:50% 120%}
 
 /* table */
-.felt{position:relative;background:radial-gradient(110% 90% at 50% 10%, #175a45, var(--felt) 45%, var(--felt-deep));border-radius:28px 28px 14px 14px;border:10px solid #3a2617;box-shadow:inset 0 0 0 2px var(--brass-dim), 0 20px 40px rgba(0,0,0,.45);padding:18px 14px 20px;overflow:hidden}
-.felt-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap;position:relative;z-index:1}
-.tcode{font-family:var(--f-num);font-size:12px;color:var(--muted)}
+.felt{--f1:#175a45;--f2:#0f3d2f;--f3:#0a2a20;--b1:#7d2a22;--b2:#6a221c;position:relative;background:radial-gradient(110% 90% at 50% 10%, var(--f1), var(--f2) 45%, var(--f3));border-radius:28px 28px 14px 14px;border:10px solid #3a2617;box-shadow:inset 0 0 0 2px var(--brass-dim), 0 20px 40px rgba(0,0,0,.45);padding:18px 14px 20px;overflow:hidden}
+.felt.vip{border-color:#5a4417;box-shadow:inset 0 0 0 2px var(--brass), 0 0 0 1px var(--brass), 0 20px 40px rgba(0,0,0,.45)}
+.felt-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap;position:relative;z-index:1;padding-right:56px}
+.tcode{font-family:var(--f-num);font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .tcode b{color:var(--brass);letter-spacing:.12em;font-size:15px}
-.shoe{position:absolute;right:18px;top:58px;width:46px;height:64px;border-radius:6px;background:repeating-linear-gradient(45deg,#7d2a22 0 6px,#6a221c 6px 12px);border:3px solid var(--card);box-shadow:3px 3px 0 -1px var(--card),6px 6px 0 -2px var(--card),0 8px 14px rgba(0,0,0,.4);transform:rotate(8deg)}
+.vipbadge{font-family:var(--f-display);font-weight:700;color:#1b140a;background:var(--brass);border-radius:4px;padding:1px 7px;font-size:12px;letter-spacing:.1em}
+.shoe{position:absolute;right:18px;top:20px;width:46px;height:64px;border-radius:6px;background:repeating-linear-gradient(45deg,var(--b1) 0 6px,var(--b2) 6px 12px);border:3px solid var(--card);box-shadow:3px 3px 0 -1px var(--card),6px 6px 0 -2px var(--card),0 8px 14px rgba(0,0,0,.4);transform:rotate(8deg)}
 .arc{font-family:var(--f-display);text-align:center;color:rgba(242,235,221,.55);font-size:13px;letter-spacing:.18em;text-transform:uppercase;margin:6px 0 2px;padding-inline:52px}
 .arc em{font-style:normal;color:var(--brass)}
 .dealer{display:flex;flex-direction:column;align-items:center;gap:6px;min-height:150px;justify-content:center}
@@ -101,11 +117,11 @@ p{margin:0}
 
 /* a card: outer box flies, inner box flips */
 .c{width:60px;height:86px;position:relative;flex:none;perspective:700px;font-family:var(--f-display);font-weight:700}
-.ci{position:absolute;inset:0;transform-style:preserve-3d;transition:none}
+.ci{position:absolute;inset:0;transform-style:preserve-3d}
 .c.down .ci{transform:rotateY(180deg)}
 .cf,.cb{position:absolute;inset:0;border-radius:7px;backface-visibility:hidden;-webkit-backface-visibility:hidden;box-shadow:0 3px 8px rgba(0,0,0,.35)}
 .cf{background:var(--card);color:var(--card-ink)}
-.cb{transform:rotateY(180deg);background:repeating-linear-gradient(45deg,#7d2a22 0 6px,#6a221c 6px 12px);border:3px solid var(--card)}
+.cb{transform:rotateY(180deg);background:repeating-linear-gradient(45deg,var(--b1) 0 6px,var(--b2) 6px 12px);border:3px solid var(--card)}
 .c.red .cf{color:var(--suit-red)}
 .cf .r{position:absolute;top:4px;left:6px;font-size:19px;line-height:1}
 .cf .s{position:absolute;top:22px;left:6px;font-size:15px;line-height:1}
@@ -113,7 +129,7 @@ p{margin:0}
 .score{font-family:var(--f-num);font-size:13px;background:rgba(0,0,0,.35);border-radius:999px;padding:2px 9px}
 
 .seats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:14px}
-.seat{border:1px dashed rgba(242,235,221,.22);border-radius:12px;padding:10px;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;transition:box-shadow .3s}
+.seat{border:1px dashed rgba(242,235,221,.22);border-radius:12px;padding:10px;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;transition:box-shadow .3s;position:relative}
 .seat.me{border-style:solid;border-color:var(--brass)}
 .seat.turn{box-shadow:0 0 0 2px var(--brass),0 0 22px rgba(209,173,98,.35)}
 .seat .nm{font-weight:700;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -123,6 +139,9 @@ p{margin:0}
 .seat .cards .c + .c{margin-left:-20px}
 .seat.me .c{width:60px;height:86px}
 .seat.me .cf .r{font-size:19px}.seat.me .cf .s{font-size:15px;top:22px}.seat.me .cf .big{font-size:30px}
+.bubble{position:absolute;left:50%;top:-14px;transform:translateX(-50%);background:var(--ink);color:var(--rail);border-radius:12px;padding:4px 10px;font-weight:700;font-size:13px;max-width:92%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;z-index:2;animation:bub 5s ease-out both;pointer-events:none}
+.bubble.emo{font-size:26px;background:none;padding:0;top:-22px}
+@keyframes bub{0%{transform:translate(-50%,8px) scale(.5);opacity:0}8%{transform:translate(-50%,0) scale(1.1);opacity:1}14%{transform:translate(-50%,0) scale(1)}85%{opacity:1}100%{opacity:0;transform:translate(-50%,-10px)}}
 .hands{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
 .hbox{display:flex;flex-direction:column;align-items:center;gap:4px;padding:4px;border-radius:8px}
 .hbox.active{background:rgba(209,173,98,.14)}
@@ -130,11 +149,11 @@ p{margin:0}
 @keyframes glow{0%{filter:drop-shadow(0 0 0 rgba(121,216,162,0))}40%{filter:drop-shadow(0 0 14px rgba(121,216,162,.9))}100%{filter:drop-shadow(0 0 0 rgba(121,216,162,0))}}
 .chip-bet{font-family:var(--f-num);font-size:12px;color:var(--brass)}
 .res{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;animation:pop .35s ease-out both}
-.res.win,.res.bj{color:var(--win)} .res.lose{color:var(--lose)} .res.push{color:var(--push)}
+.res.win,.res.bj{color:var(--win)} .res.lose{color:var(--lose)} .res.push,.res.surr{color:var(--push)}
 @keyframes pop{from{transform:scale(.4);opacity:0}to{transform:none;opacity:1}}
 .net{font-size:20px;font-weight:700;animation:pop .45s cubic-bezier(.2,1.6,.4,1) both}
 
-.controls{margin-top:14px;display:flex;flex-direction:column;gap:12px;align-items:center}
+.controls{margin-top:14px;display:flex;flex-direction:column;gap:12px;align-items:center;text-align:center}
 .chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
 .chip{width:54px;height:54px;border-radius:50%;border:4px dashed rgba(255,255,255,.75);font-family:var(--f-num);font-weight:600;font-size:12px;color:#fff;box-shadow:0 3px 6px rgba(0,0,0,.4),inset 0 0 0 3px rgba(0,0,0,.15);display:grid;place-items:center;transition:transform .12s}
 .chip:active{transform:translateY(2px) scale(.96)}
@@ -146,15 +165,28 @@ p{margin:0}
 .acts .btn{min-width:110px}
 .timer{font-family:var(--f-num);font-size:12px;color:var(--muted)}
 
+/* chat */
+.chat{margin-top:14px;display:flex;flex-direction:column;gap:10px}
+.emojis{display:flex;gap:6px;flex-wrap:wrap}
+.emojis button{background:var(--rail);border:1px solid var(--line);border-radius:999px;width:40px;height:40px;font-size:20px;display:grid;place-items:center}
+.emojis button:active{transform:scale(.9)}
+.chatlog{display:flex;flex-direction:column;gap:4px;max-height:170px;overflow-y:auto;font-size:14px;padding-right:4px}
+.chatlog .m b{color:var(--brass);margin-right:6px}
+.chatform{display:flex;gap:8px}
+.chatform input{flex:1;min-width:0;background:var(--rail);border:1px solid var(--line);border-radius:999px;padding:9px 14px;color:var(--ink)}
+
 /* players */
 table.board{width:100%;border-collapse:collapse;font-size:14px}
 .board th{text-align:left;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700;padding:8px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
 .board td{padding:10px 8px;border-bottom:1px solid rgba(209,173,98,.12);white-space:nowrap}
+.board tbody tr{cursor:pointer}
+.board tbody tr:hover td{background:rgba(209,173,98,.05)}
 .board td.r,.board th.r{text-align:right}
 .board tr.me td{background:rgba(209,173,98,.07)}
 .scroll{overflow-x:auto}
 .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#55625b;margin-right:7px;vertical-align:1px}
 .dot.on{background:var(--win);box-shadow:0 0 6px var(--win)}
+.av{display:inline-block;width:1.5em;text-align:center;margin-right:4px}
 .rank{font-family:var(--f-display);color:var(--brass);font-size:17px}
 .pill{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
 .pill.bad{color:var(--lose);border-color:rgba(236,138,120,.45)}
@@ -167,31 +199,72 @@ table.board{width:100%;border-collapse:collapse;font-size:14px}
 .stat b{font-family:var(--f-num);font-size:18px}
 .lobby-item{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1px solid var(--line);border-radius:8px;padding:10px 12px;flex-wrap:wrap}
 
+/* achievements */
+.badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.badge{border:1px solid var(--line);border-radius:10px;padding:10px;display:flex;gap:10px;align-items:flex-start;min-width:0}
+.badge .ic{font-size:24px;line-height:1}
+.badge b{display:block;font-size:13px}
+.badge span{display:block;font-size:11px;color:var(--muted)}
+.badge.locked{opacity:.35;filter:grayscale(1)}
+.badge.shame{border-color:rgba(236,138,120,.45)}
+
+/* shop */
+.shopgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px}
+.item{border:1px solid var(--line);border-radius:10px;padding:10px;display:flex;flex-direction:column;align-items:center;gap:6px;background:none;color:var(--ink);text-align:center}
+.item.sel{border-color:var(--brass);box-shadow:0 0 0 1px var(--brass)}
+.item .big{font-size:34px;line-height:1.1}
+.item .sw{width:70px;height:48px;border-radius:8px;border:3px solid #3a2617}
+.item .bk{width:38px;height:54px;border-radius:5px;border:3px solid var(--card)}
+.item small{font-size:12px;color:var(--muted)}
+.item .price{font-family:var(--f-num);font-size:12px;color:var(--brass)}
+
+/* chart */
+.chart svg{width:100%;height:auto;display:block}
+.hist{display:flex;flex-direction:column;gap:2px;font-size:13px}
+.hist .h{display:flex;justify-content:space-between;gap:10px;padding:4px 0;border-bottom:1px solid rgba(209,173,98,.1)}
+
+/* modal */
+.modal{position:fixed;inset:0;z-index:20;background:rgba(10,7,5,.72);display:flex;align-items:flex-end;justify-content:center;padding:max(16px,env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-right,0px)) 0 max(12px,env(safe-area-inset-left,0px))}
+.modal-card{background:var(--rail-2);border:1px solid var(--line);border-radius:16px 16px 0 0;width:100%;max-width:560px;max-height:88vh;overflow-y:auto;padding:18px 18px calc(18px + env(safe-area-inset-bottom,0px));animation:up .25s ease-out both}
+@keyframes up{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+@media (min-width:700px){.modal{align-items:center}.modal-card{border-radius:16px}}
+.prof-head{display:flex;gap:14px;align-items:center}
+.prof-av{font-size:44px;line-height:1;width:64px;height:64px;display:grid;place-items:center;border-radius:50%;background:var(--rail);border:1px solid var(--line);flex:none}
+.bars{display:grid;grid-template-columns:repeat(13,1fr);gap:4px;align-items:end;height:110px}
+.bars div{background:var(--brass-dim);border-radius:3px 3px 0 0;min-height:2px}
+.bars div.hi{background:var(--brass)}
+.barlbl{display:grid;grid-template-columns:repeat(13,1fr);gap:4px;font-family:var(--f-num);font-size:11px;text-align:center;color:var(--muted)}
+
 @media (max-width:520px){
   .c{width:50px;height:72px}.cf .r{font-size:16px}.cf .s{font-size:13px;top:19px}.cf .big{font-size:24px}
   .seat.me .c{width:52px;height:75px}
   .chip{width:48px;height:48px;font-size:11px}
   .acts .btn{min-width:0;flex:1 1 40%}
   .felt{border-width:7px;padding:14px 8px 16px}
-  .shoe{right:10px;top:52px;width:36px;height:50px}
+  .shoe{right:10px;top:14px;width:36px;height:50px}
   .logo{font-size:19px}
+  nav.tabs button{font-size:14px}
 }
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
 </style>
 </head>
 <body>
 <header class="top" id="top" hidden>
   <div class="top-in">
     <div class="logo">Legat <span>Casino</span></div>
+    <button class="iconbtn" id="mute" type="button" aria-label="Ton an/aus">🔊</button>
     <div class="purse"><small id="pname">Konto</small><b id="pbal">–</b></div>
     <nav class="tabs" role="tablist">
       <button id="tab-table" role="tab" aria-selected="true" data-tab="table">Tisch</button>
       <button id="tab-players" role="tab" aria-selected="false" data-tab="players">Spieler</button>
+      <button id="tab-shop" role="tab" aria-selected="false" data-tab="shop">Shop</button>
       <button id="tab-account" role="tab" aria-selected="false" data-tab="account">Konto</button>
     </nav>
   </div>
 </header>
 
 <main class="wrap">
+  <div id="daily"></div>
   <section id="view-login" class="login" hidden>
     <div class="fan" aria-hidden="true">
       <div class="c" style="transform:rotate(-14deg) translateX(-34px)"><div class="ci"><div class="cf"><span class="r">A</span><span class="s">♠</span><span class="big">♠</span></div><div class="cb"></div></div></div>
@@ -203,13 +276,25 @@ table.board{width:100%;border-collapse:collapse;font-size:14px}
       <svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>
       Mit Google anmelden
     </button>
-    <p class="muted" style="font-size:12px">Tipp fürs Handy: Über „Teilen → Zum Home-Bildschirm“ wird das Casino zur App.</p>
+    <p class="muted small">Tipp fürs Handy: Über „Teilen → Zum Home-Bildschirm“ wird das Casino zur App.</p>
   </section>
   <section id="view-setup" hidden></section>
-  <section id="view-table" hidden></section>
+  <section id="view-table" hidden>
+    <div id="tv"></div>
+    <div id="chat" class="panel chat" hidden>
+      <div class="emojis" id="emojis"></div>
+      <div class="chatlog" id="chatlog" aria-live="polite"></div>
+      <form class="chatform" id="chatform" autocomplete="off">
+        <input id="chatx" maxlength="200" placeholder="Nachricht an den Tisch …" aria-label="Nachricht an den Tisch">
+        <button class="btn gold sm" type="submit">Senden</button>
+      </form>
+    </div>
+  </section>
   <section id="view-players" hidden></section>
+  <section id="view-shop" hidden></section>
   <section id="view-account" hidden></section>
 </main>
+<div id="modal" class="modal" hidden><div class="modal-card" id="modal-card" role="dialog" aria-modal="true"></div></div>
 <div id="toast" class="toast" hidden></div>
 
 <script type="module">
@@ -217,17 +302,80 @@ import { firebaseConfig } from './firebase-config.js';
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut }
   from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-import { initializeFirestore, doc, collection, query, where, onSnapshot, setDoc, getDoc, getDocs, updateDoc, deleteDoc, runTransaction }
+import { initializeFirestore, doc, collection, query, where, orderBy, limit, onSnapshot, setDoc, getDoc, getDocs, updateDoc, deleteDoc, addDoc, runTransaction }
   from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
 /* ---------- constants ---------- */
-const START = 2000, MIN_BET = 100, MAX_BET = 50000, MAX_SEATS = 5, TURN_MS = 30000, BET_MS = 15000, ONLINE_MS = 100000;
+const START = 2000, MIN_BET = 100, VIP_MIN = 5000, MAX_BET = 50000, MAX_SEATS = 5;
+const TURN_MS = 30000, BET_MS = 15000, INS_MS = 12000, ONLINE_MS = 100000, DONE_MS = 5000;
 const CHIPS = [[100,'ch100','100'],[500,'ch500','500'],[1000,'ch1k','1K'],[5000,'ch5k','5K'],[10000,'ch10k','10K'],[25000,'ch25k','25K']];
 const SUIT = {S:'♠',H:'♥',D:'♦',C:'♣'};
+const EMOJIS = ['😂','🔥','💀','😭','🤑','👏','🙏','😤','🍀','🫡'];
+const SHOP = {
+  av: [['🙂',0],['😎',0],['🤠',0],['🦊',0],['🐻',0],['🐸',0],['🦁',5000],['🐯',5000],['🐼',5000],['🦉',5000],['🤖',10000],['👽',10000],['🧛',15000],['🥷',15000],['🐉',25000],['🦄',25000],['🎩',50000],['👑',100000]],
+  felt: [['green','Klassisch',0,'#175a45','#0f3d2f','#0a2a20'],['blue','Royal Blau',10000,'#1f5a94','#143e6a','#0c2745'],['bordeaux','Bordeaux',10000,'#8a2338','#5e1626','#3a0d17'],
+         ['purple','Samt Violett',20000,'#5a3590','#3d2266','#261443'],['black','Mitternacht',30000,'#3a3a3a','#222222','#121212'],['gold','Goldrausch',100000,'#a07d2a','#6e541a','#45340f']],
+  back: [['red','Rot',0,'#7d2a22','#6a221c'],['blue','Blau',5000,'#1f3f7a','#183263'],['green','Grün',5000,'#1f5a3a','#174a2f'],
+         ['purple','Violett',15000,'#4b2a78','#3b2060'],['black','Schwarz-Gold',15000,'#1a1a1a','#6b5520'],['gold','Gold',50000,'#c99a35','#8f6c1f']],
+};
+const ACH = [
+  ['first_win','🥇','Erster Sieg','Deine erste gewonnene Hand'],
+  ['bj','🂡','Blackjack!','Deinen ersten Blackjack bekommen'],
+  ['bj3','🎩','Hattrick','Drei Runden in Folge mit Blackjack'],
+  ['win5','🔥','Glückssträhne','Fünf Runden in Folge gewonnen'],
+  ['five21','🖐️','Fünf-Karten-21','Mit 21 aus fünf oder mehr Karten gewonnen'],
+  ['dbl','💪','Mutig','Eine verdoppelte Hand gewonnen'],
+  ['split2','✂️','Doppelt hält besser','Nach dem Teilen beide Hände gewonnen'],
+  ['ins','🛡️','Gut versichert','Die Versicherung hat sich ausgezahlt'],
+  ['high','💰','High Roller','50.000 Legats auf eine Hand gesetzt'],
+  ['k10','💵','Fünfstellig','10.000 Legats erreicht'],
+  ['k100','🏦','Hunderttausend','100.000 Legats erreicht'],
+  ['m1','👑','Millionär','1.000.000 Legats erreicht'],
+  ['comeback','📈','Vom Tellerwäscher','Von 200 oder weniger auf 10.000 Legats, ohne Wiederbelebung'],
+  ['h100','🃏','Stammspieler','100 Hände gespielt'],
+  ['h1000','🎰','Inventar','1.000 Hände gespielt'],
+  ['vip','⭐','VIP','An einem VIP-Tisch gespielt'],
+  ['daily7','📅','Treue Seele','7 Tage in Folge den Tagesbonus abgeholt'],
+  ['generous','🎁','Spendierhosen','Insgesamt 10.000 Legats verschenkt'],
+  ['broke1','💸','Erste Pleite','Zum ersten Mal pleite gegangen', true],
+  ['broke5','🪦','Stammgast beim Bestatter','Fünfmal pleite gegangen', true],
+];
 const fmt = n => Math.round(n).toLocaleString('de-DE');
+const sgn = n => (n>0?'+':n<0?'−':'') + fmt(Math.abs(n));
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const $ = id => document.getElementById(id);
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const ls = { get(k,d){ try { const v = localStorage.getItem(k); return v===null ? d : JSON.parse(v); } catch { return d; } }, set(k,v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch {} } };
+const dayId = (t=Date.now()) => new Date(t).toLocaleDateString('sv-SE');
+function weekId(t=new Date()){
+  const d = new Date(Date.UTC(t.getFullYear(), t.getMonth(), t.getDate())); const day = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - day); const y = d.getUTCFullYear();
+  return y + '-W' + String(Math.ceil(((d - Date.UTC(y,0,1)) / 864e5 + 1) / 7)).padStart(2,'0');
+}
+const dailyAmount = streak => Math.min(2500, 500 + (streak-1)*250);
+
+/* ---------- SHA-256 (for the fairness proof) ---------- */
+function sha256(ascii){
+  const rr=(v,a)=>(v>>>a)|(v<<(32-a)), maxWord=2**32, words=[], bitLen=ascii.length*8;
+  let hash=[], k=[], pc=0; const comp={};
+  for (let c=2; pc<64; c++){ if(!comp[c]){ for(let i=0;i<313;i+=c) comp[i]=c; hash[pc]=(Math.pow(c,.5)*maxWord)|0; k[pc++]=(Math.pow(c,1/3)*maxWord)|0; } }
+  hash=hash.slice(0,8); ascii+='\x80'; while(ascii.length%64-56) ascii+='\x00';
+  for (let i=0;i<ascii.length;i++) words[i>>2] |= ascii.charCodeAt(i) << ((3-i)%4)*8;
+  words[words.length]=(bitLen/maxWord)|0; words[words.length]=bitLen;
+  for (let j=0;j<words.length;){
+    const w=words.slice(j,j+=16), old=hash; hash=hash.slice(0,8);
+    for (let i=0;i<64;i++){
+      const w15=w[i-15], w2=w[i-2], a=hash[0], e=hash[4];
+      const t1=hash[7]+(rr(e,6)^rr(e,11)^rr(e,25))+((e&hash[5])^((~e)&hash[6]))+k[i]
+        +(w[i]=(i<16)?w[i]:(w[i-16]+(rr(w15,7)^rr(w15,18)^(w15>>>3))+w[i-7]+(rr(w2,17)^rr(w2,19)^(w2>>>10)))|0);
+      const t2=(rr(a,2)^rr(a,13)^rr(a,22))+((a&hash[1])^(a&hash[2])^(hash[1]&hash[2]));
+      hash=[(t1+t2)|0].concat(hash); hash[4]=(hash[4]+t1)|0;
+    }
+    for (let i=0;i<8;i++) hash[i]=(hash[i]+old[i])|0;
+  }
+  let r=''; for (let i=0;i<8;i++) for (let j=3;j+1;j--){ const b=(hash[i]>>(j*8))&255; r+=(b<16?'0':'')+b.toString(16); }
+  return r;
+}
 
 /* ---------- cards ---------- */
 function rnd(n){ const a = new Uint32Array(1); crypto.getRandomValues(a); return a[0] % n; }
@@ -246,6 +394,59 @@ function score(cards){
 }
 const scoreLabel = cards => { const s = score(cards); return (s.soft && s.t<21 ? (s.t-10)+'/' : '') + s.t; };
 
+/* ---------- sound (synthesized, no files) ---------- */
+const snd = { ctx:null, on: ls.get('sound', true) };
+function ac(){
+  if (!snd.on) return null;
+  try { if (!snd.ctx) snd.ctx = new (window.AudioContext || window.webkitAudioContext)(); if (snd.ctx.state==='suspended') snd.ctx.resume(); } catch { return null; }
+  return snd.ctx;
+}
+document.addEventListener('pointerdown', () => ac(), { passive:true });
+function tone(f, dur, { type='sine', vol=.12, at=0, to=null }={}){
+  const c = ac(); if (!c) return; const t = c.currentTime + at;
+  const o = c.createOscillator(), g = c.createGain(); o.type = type; o.frequency.setValueAtTime(f, t);
+  if (to) o.frequency.exponentialRampToValueAtTime(to, t+dur);
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t+.01); g.gain.exponentialRampToValueAtTime(0.0001, t+dur);
+  o.connect(g).connect(c.destination); o.start(t); o.stop(t+dur+.02);
+}
+function noise(dur, { vol=.2, at=0, freq=2500, q=1 }={}){
+  const c = ac(); if (!c) return; const t = c.currentTime + at;
+  const b = c.createBuffer(1, Math.ceil(c.sampleRate*dur), c.sampleRate), d = b.getChannelData(0);
+  for (let i=0;i<d.length;i++) d[i] = (Math.random()*2-1) * (1 - i/d.length);
+  const s = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
+  s.buffer = b; f.type='bandpass'; f.frequency.value=freq; f.Q.value=q; g.gain.value=vol;
+  s.connect(f).connect(g).connect(c.destination); s.start(t);
+}
+// one real card sound, cut from a recording, played quietly with a slight pitch variation
+const CARD_SND = 'data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjYwLjE2LjEwMAAAAAAAAAAAAAAA//tQwAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAAMAAAKmwAnJycnJycnJzo6Ojo6Ojo6Tk5OTk5OTk5iYmJiYmJiYmJ2dnZ2dnZ2domJiYmJiYmJnZ2dnZ2dnZ2dsbGxsbGxsbHExMTExMTExNjY2NjY2NjY2Ozs7Ozs7Ozs//////////8AAAAATGF2YzYwLjMxAAAAAAAAAAAAAAAAJAOEAAAAAAAACpvYMDPmAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP/7UMQAAkAAAaQAAAAhLRFOVpjAAKKEdWkEgmRHZ+kBujHAAAKCmCYH1QJjuhCQYRNr3+bXn77BgYLPosMFmnZ/Ze/lKUn6L/ODByEzM7GZ/7CxwMFFnxAcDGj//pUCBRUAIAAAQAgD/+6fUnBloZ/9t7wMzzFww/4NYOYADhmQsYDAMjAZ3AGGdE8Xx2gcYoHoe4sZcTBuAAo4Bp5YG5E/J99QGgGAADgMwAAyosOf+aImREBkFiE4FR4GXHgZkiBaYHr/3qZrBigDPlQAh4P/+1LEN4ATOYUbGcoACg6fKMMy8ABj4dIIKD//0P7B2CJCdBwFw8M2cIf/9D/xRHlsihoXELJ/////uXEJpHdoUBZ6V7uCngyhWOXMSkzAFpepXTJTK3hcsuZOwR5fToUSrTJRltGMWBwAqHOXvT1RtSoGAbgs5NiRJZWnnqRPqc+ltQryjOQ3EOV6tR2YxcHjcThOO0BEEmK+EfidPGL76nzpHMmJ5txMvo7t/EtfFcU9vre3O/pT6hy/etxBb+ruAALqBAgkAAAAQoBALZ0qhP/7UsQGgAwArVs4xgABcRXtlzCQAOzQqmJUDYutOk0lS8hHoknjxKcWNDqsfKtz8HC6W4Zh85PHxefrGI06zF9WYnCeX4TNjHb23aXbb1l8wdgdZp0b9KzGPNwXBnKBwbvKVGQz//KLCzwAlwZPSAZBdwwjaRG2zOxDKt0hh+0483NRbkYrO7AkJhBAu5tYmJRZady751tMhssaiiIysWyFxRWE7vshue+5Ta91+gN/7nQ9Y1RUAgKGKgTbbCT9R0CLIXrqCW7gAElygV0JcEGU//tSxAYAC4kHX1z0ABF0oSj08wnoSOJQXJiJ0woE4jmO0lSuWoILgdFSRWzouLyhpsjmsVWtViWv2laZWKdb/mViVjlmuHpppUvaaZl7/+3vXaDm9v/3klNto+aOGB13hUiWNuqFbCJRAAAK2BkjNLcW5DkUnC8KxLHIiTpxiDBTRiyAHmypK5EicaSSfOvOQuNP4oUuCy2q7GQCOUr+QUiGrbUqlAWuyZ97KjlLpT/VWOJCPap0hShmRLEVESq0o011OwVAAAFygZQlE11coFT/+1LEBwCLzLE9TDDDAX4Xp2mEjXiyMjcZgKBZsN15qwlQScJlFdommiRUkaNKPSHp0RgwgWZGIm6UXJGY9TmlbO28+2LySUJ392reOm5b1PFSRhRY6GscNoQVC4XVcjPE2WubpSMmEiUoRhCRt4yeGXfciOO+zaRwEBREoiKEUB2KNASzYtEjXURPaz0iNqaH2WaplZdNf21wbLTZgFQZ0jIk/9bDCXYS5QiocxcnEsLFUyscYqLpNhci4AASVtYWOTKbVCwGgAAAKgOrTKphs//7UsQGAAvc+TdMGG9Bdx8naPMN6FEm1jLgMCV01uB4HrW4CpYeSgDSdI48qjQjCbuu6xkZFLYsiXaCCBhhJOAiGcbCyw6gRZvbC+qV0pY5dzqny/O9/5Z33MqNapo2WTUX5I8QJKRaWJ0AABStC4AEIvVcbhOW4d5MG9CorCfD/qpmoP1G8ylM5lp0lNxu6n2XSmatNnEsURMjJmn6CIhrT4U40pJKhRjtRlqQ79zIvYiLIk4JCAZFhVgKCFi5Zl5A2cxXTQwAhIQAASpQBZBe//tSxAWACnBtO6g8wYFGnyf08Yo4PY35TmL8fyKR6rHEl75PxqbQmRQyUlhrxit/fo3aZcTsmREdnwrQiYGHGsYQGFQNQHTzSBtlDD+g+bdcHZ1QL8mlXgqiV4yukGMKyEAAlKYAgATh4VXZPEw3G6mxbHqy3I1jWWJ3i7EgHBOSiJ5IjAbdLbX24ZHmthfuusr2T7e7l1kcHBp+aaq6JV+j3t90wnCCHGXv29l7SaoeBmAQGAioWzceJN0e+TwEw6y7kkfiX8CjjxdFmrDIbsH/+1LEEIAKJLE7LBhtiUwZKHTBimBL/zc004gxV9zjVbSZ9tLQQnYTzakRWYVmubU+VCBmScuWBA8B9xrQHo/7bz997O2LQoo0QSSE+BHAMLhmAsKjwOkYcF8dCa+t2S0dH7ba173XU+M1J47Cwsi9Ln0yy9SlU9rbymN/eX9HKQyiAERAVg0YFTodEJYkKC7v9yWQw+5aNNVORy6uSotBuk5H+hiBbzyMlEoBDyYnA/PkiDDHIKLujl879kBE/f3BkTm6R+QsqaUXCfOzl8tz7//7UsQcAApE9VOHpGz5TRJnNPYMeOh8X/+8Jy+m59T/VkLpkUEBExTRZ/X/3Xz1ipEPVAgAFSAb5DzMhAeFAFSCOBqXD8zgU2NiK4w+PvUE46NAHUBAxAc1Y2YoyrT+QNt3DKJzBTtK4RgZlGNEoXfFIqac+GEFLFMIj3GoiEf77a1KGBqAABgGuBoHgu3RLh6zIJmrQOLMg5PBlOoAMFEQEFJjUCZg7TXaBpfjTq50P8jassDBFsV9GoW+Gpy1URxrqiwwEXh77CTTCwq5hNgU//tSxCcACmihMSekyIFLmCa09gxxNyJXCnoWTqlZABIbgEpIwkY/z8bkQCAhBqcBEKS8fH4lHRYWw5jhwkeiogVO0xULn3JDpSqlTrjgzivX5kmZf0IbywWV+Y+wi/0XlSYyc70b80i1Hu/zh9Vao21IgkFygEzBzC9RywT5Im8aTUpTdVSeRqweyeMc4ZBpr3d8t22ypxEbne7xvSNJnZMyrEbA2N+axn9MIgDHiBs2aKlhZri0H3HtDoJpX5YSyS5xBIFWAMI/TRQpQthlHcn/+1LEMYAKIKc1p5hvAUQZpnTzCfgEJVKdTpgwj4VqWWtGwOGPRGbzcjcUdKXl2fdvGSU+e+0fuyjOU5FYx0tx5bo+mMZlksjfaqiDbaAVcg2zfeldCTD+nWFRpChEQGjSopMliYQk101cfALO2MRSKQqBliAqJkRNMhFJLsYqocuMeqys1KZKAwZIWASNhVgmuywaRNX5XK0OFXQafgqRLPrDVZEa8bAkXG9EkCihQsgFqWv+bM7Oz0acKLMuNzZltltmjSyri8SIihQGUW0nGv/7UsQ+gAoEqxgHvSABEpWZGGCZkFFFmWpaJxokw9BYCCQrxQW/i8yAhYVIuUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV';
+let cardBuf = null, cardLoading = false;
+function loadCard(c){
+  if (cardBuf || cardLoading) return; cardLoading = true;
+  fetch(CARD_SND).then(r => r.arrayBuffer()).then(b => new Promise((ok, no) => c.decodeAudioData(b, ok, no)))
+    .then(buf => { cardBuf = buf; }).catch(() => {}).finally(() => { cardLoading = false; });
+}
+function playCard(at=0){
+  const c = ac(); if (!c) return;
+  if (!cardBuf){ loadCard(c); return; }
+  const s = c.createBufferSource(), g = c.createGain();
+  s.buffer = cardBuf; s.playbackRate.value = 0.94 + Math.random()*0.12; g.gain.value = 0.3;
+  s.connect(g).connect(c.destination); s.start(c.currentTime + at);
+}
+document.addEventListener('pointerdown', () => { const c = ac(); if (c) loadCard(c); }, { passive:true });
+const SFX = {
+  card: (at=0) => playCard(at),
+  chip: () => { tone(2300, .05, { type:'triangle', vol:.08 }); tone(3100, .07, { type:'triangle', vol:.06, at:.04 }); },
+  win: () => [523,659,784].forEach((f,i) => tone(f, .22, { type:'triangle', vol:.1, at:i*.09 })),
+  bj: () => [523,659,784,1047,1319].forEach((f,i) => tone(f, .28, { type:'triangle', vol:.11, at:i*.08 })),
+  lose: () => { tone(330, .3, { type:'sawtooth', vol:.04, to:220 }); },
+  bust: () => { tone(110, .35, { type:'sine', vol:.25, to:55 }); noise(.15, { vol:.15, freq:300 }); },
+  push: () => tone(440, .2, { type:'triangle', vol:.07 }),
+  turn: () => { tone(880, .18, { vol:.07 }); tone(1320, .25, { vol:.05, at:.1 }); },
+  pop: () => tone(1200, .07, { type:'sine', vol:.06, to:1800 }),
+  coins: () => [0,.06,.12,.2].forEach(a => tone(2600 + Math.random()*800, .08, { type:'triangle', vol:.07, at:a })),
+  badge: () => [784,988,1175,1568].forEach((f,i) => tone(f, .3, { type:'sine', vol:.08, at:i*.07 })),
+};
+
 /* ---------- setup check ---------- */
 if (!firebaseConfig || !firebaseConfig.apiKey || firebaseConfig.apiKey.includes('HIER')){
   const el = $('view-setup'); el.hidden = false;
@@ -260,48 +461,63 @@ const fs = initializeFirestore(app, { ignoreUndefinedProperties: true });
 
 /* ---------- state ---------- */
 let uid=null, authUser=null;
-let P=null, players={}, T=null, tid=null, seats={};
-let unsubT=null, unsubS=null, unsubP=null;
+let P=null, players={}, T=null, tid=null, seats={}, gifts={}, msgs=[];
+let unsubT=null, unsubS=null, unsubP=null, unsubG=null, unsubM=null;
 let amHost=false, hostBusy=false;
-let tab='table', boardMode='friends';
-let bet = 1000, pendingAct=false, confirmLeave=false;
-let lastBal = null;
+let tab='table', boardMode='friends', boardScope='all', modalId=null, modalKind=null;
+let bet = ls.get('lastBet', 1000), auto = ls.get('autobet', false), autoRound = null;
+let pendingAct=false, confirmLeave=false, lastBal=null, leaving=false, seatHealed=false;
+const bubbles = {};
+const fairSeen = {};
 
-/* ---------- write queues (one write at a time per doc) ---------- */
-let qPlayer = Promise.resolve();
-function withPlayer(fn){
-  qPlayer = qPlayer.then(async () => {
-    if (!P) return;
-    const draft = structuredClone(P);
-    if (!fn(draft)) return;
-    draft.updated = Date.now(); draft.seen = Date.now();
-    P = draft; renderAll();
-    try { await setDoc(doc(fs,'players',uid), draft); } catch(e){ handleWriteErr(e); }
-  });
-  return qPlayer;
-}
-let qSeat = Promise.resolve();
-function seatWrite(data, mode='update'){
-  qSeat = qSeat.then(async () => {
-    const ref = doc(fs,'seats',uid);
-    try { mode==='delete' ? await deleteDoc(ref) : mode==='set' ? await setDoc(ref, data) : await updateDoc(ref, data); }
-    catch(e){ handleWriteErr(e); }
-  });
-  return qSeat;
+/* ---------- writes (Firestore keeps the order of one client's writes; the UI never waits on them) ---------- */
+function slow(pr){
+  const t = setTimeout(() => toast('Firebase antwortet nicht. Prüfe deine Internetverbindung oder schalte Werbeblocker für diese Seite aus.'), 8000);
+  return pr.finally(() => clearTimeout(t));
 }
 function handleWriteErr(e){
   console.warn(e);
-  if (e?.code==='permission-denied') toast('Keine Berechtigung. Prüfe die Sicherheitsregeln in Firebase.');
+  if (e?.code==='permission-denied') toast('Keine Berechtigung. Sind die neuen Sicherheitsregeln in Firebase eingetragen?');
   else if (e?.code==='resource-exhausted') toast('Das kostenlose Tageslimit von Firebase ist erreicht.');
   else toast('Speichern fehlgeschlagen, bitte nochmal versuchen.');
 }
+function norm(d){
+  d.stats ||= { hands:0, wins:0, losses:0, pushes:0, bj:0, bankrupts:0, net:0, best:0 };
+  d.friends ||= []; d.limits ||= { win:null, loss:null, base:d.balance };
+  d.avatar ||= '🙂'; d.owned ||= []; d.sel ||= { felt:'green', back:'red' };
+  d.daily ||= { last:null, streak:0 }; d.hist ||= []; d.ach ||= {}; d.streaks ||= { win:0, bj:0 };
+  d.claimed ||= []; d.giftedTotal ||= 0; if (d.lowMark == null) d.lowMark = d.balance;
+  if (!d.week || d.week.id !== weekId()) d.week = { id: weekId(), net:0, hands:0, best:0 };
+  return d;
+}
+let newBadges = [];
+/** Change my player doc. fn(draft) returns true if it changed something. Returns whether it applied. */
+function withPlayer(fn){
+  if (!P) return false;
+  const d = norm(structuredClone(P));
+  newBadges = [];
+  if (!fn(d)) return false;
+  checkBalanceBadges(d);
+  d.updated = Math.max(Date.now(), (P.updated||0) + 1); d.seen = Date.now();
+  P = d; renderAll();
+  slow(setDoc(doc(fs,'players',uid), d)).catch(handleWriteErr);
+  if (newBadges.length){ const b = newBadges; newBadges = []; b.forEach((k,i) => setTimeout(() => { const a = ACH.find(x=>x[0]===k); SFX.badge(); toast(`${a[1]} Erfolg freigeschaltet: ${a[2]}`); }, 400 + i*2200)); }
+  return true;
+}
+function seatWrite(data, mode='update'){
+  const ref = doc(fs,'seats',uid);
+  if (mode!=='delete' && tid){ seats = { ...seats, [uid]: mode==='set' ? data : { ...(seats[uid]||{}), ...data } }; renderAll(); }
+  slow(mode==='delete' ? deleteDoc(ref) : mode==='set' ? setDoc(ref, data) : updateDoc(ref, data)).catch(handleWriteErr);
+}
 
 let toastT;
-function toast(msg){ const el=$('toast'); el.textContent=msg; el.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>el.hidden=true, 3200); }
+function toast(msg){ const el=$('toast'); el.textContent=msg; el.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>el.hidden=true, 3400); }
 
 /* ---------- helpers ---------- */
 function genCode(len, alpha='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'){ let s=''; for(let i=0;i<len;i++) s+=alpha[rnd(alpha.length)]; return s; }
-const nameOf = id => (id===uid ? P?.name : players[id]?.name) || 'Spieler';
+const pl = id => id===uid ? P : players[id];
+const nameOf = id => pl(id)?.name || 'Spieler';
+const avOf = id => pl(id)?.avatar || '🙂';
 const isOnline = id => id===uid || (players[id] && Date.now() - (players[id].seen||0) < ONLINE_MS);
 function friendIds(){
   if (!P) return [];
@@ -310,6 +526,7 @@ function friendIds(){
   s.delete(uid);
   return [...s].filter(id => players[id]);
 }
+const isFriend = id => friendIds().includes(id);
 function limitState(){
   const L = P?.limits; if (!L || (!L.win && !L.loss)) return null;
   const profit = P.balance - L.base;
@@ -317,8 +534,35 @@ function limitState(){
   if (L.loss && -profit >= L.loss) return {hit:'loss', profit};
   return {hit:null, profit};
 }
-const inRound = () => !!(P?.ledger && !P.ledger.settled);
-const isBroke = () => P && P.balance < MIN_BET && !inRound();
+const ledgerOpen = d => !!(d?.ledger && !d.ledger.settled);
+const inRound = () => ledgerOpen(P);
+const brokeDoc = d => d && d.balance < MIN_BET && !ledgerOpen(d);
+const isBroke = () => brokeDoc(P);
+const tableMin = () => T?.min || MIN_BET;
+function grant(d, key){ if (!d.ach[key]){ d.ach[key] = Date.now(); newBadges.push(key); } }
+function checkBalanceBadges(d){
+  if (d.balance >= 10000) grant(d,'k10');
+  if (d.balance >= 100000) grant(d,'k100');
+  if (d.balance >= 1000000) grant(d,'m1');
+  if (d.balance >= 10000 && d.lowMark <= 200) grant(d,'comeback');
+}
+function feltStyle(ownerId){
+  const s = pl(ownerId)?.sel || { felt:'green', back:'red' };
+  const f = SHOP.felt.find(x=>x[0]===s.felt) || SHOP.felt[0], b = SHOP.back.find(x=>x[0]===s.back) || SHOP.back[0];
+  return `--f1:${f[3]};--f2:${f[4]};--f3:${f[5]};--b1:${b[3]};--b2:${b[4]}`;
+}
+/** debts[debtor][creditor] = amount still owed */
+function debts(){
+  const m = {};
+  const add = (a,b,v) => { (m[a] ||= {}); m[a][b] = (m[a][b]||0) + v; };
+  for (const g of Object.values(gifts)){
+    if (g.kind==='loan') add(g.to, g.from, g.amount);
+    if (g.kind==='repay') add(g.from, g.to, -g.amount);
+  }
+  for (const a in m) for (const b in m[a]) if (m[a][b] <= 0) delete m[a][b];
+  return m;
+}
+const owedBy = (id, D=debts()) => Object.values(D[id]||{}).reduce((s,v)=>s+v, 0);
 
 /* ---------- auth ---------- */
 $('glogin').addEventListener('click', async () => {
@@ -336,70 +580,115 @@ getRedirectResult(auth).catch(e => console.warn(e));
 
 onAuthStateChanged(auth, u => {
   authUser = u;
-  if (!u){ stopAll(); uid=null; P=null; $('top').hidden = true; for (const v of ['table','players','account']) $('view-'+v).hidden = true; $('view-login').hidden = false; return; }
+  if (!u){ stopAll(); uid=null; P=null; $('top').hidden = true; $('daily').innerHTML=''; for (const v of ['table','players','shop','account']) $('view-'+v).hidden = true; $('view-login').hidden = false; return; }
   uid = u.uid; $('view-login').hidden = true; $('top').hidden = false; setTab(tab); startData();
 });
 
 /* ---------- data ---------- */
-let heartbeat=null, intervals=[];
+let intervals=[];
 function startData(){
   unsubP = onSnapshot(collection(fs,'players'), snap => {
     const next = {}; snap.docs.forEach(d => next[d.id] = d.data());
     players = next;
     const mine = next[uid];
-    if (mine && !snap.metadata.hasPendingWrites && (!P || (mine.updated||0) >= (P.updated||0))) P = structuredClone(mine);
+    if (mine && !snap.metadata.hasPendingWrites && (!P || (mine.updated||0) >= (P.updated||0))) P = norm(structuredClone(mine));
     if (!snap.metadata.fromCache && !mine && !P) createPlayer();
-    if (P && P.table && !tid) openTable(P.table);
-    reconcile(); renderAll();
+    if (P && P.table && !tid && !leaving) openTable(P.table);
+    reconcile(); claimGifts(); renderAll();
   }, e => { console.warn(e); toast('Keine Verbindung zur Datenbank. Prüfe die Sicherheitsregeln.'); });
+  unsubG = onSnapshot(collection(fs,'gifts'), snap => {
+    const g = {}; snap.docs.forEach(d => g[d.id] = d.data()); gifts = g; claimGifts(); renderAll();
+  }, e => console.warn(e));
   const beat = () => { if (P && document.visibilityState==='visible') updateDoc(doc(fs,'players',uid), { seen: Date.now() }).catch(()=>{}); };
-  heartbeat = setInterval(beat, 45000);
   document.addEventListener('visibilitychange', beat);
-  intervals = [setInterval(leaseLoop, 4000), setInterval(hostTick, 350), setInterval(tickTimers, 500), setInterval(renderAll, 30000)];
+  intervals = [setInterval(beat, 45000), setInterval(leaseLoop, 4000), setInterval(hostTick, 350), setInterval(tickTimers, 500), setInterval(renderAll, 30000)];
 }
 function stopAll(){
-  unsubP && unsubP(); unsubP=null; closeTable();
-  clearInterval(heartbeat); intervals.forEach(clearInterval); intervals=[];
+  unsubP && unsubP(); unsubG && unsubG(); unsubP = unsubG = null; closeTable();
+  intervals.forEach(clearInterval); intervals=[];
 }
-async function createPlayer(){
+function createPlayer(){
   if (P) return;
   let name = (authUser?.displayName || '').split(' ')[0] || 'Spieler';
   name = name.slice(0,20);
   let code; const taken = new Set(Object.values(players).map(p=>p.code));
   do { code = genCode(6); } while (taken.has(code));
-  const d = { name, code, balance: START, friends: [], table: null, ledger: null,
-    limits: { win: null, loss: null, base: START },
-    stats: { hands:0, wins:0, losses:0, pushes:0, bj:0, bankrupts:0, net:0, best:0 },
-    created: Date.now(), updated: Date.now(), seen: Date.now() };
+  const d = norm({ name, code, balance: START, table: null, ledger: null, created: Date.now(), updated: Date.now(), seen: Date.now() });
   P = d; renderAll();
-  try { await setDoc(doc(fs,'players',uid), d); } catch(e){ handleWriteErr(e); }
+  slow(setDoc(doc(fs,'players',uid), d)).catch(handleWriteErr);
+}
+
+/* ---------- gifts & loans ---------- */
+function claimGifts(){
+  if (!P) return;
+  for (const [id, g] of Object.entries(gifts)){
+    if (g.to !== uid || g.claimed) continue;
+    const did = withPlayer(d => { if (d.claimed.includes(id)) return false; d.balance += g.amount; d.claimed = [...d.claimed, id].slice(-300); return true; });
+    if (did){
+      SFX.coins();
+      toast(g.kind==='loan' ? `${nameOf(g.from)} leiht dir ${fmt(g.amount)} ℒ` : g.kind==='repay' ? `${nameOf(g.from)} zahlt dir ${fmt(g.amount)} ℒ zurück` : `${nameOf(g.from)} schenkt dir ${fmt(g.amount)} ℒ`);
+    }
+    if (P.claimed.includes(id)) updateDoc(doc(fs,'gifts',id), { claimed:true }).catch(()=>{});
+  }
+}
+function sendGift(to, amount, kind){
+  amount = Math.floor(amount);
+  if (!(amount >= 100)) return toast('Mindestens 100 Legats.');
+  if (inRound()) return toast('Warte, bis deine Runde vorbei ist.');
+  if (amount > P.balance) return toast('So viele Legats hast du nicht.');
+  const ref = doc(collection(fs,'gifts'));
+  const ok = withPlayer(d => {
+    if (d.balance < amount || ledgerOpen(d)) return false;
+    d.balance -= amount;
+    if (kind==='gift'){ d.giftedTotal += amount; if (d.giftedTotal >= 10000) grant(d,'generous'); }
+    return true;
+  });
+  if (!ok) return;
+  slow(setDoc(ref, { from:uid, to, amount, kind, claimed:false, t:Date.now() })).catch(handleWriteErr);
+  SFX.coins();
+  toast(kind==='loan' ? `Du leihst ${nameOf(to)} ${fmt(amount)} ℒ` : kind==='repay' ? `Du zahlst ${nameOf(to)} ${fmt(amount)} ℒ zurück` : `Du schenkst ${nameOf(to)} ${fmt(amount)} ℒ`);
 }
 
 /* ---------- tables ---------- */
 function openTable(id){
   if (tid === id) return;
   closeTable();
-  tid = id; T = null; seats = {}; anim.prime = true;
+  tid = id; T = null; seats = {}; msgs = []; anim.prime = true; seatHealed = false; autoRound = null;
   setTimeout(leaseLoop, 300);
   unsubT = onSnapshot(doc(fs,'tables',id), s => {
     if (!s.exists()){ if (!s.metadata.fromCache && tid===id){ T=null; renderAll(); } return; }
-    T = s.data(); pendingAct = false; reconcile(); renderAll();
+    T = s.data(); pendingAct = false; reconcile(); afterTable(); renderAll();
   }, e => console.warn(e));
   unsubS = onSnapshot(query(collection(fs,'seats'), where('table','==',id)), s => {
-    const n = {}; s.docs.forEach(d => n[d.id] = d.data()); seats = n; renderAll();
+    const n = {}; s.docs.forEach(d => n[d.id] = d.data()); seats = n;
+    if (!n[uid] && !s.metadata.fromCache && !s.metadata.hasPendingWrites && !leaving && !seatHealed && tid===id){
+      seatHealed = true; seatWrite({ table:id, joined:Date.now(), ready:false, round:-1, bet:0, act:null }, 'set');
+    }
+    afterTable(); renderAll();
+  }, e => console.warn(e));
+  let first = true;
+  unsubM = onSnapshot(query(collection(fs,'tables',id,'msgs'), orderBy('t','desc'), limit(40)), s => {
+    msgs = s.docs.map(d => d.data()).reverse();
+    if (!first) for (const ch of s.docChanges()) if (ch.type==='added' && ch.doc.data().u !== uid){
+      const m = ch.doc.data(); bubbles[m.u] = { x:m.x, k:m.k, at:Date.now() };
+      SFX.pop(); setTimeout(renderAll, 5100);
+    }
+    first = false; renderChat(); renderAll();
   }, e => console.warn(e));
 }
 function closeTable(){
-  unsubT && unsubT(); unsubS && unsubS(); unsubT = unsubS = null;
-  tid=null; T=null; seats={}; amHost=false;
+  unsubT && unsubT(); unsubS && unsubS(); unsubM && unsubM(); unsubT = unsubS = unsubM = null;
+  tid=null; T=null; seats={}; msgs=[]; amHost=false;
 }
-async function createTable(){
+async function createTable(vip){
+  if (vip && P.balance < VIP_MIN) return toast(`Für einen VIP-Tisch brauchst du mindestens ${fmt(VIP_MIN)} Legats.`);
   let id;
   for (let i=0;i<5;i++){ id = genCode(5); const s = await getDoc(doc(fs,'tables',id)); if (!s.exists()) break; }
-  const t = { name: (P?.name||'Spieler')+'s Tisch', phase:'betting', round:1, shoe:newShoe(), dealer:[], hands:{}, order:[],
+  const t = { name: (P?.name||'Spieler')+'s Tisch', owner: uid, min: vip ? VIP_MIN : MIN_BET, phase:'betting', round:1, shoe:[], dealer:[], hands:{}, order:[],
     turn:null, history:{}, acts:{}, reveal:false, betUntil:null, created:Date.now() };
-  try { await setDoc(doc(fs,'tables',id), t); } catch(e){ return handleWriteErr(e); }
-  await sitAt(id);
+  reshuffle(t);
+  try { await slow(setDoc(doc(fs,'tables',id), t)); } catch(e){ return handleWriteErr(e); }
+  sitAt(id);
 }
 async function joinByCode(code){
   code = (code||'').trim().toUpperCase().replace(/[^A-Z0-9]/g,'');
@@ -409,47 +698,111 @@ async function joinByCode(code){
   const c = await getDocs(query(collection(fs,'seats'), where('table','==',code)));
   const active = c.docs.filter(d => d.id!==uid && isOnline(d.id) && players[d.id]?.table===code).length;
   if (active >= MAX_SEATS) return toast('Der Tisch ist voll (5 Plätze).');
-  await sitAt(code);
+  sitAt(code);
 }
-async function sitAt(id){
-  await seatWrite({ table:id, joined:Date.now(), ready:false, round:-1, bet:0, act:null }, 'set');
-  await withPlayer(d => { d.table = id; return true; });
+function sitAt(id){
+  if (!id) return;
+  seatWrite({ table:id, joined:Date.now(), ready:false, round:-1, bet:0, act:null }, 'set');
+  withPlayer(d => { if (d.table===id) return false; d.table = id; return true; });
   openTable(id); setTab('table');
 }
-async function leaveTable(){
+function leaveTable(){
   const mid = T && T.hands && T.hands[uid] && T.phase!=='betting' && T.phase!=='done';
   if (mid && !confirmLeave){ confirmLeave = true; renderAll(); return; }
-  confirmLeave = false;
-  await seatWrite(null,'delete');
-  await withPlayer(d => { d.table = null; return true; });
+  confirmLeave = false; leaving = true;
+  seatWrite(null,'delete');
+  withPlayer(d => { d.table = null; return true; });
   closeTable(); renderAll();
+  setTimeout(() => { leaving = false; }, 3000);
 }
 
 /* ---------- player actions ---------- */
-async function placeBet(){
-  if (!T || T.phase!=='betting') return;
+function canBet(amount){
   const lim = limitState();
-  if (lim?.hit) return toast(lim.hit==='win' ? 'Gewinnziel erreicht. Starte im Konto eine neue Session.' : 'Stop-Loss erreicht. Starte im Konto eine neue Session.');
-  if (bet < MIN_BET || bet > MAX_BET) return toast('Einsatz zwischen 100 und 50.000 Legats.');
-  if (bet > P.balance) return toast('Nicht genug Legats.');
-  await seatWrite({ ready:true, round:T.round, bet });
+  if (lim?.hit) return lim.hit==='win' ? 'Gewinnziel erreicht. Starte im Konto eine neue Session.' : 'Stop-Loss erreicht. Starte im Konto eine neue Session.';
+  if (amount < tableMin()) return `Mindesteinsatz an diesem Tisch: ${fmt(tableMin())} Legats.`;
+  if (amount > MAX_BET) return 'Höchsteinsatz: 50.000 Legats.';
+  if (amount > P.balance) return 'Nicht genug Legats.';
+  return null;
 }
-async function unBet(){ await seatWrite({ ready:false }); }
-async function act(type){
+function placeBet(amount = bet){
+  if (!T || T.phase!=='betting') return false;
+  const err = canBet(amount); if (err){ toast(err); return false; }
+  ls.set('lastBet', amount); bet = amount;
+  seatWrite({ ready:true, round:T.round, bet:amount });
+  SFX.chip();
+  return true;
+}
+function unBet(){ seatWrite({ ready:false }); }
+function act(type){
   if (!T || T.phase!=='playing' || !T.turn || T.turn.u!==uid || pendingAct) return;
   const H = T.hands[uid][T.turn.h];
   if ((type==='double' || type==='split') && P.balance < H.bet) return toast('Nicht genug Legats für '+(type==='double'?'Verdoppeln':'Teilen')+'.');
   pendingAct = true; renderAll();
-  await seatWrite({ act: { type, h:T.turn.h, round:T.round, seq:Date.now() } });
+  seatWrite({ act: { type, h:T.turn.h, round:T.round, seq:Date.now() } });
   setTimeout(()=>{ if(pendingAct){ pendingAct=false; renderAll(); } }, 4000);
+}
+function insure(yes){
+  if (!T || T.phase!=='insurance' || !T.hands?.[uid] || T.insDone?.[uid] || pendingAct) return;
+  const cost = Math.floor(T.hands[uid][0].bet/2);
+  if (yes && P.balance < cost) return toast('Nicht genug Legats für die Versicherung.');
+  pendingAct = true; renderAll();
+  seatWrite({ act: { type: yes ? 'insure' : 'noinsure', h:-1, round:T.round, seq:Date.now() } });
+  setTimeout(()=>{ if(pendingAct){ pendingAct=false; renderAll(); } }, 4000);
+}
+/** runs after every table update: auto bet, sounds */
+let lastTurnKey = null, lastDoneKey = null;
+function afterTable(){
+  if (!T || !P) return;
+  // auto bet: repeat the last bet at the start of every round
+  if (auto && T.phase==='betting' && autoRound !== T.round && seats[uid]){
+    const s = seats[uid];
+    if (!(s.ready && s.round===T.round)){
+      autoRound = T.round;
+      const amount = ls.get('lastBet', bet);
+      const err = isBroke() ? 'Du bist pleite.' : canBet(amount);
+      if (err){ auto = false; ls.set('autobet', false); toast('Auto-Einsatz gestoppt: ' + err); }
+      else { const r = T.round; setTimeout(() => { if (auto && T?.phase==='betting' && T.round===r) placeBet(amount); }, 700); }
+    }
+  }
+  const tk = T.turn && T.turn.u===uid && T.phase==='playing' ? `${tid}-${T.round}-${T.turn.h}` : null;
+  if (tk && tk !== lastTurnKey) SFX.turn();
+  lastTurnKey = tk;
+  const r = T.phase==='done' ? T.history?.[T.round]?.[uid] : null;
+  const dk = r ? `${tid}-${T.round}` : null;
+  if (dk && dk !== lastDoneKey){
+    const hs = T.hands[uid] || [];
+    if (hs.some(H=>H.res==='bj')) SFX.bj(); else if (r.pay > r.bet) SFX.win();
+    else if (hs.length && hs.every(H=>H.st==='bust')) SFX.bust(); else if (r.pay === r.bet) SFX.push(); else SFX.lose();
+  }
+  lastDoneKey = dk;
 }
 
 /* ---------- money: reconcile my balance with the table ---------- */
-function applyResult(d, r){
+function applyResult(d, r, ctx){
   d.balance += r.pay;
-  const st = d.stats;
+  const st = d.stats, net = r.pay - r.bet;
   st.hands += r.n; st.wins += r.w; st.losses += r.l; st.pushes += r.p; st.bj += r.bj;
-  st.net += r.pay - r.bet; st.best = Math.max(st.best||0, r.pay - r.bet);
+  st.net += net; st.best = Math.max(st.best||0, net);
+  d.week.net += net; d.week.hands += r.n; d.week.best = Math.max(d.week.best, net);
+  d.hist = [...d.hist, { t:Date.now(), b:d.balance, n:net, w:r.bet }].slice(-60);
+  d.streaks.win = net > 0 ? d.streaks.win + 1 : net < 0 ? 0 : d.streaks.win;
+  d.streaks.bj = r.bj > 0 ? d.streaks.bj + 1 : 0;
+  if (r.w > 0) grant(d,'first_win');
+  if (r.bj > 0) grant(d,'bj');
+  if (d.streaks.bj >= 3) grant(d,'bj3');
+  if (d.streaks.win >= 5) grant(d,'win5');
+  if (st.hands >= 100) grant(d,'h100');
+  if (st.hands >= 1000) grant(d,'h1000');
+  if (r.insPay > 0) grant(d,'ins');
+  if (ctx){
+    const hs = ctx.hands || [];
+    if (ctx.vip) grant(d,'vip');
+    if (hs.some(H => H.res==='win' && H.c.length>=5 && score(H.c).t===21)) grant(d,'five21');
+    if (hs.some(H => H.res==='win' && H.dbl)) grant(d,'dbl');
+    if (hs.length>=2 && hs.every(H => H.res==='win')) grant(d,'split2');
+    if (hs.some(H => H.bet >= 50000 && !H.dbl)) grant(d,'high');
+  }
 }
 function reconcile(){
   if (!P || !T || !tid) return;
@@ -460,20 +813,21 @@ function reconcile(){
     if (L && !L.settled && L.key !== key){
       const [lt, lr] = L.key.split(':');
       const h = lt===tid ? T.history?.[lr]?.[uid] : null;
-      if (h) applyResult(d, h);
-      else { d.stats.hands += 1; d.stats.losses += 1; d.stats.net -= L.committed; }
+      if (h) applyResult(d, h, null);
+      else { d.stats.hands += 1; d.stats.losses += 1; d.stats.net -= L.committed; d.week.net -= L.committed; d.streaks.win = 0; d.streaks.bj = 0; }
       d.ledger = { ...L, settled:true }; changed = true;
     }
     const mine = T.hands?.[uid];
     if (mine && T.phase!=='betting'){
-      const committed = mine.reduce((s,h)=>s+h.bet, 0);
+      const committed = mine.reduce((s,h)=>s+h.bet, 0) + (T.ins?.[uid] || 0);
       if (!d.ledger || d.ledger.key !== key){ d.ledger = { key, committed:0, settled:false }; changed = true; }
       if (!d.ledger.settled && committed > d.ledger.committed){
-        d.balance = Math.max(0, d.balance - (committed - d.ledger.committed)); d.ledger.committed = committed; changed = true;
+        d.balance = Math.max(0, d.balance - (committed - d.ledger.committed)); d.ledger.committed = committed;
+        d.lowMark = Math.min(d.lowMark, d.balance); changed = true;
       }
       if (T.phase==='done' && !d.ledger.settled){
         const h = T.history?.[T.round]?.[uid];
-        if (h){ applyResult(d, h); d.ledger.settled = true; changed = true; }
+        if (h){ applyResult(d, h, { hands: mine, vip: (T.min||0) >= VIP_MIN }); d.ledger.settled = true; changed = true; }
       }
     }
     return changed;
@@ -488,7 +842,7 @@ async function leaseLoop(){
     amHost = await runTransaction(fs, async tx => {
       const s = await tx.get(ref); const d = s.exists() ? s.data() : {}; const now = Date.now();
       if (!d.holder || d.holder===uid || (d.exp||0) < now){
-        if (d.holder===uid && (d.exp||0) - now > 8000) return true;   // still fresh, skip a write
+        if (d.holder===uid && (d.exp||0) - now > 8000) return true;
         tx.set(ref, { holder: uid, exp: now + 15000 }); return true;
       }
       return false;
@@ -496,7 +850,11 @@ async function leaseLoop(){
   } catch(e){ amHost = false; }
 }
 function presentSeat(u){ return !!seats[u] && isOnline(u) && (u===uid || players[u]?.table===tid); }
-function draw(nt){ if (!nt.shoe.length) nt.shoe = newShoe(); return nt.shoe.pop(); }
+function reshuffle(nt){
+  nt.shoe = newShoe(); const orig = nt.shoe.join('');
+  nt.fair = { n: (nt.fair?.n || 0) + 1, orig, hash: sha256(orig), round: nt.round };
+}
+function draw(nt){ if (!nt.shoe.length) reshuffle(nt); return nt.shoe.pop(); }
 function nextTurn(nt, fromU, fromH, now){
   const order = nt.order; let i = fromU ? order.indexOf(fromU) : 0;
   for (; i<order.length; i++){
@@ -515,22 +873,25 @@ function advance(nt, now){
   const t = nextTurn(nt, nt.turn?.u, nt.turn?.h ?? -1, now);
   if (t) nt.turn = t; else { nt.turn = null; nt.phase = 'dealer'; nt.dAt = now; }
 }
-function dealDuration(n){ return reduceMotion ? 0 : (2*(n+1))*170 + 500; }
+function startPlay(nt, now){
+  nt.phase = 'playing'; nt.turn = { u:null, h:-1 };
+  const t = nextTurn(nt, null, -1, now);
+  if (t) nt.turn = t; else { nt.turn=null; nt.phase='dealer'; nt.dAt=now; }
+}
+const dealDuration = n => reduceMotion ? 0 : (2*(n+1))*170 + 500;
 function deal(nt, ready, now){
-  if (nt.shoe.length < 80){ nt.shoe = newShoe(); nt.shuffledAt = nt.round; }
+  if (nt.shoe.length < 80) reshuffle(nt);
   ready.sort((a,b)=>(a[1].joined||0)-(b[1].joined||0));
   nt.order = ready.map(r=>r[0]);
   nt.hands = {}; for (const [u,s] of ready) nt.hands[u] = [{ c:[], bet:s.bet, st:'play' }];
-  nt.dealer = [];
+  nt.dealer = []; nt.ins = {}; nt.insDone = {};
   for (let k=0;k<2;k++){ for (const u of nt.order) nt.hands[u][0].c.push(draw(nt)); nt.dealer.push(draw(nt)); }
   for (const u of nt.order){ const H = nt.hands[u][0]; if (score(H.c).t===21) H.st='bj'; }
   nt.betUntil = null; nt.reveal = false; nt.turn = null;
   const wait = dealDuration(nt.order.length);
-  const peek = cval(nt.dealer[0]) >= 10 && score(nt.dealer).t === 21;
-  if (peek){ nt.phase='dealer'; nt.dAt=now + wait; return; }
-  nt.phase = 'playing'; nt.turn = { u:null, h:-1 };
-  const t = nextTurn(nt, null, -1, now + wait);
-  if (t) nt.turn = t; else { nt.turn=null; nt.phase='dealer'; nt.dAt=now + wait; }
+  if (nt.dealer[0][0]==='A'){ nt.phase='insurance'; nt.insUntil = now + wait + INS_MS; return; }
+  if (cval(nt.dealer[0])===10 && score(nt.dealer).t===21){ nt.phase='dealer'; nt.dAt=now + wait; return; }
+  startPlay(nt, now + wait);
 }
 function applyAct(nt, type, now){
   const { u, h } = nt.turn, hs = nt.hands[u], H = hs[h];
@@ -540,6 +901,9 @@ function applyAct(nt, type, now){
     if (H.st!=='play') advance(nt, now); else nt.turn.until = now + TURN_MS;
   } else if (type==='stand'){
     H.st='stand'; advance(nt, now);
+  } else if (type==='surrender'){
+    if (H.c.length!==2 || hs.length!==1 || H.sp) return;
+    H.st='surr'; advance(nt, now);
   } else if (type==='double'){
     if (H.c.length!==2 || H.sa) return;
     H.bet *= 2; H.dbl = true; H.c.push(draw(nt));
@@ -559,10 +923,11 @@ function settle(nt){
   const d = score(nt.dealer).t, dBJ = nt.dealer.length===2 && d===21;
   const hist = {};
   for (const u of nt.order){
-    const r = { pay:0, bet:0, n:0, w:0, l:0, p:0, bj:0 };
+    const r = { pay:0, bet:0, n:0, w:0, l:0, p:0, bj:0, insPay:0 };
     for (const H of nt.hands[u]){
       const s = score(H.c).t, nat = H.st==='bj';
-      if (H.st==='bust'){ H.res='lose'; H.pay=0; }
+      if (H.st==='surr'){ H.res='surr'; H.pay=Math.floor(H.bet/2); }
+      else if (H.st==='bust'){ H.res='lose'; H.pay=0; }
       else if (nat && !dBJ){ H.res='bj'; H.pay=Math.floor(H.bet*2.5); }
       else if (dBJ){ H.res = nat?'push':'lose'; H.pay = nat?H.bet:0; }
       else if (d>21 || s>d){ H.res='win'; H.pay=H.bet*2; }
@@ -571,6 +936,8 @@ function settle(nt){
       r.pay += H.pay; r.bet += H.bet; r.n++;
       if (H.res==='win') r.w++; else if (H.res==='bj'){ r.w++; r.bj++; } else if (H.res==='push') r.p++; else r.l++;
     }
+    const ins = nt.ins?.[u] || 0;
+    if (ins){ r.bet += ins; r.insPay = dBJ ? ins*3 : 0; r.pay += r.insPay; }
     hist[u] = r;
   }
   nt.history = nt.history || {};
@@ -579,18 +946,38 @@ function settle(nt){
 }
 function step(nt, now){
   const seatList = Object.entries(seats);
+  const min = nt.min || MIN_BET;
+  nt.acts = nt.acts || {};
   switch (nt.phase){
     case 'betting': {
       const present = seatList.filter(([u]) => presentSeat(u));
-      const ready = present.filter(([,s]) => s.ready && s.round===nt.round && s.bet>=MIN_BET && s.bet<=MAX_BET);
+      const ready = present.filter(([,s]) => s.ready && s.round===nt.round && s.bet>=min && s.bet<=MAX_BET);
       if (!ready.length){ if (nt.betUntil){ nt.betUntil=null; return true; } return false; }
       if (!nt.betUntil){ nt.betUntil = now + BET_MS; if (ready.length < present.length) return true; }
       if (ready.length === present.length || now >= nt.betUntil){ deal(nt, ready, now); return true; }
       return false;
     }
+    case 'insurance': {
+      let changed = false;
+      for (const u of nt.order){
+        const s = seats[u];
+        if (s?.act && s.act.round===nt.round && s.act.seq > (nt.acts[u]||0) && (s.act.type==='insure' || s.act.type==='noinsure')){
+          nt.acts[u] = s.act.seq; nt.insDone[u] = true;
+          if (s.act.type==='insure') nt.ins[u] = Math.floor(nt.hands[u][0].bet/2);
+          changed = true;
+        }
+      }
+      const all = nt.order.every(u => nt.insDone[u] || !seats[u]);
+      if (all || now >= nt.insUntil){
+        if (score(nt.dealer).t===21){ nt.phase='dealer'; nt.dAt=now; }
+        else startPlay(nt, now);
+        return true;
+      }
+      return changed;
+    }
     case 'playing': {
       const t = nt.turn; if (!t){ nt.phase='dealer'; nt.dAt=now; return true; }
-      const s = seats[t.u]; nt.acts = nt.acts || {};
+      const s = seats[t.u];
       if (s && s.act && s.act.round===nt.round && s.act.seq > (nt.acts[t.u]||0)){
         nt.acts[t.u] = s.act.seq;
         if (s.act.h === t.h) applyAct(nt, s.act.type, now);
@@ -607,8 +994,8 @@ function step(nt, now){
       settle(nt); nt.phase='done'; nt.doneAt=now; return true;
     }
     case 'done': {
-      if (now - (nt.doneAt||0) < 5500) return false;
-      nt.phase='betting'; nt.round += 1; nt.hands={}; nt.dealer=[]; nt.order=[]; nt.turn=null; nt.reveal=false; nt.betUntil=null;
+      if (now - (nt.doneAt||0) < DONE_MS) return false;
+      nt.phase='betting'; nt.round += 1; nt.hands={}; nt.dealer=[]; nt.order=[]; nt.turn=null; nt.reveal=false; nt.betUntil=null; nt.ins={}; nt.insDone={};
       return true;
     }
   }
@@ -619,8 +1006,11 @@ async function hostTick(){
   hostBusy = true;
   try {
     const nt = structuredClone(T);
-    if (step(nt, Date.now())){
-      T = nt; reconcile(); renderAll();
+    let changed = false;
+    if (!nt.fair && nt.phase==='betting'){ reshuffle(nt); changed = true; }
+    if (step(nt, Date.now())) changed = true;
+    if (changed){
+      T = nt; reconcile(); afterTable(); renderAll();
       await setDoc(doc(fs,'tables',tid), nt);
     }
   } catch(e){ console.warn(e); }
@@ -641,7 +1031,7 @@ function animateCards(root){
   const shoe = root.querySelector('.shoe');
   if (anim.prime && T){ for (const el of els) anim.seen.set(el.dataset.k, { t0:-1e9, delay:0, down: el.classList.contains('down') }); anim.prime = false; return; }
   const fresh = els.filter(el => !anim.seen.has(el.dataset.k)).sort((a,b)=>(+a.dataset.o)-(+b.dataset.o));
-  fresh.forEach((el,i) => anim.seen.set(el.dataset.k, { t0: now, delay: i*STAGGER, down: el.classList.contains('down'), fresh:true }));
+  fresh.forEach((el,i) => { anim.seen.set(el.dataset.k, { t0: now, delay: i*STAGGER, down: el.classList.contains('down'), fresh:true }); SFX.card((i*STAGGER + FLY_MS*.75)/1000); });
   if (reduceMotion) return;
   const sr = shoe?.getBoundingClientRect();
   for (const el of els){
@@ -652,7 +1042,7 @@ function animateCards(root){
       const r = el.getBoundingClientRect();
       const dx = sr ? (sr.left + sr.width/2) - (r.left + r.width/2) : 0, dy = sr ? (sr.top + sr.height/2) - (r.top + r.height/2) : -60;
       const fly = el.animate([
-        { transform:`translate(${dx}px,${dy}px) rotate(-28deg) scale(.82)`, offset:0 },
+        { transform:`translate(${dx}px,${dy}px) rotate(-28deg) scale(.82)` },
         { transform:'translate(0,0) rotate(0) scale(1)' }
       ], { duration: FLY_MS, delay: a.delay, easing:'cubic-bezier(.18,.82,.26,1)', fill:'backwards' });
       fly.currentTime = elapsed;
@@ -663,7 +1053,7 @@ function animateCards(root){
         flip.currentTime = elapsed;
       }
     }
-    if (a.down && !down && !a.flipT0) a.flipT0 = now;      // hole card turned over
+    if (a.down && !down && !a.flipT0){ a.flipT0 = now; SFX.card(); }
     a.down = down;
     if (a.flipT0 && now - a.flipT0 < FLIP_MS + 60){
       const f = el.firstElementChild.animate([{ transform:'rotateY(180deg) scale(1.08)' }, { transform:'rotateY(0deg) scale(1)' }], { duration: FLIP_MS, easing:'ease-out' });
@@ -674,7 +1064,7 @@ function animateCards(root){
 }
 
 /* ---------- rendering ---------- */
-const RES = { win:'Gewonnen', bj:'Blackjack!', lose:'Verloren', push:'Unentschieden' };
+const RES = { win:'Gewonnen', bj:'Blackjack!', lose:'Verloren', push:'Unentschieden', surr:'Aufgegeben' };
 function renderTop(){
   const b = $('pbal');
   if (P && lastBal !== null && P.balance !== lastBal){
@@ -683,23 +1073,35 @@ function renderTop(){
   }
   lastBal = P ? P.balance : null;
   b.textContent = P ? fmt(P.balance)+' ℒ' : '–';
-  $('pname').textContent = P ? P.name : 'Konto';
+  $('pname').textContent = P ? `${P.avatar} ${P.name}` : 'Konto';
+  $('mute').textContent = snd.on ? '🔊' : '🔇';
+  const el = $('daily');
+  if (!P){ el.innerHTML = ''; return; }
+  const today = dayId(), D = P.daily || {};
+  if (D.last === today){ if (el.innerHTML) el.innerHTML = ''; return; }
+  const streak = D.last === dayId(Date.now()-864e5) ? (D.streak||0) + 1 : 1;
+  const html = `<div class="daily"><div><b>Täglicher Bonus: +${fmt(dailyAmount(streak))} ℒ</b> <span class="muted small">· Tag ${streak} in Folge</span>
+    <div class="streak" style="margin-top:6px">${Array.from({length:7},(_,i)=>`<i class="${i<Math.min(streak,7)?'on':''}"></i>`).join('')}</div></div>
+    <button class="btn gold sm" data-act="daily">Abholen</button></div>`;
+  if (el.innerHTML !== html) el.innerHTML = html;
 }
 function renderLobby(){
   const fr = friendIds().filter(id => players[id].table && isOnline(id));
   const tables = {};
   for (const id of fr) (tables[players[id].table] ||= []).push(id);
   const list = Object.entries(tables).map(([t, ids]) => `
-    <div class="lobby-item"><div><b>${ids.map(i=>esc(nameOf(i))).join(', ')}</b> <span class="muted">am Tisch</span> <span class="num">${esc(t)}</span></div>
+    <div class="lobby-item"><div><b>${ids.map(i=>esc(avOf(i)+' '+nameOf(i))).join(', ')}</b> <span class="muted">am Tisch</span> <span class="num">${esc(t)}</span></div>
     <button class="btn sm gold" data-act="join" data-id="${esc(t)}">Mitspielen</button></div>`).join('');
   return `<div class="stack">
-    <div class="felt"><div class="arc">Blackjack zahlt <em>3 zu 2</em> · Dealer steht auf allen <em>17</em></div>
+    <div class="felt" style="${feltStyle(uid)}"><div class="arc">Blackjack zahlt <em>3 zu 2</em> · Dealer steht auf allen <em>17</em></div>
       <div class="dealer"><p class="muted" style="text-align:center;max-width:46ch">Eröffne einen Tisch und gib den Code an deine Freunde weiter, oder setz dich an einen bestehenden Tisch. Allein spielen geht auch. Bis zu 5 Spieler pro Tisch.</p></div>
     </div>
     ${isBroke() ? reviveBox() : ''}
     <div class="grid2">
-      <div class="panel stack"><h3>Neuer Tisch</h3><p class="muted">Du bekommst einen 5-stelligen Code für deine Freunde.</p>
-        <div><button class="btn gold" data-act="create" ${!P?'disabled':''}>Tisch eröffnen</button></div></div>
+      <div class="panel stack"><h3>Neuer Tisch</h3><p class="muted">Du bekommst einen 5-stelligen Code für deine Freunde. Der Tisch trägt dein Design aus dem Shop.</p>
+        <div class="row"><button class="btn gold" data-act="create" ${!P?'disabled':''}>Tisch eröffnen</button>
+        <button class="btn" data-act="createvip" ${!P?'disabled':''}>⭐ VIP-Tisch</button></div>
+        <p class="muted small">VIP-Tisch: Mindesteinsatz ${fmt(VIP_MIN)} Legats.</p></div>
       <div class="panel stack"><h3>Mit Code beitreten</h3>
         <div class="row"><div class="field" style="flex:1"><label for="tcode">Tisch-Code</label><input id="tcode" maxlength="5" placeholder="z. B. K7QXM" autocomplete="off" autocapitalize="characters" style="text-transform:uppercase"></div>
         <button class="btn" data-act="joincode" style="align-self:flex-end" ${!P?'disabled':''}>Beitreten</button></div></div>
@@ -717,20 +1119,24 @@ function handsHTML(u){
   return `<div class="hands">${hs.map((H,i)=>{
     const active = T.phase==='playing' && T.turn?.u===u && T.turn?.h===i && hs.length>1;
     const res = H.res ? `<span class="res ${H.res}">${RES[H.res]}${H.pay>H.bet?' +'+fmt(H.pay-H.bet):''}</span>` :
-      H.st==='bust' ? '<span class="res lose">Überkauft</span>' : H.st==='bj' ? '<span class="res bj">Blackjack</span>' : '';
+      H.st==='bust' ? '<span class="res lose">Überkauft</span>' : H.st==='bj' ? '<span class="res bj">Blackjack</span>' : H.st==='surr' ? '<span class="res surr">Aufgegeben</span>' : '';
     const won = H.res==='win' || H.res==='bj';
     return `<div class="hbox${active?' active':''}${won?' won':''}"><div class="cards">${H.c.map((c,k)=>cardHTML(c, `${tid}-${T.round}-${u}-${i}-${k}`, false, (i===0 && k<2 && !H.sp) ? k*(n+1)+i0 : 999)).join('')}</div>
       <div class="row" style="justify-content:center;gap:6px"><span class="score">${scoreLabel(H.c)}</span><span class="chip-bet">${fmt(H.bet)}${H.dbl?' ×2':''}</span></div>${res}</div>`;
-  }).join('')}</div>`;
+  }).join('')}${T.ins?.[u] ? `<span class="pill" style="align-self:center">🛡️ ${fmt(T.ins[u])}</span>` : ''}</div>`;
+}
+function autoSwitch(){
+  return `<label class="switch"><input type="checkbox" id="autobet" ${auto?'checked':''}> Auto-Einsatz <span class="muted small">(${fmt(ls.get('lastBet', bet))} ℒ jede Runde)</span></label>`;
 }
 function renderTableView(){
   if (!T) return `<div class="panel stack"><p class="muted">Tisch ${esc(tid)} wird geladen …</p><div><button class="btn sm" data-act="leave">Zurück zur Lobby</button></div></div>`;
   const showHole = T.reveal || T.phase==='done';
-  const n = T.order.length;
+  const n = T.order.length, vip = (T.min||0) >= VIP_MIN;
   const dScore = T.dealer.length ? (showHole ? scoreLabel(T.dealer) : scoreLabel([T.dealer[0]])) : '';
   const dealerCards = T.dealer.map((c,i)=>cardHTML(c, `${tid}-${T.round}-d-${i}`, i===1 && !showHole, i<2 ? i*(n+1)+n : 999)).join('');
   let status = '';
   if (T.phase==='betting') status = T.betUntil ? `Karten kommen in <span class="num" data-until="${T.betUntil}"></span> s` : 'Einsätze bitte';
+  else if (T.phase==='insurance') status = `Dealer zeigt ein Ass · Versicherung? <span class="num" data-until="${T.insUntil}"></span> s`;
   else if (T.phase==='playing' && T.turn) status = T.turn.u===uid ? 'Du bist dran' : `${esc(nameOf(T.turn.u))} ist dran`;
   else if (T.phase==='dealer') status = showHole ? 'Dealer zieht …' : 'Dealer deckt auf …';
   else if (T.phase==='done'){ const d = score(T.dealer).t; status = d>21 ? 'Dealer überkauft' : (T.dealer.length===2&&d===21 ? 'Dealer hat Blackjack' : 'Dealer hat '+d); }
@@ -741,9 +1147,11 @@ function renderTableView(){
     const s = seats[u] || {}, me = u===uid, turn = T.phase==='playing' && T.turn?.u===u;
     let sub = '';
     if (T.phase==='betting') sub = s.ready && s.round===T.round ? `Setzt <span class="num">${fmt(s.bet)}</span>` : 'Überlegt …';
+    else if (T.phase==='insurance' && T.hands?.[u]) sub = T.insDone?.[u] ? (T.ins?.[u] ? 'Versichert' : 'Keine Versicherung') : 'Überlegt …';
     else if (!T.hands?.[u]) sub = 'Wartet auf die nächste Runde';
     const t = turn ? `<span class="timer">noch <span data-until="${T.turn.until}"></span> s</span>` : '';
-    return `<div class="seat${me?' me':''}${turn?' turn':''}"><div class="nm"><span class="dot${isOnline(u)?' on':''}"></span>${esc(nameOf(u))}${me?' (du)':''}</div>
+    const bb = bubbles[u] && Date.now() - bubbles[u].at < 5000 ? `<div class="bubble${bubbles[u].k==='e'?' emo':''}">${esc(bubbles[u].x)}</div>` : '';
+    return `<div class="seat${me?' me':''}${turn?' turn':''}">${bb}<div class="nm"><span class="dot${isOnline(u)?' on':''}"></span>${esc(avOf(u))} ${esc(nameOf(u))}${me?' (du)':''}</div>
       ${handsHTML(u)}<div class="sub">${sub}</div>${t}</div>`;
   }).join('');
 
@@ -754,31 +1162,39 @@ function renderTableView(){
     const mySeat = seats[uid];
     const ready = mySeat?.ready && mySeat.round===T.round;
     const max = Math.min(MAX_BET, P?.balance||0);
-    if (lim?.hit) controls = `<div class="note">${lim.hit==='win'?'Dein Gewinnziel ist erreicht':'Dein Stop-Loss ist erreicht'} (${lim.profit>=0?'+':''}${fmt(lim.profit)} ℒ). Im Konto kannst du eine neue Session starten oder das Limit ändern.</div>`;
-    else if (ready) controls = `<p>Dein Einsatz: <b class="num">${fmt(mySeat.bet)} ℒ</b>. Warte auf die anderen …</p><button class="btn sm" data-act="unbet">Einsatz zurückziehen</button>`;
+    if (lim?.hit) controls = `<div class="note">${lim.hit==='win'?'Dein Gewinnziel ist erreicht':'Dein Stop-Loss ist erreicht'} (${sgn(lim.profit)} ℒ). Im Konto kannst du eine neue Session starten oder das Limit ändern.</div>`;
+    else if (P.balance < tableMin()) controls = `<div class="note">An diesem Tisch ist der Mindesteinsatz ${fmt(tableMin())} Legats. Du hast nur ${fmt(P.balance)}.</div>`;
+    else if (ready) controls = `<p>Dein Einsatz: <b class="num">${fmt(mySeat.bet)} ℒ</b>. Warte auf die anderen …</p><button class="btn sm" data-act="unbet">Einsatz zurückziehen</button>${autoSwitch()}`;
     else controls = `
       <div class="chips">${CHIPS.map(([v,cl,l])=>`<button class="chip ${cl}" data-act="chip" data-v="${v}" ${bet+v>max?'disabled':''} aria-label="${fmt(v)} hinzufügen">${l}</button>`).join('')}</div>
       <div class="betline"><button class="btn sm" data-act="betclear">Löschen</button><span class="betval">${fmt(bet)}</span><button class="btn sm" data-act="betmax">Max</button></div>
-      <button class="btn gold" data-act="bet" ${bet<MIN_BET||bet>max?'disabled':''}>Setzen</button>
-      <p class="muted" style="font-size:12px">Einsatz 100 – 50.000 Legats</p>`;
+      <button class="btn gold" data-act="bet" ${bet<tableMin()||bet>max?'disabled':''}>Setzen</button>
+      ${autoSwitch()}
+      <p class="muted small">Einsatz ${fmt(tableMin())} – 50.000 Legats</p>`;
+  } else if (T.phase==='insurance' && T.hands?.[uid] && !T.insDone?.[uid]){
+    const cost = Math.floor(T.hands[uid][0].bet/2);
+    controls = `<p>Versicherung kostet <b class="num">${fmt(cost)} ℒ</b> und zahlt 2 zu 1, wenn der Dealer Blackjack hat.</p>
+      <div class="acts"><button class="btn gold" data-act="insure" ${pendingAct||P.balance<cost?'disabled':''}>Versichern</button><button class="btn" data-act="noinsure" ${pendingAct?'disabled':''}>Nein danke</button></div>`;
   } else if (T.phase==='playing' && T.turn?.u===uid){
-    const H = T.hands[uid][T.turn.h];
+    const hs = T.hands[uid], H = hs[T.turn.h];
     const canDbl = H.c.length===2 && !H.sa && P.balance>=H.bet;
-    const canSplit = H.c.length===2 && !H.sa && T.hands[uid].length<4 && cval(H.c[0])===cval(H.c[1]) && P.balance>=H.bet;
+    const canSplit = H.c.length===2 && !H.sa && hs.length<4 && cval(H.c[0])===cval(H.c[1]) && P.balance>=H.bet;
+    const canSurr = H.c.length===2 && hs.length===1 && !H.sp;
     const dis = pendingAct ? 'disabled' : '';
     controls = `<div class="acts">
       <button class="btn gold" data-act="hit" ${dis}>Karte</button>
       <button class="btn gold" data-act="stand" ${dis}>Halten</button>
       <button class="btn" data-act="double" ${dis} ${canDbl?'':'disabled'}>Verdoppeln</button>
-      <button class="btn" data-act="split" ${dis} ${canSplit?'':'disabled'}>Teilen</button></div>`;
+      <button class="btn" data-act="split" ${dis} ${canSplit?'':'disabled'}>Teilen</button>
+      ${canSurr ? `<button class="btn" data-act="surrender" ${dis}>Aufgeben</button>` : ''}</div>`;
   } else if (T.phase==='done' && T.history?.[T.round]?.[uid]){
     const r = T.history[T.round][uid], net = r.pay - r.bet;
-    controls = `<p class="net" style="color:${net>0?'var(--win)':net<0?'var(--lose)':'var(--push)'}">${net>0?'+':''}${fmt(net)} ℒ</p>`;
-  }
+    controls = `<p class="net" style="color:${net>0?'var(--win)':net<0?'var(--lose)':'var(--push)'}">${sgn(net)} ℒ</p>${autoSwitch()}`;
+  } else if (T.hands?.[uid]) controls = autoSwitch();
   const leaveTxt = confirmLeave ? 'Wirklich gehen? Laufender Einsatz ist verloren' : 'Tisch verlassen';
-  return `<div class="felt">
+  return `<div class="felt${vip?' vip':''}" style="${feltStyle(T.owner)}">
     <div class="shoe" aria-hidden="true"></div>
-    <div class="felt-head"><div class="tcode">Tisch-Code <b>${esc(tid)}</b> <button class="btn sm" data-act="copytable" style="margin-left:6px">Kopieren</button></div>
+    <div class="felt-head"><div class="tcode">${vip?'<span class="vipbadge">VIP</span>':''}Tisch-Code <b>${esc(tid)}</b> <button class="btn sm" data-act="copytable">Kopieren</button> <button class="btn sm" data-act="fair">Fairness</button></div>
       <button class="btn sm" data-act="leave">${leaveTxt}</button></div>
     <div class="arc">Blackjack zahlt <em>3 zu 2</em> · Dealer steht auf allen <em>17</em></div>
     <div class="dealer"><div class="who">Dealer</div><div class="hand"><div class="cards">${dealerCards}</div></div>${dScore?`<span class="score">${dScore}</span>`:''}</div>
@@ -786,45 +1202,74 @@ function renderTableView(){
     <div class="seats">${seatHTML}</div>
     <div class="controls">${controls}</div>
   </div>
-  <p class="muted" style="font-size:12px;margin-top:10px">6 Decks · Verdoppeln auf zwei Karten · Teilen bis zu 4 Hände (Asse nur einmal, je eine Karte) · Dealer prüft bei Ass/10 auf Blackjack · 30 s Bedenkzeit, danach wird gehalten.</p>`;
+  <p class="muted small" style="margin-top:10px">6 Decks · Versicherung bei Ass · Aufgeben auf den ersten zwei Karten (halber Einsatz zurück) · Verdoppeln auf zwei Karten · Teilen bis zu 4 Hände (Asse nur einmal, je eine Karte) · 30 s Bedenkzeit, danach wird gehalten.</p>`;
 }
 let lastTableHTML = '';
 function renderTable(){
-  const el = $('view-table');
+  const el = $('tv');
   let html;
   if (!P) html = `<div class="panel"><p class="muted">Dein Konto wird geladen …</p></div>`;
   else html = tid ? renderTableView() : renderLobby();
-  if (html === lastTableHTML) return;        // nothing changed: keep running animations untouched
+  $('chat').hidden = !(tid && T);
+  if (html === lastTableHTML) return;
   lastTableHTML = html;
   const keep = $('tcode')?.value;
   el.innerHTML = html;
   if (keep && $('tcode')) $('tcode').value = keep;
   animateCards(el);
 }
+function renderChat(){
+  const log = $('chatlog'); if (!log) return;
+  const atBottom = log.scrollHeight - log.scrollTop - log.clientHeight < 30;
+  log.innerHTML = msgs.length ? msgs.map(m => `<div class="m"><b>${esc(avOf(m.u))} ${esc(nameOf(m.u))}</b>${esc(m.x)}</div>`).join('') : '<p class="muted small">Noch keine Nachrichten. Sag Hallo!</p>';
+  if (atBottom) log.scrollTop = log.scrollHeight;
+}
+$('emojis').innerHTML = EMOJIS.map(e => `<button type="button" data-act="emoji" data-e="${e}" aria-label="${e} senden">${e}</button>`).join('');
+let lastMsgAt = 0;
+function sendMsg(x, k){
+  if (!tid || !x) return;
+  if (Date.now() - lastMsgAt < 800) return;
+  lastMsgAt = Date.now();
+  bubbles[uid] = { x, k, at: Date.now() }; setTimeout(renderAll, 5100); renderAll();
+  addDoc(collection(fs,'tables',tid,'msgs'), { u:uid, x:x.slice(0,200), k, t:Date.now() }).catch(handleWriteErr);
+}
+$('chatform').addEventListener('submit', e => { e.preventDefault(); const i = $('chatx'); const x = i.value.trim(); if (x){ sendMsg(x,'t'); i.value=''; } });
+
 function renderPlayers(){
   const el = $('view-players');
   if (!P){ el.innerHTML = `<div class="panel"><p class="muted">Lädt …</p></div>`; return; }
+  const D = debts(), wk = weekId();
   const ids = boardMode==='friends' ? [uid, ...friendIds()] : [...new Set([uid, ...Object.keys(players)])];
-  const rows = ids.map(id => [id, id===uid ? P : players[id]]).filter(r=>r[1]).sort((a,b)=>b[1].balance-a[1].balance);
+  const val = p => boardScope==='week' ? (p.week?.id===wk ? p.week.net : 0) : p.balance;
+  const rows = ids.map(id => [id, pl(id)]).filter(r=>r[1]).sort((a,b)=>val(b[1])-val(a[1]));
   const tr = rows.map(([id,p],i)=>{
-    const s = p.stats||{};
-    return `<tr class="${id===uid?'me':''}"><td class="rank">${i+1}</td>
-      <td><span class="dot${isOnline(id)?' on':''}"></span><b>${esc(p.name)}</b>${id===uid?' <span class="muted">(du)</span>':''}${p.table && isOnline(id)?` <span class="pill">am Tisch</span>`:''}</td>
-      <td class="r num"><b style="color:var(--brass)">${fmt(p.balance)}</b></td>
-      <td class="r num">${s.hands||0}</td>
-      <td class="r num">${s.wins||0} / ${s.losses||0} / ${s.pushes||0}</td>
+    const s = p.stats||{}, w = p.week?.id===wk ? p.week : { net:0, hands:0, best:0 };
+    const owed = owedBy(id, D), badges = Object.keys(p.ach||{}).length;
+    const main = boardScope==='week'
+      ? `<td class="r num" style="color:${w.net>=0?'var(--win)':'var(--lose)'}"><b>${sgn(w.net)}</b></td><td class="r num">${w.hands}</td><td class="r num">${sgn(w.best)}</td>`
+      : `<td class="r num"><b style="color:var(--brass)">${fmt(p.balance)}</b></td><td class="r num">${s.hands||0}</td><td class="r num">${s.wins||0} / ${s.losses||0} / ${s.pushes||0}</td>`;
+    return `<tr class="${id===uid?'me':''}" data-act="profile" data-id="${esc(id)}"><td class="rank">${i+1}</td>
+      <td><span class="dot${isOnline(id)?' on':''}"></span><span class="av">${esc(p.avatar||'🙂')}</span><b>${esc(p.name)}</b>${id===uid?' <span class="muted">(du)</span>':''}${p.table && isOnline(id)?` <span class="pill">am Tisch</span>`:''}</td>
+      ${main}
       <td class="r num">${s.bankrupts ? `<span class="pill bad">${s.bankrupts}× pleite</span>` : '0'}</td>
-      <td class="r num" style="color:${(s.net||0)>=0?'var(--win)':'var(--lose)'}">${(s.net||0)>=0?'+':''}${fmt(s.net||0)}</td></tr>`;
+      <td class="r num">${owed ? `<span class="pill bad">${fmt(owed)}</span>` : '–'}</td>
+      <td class="r num">🏆 ${badges}</td></tr>`;
   }).join('');
+  const head = boardScope==='week'
+    ? '<th class="r">Woche</th><th class="r">Hände</th><th class="r">Bester</th>'
+    : '<th class="r">Legats</th><th class="r">Hände</th><th class="r">S / N / U</th>';
   const keep = $('fcode')?.value;
   el.innerHTML = `<div class="stack">
     <div class="panel stack">
       <div class="row" style="justify-content:space-between"><h2>Rangliste</h2>
-      <div class="seg"><button data-act="mode" data-v="friends" aria-pressed="${boardMode==='friends'}">Freunde</button><button data-act="mode" data-v="all" aria-pressed="${boardMode==='all'}">Alle</button></div></div>
-      <div class="scroll"><table class="board"><thead><tr><th>#</th><th>Spieler</th><th class="r">Legats</th><th class="r">Hände</th><th class="r">S / N / U</th><th class="r">Pleiten</th><th class="r">Bilanz</th></tr></thead>
+      <div class="row">
+        <div class="seg"><button data-act="scope" data-v="all" aria-pressed="${boardScope==='all'}">Gesamt</button><button data-act="scope" data-v="week" aria-pressed="${boardScope==='week'}">Diese Woche</button></div>
+        <div class="seg"><button data-act="mode" data-v="friends" aria-pressed="${boardMode==='friends'}">Freunde</button><button data-act="mode" data-v="all" aria-pressed="${boardMode==='all'}">Alle</button></div>
+      </div></div>
+      <div class="scroll"><table class="board"><thead><tr><th>#</th><th>Spieler</th>${head}<th class="r">Pleiten</th><th class="r">Schulden</th><th class="r">Erfolge</th></tr></thead>
       <tbody>${tr}</tbody></table></div>
       ${boardMode==='friends' && rows.length<2 ? '<p class="muted">Noch keine Freunde. Tausche unten eure Freundescodes aus.</p>' : ''}
-      <p class="muted" style="font-size:12px">S / N / U = gewonnene / verlorene / unentschiedene Hände. Jede Pleite mit Wiederbelebung zählt als Niederlage.</p>
+      <p class="muted small">${boardScope==='week' ? 'Gewinn und Verlust seit Montag. Jeden Montag fängt die Wochenwertung bei null an.' : 'S / N / U = gewonnene / verlorene / unentschiedene Hände. Jede Pleite mit Wiederbelebung zählt als Niederlage.'} Tippe auf einen Spieler für sein Profil.</p>
     </div>
     <div class="grid2">
       <div class="panel stack"><h3>Dein Freundescode</h3><div class="row"><span class="code">${esc(P.code)}</span><button class="btn sm" data-act="copycode">Kopieren</button></div>
@@ -836,14 +1281,64 @@ function renderPlayers(){
   </div>`;
   if (keep && $('fcode')) $('fcode').value = keep;
 }
+function badgesHTML(ach, showLocked){
+  return `<div class="badges">${ACH.filter(a => showLocked || ach?.[a[0]]).map(a => `<div class="badge${ach?.[a[0]]?'':' locked'}${a[4]?' shame':''}" title="${esc(a[3])}"><span class="ic">${a[1]}</span><div><b>${esc(a[2])}</b><span>${esc(a[3])}</span></div></div>`).join('') || '<p class="muted">Noch keine Erfolge.</p>'}</div>`;
+}
+function chartHTML(hist){
+  if (!hist || hist.length < 2) return '<p class="muted">Nach ein paar Runden erscheint hier der Verlauf des Kontostands.</p>';
+  // draw at roughly the on-screen width so labels keep their real size
+  const W = Math.round(Math.min(1000, Math.max(300, innerWidth - 80))), H = 180, pl_ = 64, pr = 12, pt = 12, pb = 22;
+  const vals = hist.map(h=>h.b);
+  let lo = Math.min(...vals), hi = Math.max(...vals); if (hi===lo){ hi += 100; lo = Math.max(0, lo-100); }
+  const pad = (hi-lo)*.08; lo = Math.max(0, lo-pad); hi += pad;
+  const x = i => pl_ + i*(W-pl_-pr)/(vals.length-1), y = v => pt + (1-(v-lo)/(hi-lo))*(H-pt-pb);
+  const pts = vals.map((v,i)=>`${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+  const grid = [lo, (lo+hi)/2, hi].map(v => `<line x1="${pl_}" x2="${W-pr}" y1="${y(v)}" y2="${y(v)}" stroke="rgba(209,173,98,.15)"/><text x="${pl_-8}" y="${y(v)+4}" text-anchor="end" fill="#a3b7ab" font-size="11" font-family="IBM Plex Mono, monospace">${fmt(v)}</text>`).join('');
+  const last = vals.length-1;
+  return `<div class="chart"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Kontostand der letzten ${vals.length} Runden">
+    <defs><linearGradient id="ga" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#d1ad62" stop-opacity=".35"/><stop offset="1" stop-color="#d1ad62" stop-opacity="0"/></linearGradient></defs>
+    ${grid}
+    <polygon points="${x(0)},${H-pb} ${pts} ${x(last)},${H-pb}" fill="url(#ga)"/>
+    <polyline points="${pts}" fill="none" stroke="#d1ad62" stroke-width="2.2" stroke-linejoin="round"/>
+    <circle cx="${x(last)}" cy="${y(vals[last])}" r="4.5" fill="#d1ad62" stroke="#231a14" stroke-width="2"/>
+    <text x="${pl_}" y="${H-5}" fill="#a3b7ab" font-size="11">vor ${vals.length} Runden</text><text x="${W-pr}" y="${H-5}" text-anchor="end" fill="#a3b7ab" font-size="11">jetzt</text>
+  </svg></div>`;
+}
+function renderShop(){
+  const el = $('view-shop');
+  if (!P){ el.innerHTML = `<div class="panel"><p class="muted">Lädt …</p></div>`; return; }
+  const item = (kind, id, price, inner, label) => {
+    const key = kind+':'+id, owned = price===0 || P.owned.includes(key);
+    const selected = kind==='av' ? P.avatar===id : P.sel[kind]===id;
+    const pending = shopConfirm===key;
+    return `<button class="item${selected?' sel':''}" data-act="shop" data-kind="${kind}" data-id="${esc(id)}" data-price="${price}">${inner}${label?`<small>${esc(label)}</small>`:''}
+      <span class="price">${selected ? 'Ausgewählt' : owned ? 'Auswählen' : pending ? `Für ${fmt(price)} ℒ kaufen?` : fmt(price)+' ℒ'}</span></button>`;
+  };
+  const html = `<div class="stack">
+    <div class="panel stack"><h2>Shop</h2><p class="muted">Gib deine Legats für Avatar, Tischfilz und Kartenrücken aus. Filz und Kartenrücken gelten für Tische, die du eröffnest, und alle Spieler daran sehen sie. Käufe zählen nicht in deine Gewinn-Bilanz.</p></div>
+    <div class="panel stack"><h3>Avatar</h3><div class="shopgrid">${SHOP.av.map(([e,p]) => item('av', e, p, `<span class="big">${e}</span>`)).join('')}</div></div>
+    <div class="panel stack"><h3>Tischfilz</h3><div class="shopgrid">${SHOP.felt.map(([id,l,p,a,b]) => item('felt', id, p, `<span class="sw" style="background:radial-gradient(circle at 50% 20%,${a},${b})"></span>`, l)).join('')}</div></div>
+    <div class="panel stack"><h3>Kartenrücken</h3><div class="shopgrid">${SHOP.back.map(([id,l,p,a,b]) => item('back', id, p, `<span class="bk" style="background:repeating-linear-gradient(45deg,${a} 0 6px,${b} 6px 12px)"></span>`, l)).join('')}</div></div>
+  </div>`;
+  if (el.innerHTML !== html) el.innerHTML = html;
+}
+let shopConfirm = null;
 function renderAccount(){
   const el = $('view-account');
   if (!P){ el.innerHTML = `<div class="panel"><p class="muted">Lädt …</p></div>`; return; }
-  const L = P.limits||{}, lim = limitState();
+  const L = P.limits||{}, lim = limitState(), D = debts();
+  const iOwe = Object.entries(D[uid]||{}), owedToMe = Object.entries(D).flatMap(([a,m]) => m[uid] ? [[a, m[uid]]] : []);
+  const hist = P.hist.slice(-10).reverse().map(h => `<div class="h"><span class="muted num">${new Date(h.t).toLocaleString('de-DE',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</span><span class="num">Einsatz ${fmt(h.w)}</span><b class="num" style="color:${h.n>0?'var(--win)':h.n<0?'var(--lose)':'var(--push)'}">${sgn(h.n)}</b></div>`).join('');
   el.innerHTML = `<div class="stack">
     ${isBroke() ? reviveBox() : ''}
-    <div class="panel stack"><div class="row" style="justify-content:space-between"><h2>${esc(P.name)}</h2><button class="btn sm" data-act="logout">Abmelden</button></div>
-      <p class="muted" style="font-size:12px">Angemeldet als ${esc(authUser?.email||'')}</p><div id="acc-stats"></div></div>
+    <div class="panel stack"><div class="row" style="justify-content:space-between"><h2>${esc(P.avatar)} ${esc(P.name)}</h2><button class="btn sm" data-act="logout">Abmelden</button></div>
+      <p class="muted small">Angemeldet als ${esc(authUser?.email||'')}</p><div id="acc-stats"></div></div>
+    <div class="panel stack"><h3>Verlauf</h3>${chartHTML(P.hist)}${hist ? `<div class="hist">${hist}</div>` : ''}</div>
+    <div class="panel stack"><h3>Erfolge · ${Object.keys(P.ach).length} von ${ACH.length}</h3>${badgesHTML(P.ach, true)}</div>
+    ${iOwe.length || owedToMe.length ? `<div class="panel stack"><h3>Schulden</h3>
+      ${iOwe.map(([c,v]) => `<div class="lobby-item"><span>Du schuldest <b>${esc(avOf(c)+' '+nameOf(c))}</b> <b class="num">${fmt(v)} ℒ</b></span><button class="btn sm gold" data-act="repay" data-id="${esc(c)}" data-v="${v}" ${P.balance<100?'disabled':''}>Zurückzahlen</button></div>`).join('')}
+      ${owedToMe.map(([a,v]) => `<div class="lobby-item"><span><b>${esc(avOf(a)+' '+nameOf(a))}</b> schuldet dir <b class="num">${fmt(v)} ℒ</b></span></div>`).join('')}
+    </div>` : ''}
     <div class="grid2">
       <div class="panel stack"><h3>Spielername</h3>
         <div class="row"><div class="field" style="flex:1"><label for="aname">So sehen dich deine Freunde</label><input id="aname" maxlength="20" value="${esc(P.name)}"></div>
@@ -853,37 +1348,107 @@ function renderAccount(){
         <div class="row"><div class="field" style="flex:1 1 120px"><label for="lwin">Gewinnziel (+ℒ)</label><input id="lwin" type="number" min="100" step="100" inputmode="numeric" placeholder="aus" value="${L.win||''}"></div>
         <div class="field" style="flex:1 1 120px"><label for="lloss">Stop-Loss (−ℒ)</label><input id="lloss" type="number" min="100" step="100" inputmode="numeric" placeholder="aus" value="${L.loss||''}"></div></div>
         <div class="row"><button class="btn gold" data-act="savelimits">Speichern</button><button class="btn" data-act="newsession">Neue Session starten</button></div>
-        ${lim ? `<p class="${lim.hit?'note':''}">Session: <b class="num" style="color:${lim.profit>=0?'var(--win)':'var(--lose)'}">${lim.profit>=0?'+':''}${fmt(lim.profit)} ℒ</b>${lim.hit? ' · '+(lim.hit==='win'?'Gewinnziel erreicht':'Stop-Loss erreicht'):''}</p>`:''}
+        ${lim ? `<p class="${lim.hit?'note':''}">Session: <b class="num" style="color:${lim.profit>=0?'var(--win)':'var(--lose)'}">${sgn(lim.profit)} ℒ</b>${lim.hit? ' · '+(lim.hit==='win'?'Gewinnziel erreicht':'Stop-Loss erreicht'):''}</p>`:''}
       </div>
     </div>
   </div>`;
   renderAccountStats();
 }
-function renderAccountStats(){
-  const box = $('acc-stats'); if (!box || !P) return; const s = P.stats;
-  const q = s.hands ? Math.round((s.wins/s.hands)*100) : 0;
-  box.innerHTML = `<div class="statgrid">
-    <div class="stat"><small>Kontostand</small><b style="color:var(--brass)">${fmt(P.balance)}</b></div>
-    <div class="stat"><small>Hände</small><b>${s.hands}</b></div>
-    <div class="stat"><small>Gewonnen</small><b style="color:var(--win)">${s.wins}</b></div>
-    <div class="stat"><small>Verloren</small><b style="color:var(--lose)">${s.losses}</b></div>
-    <div class="stat"><small>Unentschieden</small><b>${s.pushes}</b></div>
-    <div class="stat"><small>Blackjacks</small><b>${s.bj}</b></div>
+function statsHTML(p){
+  const s = p.stats||{}, q = s.hands ? Math.round((s.wins/s.hands)*100) : 0;
+  return `<div class="statgrid">
+    <div class="stat"><small>Kontostand</small><b style="color:var(--brass)">${fmt(p.balance)}</b></div>
+    <div class="stat"><small>Hände</small><b>${s.hands||0}</b></div>
+    <div class="stat"><small>Gewonnen</small><b style="color:var(--win)">${s.wins||0}</b></div>
+    <div class="stat"><small>Verloren</small><b style="color:var(--lose)">${s.losses||0}</b></div>
+    <div class="stat"><small>Unentschieden</small><b>${s.pushes||0}</b></div>
+    <div class="stat"><small>Blackjacks</small><b>${s.bj||0}</b></div>
     <div class="stat"><small>Siegquote</small><b>${q}%</b></div>
     <div class="stat"><small>Größter Gewinn</small><b>${fmt(s.best||0)}</b></div>
-    <div class="stat"><small>Bilanz</small><b style="color:${s.net>=0?'var(--win)':'var(--lose)'}">${s.net>=0?'+':''}${fmt(s.net)}</b></div>
-    <div class="stat"><small>Pleiten (Niederlagen)</small><b style="color:${s.bankrupts?'var(--lose)':'inherit'}">${s.bankrupts}</b></div>
+    <div class="stat"><small>Bilanz</small><b style="color:${(s.net||0)>=0?'var(--win)':'var(--lose)'}">${sgn(s.net||0)}</b></div>
+    <div class="stat"><small>Pleiten (Niederlagen)</small><b style="color:${s.bankrupts?'var(--lose)':'inherit'}">${s.bankrupts||0}</b></div>
   </div>`;
 }
+function renderAccountStats(){ const box = $('acc-stats'); if (box && P) box.innerHTML = statsHTML(P); }
+
+/* ---------- modal: player profile & fairness ---------- */
+function openModal(kind, id){ modalKind = kind; modalId = id; $('modal').hidden = false; renderModal(true); }
+function closeModal(){ modalKind = null; modalId = null; $('modal').hidden = true; }
+$('modal').addEventListener('click', e => { if (e.target.id==='modal') closeModal(); });
+document.addEventListener('keydown', e => { if (e.key==='Escape' && modalKind) closeModal(); });
+let lastModalHTML = '';
+function renderModal(force){
+  if (!modalKind) return;
+  const card = $('modal-card');
+  if (!force && card.contains(document.activeElement) && document.activeElement.tagName==='INPUT') return;
+  const html = modalKind==='profile' ? profileHTML(modalId) : fairHTML();
+  if (!force && html === lastModalHTML) return;
+  lastModalHTML = html;
+  const keep = $('gamt')?.value;
+  card.innerHTML = html;
+  if (keep && $('gamt')) $('gamt').value = keep;
+}
+function profileHTML(id){
+  const p = pl(id); if (!p) return '<p class="muted">Spieler nicht gefunden.</p>';
+  const me = id===uid, friend = isFriend(id), wk = weekId(), w = p.week?.id===wk ? p.week : { net:0, hands:0 };
+  const D = debts(), theyOweMe = D[id]?.[uid] || 0, iOwe = D[uid]?.[id] || 0;
+  return `<div class="stack">
+    <div class="row" style="justify-content:space-between"><div class="prof-head"><div class="prof-av">${esc(p.avatar||'🙂')}</div><div><h2>${esc(p.name)}</h2>
+      <p class="muted small"><span class="dot${isOnline(id)?' on':''}"></span>${isOnline(id)?'Online':'Offline'}${me?' · das bist du':friend?' · Freund':''}</p></div></div>
+      <button class="btn sm" data-act="closemodal">Schließen</button></div>
+    ${statsHTML(p)}
+    <p class="muted">Diese Woche: <b class="num" style="color:${w.net>=0?'var(--win)':'var(--lose)'}">${sgn(w.net)} ℒ</b> in ${w.hands} Händen</p>
+    ${chartHTML(p.hist)}
+    <h3>Erfolge · ${Object.keys(p.ach||{}).length} von ${ACH.length}</h3>${badgesHTML(p.ach, false)}
+    ${!me && friend ? `<div class="panel stack"><h3>Legats schicken</h3>
+      ${theyOweMe ? `<p>${esc(p.name)} schuldet dir <b class="num">${fmt(theyOweMe)} ℒ</b>.</p>` : ''}${iOwe ? `<p>Du schuldest ${esc(p.name)} <b class="num">${fmt(iOwe)} ℒ</b>.</p>` : ''}
+      <div class="field"><label for="gamt">Betrag</label><input id="gamt" type="number" min="100" step="100" inputmode="numeric" placeholder="z. B. 1000"></div>
+      <div class="row"><button class="btn gold" data-act="gift" data-id="${esc(id)}">Schenken</button><button class="btn" data-act="loan" data-id="${esc(id)}">Leihen</button>
+      ${iOwe ? `<button class="btn" data-act="repay" data-id="${esc(id)}" data-v="${iOwe}">Schulden zurückzahlen</button>` : ''}</div>
+      <p class="muted small">Geliehene Legats stehen als Schulden in der Rangliste, bis sie zurückgezahlt sind.</p></div>`
+    : !me ? `<button class="btn gold" data-act="befriend" data-id="${esc(id)}">Als Freund hinzufügen</button>` : ''}
+  </div>`;
+}
+function fairHTML(){
+  const head = `<div class="row" style="justify-content:space-between"><h2>Fairness</h2><button class="btn sm" data-act="closemodal">Schließen</button></div>`;
+  if (!T?.fair) return `<div class="stack">${head}<p class="muted">Ab dem nächsten Mischen gibt es hier den Prüfwert.</p></div>`;
+  const F = T.fair, hashOk = sha256(F.orig) === F.hash;
+  const key = tid+':'+F.n; if (!fairSeen[key]) fairSeen[key] = F.hash;
+  const sameAsSeen = fairSeen[key] === F.hash;
+  const rest = (T.shoe||[]).join(''), prefixOk = F.orig.startsWith(rest);
+  const ok = hashOk && sameAsSeen && prefixOk;
+  const dealt = F.orig.slice(rest.length).match(/../g) || [];
+  const ranks = 'A23456789TJQK'.split(''), cnt = Object.fromEntries(ranks.map(r=>[r,0]));
+  dealt.forEach(c => cnt[c[0]]++);
+  const exp = dealt.length/13, maxC = Math.max(1, ...Object.values(cnt), exp);
+  const small = dealt.filter(c => c[0]==='A' || cval(c) < 9).length;
+  return `<div class="stack">${head}
+    <div class="note ${ok?'':'bad'}"><b>${ok ? '✓ Schlitten unverändert seit dem Mischen' : '✗ Der Schlitten passt nicht zum Prüfwert'}</b></div>
+    <p class="muted">Beim Mischen wird die Reihenfolge aller 312 Karten festgelegt und ein Fingerabdruck (SHA-256) davon gespeichert. Danach kommen die Karten nur in genau dieser Reihenfolge aus dem Schlitten. Dein Browser rechnet den Fingerabdruck selbst nach und merkt ihn sich. Würde jemand die Karten nachträglich umsortieren, stünde hier ein rotes ✗.</p>
+    <div class="statgrid">
+      <div class="stat"><small>Mischung Nr.</small><b>${F.n}</b></div>
+      <div class="stat"><small>Ausgeteilt</small><b>${dealt.length} / 312</b></div>
+      <div class="stat"><small>Karten A–8</small><b>${dealt.length ? Math.round(small/dealt.length*100) : 0}%</b></div>
+    </div>
+    <p class="muted small">Fingerabdruck: <span class="num" style="word-break:break-all">${F.hash}</span></p>
+    <h3>Ausgeteilte Karten dieser Mischung</h3>
+    <div class="bars">${ranks.map(r => `<div class="${cnt[r] > exp ? 'hi':''}" style="height:${(cnt[r]/maxC*100).toFixed(1)}%" title="${r==='T'?'10':r}: ${cnt[r]}"></div>`).join('')}</div>
+    <div class="barlbl">${ranks.map(r => `<span>${r==='T'?'10':r}</span>`).join('')}</div>
+    <p class="muted small">Erwartet sind pro Wert etwa ${exp.toLocaleString('de-DE',{maximumFractionDigits:1})} Karten. Karten von Ass bis 8 machen im Schlitten 61,5 % aus.</p>
+  </div>`;
+}
+
 let rq = false;
 function renderAll(){
   if (rq || !uid) return; rq = true;
   requestAnimationFrame(() => {
     rq=false; renderTop();
-    const typing = v => { const a=document.activeElement; return a && a.tagName==='INPUT' && $('view-'+v).contains(a); };
-    if (tab==='table' && !typing('table')) renderTable();
-    if (tab==='players' && !typing('players')) renderPlayers();
-    if (tab==='account'){ if (typing('account')) renderAccountStats(); else renderAccount(); }
+    const typing = el => { const a=document.activeElement; return a && a.tagName==='INPUT' && a.type!=='checkbox' && el.contains(a); };
+    if (tab==='table' && !typing($('tv'))) renderTable();
+    if (tab==='players' && !typing($('view-players'))) renderPlayers();
+    if (tab==='shop') renderShop();
+    if (tab==='account'){ if (typing($('view-account'))) renderAccountStats(); else renderAccount(); }
+    renderModal(false);
     tickTimers();
   });
 }
@@ -891,9 +1456,9 @@ function tickTimers(){
   for (const el of document.querySelectorAll('[data-until]')) el.textContent = Math.max(0, Math.ceil((+el.dataset.until - Date.now())/1000));
 }
 function setTab(t){
-  tab = t;
+  tab = t; shopConfirm = null;
   for (const b of document.querySelectorAll('nav.tabs button')) b.setAttribute('aria-selected', b.dataset.tab===t);
-  for (const v of ['table','players','account']) $('view-'+v).hidden = v!==t;
+  for (const v of ['table','players','shop','account']) $('view-'+v).hidden = v!==t;
   if (t==='table') { lastTableHTML = ''; anim.prime = true; }
   renderAll();
 }
@@ -902,52 +1467,120 @@ function setTab(t){
 async function copy(text, label){
   try { await navigator.clipboard.writeText(text); toast(label+' kopiert'); } catch { toast(label+': '+text); }
 }
+$('mute').addEventListener('click', () => { snd.on = !snd.on; ls.set('sound', snd.on); if (snd.on) SFX.chip(); renderTop(); });
+document.addEventListener('change', e => {
+  if (e.target.id==='autobet'){
+    auto = e.target.checked; ls.set('autobet', auto);
+    toast(auto ? `Auto-Einsatz an: ${fmt(ls.get('lastBet', bet))} ℒ jede Runde` : 'Auto-Einsatz aus');
+    if (auto){ autoRound = null; afterTable(); }
+    e.target.blur(); renderAll();
+  }
+});
 document.addEventListener('click', async e => {
   const tb = e.target.closest('[data-tab]'); if (tb){ setTab(tb.dataset.tab); return; }
   const b = e.target.closest('[data-act]'); if (!b || b.disabled) return;
   const a = b.dataset.act;
   if (a!=='leave') confirmLeave = false;
+  if (a!=='shop') shopConfirm = null;
   switch (a){
-    case 'create': b.disabled = true; await createTable(); break;
-    case 'join': await sitAt(b.dataset.id); break;
+    case 'create': case 'createvip': b.disabled = true; await createTable(a==='createvip'); b.disabled = false; break;
+    case 'join': toast('Du setzt dich an den Tisch …'); sitAt(b.dataset.id); break;
     case 'joincode': await joinByCode($('tcode').value); break;
-    case 'leave': await leaveTable(); break;
+    case 'leave': leaveTable(); break;
     case 'copytable': copy(tid, 'Tisch-Code'); break;
     case 'copycode': copy(P.code, 'Freundescode'); break;
-    case 'chip': bet = Math.min(MAX_BET, P.balance, (bet<MIN_BET?0:bet) + +b.dataset.v); renderAll(); break;
+    case 'chip': bet = Math.min(MAX_BET, P.balance, (bet<MIN_BET?0:bet) + +b.dataset.v); SFX.chip(); renderAll(); break;
     case 'betclear': bet = 0; renderAll(); break;
-    case 'betmax': bet = Math.max(0, Math.min(MAX_BET, Math.floor(P.balance/100)*100)); renderAll(); break;
-    case 'bet': await placeBet(); break;
-    case 'unbet': await unBet(); break;
-    case 'hit': case 'stand': case 'double': case 'split': await act(a); break;
-    case 'revive':
-      if (!isBroke()) return;
-      await withPlayer(d => { d.balance = START; d.stats.bankrupts += 1; d.limits = { ...(d.limits||{}), base: START }; d.ledger = null; return true; });
-      bet = 1000; toast('Wiederbelebt: 2.000 Legats'); break;
+    case 'betmax': bet = Math.max(0, Math.min(MAX_BET, Math.floor(P.balance/100)*100)); SFX.chip(); renderAll(); break;
+    case 'bet': placeBet(bet); break;
+    case 'unbet': unBet(); if (auto){ auto=false; ls.set('autobet', false); toast('Auto-Einsatz aus'); } break;
+    case 'hit': case 'stand': case 'double': case 'split': case 'surrender': act(a); break;
+    case 'insure': insure(true); break;
+    case 'noinsure': insure(false); break;
+    case 'emoji': sendMsg(b.dataset.e, 'e'); break;
+    case 'fair': openModal('fair'); break;
+    case 'profile': openModal('profile', b.dataset.id); break;
+    case 'closemodal': closeModal(); break;
+    case 'revive': {
+      b.disabled = true;
+      const ok = withPlayer(d => {
+        if (!brokeDoc(d)) return false;               // decided on the latest state: a second tap does nothing
+        d.balance = START; d.stats.bankrupts += 1; d.limits = { ...(d.limits||{}), base: START }; d.ledger = null; d.lowMark = START;
+        d.streaks = { win:0, bj:0 };
+        grant(d,'broke1'); if (d.stats.bankrupts >= 5) grant(d,'broke5');
+        return true;
+      });
+      if (ok){ bet = Math.min(bet, 1000); toast('Wiederbelebt: 2.000 Legats'); }
+      break;
+    }
+    case 'daily': {
+      b.disabled = true;
+      let got = 0, streak = 0;
+      withPlayer(d => {
+        const today = dayId(); if (d.daily.last === today) return false;
+        streak = d.daily.last === dayId(Date.now()-864e5) ? d.daily.streak + 1 : 1;
+        got = dailyAmount(streak); d.balance += got; d.daily = { last: today, streak };
+        if (streak >= 7) grant(d,'daily7');
+        return true;
+      });
+      if (got){ SFX.coins(); toast(`+${fmt(got)} ℒ · Tag ${streak} in Folge`); }
+      break;
+    }
     case 'mode': boardMode = b.dataset.v; renderAll(); break;
-    case 'addfriend': {
-      const code = $('fcode').value.trim().toUpperCase();
-      const hit = Object.entries(players).find(([id,p]) => p.code===code);
-      if (!hit) return toast('Kein Spieler mit diesem Code.');
+    case 'scope': boardScope = b.dataset.v; renderAll(); break;
+    case 'addfriend': case 'befriend': {
+      let hit;
+      if (a==='befriend') hit = [b.dataset.id, players[b.dataset.id]];
+      else {
+        const code = $('fcode').value.trim().toUpperCase();
+        hit = Object.entries(players).find(([id,p]) => p.code===code);
+        if (!hit) return toast('Kein Spieler mit diesem Code.');
+      }
       if (hit[0]===uid) return toast('Das ist dein eigener Code.');
       if (friendIds().includes(hit[0])) return toast('Ihr seid schon befreundet.');
-      await withPlayer(d => { d.friends = [...new Set([...(d.friends||[]), hit[0]])]; return true; });
-      $('fcode').value=''; document.activeElement?.blur(); toast('Du bist jetzt mit '+hit[1].name+' befreundet'); break;
+      withPlayer(d => { d.friends = [...new Set([...(d.friends||[]), hit[0]])]; return true; });
+      if ($('fcode')) $('fcode').value=''; document.activeElement?.blur(); toast('Du bist jetzt mit '+hit[1].name+' befreundet'); renderModal(true); break;
+    }
+    case 'gift': case 'loan': {
+      const v = parseInt($('gamt')?.value, 10);
+      sendGift(b.dataset.id, v, a); if ($('gamt')) $('gamt').value=''; document.activeElement?.blur(); renderModal(true); break;
+    }
+    case 'repay': {
+      const owed = +b.dataset.v, typed = parseInt($('gamt')?.value, 10);
+      const v = Math.min(owed, typed > 0 ? typed : owed, P.balance);
+      sendGift(b.dataset.id, v, 'repay'); renderModal(true); break;
+    }
+    case 'shop': {
+      const kind = b.dataset.kind, id = b.dataset.id, price = +b.dataset.price, key = kind+':'+id;
+      const owned = price===0 || P.owned.includes(key);
+      if (!owned){
+        if (inRound()) return toast('Warte, bis deine Runde vorbei ist.');
+        if (P.balance < price) return toast(`Dafür fehlen dir ${fmt(price - P.balance)} Legats.`);
+        if (shopConfirm !== key){ shopConfirm = key; renderAll(); return; }
+      }
+      shopConfirm = null;
+      const ok = withPlayer(d => {
+        if (!owned){ if (d.balance < price || d.owned.includes(key)) return false; d.balance -= price; d.owned = [...d.owned, key]; }
+        if (kind==='av') d.avatar = id; else d.sel = { ...d.sel, [kind]: id };
+        return true;
+      });
+      if (ok && !owned){ SFX.coins(); toast('Gekauft und ausgewählt'); }
+      break;
     }
     case 'savename': {
       const n = $('aname').value.trim().slice(0,20);
       if (!n) return toast('Bitte gib einen Namen ein.');
-      await withPlayer(d => { if (d.name===n) return false; d.name = n; return true; });
+      withPlayer(d => { if (d.name===n) return false; d.name = n; return true; });
       document.activeElement?.blur(); toast('Name gespeichert'); renderAll(); break;
     }
     case 'savelimits': {
       const w = parseInt($('lwin').value,10), l = parseInt($('lloss').value,10);
       if ((w && w<100) || (l && l<100)) return toast('Limits ab 100 Legats, oder leer lassen.');
-      await withPlayer(d => { d.limits = { win: w>0?w:null, loss: l>0?l:null, base: d.limits?.base ?? d.balance }; return true; });
+      withPlayer(d => { d.limits = { win: w>0?w:null, loss: l>0?l:null, base: d.limits?.base ?? d.balance }; return true; });
       document.activeElement?.blur(); toast('Limits gespeichert'); renderAll(); break;
     }
     case 'newsession':
-      await withPlayer(d => { d.limits = { ...(d.limits||{}), base: d.balance }; return true; });
+      withPlayer(d => { d.limits = { ...(d.limits||{}), base: d.balance }; return true; });
       toast('Neue Session ab '+fmt(P.balance)+' ℒ'); renderAll(); break;
     case 'logout': await signOut(auth); break;
   }
