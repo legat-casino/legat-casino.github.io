@@ -271,7 +271,7 @@ table.board{width:100%;border-collapse:collapse;font-size:14px}
       <div class="c red" style="transform:rotate(14deg) translateX(34px)"><div class="ci"><div class="cf"><span class="r">K</span><span class="s">♥</span><span class="big">♥</span></div><div class="cb"></div></div></div>
     </div>
     <h1>Legat <span>Casino</span></h1>
-    <p class="muted">Blackjack mit deinen Freunden. Du startest mit 2.000 Legats.</p>
+    <p class="muted" id="loginsub">Blackjack mit deinen Freunden. Du startest mit 2.000 Legats.</p>
     <button class="gbtn" id="glogin" type="button">
       <svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>
       Mit Google anmelden
@@ -447,6 +447,14 @@ const SFX = {
   badge: () => [784,988,1175,1568].forEach((f,i) => tone(f, .3, { type:'sine', vol:.08, at:i*.07 })),
 };
 
+/* ---------- invite link: #ref-CODE ---------- */
+const REF_BONUS = 1000;
+(() => {
+  const m = location.hash.match(/^#ref-([A-Z0-9]{6})$/i);
+  if (m){ ls.set('ref', m[1].toUpperCase()); history.replaceState(null, '', location.pathname + location.search); }
+})();
+const inviteLink = () => P ? `${location.origin}${location.pathname}#ref-${P.code}` : '';
+
 /* ---------- setup check ---------- */
 if (!firebaseConfig || !firebaseConfig.apiKey || firebaseConfig.apiKey.includes('HIER')){
   const el = $('view-setup'); el.hidden = false;
@@ -578,6 +586,7 @@ $('glogin').addEventListener('click', async () => {
 });
 getRedirectResult(auth).catch(e => console.warn(e));
 
+if (ls.get('ref', null)) $('loginsub').innerHTML = 'Du wurdest eingeladen! Mit diesem Link startest du mit <b style="color:var(--brass)">3.000 Legats</b> statt 2.000.';
 onAuthStateChanged(auth, u => {
   authUser = u;
   if (!u){ stopAll(); uid=null; P=null; $('top').hidden = true; $('daily').innerHTML=''; for (const v of ['table','players','shop','account']) $('view-'+v).hidden = true; $('view-login').hidden = false; return; }
@@ -593,6 +602,7 @@ function startData(){
     const mine = next[uid];
     if (mine && !snap.metadata.hasPendingWrites && (!P || (mine.updated||0) >= (P.updated||0))) P = norm(structuredClone(mine));
     if (!snap.metadata.fromCache && !mine && !P) createPlayer();
+    else if (!snap.metadata.fromCache && mine) refForExisting();
     if (P && P.table && !tid && !leaving) openTable(P.table);
     reconcile(); claimGifts(); renderAll();
   }, e => { console.warn(e); toast('Keine Verbindung zur Datenbank. Prüfe die Sicherheitsregeln.'); });
@@ -607,15 +617,33 @@ function stopAll(){
   unsubP && unsubP(); unsubG && unsubG(); unsubP = unsubG = null; closeTable();
   intervals.forEach(clearInterval); intervals=[];
 }
-function createPlayer(){
+async function createPlayer(){
   if (P) return;
   let name = (authUser?.displayName || '').split(' ')[0] || 'Spieler';
   name = name.slice(0,20);
   let code; const taken = new Set(Object.values(players).map(p=>p.code));
   do { code = genCode(6); } while (taken.has(code));
-  const d = norm({ name, code, balance: START, table: null, ledger: null, created: Date.now(), updated: Date.now(), seen: Date.now() });
+  const refCode = ls.get('ref', null);
+  const inviter = refCode ? Object.entries(players).find(([id,p]) => p.code===refCode && id!==uid)?.[0] : null;
+  const d = norm({ name, code, balance: START + (inviter ? REF_BONUS : 0), table: null, ledger: null, created: Date.now(), updated: Date.now(), seen: Date.now() });
+  if (inviter){ d.ref = inviter; d.friends = [inviter]; }
+  d.limits.base = d.balance; d.lowMark = d.balance;
   P = d; renderAll();
-  slow(setDoc(doc(fs,'players',uid), d)).catch(handleWriteErr);
+  ls.set('ref', null);
+  try {
+    await slow(setDoc(doc(fs,'players',uid), d));
+    if (inviter){
+      await slow(setDoc(doc(fs,'gifts','ref_'+uid), { from:uid, to:inviter, amount:REF_BONUS, kind:'ref', claimed:false, t:Date.now() }));
+      SFX.coins(); toast(`Willkommen! ${nameOf(inviter)} hat dich eingeladen: +${fmt(REF_BONUS)} ℒ Startbonus`);
+    }
+  } catch(e){ handleWriteErr(e); }
+}
+/** an existing player who opens someone's invite link simply becomes their friend */
+function refForExisting(){
+  const refCode = ls.get('ref', null); if (!refCode || !P) return;
+  ls.set('ref', null);
+  const hit = Object.entries(players).find(([id,p]) => p.code===refCode && id!==uid);
+  if (hit && !friendIds().includes(hit[0])){ withPlayer(d => { d.friends = [...new Set([...d.friends, hit[0]])]; return true; }); toast(`Du bist jetzt mit ${hit[1].name} befreundet`); }
 }
 
 /* ---------- gifts & loans ---------- */
@@ -626,6 +654,7 @@ function claimGifts(){
     const did = withPlayer(d => { if (d.claimed.includes(id)) return false; d.balance += g.amount; d.claimed = [...d.claimed, id].slice(-300); return true; });
     if (did){
       SFX.coins();
+      if (g.kind==='ref') toast(`${nameOf(g.from)} ist über deinen Link beigetreten: +${fmt(g.amount)} ℒ`); else
       toast(g.kind==='loan' ? `${nameOf(g.from)} leiht dir ${fmt(g.amount)} ℒ` : g.kind==='repay' ? `${nameOf(g.from)} zahlt dir ${fmt(g.amount)} ℒ zurück` : `${nameOf(g.from)} schenkt dir ${fmt(g.amount)} ℒ`);
     }
     if (P.claimed.includes(id)) updateDoc(doc(fs,'gifts',id), { claimed:true }).catch(()=>{});
@@ -1271,6 +1300,12 @@ function renderPlayers(){
       ${boardMode==='friends' && rows.length<2 ? '<p class="muted">Noch keine Freunde. Tausche unten eure Freundescodes aus.</p>' : ''}
       <p class="muted small">${boardScope==='week' ? 'Gewinn und Verlust seit Montag. Jeden Montag fängt die Wochenwertung bei null an.' : 'S / N / U = gewonnene / verlorene / unentschiedene Hände. Jede Pleite mit Wiederbelebung zählt als Niederlage.'} Tippe auf einen Spieler für sein Profil.</p>
     </div>
+    <div class="panel stack"><h3>Freunde einladen · +${fmt(REF_BONUS)} ℒ</h3>
+      <p>Wer sich über deinen Link <b>neu anmeldet</b>, startet mit ${fmt(START+REF_BONUS)} statt ${fmt(START)} Legats, und du bekommst ${fmt(REF_BONUS)} Legats. Ihr seid dann automatisch befreundet.</p>
+      <div class="row"><span class="num" style="word-break:break-all;color:var(--brass);flex:1 1 220px;min-width:0">${esc(inviteLink())}</span>
+      <button class="btn gold sm" data-act="copyinvite">Link kopieren</button>${navigator.share ? '<button class="btn sm" data-act="shareinvite">Teilen</button>' : ''}</div>
+      ${(() => { const n = Object.values(gifts).filter(g => g.kind==='ref' && g.to===uid).length; return n ? `<p class="muted small">Schon ${n} ${n===1?'Spieler':'Spieler'} über deinen Link beigetreten.</p>` : ''; })()}
+    </div>
     <div class="grid2">
       <div class="panel stack"><h3>Dein Freundescode</h3><div class="row"><span class="code">${esc(P.code)}</span><button class="btn sm" data-act="copycode">Kopieren</button></div>
         <p class="muted">Gib diesen Code an Freunde. Sobald einer von euch den Code des anderen eingibt, seid ihr befreundet.</p></div>
@@ -1489,6 +1524,8 @@ document.addEventListener('click', async e => {
     case 'leave': leaveTable(); break;
     case 'copytable': copy(tid, 'Tisch-Code'); break;
     case 'copycode': copy(P.code, 'Freundescode'); break;
+    case 'copyinvite': copy(inviteLink(), 'Einladungslink'); break;
+    case 'shareinvite': navigator.share({ title:'Legat Casino', text:`Spiel mit mir Blackjack im Legat Casino! Mit meinem Link bekommst du ${fmt(REF_BONUS)} Legats extra.`, url: inviteLink() }).catch(()=>{}); break;
     case 'chip': bet = Math.min(MAX_BET, P.balance, (bet<MIN_BET?0:bet) + +b.dataset.v); SFX.chip(); renderAll(); break;
     case 'betclear': bet = 0; renderAll(); break;
     case 'betmax': bet = Math.max(0, Math.min(MAX_BET, Math.floor(P.balance/100)*100)); SFX.chip(); renderAll(); break;
