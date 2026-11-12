@@ -48,6 +48,7 @@ header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background
 .purse{display:flex;flex-direction:column;align-items:flex-end;line-height:1.1}
 .purse small{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);max-width:40vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .purse b{font-family:var(--f-num);font-size:19px;color:var(--brass);transition:color .3s}
+.purse #peur{font-size:12px;color:var(--muted)}
 .purse b.up{color:var(--win)} .purse b.down{color:var(--lose)}
 nav.tabs{display:flex;gap:4px;width:100%;}
 nav.tabs button{flex:1;background:none;border:0;border-bottom:2px solid transparent;padding:8px 4px;color:var(--muted);font-weight:600;letter-spacing:.04em}
@@ -244,7 +245,7 @@ table.board{width:100%;border-collapse:collapse;font-size:14px}
   .felt{border-width:7px;padding:14px 8px 16px}
   .shoe{right:10px;top:14px;width:36px;height:50px}
   .logo{font-size:19px}
-  nav.tabs button{font-size:14px}
+  nav.tabs button{font-size:13px;letter-spacing:0;padding-inline:2px}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important}}
 </style>
@@ -254,10 +255,11 @@ table.board{width:100%;border-collapse:collapse;font-size:14px}
   <div class="top-in">
     <div class="logo">Legat <span>Casino</span></div>
     <button class="iconbtn" id="mute" type="button" aria-label="Ton an/aus">🔊</button>
-    <div class="purse"><small id="pname">Konto</small><b id="pbal">–</b></div>
+    <div class="purse"><small id="pname">Konto</small><b id="pbal">–</b><span id="peur" class="num"></span></div>
     <nav class="tabs" role="tablist">
       <button id="tab-table" role="tab" aria-selected="true" data-tab="table">Tisch</button>
       <button id="tab-players" role="tab" aria-selected="false" data-tab="players">Spieler</button>
+      <button id="tab-bank" role="tab" aria-selected="false" data-tab="bank">Bank</button>
       <button id="tab-shop" role="tab" aria-selected="false" data-tab="shop">Shop</button>
       <button id="tab-account" role="tab" aria-selected="false" data-tab="account">Konto</button>
     </nav>
@@ -292,6 +294,7 @@ table.board{width:100%;border-collapse:collapse;font-size:14px}
     </div>
   </section>
   <section id="view-players" hidden></section>
+  <section id="view-bank" hidden></section>
   <section id="view-shop" hidden></section>
   <section id="view-account" hidden></section>
 </main>
@@ -329,10 +332,10 @@ const ACH = [
   ['split2','✂️','Doppelt hält besser','Nach dem Teilen beide Hände gewonnen'],
   ['ins','🛡️','Gut versichert','Die Versicherung hat sich ausgezahlt'],
   ['high','💰','High Roller','50.000 Legats auf eine Hand gesetzt'],
-  ['k10','💵','Fünfstellig','10.000 Legats erreicht'],
-  ['k100','🏦','Hunderttausend','100.000 Legats erreicht'],
-  ['m1','👑','Millionär','1.000.000 Legats erreicht'],
-  ['comeback','📈','Vom Tellerwäscher','Von 200 oder weniger auf 10.000 Legats, ohne Wiederbelebung'],
+  ['k10','💵','Fünfstellig','Vermögen von 10.000 erreicht (Legats + Euro)'],
+  ['k100','🏦','Hunderttausend','Vermögen von 100.000 erreicht'],
+  ['m1','👑','Millionär','Vermögen von 1.000.000 erreicht'],
+  ['comeback','📈','Vom Tellerwäscher','Von 200 oder weniger Vermögen auf 10.000, ohne Wiederbelebung'],
   ['h100','🃏','Stammspieler','100 Hände gespielt'],
   ['h1000','🎰','Inventar','1.000 Hände gespielt'],
   ['vip','⭐','VIP','An einem VIP-Tisch gespielt'],
@@ -341,6 +344,7 @@ const ACH = [
   ['broke1','💸','Erste Pleite','Zum ersten Mal pleite gegangen', true],
   ['broke5','🪦','Stammgast beim Bestatter','Fünfmal pleite gegangen', true],
 ];
+const START_EURO = 2000, BANK_FEE = 0.05, INT_RATE = 0.01, INT_MAX = 500;
 const fmt = n => Math.round(n).toLocaleString('de-DE');
 const sgn = n => (n>0?'+':n<0?'−':'') + fmt(Math.abs(n));
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -495,6 +499,7 @@ function norm(d){
   d.friends ||= []; d.limits ||= { win:null, loss:null, base:d.balance };
   d.avatar ||= '🙂'; d.owned ||= []; d.sel ||= { felt:'green', back:'red' };
   d.daily ||= { last:null, streak:0 }; d.hist ||= []; d.ach ||= {}; d.streaks ||= { win:0, bj:0 };
+  if (d.euro == null) d.euro = START_EURO; d.bank ||= { last:null, got:0 };
   d.claimed ||= []; d.giftedTotal ||= 0; if (d.lowMark == null) d.lowMark = d.balance;
   if (!d.week || d.week.id !== weekId()) d.week = { id: weekId(), net:0, hands:0, best:0 };
   return d;
@@ -545,15 +550,20 @@ function limitState(){
 }
 const ledgerOpen = d => !!(d?.ledger && !d.ledger.settled);
 const inRound = () => ledgerOpen(P);
-const brokeDoc = d => d && d.balance < MIN_BET && !ledgerOpen(d);
+const euroOf = p => p?.euro ?? START_EURO;
+const wealth = p => (p?.balance || 0) + euroOf(p);
+// broke means everything is gone: chips and bank. Otherwise you exchange euros first.
+const brokeDoc = d => d && d.balance + euroOf(d) < MIN_BET && !ledgerOpen(d);
+const needBank = () => P && P.balance < MIN_BET && !inRound() && !brokeDoc(P);
 const isBroke = () => brokeDoc(P);
 const tableMin = () => T?.min || MIN_BET;
 function grant(d, key){ if (!d.ach[key]){ d.ach[key] = Date.now(); newBadges.push(key); } }
 function checkBalanceBadges(d){
-  if (d.balance >= 10000) grant(d,'k10');
-  if (d.balance >= 100000) grant(d,'k100');
-  if (d.balance >= 1000000) grant(d,'m1');
-  if (d.balance >= 10000 && d.lowMark <= 200) grant(d,'comeback');
+  const w = d.balance + d.euro;
+  if (w >= 10000) grant(d,'k10');
+  if (w >= 100000) grant(d,'k100');
+  if (w >= 1000000) grant(d,'m1');
+  if (w >= 10000 && d.lowMark <= 200) grant(d,'comeback');
 }
 function feltStyle(ownerId){
   const s = pl(ownerId)?.sel || { felt:'green', back:'red' };
@@ -590,7 +600,7 @@ getRedirectResult(auth).catch(e => console.warn(e));
 if (ls.get('ref', null)) $('loginsub').innerHTML = 'Du wurdest eingeladen! Mit diesem Link startest du mit <b style="color:var(--brass)">3.000 Legats</b> statt 2.000.';
 onAuthStateChanged(auth, u => {
   authUser = u;
-  if (!u){ stopAll(); uid=null; P=null; $('top').hidden = true; $('daily').innerHTML=''; for (const v of ['table','players','shop','account']) $('view-'+v).hidden = true; $('view-login').hidden = false; return; }
+  if (!u){ stopAll(); uid=null; P=null; $('top').hidden = true; $('daily').innerHTML=''; for (const v of ['table','players','bank','shop','account']) $('view-'+v).hidden = true; $('view-login').hidden = false; return; }
   uid = u.uid; $('view-login').hidden = true; $('top').hidden = false; setTab(tab); startData();
 });
 
@@ -603,7 +613,7 @@ function startData(){
     const mine = next[uid];
     if (mine && !snap.metadata.hasPendingWrites && (!P || (mine.updated||0) >= (P.updated||0))) P = norm(structuredClone(mine));
     if (!snap.metadata.fromCache && !mine && !P) createPlayer();
-    else if (!snap.metadata.fromCache && mine) refForExisting();
+    else if (!snap.metadata.fromCache && mine){ refForExisting(); accrueInterest(); }
     if (P && P.table && !tid && !leaving) openTable(P.table);
     reconcile(); claimGifts(); renderAll();
   }, e => { console.warn(e); toast('Keine Verbindung zur Datenbank. Prüfe die Sicherheitsregeln.'); });
@@ -646,6 +656,89 @@ function refForExisting(){
   const hit = Object.entries(players).find(([id,p]) => p.code===refCode && id!==uid);
   if (hit && !friendIds().includes(hit[0])){ withPlayer(d => { d.friends = [...new Set([...d.friends, hit[0]])]; return true; }); toast(`Du bist jetzt mit ${hit[1].name} befreundet`); }
 }
+
+/* ---------- bank: euros are safe from the table ---------- */
+function accrueInterest(){
+  if (!P) return; const today = dayId(); let got = 0;
+  withPlayer(d => {
+    if (d.bank.last === today) return false;
+    if (d.bank.last){ got = Math.min(INT_MAX, Math.floor(d.euro * INT_RATE)); d.euro += got; }
+    d.bank = { last: today, got };
+    return true;
+  });
+  if (got){ SFX.coins(); toast(`Zinsen von der Bank: +${fmt(got)} €`); }
+}
+function bankMove(kind, v){
+  v = Math.floor(v);
+  if (kind==='deposit'){
+    if (!(v >= 100)) return toast('Mindestens 100 Legats einzahlen.');
+    if (inRound()) return toast('Einzahlen geht erst, wenn deine Runde vorbei ist.');
+    if (v > P.balance) return toast('So viele Legats hast du nicht.');
+    const fee = Math.ceil(v * BANK_FEE);
+    const ok = withPlayer(d => {
+      if (ledgerOpen(d) || d.balance < v) return false;
+      d.balance -= v; d.euro += v - fee;
+      d.limits = { ...d.limits, base: (d.limits.base ?? d.balance + v) - v };   // moving money is not a win or loss
+      return true;
+    });
+    if (ok){ SFX.coins(); toast(`${fmt(v - fee)} € eingezahlt (Gebühr ${fmt(fee)})`); }
+    return ok;
+  }
+  if (!(v >= 50)) return toast('Mindestens 50 € abheben.');
+  if (v > P.euro) return toast('So viel liegt nicht auf der Bank.');
+  const ok = withPlayer(d => {
+    if (d.euro < v) return false;
+    d.euro -= v; d.balance += v;
+    d.limits = { ...d.limits, base: (d.limits.base ?? d.balance - v) + v };
+    return true;
+  });
+  if (ok){ SFX.chip(); toast(`${fmt(v)} Legats abgehoben`); }
+  return ok;
+}
+let lastBankHTML = '';
+function renderBank(){
+  const el = $('view-bank');
+  if (!P){ el.innerHTML = `<div class="panel"><p class="muted">Lädt …</p></div>`; lastBankHTML = ''; return; }
+  const next = Math.min(INT_MAX, Math.floor(P.euro * INT_RATE));
+  const quick = f => `<div class="row">${[[.25,'25 %'],[.5,'50 %'],[1,'Alles']].map(([q,l]) => `<button class="btn sm" data-act="bq" data-f="${f}" data-q="${q}">${l}</button>`).join('')}</div>`;
+  const html = `<div class="stack">
+    <div class="panel stack"><h2>Bank</h2>
+      <p class="muted">Euro auf der Bank sind sicher: Am Tisch kannst du nur Legats verlieren. Beides ist Spielgeld und lässt sich weder kaufen noch auszahlen.</p>
+      <div class="statgrid">
+        <div class="stat"><small>Legats am Tisch</small><b style="color:var(--brass)">${fmt(P.balance)} ℒ</b></div>
+        <div class="stat"><small>Euro auf der Bank</small><b>${fmt(P.euro)} €</b></div>
+        <div class="stat"><small>Gesamtvermögen</small><b>${fmt(wealth(P))}</b></div>
+      </div></div>
+    <div class="grid2">
+      <div class="panel stack"><h3>Einzahlen · Legats → Euro</h3>
+        <p class="muted">Kurs 1 : 1, die Bank behält ${Math.round(BANK_FEE*100)} % Gebühr.${inRound() ? ' <b>Während einer laufenden Runde gesperrt.</b>' : ''}</p>
+        <div class="field"><label for="bdep">Betrag in Legats</label><input id="bdep" type="number" min="100" step="50" inputmode="numeric" placeholder="z. B. 1000"></div>
+        ${quick('bdep')}
+        <p class="small muted" id="bdepinfo">&nbsp;</p>
+        <div><button class="btn gold" data-act="deposit" ${inRound()?'disabled':''}>Einzahlen</button></div></div>
+      <div class="panel stack"><h3>Abheben · Euro → Legats</h3>
+        <p class="muted">Kurs 1 : 1, ohne Gebühr. Geht jederzeit, auch mitten in einer Runde.</p>
+        <div class="field"><label for="bwd">Betrag in Euro</label><input id="bwd" type="number" min="50" step="50" inputmode="numeric" placeholder="z. B. 1000"></div>
+        ${quick('bwd')}
+        <p class="small muted">&nbsp;</p>
+        <div><button class="btn gold" data-act="withdraw">Abheben</button></div></div>
+    </div>
+    <div class="panel stack"><h3>Zinsen</h3>
+      <p>Die Bank zahlt <b>${(INT_RATE*100).toLocaleString('de-DE')} % pro Tag</b> auf dein Euro-Guthaben, höchstens ${fmt(INT_MAX)} € täglich. Gutgeschrieben wird beim ersten Besuch des Tages. Verpasste Tage verfallen.</p>
+      <p class="muted">${P.bank.got ? `Heute gutgeschrieben: <b class="num" style="color:var(--win)">+${fmt(P.bank.got)} €</b> · ` : ''}Morgen voraussichtlich: <b class="num">+${fmt(next)} €</b></p></div>
+  </div>`;
+  if (html === lastBankHTML) return;
+  lastBankHTML = html;
+  const keep = [$('bdep')?.value, $('bwd')?.value];
+  el.innerHTML = html;
+  if (keep[0]) $('bdep').value = keep[0]; if (keep[1]) $('bwd').value = keep[1];
+  bankInfo();
+}
+function bankInfo(){
+  const i = $('bdepinfo'); if (!i) return; const v = Math.floor(+$('bdep').value);
+  i.innerHTML = v >= 100 ? `Du bekommst <b class="num">${fmt(v - Math.ceil(v*BANK_FEE))} €</b>, Gebühr ${fmt(Math.ceil(v*BANK_FEE))}.` : '&nbsp;';
+}
+document.addEventListener('input', e => { if (e.target.id==='bdep') bankInfo(); });
 
 /* ---------- gifts & loans ---------- */
 function claimGifts(){
@@ -815,7 +908,7 @@ function applyResult(d, r, ctx){
   st.hands += r.n; st.wins += r.w; st.losses += r.l; st.pushes += r.p; st.bj += r.bj;
   st.net += net; st.best = Math.max(st.best||0, net);
   d.week.net += net; d.week.hands += r.n; d.week.best = Math.max(d.week.best, net);
-  d.hist = [...d.hist, { t:Date.now(), b:d.balance, n:net, w:r.bet }].slice(-60);
+  d.hist = [...d.hist, { t:Date.now(), b:d.balance + d.euro, n:net, w:r.bet }].slice(-60);
   d.streaks.win = net > 0 ? d.streaks.win + 1 : net < 0 ? 0 : d.streaks.win;
   d.streaks.bj = r.bj > 0 ? d.streaks.bj + 1 : 0;
   if (r.w > 0) grant(d,'first_win');
@@ -853,7 +946,7 @@ function reconcile(){
       if (!d.ledger || d.ledger.key !== key){ d.ledger = { key, committed:0, settled:false }; changed = true; }
       if (!d.ledger.settled && committed > d.ledger.committed){
         d.balance = Math.max(0, d.balance - (committed - d.ledger.committed)); d.ledger.committed = committed;
-        d.lowMark = Math.min(d.lowMark, d.balance); changed = true;
+        d.lowMark = Math.min(d.lowMark, d.balance + d.euro); changed = true;
       }
       if (T.phase==='done' && !d.ledger.settled){
         const h = T.history?.[T.round]?.[uid];
@@ -1104,6 +1197,7 @@ function renderTop(){
   lastBal = P ? P.balance : null;
   b.textContent = P ? fmt(P.balance)+' ℒ' : '–';
   $('pname').textContent = P ? `${P.avatar} ${P.name}` : 'Konto';
+  $('peur').textContent = P ? `Bank ${fmt(P.euro)} €` : '';
   $('mute').textContent = snd.on ? '🔊' : '🔇';
   const el = $('daily');
   if (!P){ el.innerHTML = ''; return; }
@@ -1126,7 +1220,7 @@ function renderLobby(){
     <div class="felt" style="${feltStyle(uid)}"><div class="arc">Blackjack zahlt <em>3 zu 2</em> · Dealer steht auf allen <em>17</em></div>
       <div class="dealer"><p class="muted" style="text-align:center;max-width:46ch">Eröffne einen Tisch und gib den Code an deine Freunde weiter, oder setz dich an einen bestehenden Tisch. Allein spielen geht auch. Bis zu 5 Spieler pro Tisch.</p></div>
     </div>
-    ${isBroke() ? reviveBox() : ''}
+    ${isBroke() ? reviveBox() : needBank() ? bankBox() : ''}
     <div class="grid2">
       <div class="panel stack"><h3>Neuer Tisch</h3><p class="muted">Du bekommst einen 5-stelligen Code für deine Freunde. Der Tisch trägt dein Design aus dem Shop.</p>
         <div class="row"><button class="btn gold" data-act="create" ${!P?'disabled':''}>Tisch eröffnen</button>
@@ -1139,8 +1233,12 @@ function renderLobby(){
     <div class="panel stack"><h3>Freunde am Tisch</h3>${list || '<p class="muted">Gerade sitzt keiner deiner Freunde an einem Tisch.</p>'}</div>
   </div>`;
 }
+function bankBox(){
+  return `<div class="note stack"><p><b>Deine Legats sind aufgebraucht.</b> Auf der Bank liegen noch ${fmt(P.euro)} €. Heb etwas ab, um weiterzuspielen.</p>
+  <div><button class="btn gold" data-tab="bank">Zur Bank</button></div></div>`;
+}
 function reviveBox(){
-  return `<div class="note bad stack"><p><b>Du bist pleite.</b> Du kannst dich wiederbeleben und bekommst ${fmt(START)} Legats. Das zählt als Niederlage in deiner Statistik und deine Freunde sehen es.</p>
+  return `<div class="note bad stack"><p><b>Du bist pleite.</b> Legats und Bankkonto sind leer. Du kannst dich wiederbeleben und bekommst ${fmt(START)} Legats. Das zählt als Niederlage in deiner Statistik und deine Freunde sehen es.</p>
   <div><button class="btn gold" data-act="revive">Wiederbeleben (+${fmt(START)} ℒ)</button></div></div>`;
 }
 function handsHTML(u){
@@ -1193,7 +1291,7 @@ function renderTableView(){
     const ready = mySeat?.ready && mySeat.round===T.round;
     const max = Math.min(MAX_BET, P?.balance||0);
     if (lim?.hit) controls = `<div class="note">${lim.hit==='win'?'Dein Gewinnziel ist erreicht':'Dein Stop-Loss ist erreicht'} (${sgn(lim.profit)} ℒ). Im Konto kannst du eine neue Session starten oder das Limit ändern.</div>`;
-    else if (P.balance < tableMin()) controls = `<div class="note">An diesem Tisch ist der Mindesteinsatz ${fmt(tableMin())} Legats. Du hast nur ${fmt(P.balance)}.</div>`;
+    else if (P.balance < tableMin()) controls = `<div class="note">An diesem Tisch ist der Mindesteinsatz ${fmt(tableMin())} Legats. Du hast nur ${fmt(P.balance)}.${P.euro > 0 ? ` Auf der Bank liegen ${fmt(P.euro)} €. <button class="btn sm gold" data-tab="bank" style="margin-left:6px">Zur Bank</button>` : ''}</div>`;
     else if (ready) controls = `<p>Dein Einsatz: <b class="num">${fmt(mySeat.bet)} ℒ</b>. Warte auf die anderen …</p><button class="btn sm" data-act="unbet">Einsatz zurückziehen</button>${autoSwitch()}`;
     else controls = `
       <div class="chips">${CHIPS.map(([v,cl,l])=>`<button class="chip ${cl}" data-act="chip" data-v="${v}" ${bet+v>max?'disabled':''} aria-label="${fmt(v)} hinzufügen">${l}</button>`).join('')}</div>
@@ -1270,14 +1368,14 @@ function renderPlayers(){
   if (!P){ el.innerHTML = `<div class="panel"><p class="muted">Lädt …</p></div>`; return; }
   const D = debts(), wk = weekId();
   const ids = boardMode==='friends' ? [uid, ...friendIds()] : [...new Set([uid, ...Object.keys(players)])];
-  const val = p => boardScope==='week' ? (p.week?.id===wk ? p.week.net : 0) : p.balance;
+  const val = p => boardScope==='week' ? (p.week?.id===wk ? p.week.net : 0) : wealth(p);
   const rows = ids.map(id => [id, pl(id)]).filter(r=>r[1]).sort((a,b)=>val(b[1])-val(a[1]));
   const tr = rows.map(([id,p],i)=>{
     const s = p.stats||{}, w = p.week?.id===wk ? p.week : { net:0, hands:0, best:0 };
     const owed = owedBy(id, D), badges = Object.keys(p.ach||{}).length;
     const main = boardScope==='week'
       ? `<td class="r num" style="color:${w.net>=0?'var(--win)':'var(--lose)'}"><b>${sgn(w.net)}</b></td><td class="r num">${w.hands}</td><td class="r num">${sgn(w.best)}</td>`
-      : `<td class="r num"><b style="color:var(--brass)">${fmt(p.balance)}</b></td><td class="r num">${s.hands||0}</td><td class="r num">${s.wins||0} / ${s.losses||0} / ${s.pushes||0}</td>`;
+      : `<td class="r num"><b style="color:var(--brass)">${fmt(wealth(p))}</b></td><td class="r num">${fmt(p.balance)}</td><td class="r num">${fmt(euroOf(p))}</td><td class="r num">${s.hands||0}</td><td class="r num">${s.wins||0} / ${s.losses||0} / ${s.pushes||0}</td>`;
     return `<tr class="${id===uid?'me':''}" data-act="profile" data-id="${esc(id)}"><td class="rank">${i+1}</td>
       <td><span class="dot${isOnline(id)?' on':''}"></span><span class="av">${esc(p.avatar||'🙂')}</span><b>${esc(p.name)}</b>${id===uid?' <span class="muted">(du)</span>':''}${p.table && isOnline(id)?` <span class="pill">am Tisch</span>`:''}</td>
       ${main}
@@ -1287,7 +1385,7 @@ function renderPlayers(){
   }).join('');
   const head = boardScope==='week'
     ? '<th class="r">Woche</th><th class="r">Hände</th><th class="r">Bester</th>'
-    : '<th class="r">Legats</th><th class="r">Hände</th><th class="r">S / N / U</th>';
+    : '<th class="r">Vermögen</th><th class="r">Legats</th><th class="r">Euro</th><th class="r">Hände</th><th class="r">S / N / U</th>';
   const keep = $('fcode')?.value;
   el.innerHTML = `<div class="stack">
     <div class="panel stack">
@@ -1299,7 +1397,7 @@ function renderPlayers(){
       <div class="scroll"><table class="board"><thead><tr><th>#</th><th>Spieler</th>${head}<th class="r">Pleiten</th><th class="r">Schulden</th><th class="r">Erfolge</th></tr></thead>
       <tbody>${tr}</tbody></table></div>
       ${boardMode==='friends' && rows.length<2 ? '<p class="muted">Noch keine Freunde. Tausche unten eure Freundescodes aus.</p>' : ''}
-      <p class="muted small">${boardScope==='week' ? 'Gewinn und Verlust seit Montag. Jeden Montag fängt die Wochenwertung bei null an.' : 'S / N / U = gewonnene / verlorene / unentschiedene Hände. Jede Pleite mit Wiederbelebung zählt als Niederlage.'} Tippe auf einen Spieler für sein Profil.</p>
+      <p class="muted small">${boardScope==='week' ? 'Gewinn und Verlust seit Montag. Jeden Montag fängt die Wochenwertung bei null an.' : 'Vermögen = Legats + Euro auf der Bank. S / N / U = gewonnene / verlorene / unentschiedene Hände. Jede Pleite mit Wiederbelebung zählt als Niederlage.'} Tippe auf einen Spieler für sein Profil.</p>
     </div>
     <div class="panel stack"><h3>Freunde einladen · +${fmt(REF_BONUS)} ℒ</h3>
       <p>Wer sich über deinen Link <b>neu anmeldet</b>, startet mit ${fmt(START+REF_BONUS)} statt ${fmt(START)} Legats, und du bekommst ${fmt(REF_BONUS)} Legats. Ihr seid dann automatisch befreundet.</p>
@@ -1321,7 +1419,7 @@ function badgesHTML(ach, showLocked){
   return `<div class="badges">${ACH.filter(a => showLocked || ach?.[a[0]]).map(a => `<div class="badge${ach?.[a[0]]?'':' locked'}${a[4]?' shame':''}" title="${esc(a[3])}"><span class="ic">${a[1]}</span><div><b>${esc(a[2])}</b><span>${esc(a[3])}</span></div></div>`).join('') || '<p class="muted">Noch keine Erfolge.</p>'}</div>`;
 }
 function chartHTML(hist){
-  if (!hist || hist.length < 2) return '<p class="muted">Nach ein paar Runden erscheint hier der Verlauf des Kontostands.</p>';
+  if (!hist || hist.length < 2) return '<p class="muted">Nach ein paar Runden erscheint hier der Verlauf deines Vermögens.</p>';
   // draw at roughly the on-screen width so labels keep their real size
   const W = Math.round(Math.min(1000, Math.max(300, innerWidth - 80))), H = 180, pl_ = 64, pr = 12, pt = 12, pb = 22;
   const vals = hist.map(h=>h.b);
@@ -1331,7 +1429,7 @@ function chartHTML(hist){
   const pts = vals.map((v,i)=>`${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
   const grid = [lo, (lo+hi)/2, hi].map(v => `<line x1="${pl_}" x2="${W-pr}" y1="${y(v)}" y2="${y(v)}" stroke="rgba(209,173,98,.15)"/><text x="${pl_-8}" y="${y(v)+4}" text-anchor="end" fill="#a3b7ab" font-size="11" font-family="IBM Plex Mono, monospace">${fmt(v)}</text>`).join('');
   const last = vals.length-1;
-  return `<div class="chart"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Kontostand der letzten ${vals.length} Runden">
+  return `<div class="chart"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Vermögen der letzten ${vals.length} Runden">
     <defs><linearGradient id="ga" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#d1ad62" stop-opacity=".35"/><stop offset="1" stop-color="#d1ad62" stop-opacity="0"/></linearGradient></defs>
     ${grid}
     <polygon points="${x(0)},${H-pb} ${pts} ${x(last)},${H-pb}" fill="url(#ga)"/>
@@ -1348,10 +1446,10 @@ function renderShop(){
     const selected = kind==='av' ? P.avatar===id : P.sel[kind]===id;
     const pending = shopConfirm===key;
     return `<button class="item${selected?' sel':''}" data-act="shop" data-kind="${kind}" data-id="${esc(id)}" data-price="${price}">${inner}${label?`<small>${esc(label)}</small>`:''}
-      <span class="price">${selected ? 'Ausgewählt' : owned ? 'Auswählen' : pending ? `Für ${fmt(price)} ℒ kaufen?` : fmt(price)+' ℒ'}</span></button>`;
+      <span class="price">${selected ? 'Ausgewählt' : owned ? 'Auswählen' : pending ? `Für ${fmt(price)} € kaufen?` : fmt(price)+' €'}</span></button>`;
   };
   const html = `<div class="stack">
-    <div class="panel stack"><h2>Shop</h2><p class="muted">Gib deine Legats für Avatar, Tischfilz und Kartenrücken aus. Filz und Kartenrücken gelten für Tische, die du eröffnest, und alle Spieler daran sehen sie. Käufe zählen nicht in deine Gewinn-Bilanz.</p></div>
+    <div class="panel stack"><h2>Shop</h2><p class="muted">Bezahlt wird mit Euro von deinem Bankkonto (du hast <b class="num">${fmt(P.euro)} €</b>). Filz und Kartenrücken gelten für Tische, die du eröffnest, und alle Spieler daran sehen sie. Käufe zählen nicht in deine Gewinn-Bilanz.</p></div>
     <div class="panel stack"><h3>Avatar</h3><div class="shopgrid">${SHOP.av.map(([e,p]) => item('av', e, p, `<span class="big">${e}</span>`)).join('')}</div></div>
     <div class="panel stack"><h3>Tischfilz</h3><div class="shopgrid">${SHOP.felt.map(([id,l,p,a,b]) => item('felt', id, p, `<span class="sw" style="background:radial-gradient(circle at 50% 20%,${a},${b})"></span>`, l)).join('')}</div></div>
     <div class="panel stack"><h3>Kartenrücken</h3><div class="shopgrid">${SHOP.back.map(([id,l,p,a,b]) => item('back', id, p, `<span class="bk" style="background:repeating-linear-gradient(45deg,${a} 0 6px,${b} 6px 12px)"></span>`, l)).join('')}</div></div>
@@ -1366,7 +1464,7 @@ function renderAccount(){
   const iOwe = Object.entries(D[uid]||{}), owedToMe = Object.entries(D).flatMap(([a,m]) => m[uid] ? [[a, m[uid]]] : []);
   const hist = P.hist.slice(-10).reverse().map(h => `<div class="h"><span class="muted num">${new Date(h.t).toLocaleString('de-DE',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</span><span class="num">Einsatz ${fmt(h.w)}</span><b class="num" style="color:${h.n>0?'var(--win)':h.n<0?'var(--lose)':'var(--push)'}">${sgn(h.n)}</b></div>`).join('');
   el.innerHTML = `<div class="stack">
-    ${isBroke() ? reviveBox() : ''}
+    ${isBroke() ? reviveBox() : needBank() ? bankBox() : ''}
     <div class="panel stack"><div class="row" style="justify-content:space-between"><h2>${esc(P.avatar)} ${esc(P.name)}</h2><button class="btn sm" data-act="logout">Abmelden</button></div>
       <p class="muted small">Angemeldet als ${esc(authUser?.email||'')}</p><div id="acc-stats"></div></div>
     <div class="panel stack"><h3>Verlauf</h3>${chartHTML(P.hist)}${hist ? `<div class="hist">${hist}</div>` : ''}</div>
@@ -1393,7 +1491,9 @@ function renderAccount(){
 function statsHTML(p){
   const s = p.stats||{}, q = s.hands ? Math.round((s.wins/s.hands)*100) : 0;
   return `<div class="statgrid">
-    <div class="stat"><small>Kontostand</small><b style="color:var(--brass)">${fmt(p.balance)}</b></div>
+    <div class="stat"><small>Legats</small><b style="color:var(--brass)">${fmt(p.balance)}</b></div>
+    <div class="stat"><small>Euro (Bank)</small><b>${fmt(euroOf(p))}</b></div>
+    <div class="stat"><small>Vermögen</small><b>${fmt(wealth(p))}</b></div>
     <div class="stat"><small>Hände</small><b>${s.hands||0}</b></div>
     <div class="stat"><small>Gewonnen</small><b style="color:var(--win)">${s.wins||0}</b></div>
     <div class="stat"><small>Verloren</small><b style="color:var(--lose)">${s.losses||0}</b></div>
@@ -1482,6 +1582,7 @@ function renderAll(){
     const typing = el => { const a=document.activeElement; return a && a.tagName==='INPUT' && a.type!=='checkbox' && el.contains(a); };
     if (tab==='table' && !typing($('tv'))) renderTable();
     if (tab==='players' && !typing($('view-players'))) renderPlayers();
+    if (tab==='bank' && !typing($('view-bank'))) renderBank();
     if (tab==='shop') renderShop();
     if (tab==='account'){ if (typing($('view-account'))) renderAccountStats(); else renderAccount(); }
     renderModal(false);
@@ -1494,7 +1595,7 @@ function tickTimers(){
 function setTab(t){
   tab = t; shopConfirm = null;
   for (const b of document.querySelectorAll('nav.tabs button')) b.setAttribute('aria-selected', b.dataset.tab===t);
-  for (const v of ['table','players','shop','account']) $('view-'+v).hidden = v!==t;
+  for (const v of ['table','players','bank','shop','account']) $('view-'+v).hidden = v!==t;
   if (t==='table') { lastTableHTML = ''; anim.prime = true; }
   renderAll();
 }
@@ -1525,6 +1626,10 @@ document.addEventListener('click', async e => {
     case 'leave': leaveTable(); break;
     case 'copytable': copy(tid, 'Tisch-Code'); break;
     case 'copycode': copy(P.code, 'Freundescode'); break;
+    case 'bq': { const i = $(b.dataset.f), base = b.dataset.f==='bdep' ? P.balance : P.euro, q = +b.dataset.q;
+      i.value = q===1 ? base : Math.floor(base*q/50)*50; bankInfo(); break; }
+    case 'deposit': if (bankMove('deposit', +$('bdep').value)){ $('bdep').value=''; lastBankHTML=''; } document.activeElement?.blur(); renderAll(); break;
+    case 'withdraw': if (bankMove('withdraw', +$('bwd').value)){ $('bwd').value=''; lastBankHTML=''; } document.activeElement?.blur(); renderAll(); break;
     case 'copyinvite': copy(inviteLink(), 'Einladungslink'); break;
     case 'shareinvite': navigator.share({ title:'Legat Casino', text:`Spiel mit mir Blackjack im Legat Casino! Mit meinem Link bekommst du ${fmt(REF_BONUS)} Legats extra.`, url: inviteLink() }).catch(()=>{}); break;
     case 'chip': bet = Math.min(MAX_BET, P.balance, bet + +b.dataset.v); SFX.chip(); renderAll(); break;
@@ -1592,13 +1697,12 @@ document.addEventListener('click', async e => {
       const kind = b.dataset.kind, id = b.dataset.id, price = +b.dataset.price, key = kind+':'+id;
       const owned = price===0 || P.owned.includes(key);
       if (!owned){
-        if (inRound()) return toast('Warte, bis deine Runde vorbei ist.');
-        if (P.balance < price) return toast(`Dafür fehlen dir ${fmt(price - P.balance)} Legats.`);
+        if (P.euro < price) return toast(`Dafür fehlen dir ${fmt(price - P.euro)} € auf der Bank.`);
         if (shopConfirm !== key){ shopConfirm = key; renderAll(); return; }
       }
       shopConfirm = null;
       const ok = withPlayer(d => {
-        if (!owned){ if (d.balance < price || d.owned.includes(key)) return false; d.balance -= price; d.owned = [...d.owned, key]; }
+        if (!owned){ if (d.euro < price || d.owned.includes(key)) return false; d.euro -= price; d.owned = [...d.owned, key]; }
         if (kind==='av') d.avatar = id; else d.sel = { ...d.sel, [kind]: id };
         return true;
       });
