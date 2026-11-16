@@ -247,6 +247,139 @@ table.board{width:100%;border-collapse:collapse;font-size:14px}
   .logo{font-size:19px}
   nav.tabs button{font-size:13px;letter-spacing:0;padding-inline:2px}
 }
+
+/* ---------- v1.1: casino home ---------- */
+.hero{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;padding:8px 2px 4px}
+.hero h1{font-family:var(--f-display);font-size:clamp(34px,7vw,56px);line-height:1;margin:2px 0 0;font-weight:700;letter-spacing:.01em}
+.hero h1 span{color:var(--brass);font-style:italic;font-weight:500}
+.eyebrow{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.wallet{display:flex;gap:10px}
+.wallet>div{border:1px solid var(--line);border-radius:10px;padding:8px 14px;min-width:120px;background:var(--rail-2)}
+.wallet small{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.wallet b{font-size:20px;color:var(--brass)}
+.wallet>div+div b{color:var(--ink)}
+.wheelbanner{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:linear-gradient(90deg,rgba(209,173,98,.25),rgba(209,173,98,.05));border:1px solid var(--brass-dim);border-radius:12px;padding:10px 16px;color:var(--ink)}
+.wheelbanner b{color:var(--brass)}
+.wheelbanner.done{background:var(--rail-2);border-color:var(--line)}
+.wheelbanner.done b{color:var(--muted)}
+.mini-wheel{flex:none;width:64px;height:64px;display:block}
+.mini-wheel svg{width:64px;height:64px;animation:slowspin 30s linear infinite}
+.wheelbanner.done .mini-wheel svg{animation:none;opacity:.6}
+@keyframes slowspin{to{transform:rotate(360deg)}}
+.tiles{display:grid;grid-template-columns:repeat(6,1fr);gap:14px}
+.tile{grid-column:span 2;display:flex;flex-direction:column;text-align:left;padding:0;border-radius:14px;border:1px solid var(--line);background:var(--rail-2);color:var(--ink);overflow:hidden;min-width:0;transition:transform .15s,border-color .15s}
+.tile:hover{transform:translateY(-2px);border-color:var(--brass-dim)}
+.tile-bj{grid-column:span 3}.tile-sports{grid-column:span 3}
+.tile .art{height:120px;display:grid;place-items:center;background:radial-gradient(110% 120% at 50% 0%,#175a45,#0f3d2f 55%,#0a2a20);border-bottom:1px solid var(--line);overflow:hidden;position:relative}
+.tile-roulette .art{background:radial-gradient(110% 120% at 50% 0%,#5e1626,#3a0d17)}
+.tile-slots .art{background:radial-gradient(110% 120% at 50% 0%,#3d2266,#261443)}
+.tile-horses .art{background:linear-gradient(#5a7d3a,#3e5a26)}
+.tile-sports .art{background:radial-gradient(110% 120% at 50% 0%,#143e6a,#0c2745)}
+.tinfo{padding:12px 14px 14px;display:flex;flex-direction:column;gap:4px}
+.tinfo b{font-family:var(--f-display);font-size:22px;font-weight:700}
+.tinfo>span:first-of-type{color:var(--muted);font-size:13px}
+.tinfo .pill{align-self:flex-start;margin-top:2px}
+.minicards{display:flex}
+.mc{width:52px;height:74px;background:var(--card);color:var(--card-ink);border-radius:6px;font-family:var(--f-display);font-weight:700;font-size:20px;padding:4px 7px;box-shadow:0 4px 10px rgba(0,0,0,.4);transform:rotate(-8deg);display:flex;flex-direction:column;line-height:1}
+.mc+.mc{transform:rotate(8deg);margin-left:-12px}
+.mc.red{color:var(--suit-red)}
+.mc i{font-style:normal;font-size:16px}
+.miniwheel svg{width:150px;height:150px;margin-top:40px;animation:slowspin 40s linear infinite}
+.minislots{display:flex;gap:6px}
+.minislots span{background:var(--card);border-radius:6px;font-size:30px;width:50px;height:58px;display:grid;place-items:center;box-shadow:inset 0 -6px 10px rgba(0,0,0,.15)}
+.minihorses{display:flex;flex-direction:column;gap:2px;width:80%}
+.minihorses span{font-size:24px;display:inline-block;transform:scaleX(-1);animation:trot 2.4s ease-in-out infinite alternate;width:max-content}
+.minihorses span:nth-child(2){animation-delay:-.8s}.minihorses span:nth-child(3){animation-delay:-1.6s}
+@keyframes trot{from{margin-left:0}to{margin-left:calc(100% - 30px)}}
+.minisports{font-size:44px;display:flex;gap:18px}
+@media (max-width:760px){.tiles{grid-template-columns:1fr 1fr}.tile,.tile-bj,.tile-sports{grid-column:span 1}.tile-bj{grid-column:span 2}.tile .art{height:96px}.tinfo b{font-size:19px}}
+.ver{text-align:center;color:var(--muted);font-size:12px;margin-top:22px;font-family:var(--f-num)}
+
+/* ---------- shared game chrome ---------- */
+.gamebar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.gamebar h2{margin:0;margin-right:auto}
+.small-chips .chip{width:46px;height:46px;font-size:11px}
+.chip.on{outline:3px solid var(--ink);outline-offset:2px}
+.felt{min-width:0}
+
+/* ---------- Glücksrad ---------- */
+.wheelwrap{position:relative;display:grid;place-items:center}
+.wheelwrap .pointer{position:absolute;top:-6px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:14px solid transparent;border-right:14px solid transparent;border-top:26px solid var(--brass);z-index:2;filter:drop-shadow(0 2px 3px rgba(0,0,0,.5))}
+.wheel{max-width:100%;height:auto}
+
+/* ---------- Roulette ---------- */
+.rtop{display:grid;grid-template-columns:minmax(0,260px) 1fr;gap:18px;align-items:center;margin-bottom:14px}
+.rwheelbox svg{width:100%;height:auto;display:block}
+.rresult{display:flex;align-items:center;gap:12px;min-height:56px}
+.rnum{display:inline-grid;place-items:center;width:52px;height:52px;border-radius:50%;font-family:var(--f-num);font-weight:600;font-size:22px;color:#fff;border:2px solid var(--brass)}
+.rnum.sm{width:28px;height:28px;font-size:12px;border-width:1px}
+.rnum.red{background:#b1302a}.rnum.black{background:#1b1b1f}.rnum.green{background:#1f7a4a}
+.rhist{display:flex;gap:4px;flex-wrap:wrap}
+.rboard{display:grid;grid-template-columns:44px repeat(12,1fr) 44px;grid-template-rows:repeat(3,44px) 36px 36px;gap:3px}
+.rc{grid-column:var(--c);grid-row:var(--r);position:relative;border:1px solid rgba(242,235,221,.35);border-radius:4px;background:rgba(0,0,0,.15);color:#fff;font-family:var(--f-num);font-weight:600;font-size:14px;padding:0;min-width:0}
+.rc.red{background:#b1302a}.rc.black{background:#1b1b1f}.rc.green{background:#1f7a4a}
+.rc.out{font-family:var(--f-body);font-size:13px}
+.rc:hover{filter:brightness(1.25)}
+.rchip{position:absolute;right:2px;top:2px;min-width:22px;height:22px;padding:0 3px;border-radius:999px;background:var(--brass);color:#1b140a;font-size:10px;display:grid;place-items:center;border:2px dashed #fff;box-shadow:0 2px 4px rgba(0,0,0,.5);pointer-events:none}
+@media (max-width:640px){
+  .rtop{grid-template-columns:1fr}.rwheelbox{max-width:240px;margin:0 auto}
+  .rboard{grid-template-columns:repeat(3,1fr) 44px 44px;grid-template-rows:38px repeat(12,32px) 34px}
+  .rc{grid-column:var(--mc);grid-row:var(--mr);font-size:13px}
+  .rc.out{font-size:11px;writing-mode:vertical-rl;transform:rotate(180deg)}
+  .rc.out[data-k^="c"]{writing-mode:horizontal-tb;transform:none}
+}
+
+/* ---------- Automat ---------- */
+.slotmachine{display:flex;justify-content:center;margin:6px 0 4px}
+.reels{position:relative;display:flex;gap:8px;padding:14px;background:linear-gradient(#2a1f17,#120c08);border:4px solid var(--brass);border-radius:16px;box-shadow:inset 0 0 0 2px #000,0 14px 30px rgba(0,0,0,.5)}
+.reel{width:min(26vw,104px);height:min(66vw,240px);overflow:hidden;background:linear-gradient(#cfcac0,#fbf8f1 30%,#fbf8f1 70%,#cfcac0);border-radius:8px;position:relative}
+.strip{will-change:transform}
+.sym{height:min(22vw,80px);display:grid;place-items:center;font-size:min(12vw,46px)}
+.payline{position:absolute;left:6px;right:6px;top:50%;height:2px;background:rgba(196,56,42,.8);transform:translateY(-1px);pointer-events:none}
+.spinbtn{font-size:18px;padding:12px 34px}
+.paytable{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px;margin-top:14px}
+.pt{display:flex;justify-content:space-between;gap:8px;background:rgba(0,0,0,.2);border-radius:8px;padding:6px 10px;font-size:14px}
+.pt b{color:var(--brass)}
+
+/* ---------- Pferderennen ---------- */
+.racecourse{position:relative;display:flex;flex-direction:column;gap:4px;padding:10px 8px;background:linear-gradient(#7a5a35,#5e4427);border-radius:10px;border:2px solid #3a2617}
+.finish{position:absolute;top:0;bottom:0;right:34px;width:6px;background:repeating-linear-gradient(#fff 0 6px,#111 6px 12px);opacity:.85}
+.lane{display:flex;align-items:center;gap:6px;border-bottom:1px dashed rgba(255,255,255,.18);padding-bottom:3px}
+.lnum{flex:none;width:22px;height:22px;border-radius:5px;display:grid;place-items:center;color:#fff;font-family:var(--f-num);font-weight:600;font-size:12px}
+.track{position:relative;flex:1;height:32px}
+.horse{position:absolute;top:0;left:calc(var(--x) * (100% - 40px));font-size:28px;line-height:32px;transform:scaleX(-1)}
+.hpicks{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin-top:14px}
+.hpick{display:flex;align-items:center;gap:8px;border:1px solid rgba(242,235,221,.3);border-radius:10px;padding:8px 10px;background:rgba(0,0,0,.18);color:var(--ink);text-align:left}
+.hpick.on{border-color:var(--brass);box-shadow:0 0 0 1px var(--brass);background:rgba(209,173,98,.15)}
+.hpick b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hpick .odds{color:var(--brass)}
+.hpick .place{font-family:var(--f-display);font-weight:700}
+
+/* ---------- Sportwetten ---------- */
+.segwrap{flex-wrap:wrap;border-radius:12px;display:flex}
+.grid-sports{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:14px;align-items:start}
+@media (max-width:820px){.grid-sports{grid-template-columns:1fr}}
+.dayh{margin:10px 0 2px}
+.match{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"meta odds" "teams odds";gap:2px 10px;padding:8px 0;border-bottom:1px solid rgba(209,173,98,.12);align-items:center}
+.mmeta{grid-area:meta;display:flex;gap:8px;align-items:center;font-size:12px;color:var(--muted)}
+.mmeta .lg.fict{color:var(--brass)}
+.pill.live{color:#fff;background:#b1302a;border-color:#b1302a}
+.pill.good{color:var(--win);border-color:rgba(121,216,162,.45)}
+.teams{grid-area:teams;display:flex;flex-direction:column;gap:1px;min-width:0;font-weight:600}
+.teams>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:flex;align-items:center;gap:6px}
+.teams img{width:18px;height:18px;object-fit:contain}
+.score2{color:var(--brass)}
+.odds{grid-area:odds;display:flex;gap:5px}
+.oddbtn{display:flex;flex-direction:column;align-items:center;min-width:54px;padding:5px 6px;border-radius:8px;border:1px solid var(--line);background:var(--rail);color:var(--ink)}
+.oddbtn small{font-size:10px;color:var(--muted)}
+.oddbtn b{color:var(--brass);font-size:14px}
+.oddbtn.on{background:var(--brass);border-color:var(--brass)}
+.oddbtn.on b,.oddbtn.on small{color:#1b140a}
+.oddbtn:disabled{opacity:.35}
+.mybet{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(209,173,98,.12);font-size:14px}
+.slip{position:sticky;bottom:calc(10px + env(safe-area-inset-bottom,0px));margin-top:14px;z-index:4;background:var(--rail-2);border:1px solid var(--brass);border-radius:14px;padding:12px 14px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;box-shadow:0 10px 30px rgba(0,0,0,.6);animation:up .2s ease-out both}
+.news li{margin:4px 0}
+
 @media (prefers-reduced-motion:reduce){*{animation:none!important}}
 </style>
 </head>
@@ -257,7 +390,7 @@ table.board{width:100%;border-collapse:collapse;font-size:14px}
     <button class="iconbtn" id="mute" type="button" aria-label="Ton an/aus">🔊</button>
     <div class="purse"><small id="pname">Konto</small><b id="pbal">–</b><span id="peur" class="num"></span></div>
     <nav class="tabs" role="tablist">
-      <button id="tab-table" role="tab" aria-selected="true" data-tab="table">Tisch</button>
+      <button id="tab-table" role="tab" aria-selected="true" data-tab="table">Casino</button>
       <button id="tab-players" role="tab" aria-selected="false" data-tab="players">Spieler</button>
       <button id="tab-bank" role="tab" aria-selected="false" data-tab="bank">Bank</button>
       <button id="tab-shop" role="tab" aria-selected="false" data-tab="shop">Shop</button>
@@ -283,7 +416,12 @@ table.board{width:100%;border-collapse:collapse;font-size:14px}
   </section>
   <section id="view-setup" hidden></section>
   <section id="view-table" hidden>
-    <div id="tv"></div>
+    <div id="home"></div>
+    <div id="tv" hidden></div>
+    <div id="g-roulette" hidden></div>
+    <div id="g-slots" hidden></div>
+    <div id="g-horses" hidden></div>
+    <div id="g-sports" hidden></div>
     <div id="chat" class="panel chat" hidden>
       <div class="emojis" id="emojis"></div>
       <div class="chatlog" id="chatlog" aria-live="polite"></div>
@@ -297,6 +435,7 @@ table.board{width:100%;border-collapse:collapse;font-size:14px}
   <section id="view-bank" hidden></section>
   <section id="view-shop" hidden></section>
   <section id="view-account" hidden></section>
+  <p class="ver" id="ver"></p>
 </main>
 <div id="modal" class="modal" hidden><div class="modal-card" id="modal-card" role="dialog" aria-modal="true"></div></div>
 <div id="toast" class="toast" hidden></div>
@@ -499,6 +638,7 @@ function norm(d){
   d.friends ||= []; d.limits ||= { win:null, loss:null, base:d.balance };
   d.avatar ||= '🙂'; d.owned ||= []; d.sel ||= { felt:'green', back:'red' };
   d.daily ||= { last:null, streak:0 }; d.hist ||= []; d.ach ||= {}; d.streaks ||= { win:0, bj:0 };
+  d.bets ||= [];
   if (d.euro == null) d.euro = START_EURO; d.bank ||= { last:null, got:0 };
   d.claimed ||= []; d.giftedTotal ||= 0; if (d.lowMark == null) d.lowMark = d.balance;
   if (!d.week || d.week.id !== weekId()) d.week = { id: weekId(), net:0, hands:0, best:0 };
@@ -613,7 +753,7 @@ function startData(){
     const mine = next[uid];
     if (mine && !snap.metadata.hasPendingWrites && (!P || (mine.updated||0) >= (P.updated||0))) P = norm(structuredClone(mine));
     if (!snap.metadata.fromCache && !mine && !P) createPlayer();
-    else if (!snap.metadata.fromCache && mine){ refForExisting(); accrueInterest(); }
+    else if (!snap.metadata.fromCache && mine){ refForExisting(); accrueInterest(); afterLogin(); }
     if (P && P.table && !tid && !leaving) openTable(P.table);
     reconcile(); claimGifts(); renderAll();
   }, e => { console.warn(e); toast('Keine Verbindung zur Datenbank. Prüfe die Sicherheitsregeln.'); });
@@ -657,6 +797,13 @@ function refForExisting(){
   if (hit && !friendIds().includes(hit[0])){ withPlayer(d => { d.friends = [...new Set([...d.friends, hit[0]])]; return true; }); toast(`Du bist jetzt mit ${hit[1].name} befreundet`); }
 }
 
+let loggedOnce = false;
+function afterLogin(){
+  if (loggedOnce) return; loggedOnce = true;
+  if (ls.get('seenVersion', null) !== APP_VERSION){ ls.set('seenVersion', APP_VERSION); if (P.created && Date.now() - P.created > 60e3) openModal('news'); }
+  if (P.bets?.some(b => b.st==='open' && b.src==='oldb')) loadSports();
+}
+setInterval(() => { if (uid && P?.bets?.some(b => b.st==='open' && b.src==='oldb') && Date.now() - SP.lastLoad > 5*60e3) loadSports(); }, 60e3);
 /* ---------- bank: euros are safe from the table ---------- */
 function accrueInterest(){
   if (!P) return; const today = dayId(); let got = 0;
@@ -775,7 +922,7 @@ function sendGift(to, amount, kind){
 /* ---------- tables ---------- */
 function openTable(id){
   if (tid === id) return;
-  closeTable();
+  closeTable(); game = 'bj';
   tid = id; T = null; seats = {}; msgs = []; anim.prime = true; seatHealed = false; autoRound = null;
   setTimeout(leaseLoop, 300);
   unsubT = onSnapshot(doc(fs,'tables',id), s => {
@@ -1186,21 +1333,676 @@ function animateCards(root){
   if (anim.seen.size > 400){ const keep = new Set(els.map(e=>e.dataset.k)); for (const k of anim.seen.keys()) if (!keep.has(k)) anim.seen.delete(k); }
 }
 
+/* =====================================================================
+   v1.1 – Casino home, Glücksrad, Roulette, Automat, Pferderennen, Sportwetten
+   ===================================================================== */
+const APP_VERSION = '1.1';
+const CHANGELOG = [
+  'Neue Startseite mit allen Spielen',
+  'Glücksrad statt Tagesbonus: Legats, Euro oder Shop-Sachen',
+  'Roulette (europäisch, 0–36)',
+  'Automat mit drei Walzen',
+  'Pferderennen mit sechs Pferden',
+  'Sportwetten auf echte Spiele (Bundesliga, Champions League, Darts) und fiktive Turniere',
+  '5 neue Erfolge',
+];
+let game = null;            // null = Casino-Startseite, 'bj', 'roulette', 'slots', 'horses', 'sports'
+let hold = 0;               // Gewinn, der erst nach der Animation im Kontostand erscheint
+const GAME_NAMES = { bj:'Blackjack', roulette:'Roulette', slots:'Automat', horses:'Pferderennen', sports:'Sportwette', wheel:'Glücksrad' };
+ACH.splice(ACH.length - 2, 0,
+  ['r_num','🎯','Volltreffer','Beim Roulette eine einzelne Zahl getroffen'],
+  ['jackpot','7️⃣','Jackpot','Am Automaten drei Siebenen gedreht'],
+  ['horse8','🐎','Außenseiter','Ein Pferd mit Quote 8 oder höher gewonnen'],
+  ['sport3','⚽','Wettkönig','Eine Sportwette mit Quote 3 oder höher gewonnen'],
+  ['wheel','🎡','Glückspilz','Den Hauptgewinn am Glücksrad gedreht'],
+);
+const pick = arr => arr[rnd(arr.length)];
+const secs = ms => new Promise(r => setTimeout(r, ms));
+const timeLabel = t => new Date(t).toLocaleString('de-DE', { weekday:'short', day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
+
+/** book a finished bet in the stats (balance is handled by the caller) */
+function record(d, key, stake, pay){
+  const net = pay - stake;
+  d.games ||= {};
+  const g = d.games[key] ||= { n:0, net:0, best:0 };
+  g.n++; g.net += net; g.best = Math.max(g.best, net);
+  d.stats.net += net; d.stats.best = Math.max(d.stats.best||0, net);
+  d.week.net += net; d.week.best = Math.max(d.week.best, net);
+  d.hist = [...d.hist, { t:Date.now(), b:d.balance + d.euro, n:net, w:stake, g:key }].slice(-60);
+  d.lowMark = Math.min(d.lowMark, d.balance + d.euro);
+}
+function betError(amount, min=50, max=MAX_BET){
+  const lim = limitState();
+  if (lim?.hit) return lim.hit==='win' ? 'Gewinnziel erreicht. Starte im Konto eine neue Session.' : 'Stop-Loss erreicht. Starte im Konto eine neue Session.';
+  if (!(amount >= min)) return `Mindesteinsatz: ${fmt(min)} Legats.`;
+  if (amount > max) return `Höchsteinsatz: ${fmt(max)} Legats.`;
+  if (amount > P.balance) return P.euro > 0 ? 'Nicht genug Legats. Heb auf der Bank etwas ab.' : 'Nicht genug Legats.';
+  return null;
+}
+/** one instant game round: take the stake, pay out, book it. The win shows after the animation (hold). */
+function playInstant(key, stake, pay, extra){
+  const ok = withPlayer(d => {
+    if (d.balance < stake) return false;
+    d.balance += pay - stake; record(d, key, stake, pay); extra?.(d);
+    return true;
+  });
+  if (ok) hold = pay;
+  return ok;
+}
+function release(){ hold = 0; renderAll(); }
+function chipPicker(sel, act){
+  return `<div class="chips small-chips">${[[50,'ch50','50'],[100,'ch100','100'],[500,'ch500','500'],[1000,'ch1k','1K'],[5000,'ch5k','5K']].map(([v,c,l]) =>
+    `<button class="chip ${c}${sel===v?' on':''}" data-act="${act}" data-v="${v}" aria-pressed="${sel===v}">${l}</button>`).join('')}</div>`;
+}
+function backBar(title, extra=''){
+  return `<div class="gamebar"><button class="btn sm" data-act="home">← Casino</button><h2>${title}</h2>${extra}</div>`;
+}
+
+/* ---------- Glücksrad (daily) ---------- */
+const WHEEL = [
+  { k:'L', v:500 }, { k:'E', v:250 }, { k:'L', v:1000 }, { k:'I' }, { k:'L', v:500 }, { k:'E', v:500 },
+  { k:'L', v:2000 }, { k:'E', v:250 }, { k:'L', v:750 }, { k:'E', v:1000 }, { k:'L', v:500 }, { k:'J', v:5000 },
+];
+const WHEEL_COL = ['#7d2a22','#1f3f7a','#7d2a22','#6b5520','#7d2a22','#1f5a3a','#7d2a22','#1f3f7a','#7d2a22','#1f5a3a','#7d2a22','#b48a2c'];
+const wheelLabel = s => s.k==='I' ? '🎁' : s.k==='J' ? '💎 5K' : (s.v>=1000 ? (s.v/1000)+'K' : s.v) + (s.k==='E' ? ' €' : ' ℒ');
+const streakMult = st => 1 + Math.min(Math.max(st,1),7)*0.1 - 0.1;
+let wheelRot = 0, wheelBusy = false, wheelMsg = '';
+function wheelState(){
+  const D = P?.daily || {}, today = dayId();
+  const streak = D.last === dayId(Date.now()-864e5) ? (D.streak||0) + 1 : 1;
+  return { ready: D.last !== today, streak };
+}
+function wheelSVG(size=300, main=false){
+  const n = WHEEL.length, r = 140, cx = 150, cy = 150;
+  const sl = WHEEL.map((s,i) => {
+    const a0 = (i/n)*2*Math.PI - Math.PI/2 - Math.PI/n, a1 = a0 + 2*Math.PI/n, am = (a0+a1)/2;
+    const p = a => `${(cx + r*Math.cos(a)).toFixed(2)},${(cy + r*Math.sin(a)).toFixed(2)}`;
+    const tx = cx + r*0.68*Math.cos(am), ty = cy + r*0.68*Math.sin(am), rot = am*180/Math.PI + 90;
+    return `<path d="M${cx},${cy} L${p(a0)} A${r},${r} 0 0 1 ${p(a1)} Z" fill="${WHEEL_COL[i]}" stroke="#f2ebdd" stroke-width="2"/>
+      <text x="${tx.toFixed(1)}" y="${ty.toFixed(1)}" fill="#fff" font-size="${s.k==='I'?22:15}" font-weight="700" font-family="IBM Plex Mono, monospace" text-anchor="middle" dominant-baseline="middle" transform="rotate(${rot.toFixed(1)} ${tx.toFixed(1)} ${ty.toFixed(1)})">${wheelLabel(s)}</text>`;
+  }).join('');
+  return `<svg class="wheel" viewBox="0 0 300 300" width="${size}" height="${size}" role="img" aria-label="Glücksrad">
+    <g ${main ? 'id="wheelg"' : ''} style="transform:rotate(${main ? wheelRot : 0}deg);transform-origin:150px 150px">${sl}</g>
+    <circle cx="150" cy="150" r="26" fill="#231a14" stroke="#d1ad62" stroke-width="3"/><text x="150" y="151" fill="#d1ad62" font-size="13" font-family="Bodoni Moda, serif" font-weight="700" text-anchor="middle" dominant-baseline="middle">LEGAT</text>
+  </svg>`;
+}
+function wheelHTML(){
+  const W = wheelState();
+  return `<div class="stack" style="align-items:center;text-align:center">
+    <div class="row" style="justify-content:space-between;width:100%"><h2>Glücksrad</h2><button class="btn sm" data-act="closemodal">Schließen</button></div>
+    <p class="muted">Einmal am Tag gratis drehen. Tag ${W.streak} in Folge: Legats und Euro zählen <b>×${streakMult(W.streak).toLocaleString('de-DE')}</b>.</p>
+    <div class="wheelwrap"><div class="pointer" aria-hidden="true"></div>${wheelSVG(Math.min(320, innerWidth - 70), true)}</div>
+    <div id="wheelres" class="net" style="min-height:28px;color:var(--win)">${esc(wheelMsg)}</div>
+    <button class="btn gold" data-act="spinwheel" ${W.ready && !wheelBusy ? '' : 'disabled'}>${W.ready ? 'Drehen' : 'Morgen wieder'}</button>
+  </div>`;
+}
+async function spinWheel(){
+  const W = wheelState(); if (!W.ready || wheelBusy) return;
+  wheelBusy = true;   // keeps the modal from re-rendering mid-spin
+  const i = rnd(WHEEL.length), s = WHEEL[i], mult = streakMult(W.streak);
+  let prize = '', itemKey = null, txt = '';
+  if (s.k==='I'){
+    const pool = [...SHOP.av.map(([e,p]) => ['av:'+e, p, e]), ...SHOP.felt.map(x => ['felt:'+x[0], x[2], x[1]+' (Filz)']), ...SHOP.back.map(x => ['back:'+x[0], x[2], x[1]+' (Kartenrücken)'])]
+      .filter(([k,p]) => p > 0 && p <= 25000 && !P.owned.includes(k));
+    if (pool.length){ const it = pick(pool); itemKey = it[0]; txt = `🎁 ${it[2]} gewonnen!`; }
+  }
+  let addL = 0, addE = 0;
+  if (s.k==='L' || s.k==='J') addL = Math.round(s.v * mult);
+  if (s.k==='E') addE = Math.round(s.v * mult);
+  if (s.k==='I' && !itemKey) addE = 2500;
+  if (!txt) txt = addL ? `+${fmt(addL)} Legats` : `+${fmt(addE)} €`;
+  const ok = withPlayer(d => {
+    if (d.daily.last === dayId()) return false;
+    d.daily = { last: dayId(), streak: W.streak };
+    d.balance += addL; d.euro += addE;
+    if (itemKey) d.owned = [...d.owned, itemKey];
+    if (s.k==='J') grant(d,'wheel');
+    if (W.streak >= 7) grant(d,'daily7');
+    return true;
+  });
+  if (!ok){ wheelBusy = false; return; }
+  hold = addL;
+  const target = 360*6 + (360 - i*30) - (wheelRot % 360) + (rnd(17)-8);
+  wheelRot += target;
+  const g = $('wheelg'); if (g){ g.style.transition = 'transform 4.6s cubic-bezier(.12,.75,.18,1)'; g.style.transform = `rotate(${wheelRot}deg)`; }
+  for (let k=0;k<26;k++) setTimeout(() => SFX.chip(), 4600 * (1 - Math.pow(1 - k/26, 1.7)));
+  const b = document.querySelector('[data-act="spinwheel"]'); if (b) b.disabled = true;
+  await secs(4700);
+  wheelBusy = false; hold = 0;
+  if (s.k==='J') SFX.bj(); else SFX.coins();
+  wheelMsg = txt; const r = $('wheelres'); if (r) r.textContent = txt;
+  toast(txt); renderAll();
+}
+
+/* ---------- Roulette ---------- */
+const RED = new Set([1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]);
+const WHEEL_ORDER = [0,32,15,19,4,21,2,25,17,34,6,27,13,36,11,30,8,23,10,5,24,16,33,1,20,14,31,9,22,18,29,7,28,12,35,3,26];
+const R = { chip: 100, bets: {}, last: null, hist: ls.get('rhist', []), rot: 0, busy: false, res: null };
+const numCol = n => n===0 ? 'green' : RED.has(n) ? 'red' : 'black';
+function rWins(key, n){
+  if (key[0]==='n') return +key.slice(1)===n ? 36 : 0;
+  if (n===0) return 0;
+  switch (key){
+    case 'red': return RED.has(n) ? 2 : 0;   case 'black': return !RED.has(n) ? 2 : 0;
+    case 'odd': return n%2 ? 2 : 0;           case 'even': return n%2 ? 0 : 2;
+    case 'low': return n<=18 ? 2 : 0;         case 'high': return n>=19 ? 2 : 0;
+    case 'd1': return n<=12 ? 3 : 0;          case 'd2': return n>=13 && n<=24 ? 3 : 0;   case 'd3': return n>=25 ? 3 : 0;
+    case 'c1': return n%3===1 ? 3 : 0;        case 'c2': return n%3===2 ? 3 : 0;          case 'c3': return n%3===0 ? 3 : 0;
+  }
+  return 0;
+}
+const rTotal = b => Object.values(b).reduce((s,v)=>s+v, 0);
+function rouletteWheel(){
+  const n = 37, r = 140, cx = 150, cy = 150;
+  const seg = WHEEL_ORDER.map((num,i) => {
+    const a0 = (i/n)*2*Math.PI - Math.PI/2 - Math.PI/n, a1 = a0 + 2*Math.PI/n, am = (a0+a1)/2;
+    const p = (a, rr=r) => `${(cx + rr*Math.cos(a)).toFixed(2)},${(cy + rr*Math.sin(a)).toFixed(2)}`;
+    const tx = cx + r*0.86*Math.cos(am), ty = cy + r*0.86*Math.sin(am);
+    const fill = num===0 ? '#1f7a4a' : RED.has(num) ? '#b1302a' : '#1b1b1f';
+    return `<path d="M${p(a0,r*0.62)} L${p(a0)} A${r},${r} 0 0 1 ${p(a1)} L${p(a1,r*0.62)} A${r*0.62},${r*0.62} 0 0 0 ${p(a0,r*0.62)} Z" fill="${fill}" stroke="#d1ad62" stroke-width=".8"/>
+      <text x="${tx.toFixed(1)}" y="${ty.toFixed(1)}" fill="#fff" font-size="10" font-weight="700" font-family="IBM Plex Mono, monospace" text-anchor="middle" dominant-baseline="middle" transform="rotate(${(am*180/Math.PI+90).toFixed(1)} ${tx.toFixed(1)} ${ty.toFixed(1)})">${num}</text>`;
+  }).join('');
+  return `<svg viewBox="0 0 300 300" class="rwheel" role="img" aria-label="Roulette-Kessel">
+    <circle cx="150" cy="150" r="148" fill="#3a2617" stroke="#d1ad62" stroke-width="2"/>
+    <g id="rwheelg" style="transform:rotate(${R.rot}deg);transform-origin:150px 150px">${seg}
+      <circle cx="150" cy="150" r="${r*0.62}" fill="#5a3a22" stroke="#d1ad62" stroke-width="2"/>
+      ${[0,45,90,135].map(a => `<rect x="146" y="${150-r*0.55}" width="8" height="${r*1.1}" rx="4" fill="#d1ad62" transform="rotate(${a} 150 150)"/>`).join('')}
+      <circle cx="150" cy="150" r="14" fill="#d1ad62"/></g>
+    <circle id="rball" cx="150" cy="${150 - r*0.74}" r="6" fill="#fbf8f1" stroke="#999" stroke-width=".5" style="transform-origin:150px 150px"/>
+  </svg>`;
+}
+function rCell(key, label, cls, style){
+  const amt = R.bets[key];
+  return `<button class="rc ${cls}" data-act="rbet" data-k="${key}" style="${style}" aria-label="${label} setzen">${label}${amt ? `<span class="rchip">${amt>=1000 ? (amt/1000).toLocaleString('de-DE')+'K' : amt}</span>` : ''}</button>`;
+}
+function renderRoulette(force){
+  const el = $('g-roulette');
+  if (R.busy && !force && el.innerHTML) return;
+  let cells = rCell('n0','0','green','--c:1/2;--r:1/4;--mc:1/4;--mr:1/2');
+  for (let n=1;n<=36;n++){
+    const col = Math.ceil(n/3), row = 3 - ((n-1)%3);          // desktop: 3 rows × 12 columns
+    const mcol = ((n-1)%3) + 1, mrow = col + 1;                 // phone: 12 rows × 3 columns
+    cells += rCell('n'+n, n, numCol(n), `--c:${col+1}/${col+2};--r:${row}/${row+1};--mc:${mcol}/${mcol+1};--mr:${mrow}/${mrow+1}`);
+  }
+  for (let c=1;c<=3;c++) cells += rCell('c'+c, '2:1', 'out', `--c:14/15;--r:${4-c}/${5-c};--mc:${c}/${c+1};--mr:14/15`);
+  [['d1','1–12'],['d2','13–24'],['d3','25–36']].forEach(([k,l],i) => cells += rCell(k, l, 'out', `--c:${2+i*4}/${6+i*4};--r:4/5;--mc:4/5;--mr:${2+i*4}/${6+i*4}`));
+  [['low','1–18'],['even','Gerade'],['red','Rot'],['black','Schwarz'],['odd','Ungerade'],['high','19–36']].forEach(([k,l],i) =>
+    cells += rCell(k, l, 'out'+(k==='red'?' red':k==='black'?' black':''), `--c:${2+i*2}/${4+i*2};--r:5/6;--mc:5/6;--mr:${2+i*2}/${4+i*2}`));
+  const total = rTotal(R.bets), res = R.res;
+  const html = `${backBar('Roulette', '<span class="muted small">Europäisch · 0 bis 36</span>')}
+  <div class="felt rfelt" style="${feltStyle(uid)}">
+    <div class="rtop">
+      <div class="rwheelbox">${rouletteWheel()}</div>
+      <div class="stack" style="gap:10px;min-width:0">
+        <div class="rresult">${res!=null ? `<span class="rnum ${numCol(res.n)}">${res.n}</span><div><b style="color:${res.net>0?'var(--win)':res.net<0?'var(--lose)':'var(--push)'}">${res.net>0?'Gewonnen '+sgn(res.net):res.net<0?'Verloren '+sgn(res.net):'Einsatz zurück'} ℒ</b></div>` : '<span class="muted">Setz deine Chips und dreh den Kessel.</span>'}</div>
+        <div class="rhist">${R.hist.map(n => `<span class="rnum sm ${numCol(n)}">${n}</span>`).join('')}</div>
+        <p class="muted small">Zahl zahlt 35 : 1 · Dutzend und Kolonne 2 : 1 · Rot, Schwarz, Gerade, Ungerade, 1–18, 19–36 zahlen 1 : 1. Bei 0 verlieren alle Außenwetten.</p>
+      </div>
+    </div>
+    <div class="rboard">${cells}</div>
+    <div class="controls">
+      ${chipPicker(R.chip, 'rchip')}
+      <div class="betline"><button class="btn sm" data-act="rclear" ${R.busy?'disabled':''}>Löschen</button><button class="btn sm" data-act="rdouble" ${R.busy?'disabled':''}>Verdoppeln</button><button class="btn sm" data-act="rrepeat" ${R.busy||!R.last?'disabled':''}>Wiederholen</button>
+      <span class="betval">${fmt(total)}</span></div>
+      <button class="btn gold" data-act="rspin" ${R.busy||!total?'disabled':''}>${R.busy ? 'Kugel rollt …' : 'Drehen'}</button>
+    </div>
+  </div>`;
+  if (el.innerHTML !== html){ el.innerHTML = html; }
+}
+function rAdd(key){
+  if (R.busy) return;
+  const v = R.chip, total = rTotal(R.bets);
+  if (total + v > Math.min(MAX_BET, P.balance)) return toast(total + v > MAX_BET ? 'Höchsteinsatz pro Dreh: 50.000 Legats.' : 'Nicht genug Legats.');
+  R.bets = { ...R.bets, [key]: (R.bets[key]||0) + v }; SFX.chip(); renderAll();
+}
+async function rSpin(){
+  if (R.busy) return; const total = rTotal(R.bets);
+  const err = betError(total); if (err) return toast(err);
+  const n = rnd(37);
+  let pay = 0; for (const [k,v] of Object.entries(R.bets)) pay += v * rWins(k, n);
+  if (!playInstant('roulette', total, pay, d => { if (R.bets['n'+n]) grant(d,'r_num'); })) return;
+  R.last = { ...R.bets }; R.busy = true; R.res = null; renderRoulette(true);
+  const idx = WHEEL_ORDER.indexOf(n), seg = 360/37;
+  R.rot += 360*5 + ((360 - idx*seg) - (R.rot % 360) + 360) % 360;
+  const g = $('rwheelg'), ball = $('rball');
+  if (g){ g.style.transition = 'transform 5s cubic-bezier(.15,.7,.2,1)'; g.style.transform = `rotate(${R.rot}deg)`; }
+  if (ball && !reduceMotion) ball.animate([{ transform:'rotate(0deg)' }, { transform:'rotate(-1440deg)' }], { duration:5000, easing:'cubic-bezier(.2,.6,.3,1)' });
+  for (let k=0;k<30;k++) setTimeout(() => noise(.02, { vol:.12, freq:5000 }), 5000 * Math.pow(k/30, 0.6));
+  await secs(5100);
+  R.busy = false; R.res = { n, net: pay - total }; R.hist = [n, ...R.hist].slice(0, 14); ls.set('rhist', R.hist); R.bets = {};
+  release(); if (pay > total) SFX.win(); else if (pay < total) SFX.lose(); else SFX.push();
+}
+
+/* ---------- Automat ---------- */
+const SLOT_SYMS = ['🍒','🍋','🔔','⭐','💎','7️⃣'], SLOT_W = [30,25,20,14,8,3], SLOT_PAY3 = [6,10,20,40,100,500];
+const S = { bet: ls.get('slotbet', 100), busy: false, reels: [[1,0,2],[3,0,1],[2,0,4]], res: null };
+function slotSym(){ let x = rnd(100); for (let i=0;i<SLOT_W.length;i++){ if (x < SLOT_W[i]) return i; x -= SLOT_W[i]; } return 0; }
+function slotPay(c){   // c = center line symbol indices
+  if (c[0]===c[1] && c[1]===c[2]) return SLOT_PAY3[c[0]];
+  if (c[0]===0 && c[1]===0) return 3;
+  if (c[0]===0) return 0.5;
+  return 0;
+}
+function renderSlots(){
+  const el = $('g-slots');
+  if (S.busy && el.innerHTML) return;
+  const reels = S.reels.map((r,i) => `<div class="reel"><div class="strip" id="strip${i}">${r.map(s => `<div class="sym">${SLOT_SYMS[s]}</div>`).join('')}</div></div>`).join('');
+  const pt = SLOT_SYMS.map((s,i) => `<div class="pt"><span>${s}${s}${s}</span><b class="num">×${SLOT_PAY3[i]}</b></div>`).join('') + `<div class="pt"><span>🍒🍒 ·</span><b class="num">×3</b></div><div class="pt"><span>🍒 · ·</span><b class="num">×0,5</b></div>`;
+  const res = S.res;
+  const html = `${backBar('Automat', '<span class="muted small">Auszahlungsquote 94,7 %</span>')}
+  <div class="felt sfelt" style="${feltStyle(uid)}">
+    <div class="slotmachine"><div class="reels">${reels}<div class="payline" aria-hidden="true"></div></div></div>
+    <div class="status" id="slotres">${res ? (res.pay ? `<span style="color:var(--win)">Gewonnen: ${fmt(res.pay)} ℒ</span>` : 'Leider nichts') : 'Drei gleiche auf der Mittellinie gewinnen'}</div>
+    <div class="controls">
+      ${chipPicker(S.bet, 'sbet')}
+      <button class="btn gold spinbtn" data-act="sspin" ${S.busy?'disabled':''}>Drehen · ${fmt(S.bet)} ℒ</button>
+    </div>
+    <div class="paytable">${pt}</div>
+  </div>`;
+  if (el.innerHTML !== html) el.innerHTML = html;
+}
+async function slotSpin(){
+  if (S.busy) return;
+  const err = betError(S.bet, 50, 5000); if (err) return toast(err);
+  const reels = [0,1,2].map(() => [slotSym(), slotSym(), slotSym()]);
+  const center = reels.map(r => r[1]), mult = slotPay(center), pay = Math.floor(S.bet * mult);
+  if (!playInstant('slots', S.bet, pay, d => { if (center.every(s => s===5)) grant(d,'jackpot'); })) return;
+  S.busy = true; S.res = null; renderAll();
+  document.querySelectorAll('[data-act="sspin"],[data-act="sbet"]').forEach(x => x.disabled = true);
+  const H = document.querySelector('.reel')?.clientHeight / 3 || 70;
+  for (let i=0;i<3;i++){
+    const strip = $('strip'+i); if (!strip) continue;
+    const filler = Array.from({ length: 18 + i*6 }, () => slotSym());
+    strip.innerHTML = [...S.reels[i], ...filler, ...reels[i]].map(s => `<div class="sym">${SLOT_SYMS[s]}</div>`).join('');
+    strip.style.transition = 'none'; strip.style.transform = 'translateY(0)';
+    void strip.offsetHeight;
+    const dist = (filler.length + 3) * H;
+    strip.style.transition = `transform ${1.1 + i*0.45}s cubic-bezier(.25,.1,.25,1.05)`;
+    strip.style.transform = `translateY(-${dist}px)`;
+    for (let k=0;k<8+i*3;k++) setTimeout(() => tone(900 + rnd(200), .02, { type:'square', vol:.02 }), k*120);
+    setTimeout(() => SFX.card(), (1.1 + i*0.45)*1000);
+  }
+  await secs(2150);
+  S.reels = reels; S.busy = false; S.res = { pay };
+  release();
+  if (center.every(s => s===5)) SFX.bj(); else if (pay > S.bet) SFX.win(); else if (pay > 0) SFX.push();
+}
+
+/* ---------- Pferderennen ---------- */
+const HORSE_NAMES = ['Goldjunge','Silberpfeil','Abendrot','Sturmwind','Herzbube','Kreuzass','Pik Dame','Glücksklee','Nachtfalter','Feuerprobe','Donnerhall','Morgentau','Schwarzer Peter','Wildfang','Sternschnuppe','Hofnarr'];
+const SILKS = ['#c4382a','#2f6fb6','#d1ad62','#2f8a55','#7b3fa0','#e07a2b'];
+const H = { race: null, pickI: null, bet: ls.get('horsebet', 500), busy: false, res: null };
+function newRace(){
+  const names = [...HORSE_NAMES].sort(() => rnd(1000) - 500).slice(0, 6);
+  const str = names.map(() => 0.5 + rnd(1000)/1000 * 1.6);
+  const sum = str.reduce((a,b)=>a+b, 0);
+  H.race = names.map((n,i) => { const p = str[i]/sum; return { n, p, odds: Math.max(1.2, Math.floor(0.9/p*10)/10), c: SILKS[i] }; });
+  H.res = null; H.pickI = null;
+}
+function renderHorses(){
+  const el = $('g-horses');
+  if (!H.race) newRace();
+  if (H.busy && el.innerHTML) return;
+  const lanes = H.race.map((h,i) => `<div class="lane"><span class="lnum" style="background:${h.c}">${i+1}</span><div class="track"><span class="horse" id="horse${i}" style="--x:${H.res ? H.res.pos[i] : 0}">🏇</span></div></div>`).join('');
+  const list = H.race.map((h,i) => `<button class="hpick${H.pickI===i?' on':''}" data-act="hpick" data-i="${i}" ${H.busy?'disabled':''}>
+      <span class="lnum" style="background:${h.c}">${i+1}</span><b>${esc(h.n)}</b><span class="num odds">${h.odds.toLocaleString('de-DE',{minimumFractionDigits:1})}</span>
+      ${H.res ? `<span class="place">${H.res.order.indexOf(i)+1}.</span>` : ''}</button>`).join('');
+  const r = H.res;
+  const html = `${backBar('Pferderennen', '<span class="muted small">Sieg-Wette · Quote = Auszahlung pro Legat</span>')}
+  <div class="felt hfelt" style="${feltStyle(uid)}">
+    <div class="racecourse"><div class="finish" aria-hidden="true"></div>${lanes}</div>
+    <div class="status">${r ? `${esc(H.race[r.order[0]].n)} gewinnt! ${r.pay ? `<span style="color:var(--win)">+${fmt(r.pay - r.stake)} ℒ</span>` : '<span style="color:var(--lose)">Dein Pferd war nicht vorne.</span>'}` : H.busy ? 'Und los!' : 'Wähl ein Pferd und deinen Einsatz'}</div>
+    <div class="hpicks">${list}</div>
+    <div class="controls">
+      ${chipPicker(H.bet, 'hbet')}
+      ${r ? `<button class="btn gold" data-act="hnew">Nächstes Rennen</button>` :
+        `<button class="btn gold" data-act="hrun" ${H.busy || H.pickI==null ? 'disabled' : ''}>${H.pickI==null ? 'Pferd wählen' : `${fmt(H.bet)} ℒ auf ${esc(H.race[H.pickI].n)} · Start`}</button>`}
+    </div>
+  </div>`;
+  if (el.innerHTML !== html) el.innerHTML = html;
+}
+async function horseRun(){
+  if (H.busy || H.pickI==null || H.res) return;
+  const err = betError(H.bet); if (err) return toast(err);
+  // finishing order: weighted by each horse's chance
+  const left = H.race.map((h,i) => i), order = [];
+  while (left.length){ let x = Math.random() * left.reduce((s,i)=>s+H.race[i].p, 0); let k = 0; for (; k<left.length-1; k++){ x -= H.race[left[k]].p; if (x <= 0) break; } order.push(left.splice(k,1)[0]); }
+  const won = order[0] === H.pickI, h = H.race[H.pickI], pay = won ? Math.floor(H.bet * h.odds) : 0;
+  if (!playInstant('horses', H.bet, pay, d => { if (won && h.odds >= 8) grant(d,'horse8'); })) return;
+  H.busy = true; renderAll();
+  document.querySelectorAll('#g-horses button').forEach(x => x.disabled = true);
+  // each horse gets a wobbly pace and crosses the line in finishing order
+  const T = reduceMotion ? 300 : 8000, plan = H.race.map((_,i) => {
+    const rank = order.indexOf(i), end = T + rank*260;
+    const pts = [0]; for (let k=1;k<8;k++) pts.push(pts[k-1] + 0.6 + Math.random()*0.8);
+    return { end, pts: pts.map(v => v / pts[7]) };
+  });
+  const t0 = performance.now(); let gallop = 0;
+  await new Promise(done => {
+    const frame = now => {
+      const t = now - t0; let all = true;
+      plan.forEach((pl,i) => {
+        const f = Math.min(1, t / pl.end); if (f < 1) all = false;
+        const seg = Math.min(6, Math.floor(f*7)), lf = f*7 - seg;
+        const x = Math.min(1, pl.pts[seg] + (pl.pts[seg+1] - pl.pts[seg]) * lf);
+        const e = $('horse'+i); if (e) e.style.setProperty('--x', x.toFixed(4));
+      });
+      if (now - gallop > 140){ gallop = now; noise(.03, { vol:.08, freq:180 }); }
+      if (!all) requestAnimationFrame(frame); else done();
+    };
+    requestAnimationFrame(frame);
+  });
+  H.busy = false; H.res = { order, pay, stake: H.bet, pos: H.race.map(() => 1) };
+  release(); won ? SFX.win() : SFX.lose();
+}
+
+/* ---------- Sportwetten ---------- */
+const SP = { filter: 'all', data: {}, loading: false, err: null, lastLoad: 0, slip: null, stake: ls.get('sportstake', 500), leagues: null };
+const OLDB = 'https://api.openligadb.de';
+const seasonNow = () => { const d = new Date(); return d.getMonth() >= 6 ? d.getFullYear() : d.getFullYear() - 1; };
+async function jget(url){ const r = await fetch(url); if (!r.ok) throw new Error(r.status); return r.json(); }
+async function oldbLeagues(){
+  const cached = ls.get('oldbLeagues', null);
+  if (cached && Date.now() - cached.t < 12*3600e3) return cached.list;
+  const all = await jget(OLDB + '/getavailableleagues'), y = new Date().getFullYear();
+  const list = [];
+  const s = seasonNow();
+  list.push({ sc:'bl1', season:s, name:'Bundesliga', kind:'fb', home:true });
+  list.push({ sc:'ucl', season:s, name:'Champions League', kind:'fb', home:true });
+  // tournaments that come and go: national-team WM/EM and darts (community-run leagues, newest first)
+  const fresh = all.filter(l => +l.leagueSeason >= y - 1);
+  const fb = fresh.filter(l => (l.sport?.sportName||'') === 'Fußball' && /(^|\s)(WM|EM)\s?20\d\d|Weltmeisterschaft|Europameisterschaft/i.test(l.leagueName) && !/frauen|klub|club|u\d\d|test/i.test(l.leagueName))
+    .sort((a,b) => b.leagueId - a.leagueId).slice(0, 3);
+  fb.forEach(l => list.push({ sc:l.leagueShortcut, season:+l.leagueSeason, name:l.leagueName, kind:'fb', home:false }));
+  const darts = fresh.filter(l => /dart|pdc/i.test(l.leagueName + ' ' + l.leagueShortcut)).sort((a,b) => (/wm|world champ/i.test(b.leagueName) - /wm|world champ/i.test(a.leagueName)) || b.leagueId - a.leagueId).slice(0, 6);
+  darts.forEach(l => list.push({ sc:l.leagueShortcut, season:+l.leagueSeason, name:l.leagueName, kind:'darts', home:false }));
+  ls.set('oldbLeagues', { t: Date.now(), list });
+  return list;
+}
+const finalScore = m => { const rs = (m.matchResults||[]).slice().sort((a,b) => (b.resultTypeID===2) - (a.resultTypeID===2) || b.resultOrderID - a.resultOrderID)[0]; return rs ? [rs.pointsTeam1, rs.pointsTeam2] : null; };
+function ratings(matches, kind){
+  const R = {};
+  for (const m of matches){
+    if (!m.matchIsFinished) continue; const sc = finalScore(m); if (!sc) continue;
+    const a = m.team1.teamId, b = m.team2.teamId;
+    R[a] ||= { g:0, d:0, w:0 }; R[b] ||= { g:0, d:0, w:0 };
+    R[a].g++; R[b].g++; R[a].d += sc[0]-sc[1]; R[b].d += sc[1]-sc[0];
+    if (sc[0] > sc[1]) R[a].w++; else if (sc[1] > sc[0]) R[b].w++;
+  }
+  const v = id => { const r = R[id]; if (!r) return 0; return kind==='darts' ? Math.log((r.w+1)/(r.g-r.w+1)) + 0.08*r.d/(r.g+1) : r.d/(r.g+3); };
+  return v;
+}
+function oddsFor(kind, d){
+  const sig = 1/(1+Math.exp(-d)), m = 0.94, o = p => Math.max(1.05, Math.round(m/p*100)/100);
+  if (kind==='darts') return { '1': o(sig), '2': o(1-sig) };
+  const pd = 0.27*Math.exp(-(d*d)/1.5);
+  return { '1': o((1-pd)*sig), 'X': o(pd), '2': o((1-pd)*(1-sig)) };
+}
+async function loadSports(force){
+  if (SP.loading || (!force && Date.now() - SP.lastLoad < 5*60e3)) return;
+  SP.loading = true; SP.err = null; renderAll();
+  try {
+    SP.leagues = await oldbLeagues();
+    const raw = {};
+    await Promise.all(SP.leagues.map(async L => { try { raw[L.sc+'/'+L.season] = await jget(`${OLDB}/getmatchdata/${encodeURIComponent(L.sc)}/${L.season}`); } catch {} }));
+    const dartsAll = SP.leagues.filter(L => L.kind==='darts').flatMap(L => raw[L.sc+'/'+L.season] || []);
+    const byName = ms => ms.map(m => ({ ...m, team1:{ ...m.team1, teamId:m.team1.teamName }, team2:{ ...m.team2, teamId:m.team2.teamName } }));
+    const dartsV = ratings(byName(dartsAll), 'darts');
+    await Promise.all(SP.leagues.map(async L => {
+      try {
+        const ms0 = raw[L.sc+'/'+L.season]; if (!ms0) return;
+        const ms = L.kind==='darts' ? byName(ms0) : ms0;
+        const v = L.kind==='darts' ? dartsV : ratings(ms, L.kind);
+        SP.data[L.sc+'/'+L.season] = { L, ms: ms.map(m => {
+          const t = Date.parse(m.matchDateTimeUTC);
+          const d = L.kind==='darts' ? 1.2*(v(m.team1.teamId) - v(m.team2.teamId)) : 0.45*(v(m.team1.teamId) - v(m.team2.teamId)) + 0.25;
+          return { id: String(m.matchID), t, t1: m.team1.teamName, t2: m.team2.teamName, i1: m.team1.teamIconUrl, i2: m.team2.teamIconUrl, done: m.matchIsFinished, sc: finalScore(m), grp: m.group?.groupName || '', odds: oddsFor(L.kind, d) };
+        }) };
+      } catch { /* one league failing doesn't stop the others */ }
+    }));
+    SP.lastLoad = Date.now();
+  } catch(e){ SP.err = 'Echte Spiele sind gerade nicht erreichbar. Die fiktiven Turniere laufen trotzdem.'; console.warn(e); }
+  SP.loading = false; settleBets(); renderAll();
+}
+/* fictional tournaments: same schedule and results for everyone */
+const F_TEAMS = [['FC Legatia',1.5],['Kartenhausen 04',1.2],['Dynamo Dealer',1.35],['Royal Flush United',1.55],['SV Chipstadt',0.9],['Union Zockerberg',1.0],['Fortuna Jetonheim',1.1],['Rot-Schwarz Roulette',0.85],['TSV Glückshafen',0.95],['Sporting Splitburg',1.25],['Inter Pokeria',1.4],['Atlético Croupier',0.8]];
+const F_DARTS = [['Kalle „The Bull“ Krause',1.3],['Mia „Treble“ Tanner',1.45],['Jonas „Checkout“ Klein',1.0],['Lena „Bullseye“ Brandt',1.2],['Pete „The Arrow“ Novak',0.9],['Sven „180“ Sörensen',1.35],['Tom „Double Trouble“ Weber',0.85],['Ivy „Ice“ Larsen',1.1]];
+const SLOT_MS = 15*60e3, LIVE_MS = 5*60e3;
+function seeded(str){ let h = parseInt(sha256('legat-fiktiv-1:' + str).slice(0, 8), 16); return () => { h |= 0; h = h + 0x6D2B79F5 | 0; let t = Math.imul(h ^ h >>> 15, 1 | h); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const poisson = (l, r) => { let k = 0, p = Math.exp(-l), s = p, u = r(); while (u > s && k < 10){ k++; p *= l/k; s += p; } return k; };
+const pmf = (l, k) => Math.exp(-l) * Math.pow(l, k) / [1,1,2,6,24,120,720,5040,40320,362880,3628800][k];
+function fictMatches(slot){
+  const r = seeded('slot-' + slot), out = [], t = slot * SLOT_MS;
+  const shuffle = a => { for (let i=a.length-1;i>0;i--){ const j = Math.floor(r()*(i+1)); [a[i],a[j]] = [a[j],a[i]]; } return a; };
+  const tm = shuffle([...F_TEAMS.keys()]);
+  for (let i=0;i<2;i++){
+    const [a,b] = [tm[i*2], tm[i*2+1]], sa = F_TEAMS[a][1], sb = F_TEAMS[b][1];
+    const l1 = 1.35*Math.pow(sa/sb, 0.8) + 0.15, l2 = 1.15*Math.pow(sb/sa, 0.8);
+    let p1 = 0, px = 0, p2 = 0;
+    for (let x=0;x<=10;x++) for (let y=0;y<=10;y++){ const p = pmf(l1,x)*pmf(l2,y); if (x>y) p1 += p; else if (x===y) px += p; else p2 += p; }
+    const o = p => Math.max(1.05, Math.round(0.94/p*100)/100);
+    out.push({ id:`F-${slot}-${i}`, kind:'fb', t, t1:F_TEAMS[a][0], t2:F_TEAMS[b][0], l1, l2, odds:{ '1':o(p1), 'X':o(px), '2':o(p2) }, lg:'Legat-Liga', grp:'fiktiv' });
+  }
+  const ds = shuffle([...F_DARTS.keys()]), [a,b] = ds, q = F_DARTS[a][1] / (F_DARTS[a][1] + F_DARTS[b][1]);
+  let pw = 0; for (let k=0;k<6;k++){ let c = 1; for (let j=0;j<k;j++) c = c*(5+k-j)/(j+1); pw += c*Math.pow(q,6)*Math.pow(1-q,k); }
+  out.push({ id:`D-${slot}`, kind:'darts', t, t1:F_DARTS[a][0], t2:F_DARTS[b][0], q, odds:{ '1':Math.max(1.05, Math.round(0.94/pw*100)/100), '2':Math.max(1.05, Math.round(0.94/(1-pw)*100)/100) }, lg:'Legat Darts Open', grp:'fiktiv' });
+  return out;
+}
+/** the full result, known from kick-off; shown bit by bit while the match is "live" */
+function fictResult(m){
+  const r = seeded('result-' + m.id), ev = [];
+  if (m.kind==='fb'){
+    const g1 = poisson(m.l1, r), g2 = poisson(m.l2, r);
+    for (let i=0;i<g1;i++) ev.push({ f: (1 + Math.floor(r()*90))/90, s:0 });
+    for (let i=0;i<g2;i++) ev.push({ f: (1 + Math.floor(r()*90))/90, s:1 });
+  } else {
+    let a = 0, b = 0, k = 0; while (a < 6 && b < 6){ k++; const w = r() < m.q ? 0 : 1; w ? b++ : a++; ev.push({ f: k/11, s:w }); }
+    const last = ev[ev.length-1].f; ev.forEach(e => e.f = e.f / last);
+  }
+  return ev.sort((x,y) => x.f - y.f);
+}
+function fictScore(m, now=Date.now()){
+  if (now < m.t) return null;
+  const f = Math.min(1, (now - m.t) / LIVE_MS), sc = [0,0];
+  fictResult(m).forEach(e => { if (e.f <= f) sc[e.s]++; });
+  return { sc, done: f >= 1, min: m.kind==='fb' ? Math.max(1, Math.round(f*90)) : null };
+}
+function fictById(id){ const slot = +id.split('-')[1]; return fictMatches(slot).find(m => m.id===id); }
+const outcome = (sc, kind) => sc[0] > sc[1] ? '1' : sc[0] < sc[1] ? '2' : (kind==='darts' ? null : 'X');
+function settleBets(){
+  if (!P?.bets?.some(b => b.st==='open')) return;
+  const now = Date.now(), done = [];
+  for (const b of P.bets){
+    if (b.st !== 'open') continue;
+    let sc = null, fin = false;
+    if (b.src==='fict'){ const m = fictById(b.mid); const s = m && fictScore(m, now); if (s?.done){ sc = s.sc; fin = true; } }
+    else { const D = SP.data[b.sc+'/'+b.season]; const m = D?.ms.find(x => x.id===b.mid); if (m?.done && m.sc){ sc = m.sc; fin = true; } else if (D && now - b.ko > 10*864e5) fin = true; }
+    if (fin) done.push([b.id, sc]);
+  }
+  if (!done.length) return;
+  let won = 0;
+  withPlayer(d => {
+    let ch = false;
+    for (const [id, sc] of done){
+      const b = d.bets.find(x => x.id===id); if (!b || b.st!=='open') continue;
+      let pay = 0;
+      if (!sc){ b.st = 'void'; pay = b.stake; }
+      else { const o = outcome(sc, b.kind); b.res = sc; if (o === b.pick){ b.st = 'won'; pay = Math.floor(b.stake * b.odds); won += pay - b.stake; if (b.odds >= 3) grant(d,'sport3'); } else b.st = 'lost'; }
+      b.pay = pay; d.balance += pay; if (b.st !== 'void') record(d, 'sports', b.stake, pay);
+      ch = true;
+    }
+    const open = d.bets.filter(b => b.st==='open'), closed = d.bets.filter(b => b.st!=='open').slice(-25);
+    d.bets = [...closed, ...open];
+    return ch;
+  });
+  if (won > 0){ SFX.coins(); toast(`Sportwette gewonnen: +${fmt(won)} ℒ`); }
+}
+function allMatches(){
+  const now = Date.now(), list = [];
+  for (const D of Object.values(SP.data)) for (const m of D.ms){
+    if (m.done || m.t < now - 3*3600e3 || m.t > now + 10*864e5) continue;
+    list.push({ ...m, src:'oldb', sc_:D.L.sc, season:D.L.season, kind:D.L.kind, lg:D.L.name, fkey: D.L.kind==='darts' ? 'darts' : D.L.sc });
+  }
+  const s0 = Math.floor((now - LIVE_MS) / SLOT_MS);
+  for (let s = s0; s <= s0 + 4; s++) for (const m of fictMatches(s)){ if (m.t + LIVE_MS < now) continue; list.push({ ...m, src:'fict', fkey:'fict' }); }
+  return list.sort((a,b) => a.t - b.t);
+}
+function liveOf(m){
+  if (m.src==='fict') return fictScore(m);
+  if (Date.now() < m.t) return null;
+  return { sc: null, done: false, min: null, live: true };
+}
+function placeBet2(){
+  const s = SP.slip; if (!s) return;
+  const err = betError(SP.stake); if (err) return toast(err);
+  if (Date.now() > s.m.t - 30e3) { SP.slip = null; renderAll(); return toast('Das Spiel hat schon angefangen.'); }
+  if ((P.bets||[]).filter(b => b.st==='open').length >= 30) return toast('Höchstens 30 offene Wetten gleichzeitig.');
+  const m = s.m, bet = { id: Date.now().toString(36) + rnd(1e6).toString(36), src:m.src, sc:m.sc_ || null, season:m.season || null, mid:m.id, kind:m.kind, lg:m.lg, t1:m.t1, t2:m.t2, ko:m.t, pick:s.pick, odds:m.odds[s.pick], stake:SP.stake, st:'open', at:Date.now() };
+  const ok = withPlayer(d => { if (d.balance < SP.stake) return false; d.balance -= SP.stake; d.bets = [...(d.bets||[]), bet]; return true; });
+  if (ok){ ls.set('sportstake', SP.stake); SP.slip = null; SFX.chip(); toast(`Wette platziert: ${fmt(bet.stake)} ℒ, möglicher Gewinn ${fmt(Math.floor(bet.stake*bet.odds))} ℒ`); renderAll(); }
+}
+const pickLabel = (b) => b.pick==='X' ? 'Unentschieden' : b.pick==='1' ? b.t1 : b.t2;
+const oddsFmt = o => o.toLocaleString('de-DE', { minimumFractionDigits:2, maximumFractionDigits:2 });
+function renderSports(){
+  const el = $('g-sports');
+  if (!SP.lastLoad && !SP.loading && !SP.err) loadSports();
+  const ms = allMatches();
+  const F = [['all','Alle'],['bl1','Bundesliga'],['ucl','Champions League'],['darts','Darts'],['fict','Fiktive Turniere']];
+  for (const L of SP.leagues||[]) if (L.kind==='fb' && !L.home && ms.some(m => m.fkey===L.sc)) F.splice(3, 0, [L.sc, L.name]);
+  const shown = ms.filter(m => SP.filter==='all' || m.fkey===SP.filter).slice(0, 40);
+  let lastDay = '';
+  const rows = shown.map(m => {
+    const day = new Date(m.t).toLocaleDateString('de-DE', { weekday:'long', day:'2-digit', month:'2-digit' });
+    const head = day !== lastDay ? `<h3 class="dayh">${esc(day)}</h3>` : ''; lastDay = day;
+    const live = liveOf(m), started = Date.now() >= m.t - 30e3;
+    const icon = u => u ? `<img src="${esc(u)}" alt="" loading="lazy" onerror="this.remove()">` : '';
+    const btn = k => `<button class="oddbtn${SP.slip?.m.id===m.id && SP.slip.pick===k ? ' on':''}" data-act="spick" data-id="${esc(m.id)}" data-k="${k}" ${started?'disabled':''}><small>${k}</small><b class="num">${oddsFmt(m.odds[k])}</b></button>`;
+    return `${head}<div class="match"><div class="mmeta"><span class="num">${new Date(m.t).toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})}</span><span class="lg${m.src==='fict'?' fict':''}">${esc(m.lg)}</span>${live ? `<span class="pill live">${live.done ? 'Ende' : 'Live'}${live.min ? ' ' + live.min + '′' : ''}</span>` : ''}</div>
+      <div class="teams"><span>${icon(m.i1)}${esc(m.t1)}</span>${live?.sc ? `<b class="num score2">${live.sc[0]} : ${live.sc[1]}</b>` : ''}<span>${icon(m.i2)}${esc(m.t2)}</span></div>
+      <div class="odds">${btn('1')}${m.odds.X ? btn('X') : ''}${btn('2')}</div></div>`;
+  }).join('');
+  const mine = (P.bets||[]).slice().reverse();
+  const betRow = b => {
+    let live = '';
+    if (b.st==='open' && b.src==='fict'){ const m = fictById(b.mid), s = m && fictScore(m); if (s) live = `<b class="num">${s.sc[0]} : ${s.sc[1]}</b>${s.min ? ` <span class="muted">${s.min}′</span>` : ''}`; }
+    const st = b.st==='open' ? '<span class="pill">offen</span>' : b.st==='won' ? `<span class="pill good">+${fmt(b.pay - b.stake)}</span>` : b.st==='void' ? '<span class="pill">erstattet</span>' : `<span class="pill bad">−${fmt(b.stake)}</span>`;
+    return `<div class="mybet"><div><b>${esc(b.t1)} – ${esc(b.t2)}</b>${b.res ? ` <span class="num">${b.res[0]} : ${b.res[1]}</span>` : ''} ${live}<br><span class="muted small">${esc(b.lg)} · ${timeLabel(b.ko)} · Tipp: ${esc(pickLabel(b))} @ ${oddsFmt(b.odds)} · ${fmt(b.stake)} ℒ</span></div>${st}</div>`;
+  };
+  const s = SP.slip;
+  const slip = s ? `<div class="slip"><div><b>${esc(pickLabel({ ...s.m, pick:s.pick }))}</b> <span class="muted small">${esc(s.m.t1)} – ${esc(s.m.t2)}</span><br>Quote <b class="num">${oddsFmt(s.m.odds[s.pick])}</b> · Gewinn <b class="num" style="color:var(--win)">${fmt(Math.floor(SP.stake*s.m.odds[s.pick]))} ℒ</b></div>
+    ${chipPicker(SP.stake, 'sstake')}<div class="row"><button class="btn sm" data-act="sclear">Abbrechen</button><button class="btn gold" data-act="splace">${fmt(SP.stake)} ℒ setzen</button></div></div>` : '';
+  const html = `${backBar('Sportwetten', `<button class="btn sm" data-act="sreload" ${SP.loading?'disabled':''}>${SP.loading ? 'Lädt …' : 'Aktualisieren'}</button>`)}
+  <div class="stack">
+    <div class="seg segwrap">${F.map(([k,l]) => `<button data-act="sfilter" data-v="${esc(k)}" aria-pressed="${SP.filter===k}">${esc(l)}</button>`).join('')}</div>
+    ${SP.err ? `<div class="note bad">${esc(SP.err)}</div>` : ''}
+    <div class="grid-sports">
+      <div class="panel stack" style="gap:8px">${rows || `<p class="muted">${SP.loading ? 'Spiele werden geladen …' : 'In diesem Bereich stehen gerade keine Spiele an.'}</p>`}
+        <p class="muted small">Echte Spiele und Ergebnisse kommen von OpenLigaDB (Community-Daten). Gewertet wird das Ergebnis nach regulärer Spielzeit. Fiktive Turniere: alle 15 Minuten neue Spiele, Live-Ticker 5 Minuten. Wetten schließen beim Anpfiff.</p></div>
+      <div class="panel stack" style="gap:8px"><h3>Meine Wetten</h3>${mine.length ? mine.map(betRow).join('') : '<p class="muted">Noch keine Wetten. Tippe auf eine Quote.</p>'}</div>
+    </div>
+  </div>${slip}`;
+  if (el.innerHTML !== html) el.innerHTML = html;
+}
+
+/* ---------- Casino home ---------- */
+function renderHome(){
+  const el = $('home');
+  const W = P ? wheelState() : { ready:false };
+  const fr = P ? friendIds() : [];
+  const atTables = fr.filter(id => players[id].table && isOnline(id)).length;
+  const onl = fr.filter(id => isOnline(id));
+  const next = allMatches().find(m => m.src==='oldb' && m.t > Date.now());
+  const hour = new Date().getHours(), greet = hour < 11 ? 'Guten Morgen' : hour < 18 ? 'Hallo' : 'Guten Abend';
+  const tile = (g, title, sub, art, extra='') => `<button class="tile tile-${g}" data-act="game" data-g="${g}"><div class="art" aria-hidden="true">${art}</div><div class="tinfo"><b>${title}</b><span>${sub}</span>${extra}</div></button>`;
+  const html = `<div class="stack">
+    <section class="hero">
+      <div><p class="eyebrow">${greet}, ${esc(P?.name || '')}</p><h1>Legat <span>Casino</span></h1></div>
+      <div class="wallet"><div><small>Legats</small><b class="num">${fmt(P ? P.balance - hold : 0)} ℒ</b></div><div><small>Bank</small><b class="num">${fmt(P?.euro || 0)} €</b></div></div>
+    </section>
+    ${isBroke() ? reviveBox() : needBank() ? bankBox() : ''}
+    <button class="wheelbanner${W.ready ? '' : ' done'}" data-act="openwheel">
+      <span class="mini-wheel" aria-hidden="true">${wheelSVG(64)}</span>
+      <span><b>${W.ready ? 'Glücksrad: einmal am Tag gratis drehen' : 'Glücksrad: morgen wieder'}</b><br><span class="muted small">${W.ready ? `Tag ${W.streak} in Folge · Legats, Euro oder Shop-Sachen` : `Heute schon gedreht · Serie: ${P?.daily?.streak || 0} Tage`}</span></span>
+    </button>
+    <div class="tiles">
+      ${tile('bj', 'Blackjack', 'Mit Freunden am Tisch, bis zu 5 Spieler', `<div class="minicards"><div class="mc">A<i>♠</i></div><div class="mc red">K<i>♥</i></div></div>`, atTables ? `<span class="pill good">${atTables} ${atTables===1?'Freund':'Freunde'} am Tisch</span>` : tid ? '<span class="pill good">Du sitzt am Tisch</span>' : '')}
+      ${tile('sports', 'Sportwetten', 'Bundesliga · Champions League · Darts', `<div class="minisports"><span>⚽</span><span>🎯</span></div>`, next ? `<span class="small muted">Nächstes: ${esc(next.t1)} – ${esc(next.t2)}, ${timeLabel(next.t)}</span>` : '<span class="small muted">Plus fiktive Turniere alle 15 Minuten</span>')}
+      ${tile('roulette', 'Roulette', 'Europäisch, 0 bis 36', `<div class="miniwheel">${rouletteWheel().replace('id="rwheelg"','').replace('id="rball"','')}</div>`)}
+      ${tile('slots', 'Automat', 'Drei Walzen, bis ×500', `<div class="minislots"><span>7️⃣</span><span>7️⃣</span><span>7️⃣</span></div>`)}
+      ${tile('horses', 'Pferderennen', 'Sechs Pferde, ein Sieger', `<div class="minihorses"><span>🏇</span><span>🏇</span><span>🏇</span></div>`)}
+    </div>
+    ${onl.length ? `<div class="panel"><h3>Freunde online</h3><div class="row">${onl.map(id => `<button class="pill" data-act="profile" data-id="${esc(id)}">${esc(avOf(id))} ${esc(nameOf(id))}${players[id].table ? ' · am Tisch' : ''}</button>`).join('')}</div></div>` : ''}
+  </div>`;
+  if (el.innerHTML !== html) el.innerHTML = html;
+}
+function openGame(g){
+  game = g; SP.slip = null;
+  if (g==='bj'){ lastTableHTML = ''; anim.prime = true; }
+  if (g==='sports') loadSports();
+  window.scrollTo(0, 0); renderAll();
+}
+function renderCasino(){
+  const views = { home: game===null, tv: game==='bj', 'g-roulette': game==='roulette', 'g-slots': game==='slots', 'g-horses': game==='horses', 'g-sports': game==='sports' };
+  for (const [id, show] of Object.entries(views)) $(id).hidden = !show;
+  $('chat').hidden = !(game==='bj' && tid && T);
+  const typing = el => { const a=document.activeElement; return a && a.tagName==='INPUT' && a.type!=='checkbox' && el.contains(a); };
+  if (game===null) renderHome();
+  else if (game==='bj'){ if (!typing($('tv'))) renderTable(); }
+  else if (game==='roulette') renderRoulette();
+  else if (game==='slots') renderSlots();
+  else if (game==='horses') renderHorses();
+  else if (game==='sports') renderSports();
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-act]'); if (!b || b.disabled) return;
+  const v = +b.dataset.v;
+  switch (b.dataset.act){
+    case 'home': game = null; window.scrollTo(0,0); renderAll(); break;
+    case 'game': openGame(b.dataset.g); break;
+    case 'openwheel': wheelMsg = ''; openModal('wheel'); break;
+    case 'spinwheel': spinWheel(); break;
+    case 'rchip': R.chip = v; renderAll(); break;
+    case 'rbet': rAdd(b.dataset.k); break;
+    case 'rclear': R.bets = {}; renderAll(); break;
+    case 'rdouble': { const t = rTotal(R.bets); if (t*2 > Math.min(MAX_BET, P.balance)) { toast('Nicht genug Legats.'); break; } R.bets = Object.fromEntries(Object.entries(R.bets).map(([k,x]) => [k, x*2])); SFX.chip(); renderAll(); break; }
+    case 'rrepeat': if (R.last && rTotal(R.last) <= Math.min(MAX_BET, P.balance)){ R.bets = { ...R.last }; SFX.chip(); renderAll(); } else toast('Nicht genug Legats.'); break;
+    case 'rspin': rSpin(); break;
+    case 'sbet': S.bet = v; ls.set('slotbet', v); renderAll(); break;
+    case 'sspin': slotSpin(); break;
+    case 'hpick': H.pickI = +b.dataset.i; renderAll(); break;
+    case 'hbet': H.bet = v; ls.set('horsebet', v); renderAll(); break;
+    case 'hrun': horseRun(); break;
+    case 'hnew': newRace(); renderAll(); break;
+    case 'sfilter': SP.filter = b.dataset.v; renderAll(); break;
+    case 'sreload': SP.lastLoad = 0; ls.set('oldbLeagues', null); loadSports(true); break;
+    case 'spick': { const m = allMatches().find(x => x.id===b.dataset.id); if (m){ SP.slip = (SP.slip?.m.id===m.id && SP.slip.pick===b.dataset.k) ? null : { m, pick:b.dataset.k }; renderAll(); } break; }
+    case 'sstake': SP.stake = v; renderAll(); break;
+    case 'sclear': SP.slip = null; renderAll(); break;
+    case 'splace': placeBet2(); break;
+  }
+});
+document.addEventListener('keydown', e => { if ((e.code==='Space' || e.key==='Enter') && game==='slots' && tab==='table' && !['INPUT','BUTTON'].includes(document.activeElement?.tagName)){ e.preventDefault(); slotSpin(); } });
+// fictional live tickers and bet settlement tick along
+setInterval(() => { if (!uid) return; settleBets(); if (tab==='table' && (game==='sports' || game===null)) renderAll(); }, 5000);
+
 /* ---------- rendering ---------- */
 const RES = { win:'Gewonnen', bj:'Blackjack!', lose:'Verloren', push:'Unentschieden', surr:'Aufgegeben' };
 function renderTop(){
   const b = $('pbal');
-  if (P && lastBal !== null && P.balance !== lastBal){
-    b.classList.remove('up','down'); void b.offsetWidth; b.classList.add(P.balance > lastBal ? 'up' : 'down');
+  const shown = P ? P.balance - hold : null;
+  if (P && lastBal !== null && shown !== lastBal){
+    b.classList.remove('up','down'); void b.offsetWidth; b.classList.add(shown > lastBal ? 'up' : 'down');
     setTimeout(()=>b.classList.remove('up','down'), 1200);
   }
-  lastBal = P ? P.balance : null;
-  b.textContent = P ? fmt(P.balance)+' ℒ' : '–';
+  lastBal = shown;
+  b.textContent = P ? fmt(P.balance - hold)+' ℒ' : '–';
+  $('ver').textContent = `Legat Casino · Version ${APP_VERSION}`;
   $('pname').textContent = P ? `${P.avatar} ${P.name}` : 'Konto';
   $('peur').textContent = P ? `Bank ${fmt(P.euro)} €` : '';
   $('mute').textContent = snd.on ? '🔊' : '🔇';
   const el = $('daily');
-  if (!P){ el.innerHTML = ''; return; }
+  if (el.innerHTML) el.innerHTML = '';   // the daily bonus is now the Glücksrad on the casino home
+  if (true) return;
   const today = dayId(), D = P.daily || {};
   if (D.last === today){ if (el.innerHTML) el.innerHTML = ''; return; }
   const streak = D.last === dayId(Date.now()-864e5) ? (D.streak||0) + 1 : 1;
@@ -1216,7 +2018,7 @@ function renderLobby(){
   const list = Object.entries(tables).map(([t, ids]) => `
     <div class="lobby-item"><div><b>${ids.map(i=>esc(avOf(i)+' '+nameOf(i))).join(', ')}</b> <span class="muted">am Tisch</span> <span class="num">${esc(t)}</span></div>
     <button class="btn sm gold" data-act="join" data-id="${esc(t)}">Mitspielen</button></div>`).join('');
-  return `<div class="stack">
+  return `${backBar('Blackjack')}<div class="stack">
     <div class="felt" style="${feltStyle(uid)}"><div class="arc">Blackjack zahlt <em>3 zu 2</em> · Dealer steht auf allen <em>17</em></div>
       <div class="dealer"><p class="muted" style="text-align:center;max-width:46ch">Eröffne einen Tisch und gib den Code an deine Freunde weiter, oder setz dich an einen bestehenden Tisch. Allein spielen geht auch. Bis zu 5 Spieler pro Tisch.</p></div>
     </div>
@@ -1320,7 +2122,7 @@ function renderTableView(){
     controls = `<p class="net" style="color:${net>0?'var(--win)':net<0?'var(--lose)':'var(--push)'}">${sgn(net)} ℒ</p>${autoSwitch()}`;
   } else if (T.hands?.[uid]) controls = autoSwitch();
   const leaveTxt = confirmLeave ? 'Wirklich gehen? Laufender Einsatz ist verloren' : 'Tisch verlassen';
-  return `<div class="felt${vip?' vip':''}" style="${feltStyle(T.owner)}">
+  return `${backBar('Blackjack', '<span class="muted small">Du bleibst am Tisch sitzen, wenn du zurückgehst</span>')}<div class="felt${vip?' vip':''}" style="${feltStyle(T.owner)}">
     <div class="shoe" aria-hidden="true"></div>
     <div class="felt-head"><div class="tcode">${vip?'<span class="vipbadge">VIP</span>':''}Tisch-Code <b>${esc(tid)}</b> <button class="btn sm" data-act="copytable">Kopieren</button> <button class="btn sm" data-act="fair">Fairness</button></div>
       <button class="btn sm" data-act="leave">${leaveTxt}</button></div>
@@ -1462,12 +2264,13 @@ function renderAccount(){
   if (!P){ el.innerHTML = `<div class="panel"><p class="muted">Lädt …</p></div>`; return; }
   const L = P.limits||{}, lim = limitState(), D = debts();
   const iOwe = Object.entries(D[uid]||{}), owedToMe = Object.entries(D).flatMap(([a,m]) => m[uid] ? [[a, m[uid]]] : []);
-  const hist = P.hist.slice(-10).reverse().map(h => `<div class="h"><span class="muted num">${new Date(h.t).toLocaleString('de-DE',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</span><span class="num">Einsatz ${fmt(h.w)}</span><b class="num" style="color:${h.n>0?'var(--win)':h.n<0?'var(--lose)':'var(--push)'}">${sgn(h.n)}</b></div>`).join('');
+  const hist = P.hist.slice(-10).reverse().map(h => `<div class="h"><span class="muted num">${new Date(h.t).toLocaleString('de-DE',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</span><span>${h.g ? GAME_NAMES[h.g] : 'Blackjack'} · <span class="num">Einsatz ${fmt(h.w)}</span></span><b class="num" style="color:${h.n>0?'var(--win)':h.n<0?'var(--lose)':'var(--push)'}">${sgn(h.n)}</b></div>`).join('');
   el.innerHTML = `<div class="stack">
     ${isBroke() ? reviveBox() : needBank() ? bankBox() : ''}
     <div class="panel stack"><div class="row" style="justify-content:space-between"><h2>${esc(P.avatar)} ${esc(P.name)}</h2><button class="btn sm" data-act="logout">Abmelden</button></div>
-      <p class="muted small">Angemeldet als ${esc(authUser?.email||'')}</p><div id="acc-stats"></div></div>
+      <p class="muted small">Angemeldet als ${esc(authUser?.email||'')} · Version ${APP_VERSION}</p><div id="acc-stats"></div></div>
     <div class="panel stack"><h3>Verlauf</h3>${chartHTML(P.hist)}${hist ? `<div class="hist">${hist}</div>` : ''}</div>
+    ${Object.keys(P.games||{}).length ? `<div class="panel stack"><h3>Andere Spiele</h3><div class="statgrid">${Object.entries(P.games).map(([k,g]) => `<div class="stat"><small>${GAME_NAMES[k]||k}</small><b style="color:${g.net>=0?'var(--win)':'var(--lose)'}">${sgn(g.net)}</b><span class="muted small"> · ${g.n}×</span></div>`).join('')}</div></div>` : ''}
     <div class="panel stack"><h3>Erfolge · ${Object.keys(P.ach).length} von ${ACH.length}</h3>${badgesHTML(P.ach, true)}</div>
     ${iOwe.length || owedToMe.length ? `<div class="panel stack"><h3>Schulden</h3>
       ${iOwe.map(([c,v]) => `<div class="lobby-item"><span>Du schuldest <b>${esc(avOf(c)+' '+nameOf(c))}</b> <b class="num">${fmt(v)} ℒ</b></span><button class="btn sm gold" data-act="repay" data-id="${esc(c)}" data-v="${v}" ${P.balance<100?'disabled':''}>Zurückzahlen</button></div>`).join('')}
@@ -1517,12 +2320,18 @@ function renderModal(force){
   if (!modalKind) return;
   const card = $('modal-card');
   if (!force && card.contains(document.activeElement) && document.activeElement.tagName==='INPUT') return;
-  const html = modalKind==='profile' ? profileHTML(modalId) : fairHTML();
+  if (modalKind==='wheel' && wheelBusy) return;
+  const html = modalKind==='profile' ? profileHTML(modalId) : modalKind==='wheel' ? wheelHTML() : modalKind==='news' ? newsHTML() : fairHTML();
   if (!force && html === lastModalHTML) return;
   lastModalHTML = html;
   const keep = $('gamt')?.value;
   card.innerHTML = html;
   if (keep && $('gamt')) $('gamt').value = keep;
+}
+function newsHTML(){
+  return `<div class="stack"><div class="row" style="justify-content:space-between"><h2>Neu in Version ${APP_VERSION}</h2><button class="btn sm" data-act="closemodal">Schließen</button></div>
+    <ul class="news">${CHANGELOG.map(x => `<li>${esc(x)}</li>`).join('')}</ul>
+    <button class="btn gold" data-act="closemodal">Los geht's</button></div>`;
 }
 function profileHTML(id){
   const p = pl(id); if (!p) return '<p class="muted">Spieler nicht gefunden.</p>';
@@ -1580,7 +2389,7 @@ function renderAll(){
   requestAnimationFrame(() => {
     rq=false; renderTop();
     const typing = el => { const a=document.activeElement; return a && a.tagName==='INPUT' && a.type!=='checkbox' && el.contains(a); };
-    if (tab==='table' && !typing($('tv'))) renderTable();
+    if (tab==='table') renderCasino();
     if (tab==='players' && !typing($('view-players'))) renderPlayers();
     if (tab==='bank' && !typing($('view-bank'))) renderBank();
     if (tab==='shop') renderShop();
