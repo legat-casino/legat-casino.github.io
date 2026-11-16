@@ -800,7 +800,9 @@ function refForExisting(){
 let loggedOnce = false;
 function afterLogin(){
   if (loggedOnce) return; loggedOnce = true;
-  if (ls.get('seenVersion', null) !== APP_VERSION){ ls.set('seenVersion', APP_VERSION); if (P.created && Date.now() - P.created > 60e3) openModal('news'); }
+  const seen = ls.get('seenVersion', null);
+  if (seen !== APP_VERSION){ seenBefore = seen; ls.set('seenVersion', APP_VERSION); if (P.created && Date.now() - P.created > 60e3) openModal('news'); }
+  setPlaying(game);
   if (P.bets?.some(b => b.st==='open' && b.src==='oldb')) loadSports();
 }
 setInterval(() => { if (uid && P?.bets?.some(b => b.st==='open' && b.src==='oldb') && Date.now() - SP.lastLoad > 5*60e3) loadSports(); }, 60e3);
@@ -922,7 +924,7 @@ function sendGift(to, amount, kind){
 /* ---------- tables ---------- */
 function openTable(id){
   if (tid === id) return;
-  closeTable(); game = 'bj';
+  closeTable(); game = 'bj'; setTimeout(() => setPlaying('bj'), 0);
   tid = id; T = null; seats = {}; msgs = []; anim.prime = true; seatHealed = false; autoRound = null;
   setTimeout(leaseLoop, 300);
   unsubT = onSnapshot(doc(fs,'tables',id), s => {
@@ -981,7 +983,17 @@ function leaveTable(){
   if (mid && !confirmLeave){ confirmLeave = true; renderAll(); return; }
   confirmLeave = false; leaving = true;
   seatWrite(null,'delete');
-  withPlayer(d => { d.table = null; return true; });
+  withPlayer(d => {
+    d.table = null;
+    // a hand you walk away from is lost; close it so bank and revive don't stay locked
+    if (d.ledger && !d.ledger.settled){
+      const c = d.ledger.committed || 0;
+      d.stats.hands += 1; d.stats.losses += 1; d.stats.net -= c; d.week.net -= c; d.streaks.win = 0; d.streaks.bj = 0;
+      d.hist = [...d.hist, { t:Date.now(), b:d.balance + d.euro, n:-c, w:c }].slice(-60);
+      d.ledger = { ...d.ledger, settled:true };
+    }
+    return true;
+  });
   closeTable(); renderAll();
   setTimeout(() => { leaving = false; }, 3000);
 }
@@ -1336,8 +1348,14 @@ function animateCards(root){
 /* =====================================================================
    v1.1 – Casino home, Glücksrad, Roulette, Automat, Pferderennen, Sportwetten
    ===================================================================== */
-const APP_VERSION = '1.1';
-const CHANGELOG = [
+const APP_VERSION = '1.1.1';
+const CHANGELOGS = {
+  '1.1.1': [
+    'Wer vom Blackjack ins Casino oder zu einem anderen Spiel geht, verlässt jetzt den Tisch',
+    'Auf der Startseite siehst du, was deine Freunde gerade spielen',
+    'Wer mitten in einer Hand aufsteht, kann danach wieder einzahlen und wiederbeleben',
+  ],
+  '1.1': [
   'Neue Startseite mit allen Spielen',
   'Glücksrad statt Tagesbonus: Legats, Euro oder Shop-Sachen',
   'Roulette (europäisch, 0–36)',
@@ -1345,7 +1363,10 @@ const CHANGELOG = [
   'Pferderennen mit sechs Pferden',
   'Sportwetten auf echte Spiele (Bundesliga, Champions League, Darts) und fiktive Turniere',
   '5 neue Erfolge',
-];
+  ],
+};
+const verNum = v => (v||'0').split('.').map(Number).reduce((a,x,i) => a + x * Math.pow(1000, 2-i), 0);
+let seenBefore = null;
 let game = null;            // null = Casino-Startseite, 'bj', 'roulette', 'slots', 'horses', 'sports'
 let hold = 0;               // Gewinn, der erst nach der Animation im Kontostand erscheint
 const GAME_NAMES = { bj:'Blackjack', roulette:'Roulette', slots:'Automat', horses:'Pferderennen', sports:'Sportwette', wheel:'Glücksrad' };
@@ -1931,12 +1952,21 @@ function renderHome(){
       ${tile('slots', 'Automat', 'Drei Walzen, bis ×500', `<div class="minislots"><span>7️⃣</span><span>7️⃣</span><span>7️⃣</span></div>`)}
       ${tile('horses', 'Pferderennen', 'Sechs Pferde, ein Sieger', `<div class="minihorses"><span>🏇</span><span>🏇</span><span>🏇</span></div>`)}
     </div>
-    ${onl.length ? `<div class="panel"><h3>Freunde online</h3><div class="row">${onl.map(id => `<button class="pill" data-act="profile" data-id="${esc(id)}">${esc(avOf(id))} ${esc(nameOf(id))}${players[id].table ? ' · am Tisch' : ''}</button>`).join('')}</div></div>` : ''}
+    ${onl.length ? `<div class="panel"><h3>Freunde online</h3><div class="row">${onl.map(id => `<button class="pill" data-act="profile" data-id="${esc(id)}">${esc(avOf(id))} ${esc(nameOf(id))}${players[id].table ? ' · am Blackjack-Tisch' : players[id].playing && players[id].playing !== 'bj' ? ' · spielt ' + (GAME_NAMES[players[id].playing] || '') : ''}</button>`).join('')}</div></div>` : ''}
   </div>`;
   if (el.innerHTML !== html) el.innerHTML = html;
 }
+/** leaving the blackjack view means leaving the table; a running hand needs a second tap */
+function standUp(target){
+  if (game !== 'bj' || !tid || target === 'bj') return true;
+  const was = confirmLeave;
+  leaveTable();
+  if (tid){ if (!was) toast('Deine Hand läuft noch. Tippe nochmal, um den Tisch zu verlassen. Dein Einsatz ist dann verloren.'); return false; }
+  return true;
+}
+function setPlaying(g){ withPlayer(d => { const v = g || null; if (d.playing === v) return false; d.playing = v; return true; }); }
 function openGame(g){
-  game = g; SP.slip = null;
+  game = g; SP.slip = null; setPlaying(g);
   if (g==='bj'){ lastTableHTML = ''; anim.prime = true; }
   if (g==='sports') loadSports();
   window.scrollTo(0, 0); renderAll();
@@ -1957,8 +1987,8 @@ document.addEventListener('click', e => {
   const b = e.target.closest('[data-act]'); if (!b || b.disabled) return;
   const v = +b.dataset.v;
   switch (b.dataset.act){
-    case 'home': game = null; window.scrollTo(0,0); renderAll(); break;
-    case 'game': openGame(b.dataset.g); break;
+    case 'home': if (standUp(null)){ game = null; setPlaying(null); window.scrollTo(0,0); renderAll(); } break;
+    case 'game': if (standUp(b.dataset.g)) openGame(b.dataset.g); break;
     case 'openwheel': wheelMsg = ''; openModal('wheel'); break;
     case 'spinwheel': spinWheel(); break;
     case 'rchip': R.chip = v; renderAll(); break;
@@ -2122,7 +2152,7 @@ function renderTableView(){
     controls = `<p class="net" style="color:${net>0?'var(--win)':net<0?'var(--lose)':'var(--push)'}">${sgn(net)} ℒ</p>${autoSwitch()}`;
   } else if (T.hands?.[uid]) controls = autoSwitch();
   const leaveTxt = confirmLeave ? 'Wirklich gehen? Laufender Einsatz ist verloren' : 'Tisch verlassen';
-  return `${backBar('Blackjack', '<span class="muted small">Du bleibst am Tisch sitzen, wenn du zurückgehst</span>')}<div class="felt${vip?' vip':''}" style="${feltStyle(T.owner)}">
+  return `${backBar('Blackjack', (confirmLeave ? '<span class="small" style="color:var(--lose)">Hand läuft: nochmal „Casino“ tippen, um zu gehen</span>' : '<span class="muted small">„Casino“ verlässt den Tisch</span>'))}<div class="felt${vip?' vip':''}" style="${feltStyle(T.owner)}">
     <div class="shoe" aria-hidden="true"></div>
     <div class="felt-head"><div class="tcode">${vip?'<span class="vipbadge">VIP</span>':''}Tisch-Code <b>${esc(tid)}</b> <button class="btn sm" data-act="copytable">Kopieren</button> <button class="btn sm" data-act="fair">Fairness</button></div>
       <button class="btn sm" data-act="leave">${leaveTxt}</button></div>
@@ -2329,8 +2359,9 @@ function renderModal(force){
   if (keep && $('gamt')) $('gamt').value = keep;
 }
 function newsHTML(){
+  const vs = Object.keys(CHANGELOGS).filter(v => verNum(v) > verNum(seenBefore)).sort((a,b) => verNum(b) - verNum(a));
   return `<div class="stack"><div class="row" style="justify-content:space-between"><h2>Neu in Version ${APP_VERSION}</h2><button class="btn sm" data-act="closemodal">Schließen</button></div>
-    <ul class="news">${CHANGELOG.map(x => `<li>${esc(x)}</li>`).join('')}</ul>
+    ${(vs.length ? vs : [APP_VERSION]).map(v => `${vs.length > 1 ? `<h3>Version ${v}</h3>` : ''}<ul class="news">${CHANGELOGS[v].map(x => `<li>${esc(x)}</li>`).join('')}</ul>`).join('')}
     <button class="btn gold" data-act="closemodal">Los geht's</button></div>`;
 }
 function profileHTML(id){
@@ -2426,7 +2457,7 @@ document.addEventListener('click', async e => {
   const tb = e.target.closest('[data-tab]'); if (tb){ setTab(tb.dataset.tab); return; }
   const b = e.target.closest('[data-act]'); if (!b || b.disabled) return;
   const a = b.dataset.act;
-  if (a!=='leave') confirmLeave = false;
+  if (a!=='leave' && a!=='home' && a!=='game') confirmLeave = false;
   if (a!=='shop') shopConfirm = null;
   switch (a){
     case 'create': case 'createvip': b.disabled = true; await createTable(a==='createvip'); b.disabled = false; break;
