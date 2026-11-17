@@ -380,6 +380,44 @@ table.board{width:100%;border-collapse:collapse;font-size:14px}
 .slip{position:sticky;bottom:calc(10px + env(safe-area-inset-bottom,0px));margin-top:14px;z-index:4;background:var(--rail-2);border:1px solid var(--brass);border-radius:14px;padding:12px 14px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;box-shadow:0 10px 30px rgba(0,0,0,.6);animation:up .2s ease-out both}
 .news li{margin:4px 0}
 
+
+/* ---------- v1.2: Automat ---------- */
+.sym.hit{background:radial-gradient(circle,rgba(209,173,98,.55),rgba(209,173,98,0) 70%);animation:hitglow .7s ease-in-out infinite alternate}
+@keyframes hitglow{from{transform:scale(1)}to{transform:scale(1.16)}}
+.anysym{display:inline-grid;place-items:center;width:1.3em;height:1.3em;margin-left:3px;border:1px dashed var(--muted);border-radius:4px;font-style:normal;font-size:.8em;color:var(--muted);vertical-align:middle}
+.autorow{justify-content:center;gap:6px}
+.slotrule{margin-top:10px;text-align:center;max-width:70ch;margin-inline:auto}
+
+/* ---------- v1.2: Tellerwäscher ---------- */
+.dishhud{display:flex;justify-content:space-between;gap:10px;font-weight:600}
+.dishhud b{color:var(--brass);font-size:18px}
+.dishbar{height:6px;border-radius:999px;background:#3b332b;overflow:hidden}
+.dishbar i{display:block;height:100%;width:100%;background:var(--brass);transition:width .1s linear}
+.sink{position:relative;height:min(52vh,340px);border-radius:14px;overflow:hidden;touch-action:manipulation;user-select:none;-webkit-user-select:none;
+  background:radial-gradient(circle at 20% 30%,rgba(255,255,255,.35) 0 6px,transparent 7px),radial-gradient(circle at 70% 60%,rgba(255,255,255,.3) 0 9px,transparent 10px),radial-gradient(circle at 45% 85%,rgba(255,255,255,.25) 0 5px,transparent 6px),linear-gradient(#a9cbd6,#6c93a3);
+  border:6px solid #8d969b;box-shadow:inset 0 6px 18px rgba(0,0,0,.35)}
+.sinkintro{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding:16px;background:rgba(23,17,13,.78)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;font-weight:700}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend .rch{font-style:normal;font-size:26px}
+.pl{display:inline-block;width:30px;height:30px;border-radius:50%;flex:none;
+  background:radial-gradient(circle at 34% 38%,#8a6a3a 0 9%,transparent 10%),radial-gradient(circle at 62% 60%,#7a8a3a 0 7%,transparent 8%),radial-gradient(circle at 55% 30%,#9a5a2a 0 5%,transparent 6%),
+    radial-gradient(circle,#ffffff 0 50%,#e6e0d4 51% 60%,#ffffff 61% 68%,#d9d2c4 69%);box-shadow:0 3px 6px rgba(0,0,0,.35)}
+.pl.gold{background:radial-gradient(circle at 40% 35%,#fff6c8 0 12%,transparent 13%),radial-gradient(circle,#f3cf64 0 50%,#c99a35 51% 60%,#f7dc84 61% 68%,#a77b1f 69%);box-shadow:0 0 14px #ffd76a,0 3px 6px rgba(0,0,0,.35)}
+.plate{position:absolute;transform:translate(-50%,-50%);width:68px;height:68px;border:0;padding:0;cursor:pointer;animation:platein .18s ease-out both,plateout var(--life) linear both}
+.plate.pl{width:70px;height:70px}
+.plate.roach{background:none;font-size:44px;line-height:68px;filter:drop-shadow(0 3px 3px rgba(0,0,0,.4))}
+.plate.clean{animation:clean .4s ease-out forwards}
+.plate.squash{animation:squash .4s ease-out forwards}
+@keyframes platein{from{transform:translate(-50%,-50%) scale(.3);opacity:0}}
+@keyframes plateout{0%,80%{opacity:1}100%{opacity:.35}}
+@keyframes clean{to{transform:translate(-50%,-80%) scale(1.3) rotate(25deg);opacity:0}}
+@keyframes squash{to{transform:translate(-50%,-50%) scale(1.4,.3);opacity:0}}
+.dishpop{position:absolute;transform:translate(-50%,-50%);font-family:var(--f-num);font-weight:700;color:#fff;text-shadow:0 2px 4px rgba(0,0,0,.6);pointer-events:none;animation:dishpop .45s ease-out both}
+@keyframes dishpop{to{transform:translate(-50%,-160%);opacity:0}}
+.dishpop.bad{color:#ffb3a6}
+.dishresult{text-align:center;display:flex;flex-direction:column;gap:6px;align-items:center}
+.dishresult .big{font-size:54px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important}}
 </style>
 </head>
@@ -652,6 +690,7 @@ function withPlayer(fn){
   newBadges = [];
   if (!fn(d)) return false;
   checkBalanceBadges(d);
+  if (brokeDoc(d)){ if (!d.brokeAt) d.brokeAt = Date.now(); } else if (d.brokeAt) d.brokeAt = null;
   d.updated = Math.max(Date.now(), (P.updated||0) + 1); d.seen = Date.now();
   P = d; renderAll();
   slow(setDoc(doc(fs,'players',uid), d)).catch(handleWriteErr);
@@ -803,6 +842,7 @@ function afterLogin(){
   const seen = ls.get('seenVersion', null);
   if (seen !== APP_VERSION){ seenBefore = seen; ls.set('seenVersion', APP_VERSION); if (P.created && Date.now() - P.created > 60e3) openModal('news'); }
   setPlaying(game);
+  checkAbortedShift();
   if (P.bets?.some(b => b.st==='open' && b.src==='oldb')) loadSports();
 }
 setInterval(() => { if (uid && P?.bets?.some(b => b.st==='open' && b.src==='oldb') && Date.now() - SP.lastLoad > 5*60e3) loadSports(); }, 60e3);
@@ -1348,8 +1388,15 @@ function animateCards(root){
 /* =====================================================================
    v1.1 – Casino home, Glücksrad, Roulette, Automat, Pferderennen, Sportwetten
    ===================================================================== */
-const APP_VERSION = '1.1.1';
+const APP_VERSION = '1.2';
 const CHANGELOGS = {
+  '1.2': [
+    'Pleite? Jetzt verdienst du dir den Neustart mit einer Schicht als Tellerwäscher. Der Lohn (300 bis 2.500 €) kommt auf dein Bankkonto',
+    'Nach einer Pleite öffnet die Küche erst nach einer Wartezeit: beim ersten Mal sofort, dann bis zu 20 Minuten',
+    'Automat: Auto-Spin mit 10, 25 oder 50 Drehs',
+    'Automat: Gewinnsymbole leuchten auf, und die Kirschen-Regel steht jetzt klar dabei',
+    'Neuer Erfolg: Spülmeister',
+  ],
   '1.1.1': [
     'Wer vom Blackjack ins Casino oder zu einem anderen Spiel geht, verlässt jetzt den Tisch',
     'Auf der Startseite siehst du, was deine Freunde gerade spielen',
@@ -1376,6 +1423,7 @@ ACH.splice(ACH.length - 2, 0,
   ['horse8','🐎','Außenseiter','Ein Pferd mit Quote 8 oder höher gewonnen'],
   ['sport3','⚽','Wettkönig','Eine Sportwette mit Quote 3 oder höher gewonnen'],
   ['wheel','🎡','Glückspilz','Den Hauptgewinn am Glücksrad gedreht'],
+  ['dish40','🧽','Spülmeister','40 Teller in einer Tellerwäscher-Schicht'],
 );
 const pick = arr => arr[rnd(arr.length)];
 const secs = ms => new Promise(r => setTimeout(r, ms));
@@ -1596,7 +1644,14 @@ async function rSpin(){
 
 /* ---------- Automat ---------- */
 const SLOT_SYMS = ['🍒','🍋','🔔','⭐','💎','7️⃣'], SLOT_W = [30,25,20,14,8,3], SLOT_PAY3 = [6,10,20,40,100,500];
-const S = { bet: ls.get('slotbet', 100), busy: false, reels: [[1,0,2],[3,0,1],[2,0,4]], res: null };
+const S = { bet: ls.get('slotbet', 100), busy: false, reels: [[1,0,2],[3,0,1],[2,0,4]], res: null, win: [0,0,0], auto: 0 };
+/** which reels on the centre line made the win */
+function slotMask(c){
+  if (c[0]===c[1] && c[1]===c[2]) return [1,1,1];
+  if (c[0]===0 && c[1]===0) return [1,1,0];
+  if (c[0]===0) return [1,0,0];
+  return [0,0,0];
+}
 function slotSym(){ let x = rnd(100); for (let i=0;i<SLOT_W.length;i++){ if (x < SLOT_W[i]) return i; x -= SLOT_W[i]; } return 0; }
 function slotPay(c){   // c = center line symbol indices
   if (c[0]===c[1] && c[1]===c[2]) return SLOT_PAY3[c[0]];
@@ -1607,8 +1662,9 @@ function slotPay(c){   // c = center line symbol indices
 function renderSlots(){
   const el = $('g-slots');
   if (S.busy && el.innerHTML) return;
-  const reels = S.reels.map((r,i) => `<div class="reel"><div class="strip" id="strip${i}">${r.map(s => `<div class="sym">${SLOT_SYMS[s]}</div>`).join('')}</div></div>`).join('');
-  const pt = SLOT_SYMS.map((s,i) => `<div class="pt"><span>${s}${s}${s}</span><b class="num">×${SLOT_PAY3[i]}</b></div>`).join('') + `<div class="pt"><span>🍒🍒 ·</span><b class="num">×3</b></div><div class="pt"><span>🍒 · ·</span><b class="num">×0,5</b></div>`;
+  const reels = S.reels.map((r,i) => `<div class="reel"><div class="strip" id="strip${i}">${r.map((s,j) => `<div class="sym${j===1 && S.res && S.win[i] ? ' hit' : ''}">${SLOT_SYMS[s]}</div>`).join('')}</div></div>`).join('');
+  const any = '<i class="anysym" title="beliebig">?</i>';
+  const pt = SLOT_SYMS.map((s,i) => `<div class="pt"><span>${s}${s}${s}</span><b class="num">×${SLOT_PAY3[i]}</b></div>`).join('') + `<div class="pt"><span>🍒🍒${any}</span><b class="num">×3</b></div><div class="pt"><span>🍒${any}${any}</span><b class="num">×0,5</b></div>`;
   const res = S.res;
   const html = `${backBar('Automat', '<span class="muted small">Auszahlungsquote 94,7 %</span>')}
   <div class="felt sfelt" style="${feltStyle(uid)}">
@@ -1616,18 +1672,22 @@ function renderSlots(){
     <div class="status" id="slotres">${res ? (res.pay ? `<span style="color:var(--win)">Gewonnen: ${fmt(res.pay)} ℒ</span>` : 'Leider nichts') : 'Drei gleiche auf der Mittellinie gewinnen'}</div>
     <div class="controls">
       ${chipPicker(S.bet, 'sbet')}
-      <button class="btn gold spinbtn" data-act="sspin" ${S.busy?'disabled':''}>Drehen · ${fmt(S.bet)} ℒ</button>
+      ${S.auto ? `<button class="btn gold spinbtn" data-act="sautostop">Auto stoppen · noch ${S.auto}</button>`
+        : `<button class="btn gold spinbtn" data-act="sspin" ${S.busy?'disabled':''}>Drehen · ${fmt(S.bet)} ℒ</button>
+           <div class="row autorow"><span class="muted small">Auto-Spin</span>${[10,25,50].map(n => `<button class="btn sm" data-act="sauto" data-v="${n}" ${S.busy?'disabled':''}>${n}×</button>`).join('')}</div>`}
+      <p class="muted small" style="max-width:52ch">Auto-Spin hält an, wenn die Legats nicht reichen, ein Limit erreicht ist oder du ×20 oder mehr gewinnst.</p>
     </div>
     <div class="paytable">${pt}</div>
+    <p class="muted small slotrule">Es zählt nur die <b>rote Mittellinie</b>. Kirschen zählen <b>von links</b>: eine Kirsche auf der ersten Walze gibt ×0,5, Kirschen auf der ersten <i>und</i> zweiten Walze ×3. Kirschen nur auf der zweiten oder dritten Walze zählen nicht. <i class="anysym">?</i> = beliebiges Symbol.</p>
   </div>`;
   if (el.innerHTML !== html) el.innerHTML = html;
 }
 async function slotSpin(){
-  if (S.busy) return;
-  const err = betError(S.bet, 50, 5000); if (err) return toast(err);
+  if (S.busy) return null;
+  const err = betError(S.bet, 50, 5000); if (err){ toast(err); return null; }
   const reels = [0,1,2].map(() => [slotSym(), slotSym(), slotSym()]);
   const center = reels.map(r => r[1]), mult = slotPay(center), pay = Math.floor(S.bet * mult);
-  if (!playInstant('slots', S.bet, pay, d => { if (center.every(s => s===5)) grant(d,'jackpot'); })) return;
+  if (!playInstant('slots', S.bet, pay, d => { if (center.every(s => s===5)) grant(d,'jackpot'); })) return null;
   S.busy = true; S.res = null; renderAll();
   document.querySelectorAll('[data-act="sspin"],[data-act="sbet"]').forEach(x => x.disabled = true);
   const H = document.querySelector('.reel')?.clientHeight / 3 || 70;
@@ -1644,9 +1704,22 @@ async function slotSpin(){
     setTimeout(() => SFX.card(), (1.1 + i*0.45)*1000);
   }
   await secs(2150);
-  S.reels = reels; S.busy = false; S.res = { pay };
+  S.reels = reels; S.busy = false; S.res = { pay }; S.win = pay ? slotMask(center) : [0,0,0];
   release();
   if (center.every(s => s===5)) SFX.bj(); else if (pay > S.bet) SFX.win(); else if (pay > 0) SFX.push();
+  return { pay, mult };
+}
+async function slotAuto(n){
+  if (S.auto || S.busy) return;
+  S.auto = n; renderAll();
+  while (S.auto > 0){
+    if (game !== 'slots' || tab !== 'table') break;
+    const r = await slotSpin(); if (!r) break;
+    if (S.auto > 0) S.auto--;
+    if (r.mult >= 20){ toast(`Großer Gewinn: ×${r.mult}! Auto-Spin gestoppt.`); break; }
+    if (S.auto > 0){ renderAll(); await secs(500); }
+  }
+  S.auto = 0; renderAll();
 }
 
 /* ---------- Pferderennen ---------- */
@@ -1925,6 +1998,125 @@ function renderSports(){
   if (el.innerHTML !== html) el.innerHTML = html;
 }
 
+
+/* ---------- Tellerwäscher-Schicht: the way back after going broke ---------- */
+const DISH_MS = 30000, DISH_PAY = 50, DISH_GOLD = 150, DISH_ROACH = -200, DISH_MIN = 300, DISH_MAX = 2500;
+const REVIVE_WAIT = [0, 5, 10, 15, 20];          // minutes, by revives in the last 7 days
+const DISH = { phase:'intro', n:0, gold:0, roach:0, end:0, timer:null, collected:false };
+const recentRevives = (d=P) => (d?.revives || []).filter(t => Date.now() - t < 7*864e5).length;
+const reviveWaitMin = (d=P) => REVIVE_WAIT[Math.min(recentRevives(d), REVIVE_WAIT.length - 1)];
+const reviveAt = (d=P) => (d?.brokeAt || 0) + reviveWaitMin(d) * 60e3;
+const dishEarn = () => Math.max(DISH_MIN, Math.min(DISH_MAX, DISH.n*DISH_PAY + DISH.gold*DISH_GOLD + DISH.roach*DISH_ROACH));
+const mmss = ms => { const s = Math.max(0, Math.ceil(ms/1000)); return `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`; };
+function reviveBox(){
+  const wait = reviveAt() - Date.now(), mins = reviveWaitMin();
+  return `<div class="note bad stack"><p><b>Du bist pleite.</b> Legats und Bankkonto sind leer. Verdien dir deinen Neustart mit einer <b>Schicht als Tellerwäscher</b>: 30 Sekunden Teller spülen, jeder Teller bringt ${DISH_PAY} €. Der Lohn (${fmt(DISH_MIN)} bis ${fmt(DISH_MAX)} €) kommt auf dein Bankkonto. Das zählt als Pleite in deiner Statistik.</p>
+  ${wait > 0 ? `<p>Die Küche öffnet in <b class="num" data-mmss="${reviveAt()}">${mmss(wait)}</b>. <span class="muted small">Wartezeit ${mins} Minuten, weil du in den letzten 7 Tagen schon ${recentRevives()}× pleite warst.</span></p>`
+    : `<div><button class="btn gold" data-act="revive">🧽 Schicht antreten</button></div>`}
+  ${mins === 0 && recentRevives() === 0 ? '<p class="muted small">Die erste Pleite in 7 Tagen geht sofort. Danach wartest du 5, 10, 15 und höchstens 20 Minuten.</p>' : ''}</div>`;
+}
+function dishHTML(){
+  const head = `<div class="row" style="justify-content:space-between"><h2>Tellerwäscher-Schicht</h2>${DISH.phase==='run' ? '' : '<button class="btn sm" data-act="closemodal">Schließen</button>'}</div>`;
+  if (DISH.phase === 'done'){
+    const earn = dishEarn();
+    return `<div class="stack">${head}
+      <div class="dishresult"><div class="big">🧽</div><h3>Feierabend!</h3>
+      <p>${DISH.n + DISH.gold} Teller gespült${DISH.gold ? `, davon ${DISH.gold} goldene` : ''}${DISH.roach ? ` · ${DISH.roach}× Kakerlake erwischt` : ''}</p>
+      <p class="net" style="color:var(--win)">${fmt(earn)} € Lohn</p>
+      <p class="muted small">Der Lohn kommt auf dein Bankkonto. Heb ihn ab, um wieder zu spielen.</p>
+      ${earn === DISH_MIN && DISH.n*DISH_PAY + DISH.gold*DISH_GOLD + DISH.roach*DISH_ROACH < DISH_MIN ? '<p class="muted small">Mindestlohn: Weniger als 300 € gibt es nie.</p>' : ''}
+      ${earn === DISH_MAX ? '<p class="muted small">Höchstlohn erreicht!</p>' : ''}</div>
+      <button class="btn gold" data-act="dishcollect">Lohn abholen</button></div>`;
+  }
+  return `<div class="stack">${head}
+    <div class="dishhud"><span>Zeit <b class="num" id="dishtime">${DISH_MS/1000}</b> s</span><span>Teller <b class="num" id="dishn">0</b></span><span>Lohn <b class="num" id="dishpay">0</b> €</span></div>
+    <div class="dishbar"><i id="dishbar"></i></div>
+    <div class="sink" id="sink">
+      <div class="sinkintro" id="sinkintro">
+        <p><b>Tippe die Teller an, bevor sie wieder verschwinden.</b></p>
+        <div class="legend"><span><i class="pl"></i> +${DISH_PAY} €</span><span><i class="pl gold"></i> +${DISH_GOLD} €</span><span><i class="rch">🪳</i> ${DISH_ROACH} €</span></div>
+        <p class="muted small">Es wird immer schneller. Lohn zwischen ${fmt(DISH_MIN)} und ${fmt(DISH_MAX)} €, er kommt auf dein Bankkonto.</p>
+        <button class="btn gold" data-act="dishstart">Los geht's</button>
+      </div>
+    </div></div>`;
+}
+function dishHud(){
+  const t = $('dishtime'), n = $('dishn'), p = $('dishpay'), bar = $('dishbar');
+  const left = Math.max(0, DISH.end - Date.now());
+  if (t) t.textContent = Math.ceil(left/1000);
+  if (n) n.textContent = DISH.n + DISH.gold;
+  if (p) p.textContent = fmt(Math.max(0, DISH.n*DISH_PAY + DISH.gold*DISH_GOLD + DISH.roach*DISH_ROACH));
+  if (bar) bar.style.width = (left / DISH_MS * 100).toFixed(1) + '%';
+}
+function dishStart(){
+  if (DISH.phase !== 'intro') return;
+  if (!isBroke()) { closeModal(); return; }
+  if (Date.now() < reviveAt()) return toast('Die Küche hat noch zu.');
+  // the shift is written down first: a reload during the shift ends it with the minimum wage
+  if (!withPlayer(d => { if (!brokeDoc(d) || d.shift) return false; d.shift = { at: Date.now() }; return true; })) return;
+  Object.assign(DISH, { phase:'run', n:0, gold:0, roach:0, end: Date.now() + DISH_MS, collected:false });
+  $('sinkintro')?.remove();
+  document.querySelector('#modal-card [data-act="closemodal"]')?.remove();
+  const sink = $('sink');
+  sink.addEventListener('pointerdown', e => {
+    const pl = e.target.closest('.plate'); if (!pl || pl.dataset.hit || DISH.phase !== 'run') return;
+    e.preventDefault(); pl.dataset.hit = '1';
+    const k = pl.dataset.k;
+    if (k === 'gold'){ DISH.gold++; SFX.coins(); }
+    else if (k === 'roach'){ DISH.roach++; tone(160, .18, { type:'sawtooth', vol:.05, to:90 }); }
+    else { DISH.n++; noise(.06, { vol:.18, freq:2400, q:.7 }); tone(1300, .05, { vol:.04, to:1900 }); }
+    pl.classList.add(k === 'roach' ? 'squash' : 'clean');
+    const pop = document.createElement('span'); pop.className = 'dishpop' + (k === 'roach' ? ' bad' : '');
+    pop.textContent = k === 'gold' ? `+${DISH_GOLD}` : k === 'roach' ? `${DISH_ROACH}` : `+${DISH_PAY}`;
+    pop.style.left = pl.style.left; pop.style.top = pl.style.top; sink.appendChild(pop);
+    setTimeout(() => { pl.remove(); pop.remove(); }, 450);
+    dishHud();
+  });
+  const spawn = () => {
+    if (DISH.phase !== 'run') return;
+    const f = 1 - Math.max(0, DISH.end - Date.now()) / DISH_MS;   // 0 → 1 over the shift
+    const r = Math.random(), k = r < 0.08 ? 'gold' : r < 0.22 ? 'roach' : 'plate';
+    const pl = document.createElement('button');
+    pl.type = 'button'; pl.className = 'plate ' + (k === 'gold' ? 'pl gold' : k === 'roach' ? 'roach' : 'pl'); pl.dataset.k = k;
+    if (k === 'roach') pl.textContent = '🪳'; pl.setAttribute('aria-label', k === 'roach' ? 'Kakerlake' : 'Teller');
+    pl.style.left = (10 + Math.random()*80).toFixed(1) + '%'; pl.style.top = (14 + Math.random()*72).toFixed(1) + '%';
+    const life = (k === 'gold' ? 900 : 1700) - 700*f;
+    pl.style.setProperty('--life', life + 'ms');
+    sink.appendChild(pl);
+    setTimeout(() => { if (!pl.dataset.hit) pl.remove(); }, life);
+    DISH.timer = setTimeout(spawn, 560 - 280*f + Math.random()*120);
+  };
+  spawn();
+  const tick = setInterval(() => {
+    dishHud();
+    if (Date.now() >= DISH.end){ clearInterval(tick); clearTimeout(DISH.timer); DISH.phase = 'done'; SFX.win(); renderModal(true); }
+  }, 100);
+}
+function finishRevive(earn, plates=0){
+  const now = Date.now();
+  return withPlayer(d => {
+    if (!brokeDoc(d)) { if (d.shift){ d.shift = null; return true; } return false; }
+    d.euro += earn; d.stats.bankrupts += 1; d.limits = { ...(d.limits||{}), base: d.balance }; d.ledger = null; d.lowMark = d.balance + d.euro;
+    d.streaks = { win:0, bj:0 }; d.shift = null;
+    d.revives = [...(d.revives||[]).filter(t => now - t < 7*864e5), now].slice(-10);
+    grant(d,'broke1'); if (d.stats.bankrupts >= 5) grant(d,'broke5');
+    if (plates >= 40) grant(d,'dish40');
+    return true;
+  });
+}
+function dishCollect(){
+  if (DISH.collected) return; DISH.collected = true;
+  const earn = dishEarn(), plates = DISH.n + DISH.gold;
+  if (finishRevive(earn, plates)){ bet = Math.min(bet, 1000); toast(`${fmt(earn)} € Lohn liegen auf deiner Bank. Heb sie ab, um zu spielen.`); }
+  DISH.phase = 'intro'; closeModal();
+}
+/** a shift that never finished (page closed or reloaded) ends with the minimum wage */
+function checkAbortedShift(){
+  if (!P?.shift || DISH.phase === 'run') return;
+  if (brokeDoc(P)){ finishRevive(DISH_MIN); toast(`Deine letzte Schicht wurde abgebrochen. Mindestlohn: ${fmt(DISH_MIN)} € auf deine Bank`); }
+  else withPlayer(d => { d.shift = null; return true; });
+}
+
 /* ---------- Casino home ---------- */
 function renderHome(){
   const el = $('home');
@@ -1999,6 +2191,8 @@ document.addEventListener('click', e => {
     case 'rspin': rSpin(); break;
     case 'sbet': S.bet = v; ls.set('slotbet', v); renderAll(); break;
     case 'sspin': slotSpin(); break;
+    case 'sauto': slotAuto(v); break;
+    case 'sautostop': S.auto = 0; renderAll(); break;
     case 'hpick': H.pickI = +b.dataset.i; renderAll(); break;
     case 'hbet': H.bet = v; ls.set('horsebet', v); renderAll(); break;
     case 'hrun': horseRun(); break;
@@ -2011,7 +2205,7 @@ document.addEventListener('click', e => {
     case 'splace': placeBet2(); break;
   }
 });
-document.addEventListener('keydown', e => { if ((e.code==='Space' || e.key==='Enter') && game==='slots' && tab==='table' && !['INPUT','BUTTON'].includes(document.activeElement?.tagName)){ e.preventDefault(); slotSpin(); } });
+document.addEventListener('keydown', e => { if ((e.code==='Space' || e.key==='Enter') && game==='slots' && tab==='table' && !S.auto && !modalKind && !['INPUT','BUTTON'].includes(document.activeElement?.tagName)){ e.preventDefault(); slotSpin(); } });
 // fictional live tickers and bet settlement tick along
 setInterval(() => { if (!uid) return; settleBets(); if (tab==='table' && (game==='sports' || game===null)) renderAll(); }, 5000);
 
@@ -2068,10 +2262,6 @@ function renderLobby(){
 function bankBox(){
   return `<div class="note stack"><p><b>Deine Legats sind aufgebraucht.</b> Auf der Bank liegen noch ${fmt(P.euro)} €. Heb etwas ab, um weiterzuspielen.</p>
   <div><button class="btn gold" data-tab="bank">Zur Bank</button></div></div>`;
-}
-function reviveBox(){
-  return `<div class="note bad stack"><p><b>Du bist pleite.</b> Legats und Bankkonto sind leer. Du kannst dich wiederbeleben und bekommst ${fmt(START)} Legats. Das zählt als Niederlage in deiner Statistik und deine Freunde sehen es.</p>
-  <div><button class="btn gold" data-act="revive">Wiederbeleben (+${fmt(START)} ℒ)</button></div></div>`;
 }
 function handsHTML(u){
   const hs = T.hands?.[u]; if (!hs) return '';
@@ -2342,7 +2532,9 @@ function renderAccountStats(){ const box = $('acc-stats'); if (box && P) box.inn
 
 /* ---------- modal: player profile & fairness ---------- */
 function openModal(kind, id){ modalKind = kind; modalId = id; $('modal').hidden = false; renderModal(true); }
-function closeModal(){ modalKind = null; modalId = null; $('modal').hidden = true; }
+function closeModal(){
+  if (modalKind === 'dish'){ if (DISH.phase === 'run') return; if (DISH.phase === 'done' && !DISH.collected){ dishCollect(); return; } }
+  modalKind = null; modalId = null; $('modal').hidden = true; }
 $('modal').addEventListener('click', e => { if (e.target.id==='modal') closeModal(); });
 document.addEventListener('keydown', e => { if (e.key==='Escape' && modalKind) closeModal(); });
 let lastModalHTML = '';
@@ -2351,7 +2543,8 @@ function renderModal(force){
   const card = $('modal-card');
   if (!force && card.contains(document.activeElement) && document.activeElement.tagName==='INPUT') return;
   if (modalKind==='wheel' && wheelBusy) return;
-  const html = modalKind==='profile' ? profileHTML(modalId) : modalKind==='wheel' ? wheelHTML() : modalKind==='news' ? newsHTML() : fairHTML();
+  if (modalKind==='dish' && DISH.phase==='run') return;
+  const html = modalKind==='profile' ? profileHTML(modalId) : modalKind==='wheel' ? wheelHTML() : modalKind==='news' ? newsHTML() : modalKind==='dish' ? dishHTML() : fairHTML();
   if (!force && html === lastModalHTML) return;
   lastModalHTML = html;
   const keep = $('gamt')?.value;
@@ -2430,6 +2623,10 @@ function renderAll(){
   });
 }
 function tickTimers(){
+  for (const el of document.querySelectorAll('[data-mmss]')){
+    const left = +el.dataset.mmss - Date.now(); el.textContent = mmss(left);
+    if (left <= 0 && !el.dataset.done){ el.dataset.done = '1'; lastTableHTML = ''; renderAll(); }
+  }
   for (const el of document.querySelectorAll('[data-until]')) el.textContent = Math.max(0, Math.ceil((+el.dataset.until - Date.now())/1000));
 }
 function setTab(t){
@@ -2484,18 +2681,9 @@ document.addEventListener('click', async e => {
     case 'fair': openModal('fair'); break;
     case 'profile': openModal('profile', b.dataset.id); break;
     case 'closemodal': closeModal(); break;
-    case 'revive': {
-      b.disabled = true;
-      const ok = withPlayer(d => {
-        if (!brokeDoc(d)) return false;               // decided on the latest state: a second tap does nothing
-        d.balance = START; d.stats.bankrupts += 1; d.limits = { ...(d.limits||{}), base: START }; d.ledger = null; d.lowMark = START;
-        d.streaks = { win:0, bj:0 };
-        grant(d,'broke1'); if (d.stats.bankrupts >= 5) grant(d,'broke5');
-        return true;
-      });
-      if (ok){ bet = Math.min(bet, 1000); toast('Wiederbelebt: 2.000 Legats'); }
-      break;
-    }
+    case 'revive': if (isBroke() && Date.now() >= reviveAt()){ Object.assign(DISH, { phase:'intro', collected:false }); openModal('dish'); } break;
+    case 'dishstart': dishStart(); break;
+    case 'dishcollect': dishCollect(); break;
     case 'daily': {
       b.disabled = true;
       let got = 0, streak = 0;
