@@ -42,7 +42,9 @@ input{font:inherit}
 
 header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--rail);border-bottom:1px solid var(--line)}
 .top-in{max-width:1040px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:10px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.logo{font-family:var(--f-display);font-weight:700;font-size:22px;letter-spacing:.02em;margin-right:auto;white-space:nowrap}
+.logo{font-family:var(--f-display);font-weight:700;font-size:22px;letter-spacing:.02em;white-space:nowrap;flex:none}
+.top-in > .iconbtn{margin-left:auto}
+.top.has-island .top-in > .iconbtn{margin-left:0}
 .logo span{color:var(--brass)}
 .iconbtn{background:none;border:1px solid var(--line);border-radius:999px;width:36px;height:36px;display:grid;place-items:center;font-size:16px}
 .purse{display:flex;flex-direction:column;align-items:flex-end;line-height:1.1}
@@ -504,13 +506,97 @@ nav.tabs button{position:relative}
 .cface small{font:700 13px/1 var(--f-body);letter-spacing:.14em;text-transform:uppercase;margin-top:4px}
 .cz{transform:rotateY(180deg)}
 
+
+/* ---------- v1.3.1: Dynamic Island ---------- */
+.logo .mono{display:none}
+.island{flex:0 1 auto;min-width:0;max-width:min(360px,48vw);margin:0 auto;height:34px;padding:0 6px 0 12px;border-radius:999px;background:#000;border:1px solid #2b2420;color:#fff;
+  display:flex;align-items:center;gap:6px;font:600 13px/1 var(--f-body);box-shadow:0 6px 18px rgba(0,0,0,.55);overflow:hidden;animation:islin .35s cubic-bezier(.2,1.4,.4,1) both}
+@keyframes islin{from{transform:scale(.6);opacity:0}}
+.islide{display:flex;align-items:center;gap:6px;min-width:0;white-space:nowrap}
+.islide.in{animation:islswap .35s ease-out both}
+@keyframes islswap{from{transform:translateY(10px);opacity:0}}
+.idot{flex:none;width:8px;height:8px;border-radius:50%;background:#ff3b30;box-shadow:0 0 0 0 rgba(255,59,48,.7);animation:livepulse 1.4s infinite}
+@keyframes livepulse{70%{box-shadow:0 0 0 6px rgba(255,59,48,0)}100%{box-shadow:0 0 0 0 rgba(255,59,48,0)}}
+.iteam{overflow:hidden;text-overflow:ellipsis;max-width:9ch}
+.island b{color:#fff;font-size:14px}
+.imin{color:#ffcf6b;font-size:12px}
+.imore{flex:none;font-size:11px;color:#bbb;background:#1c1c1c;border-radius:999px;padding:3px 7px;margin-left:2px}
+.ilg{margin-left:auto;font-size:11px;color:var(--muted);font-weight:600;overflow:hidden;text-overflow:ellipsis}
+.islandpanel{position:fixed;z-index:25;top:calc(env(safe-area-inset-top,0px) + 56px);left:50%;transform:translateX(-50%);width:min(440px,calc(100% - 24px));background:#0b0908;border:1px solid #2b2420;border-radius:22px;padding:10px;box-shadow:0 20px 50px rgba(0,0,0,.7);animation:up .2s ease-out both;display:flex;flex-direction:column;gap:4px}
+.iphead{display:flex;justify-content:space-between;align-items:baseline;padding:2px 6px 6px}
+.iprow{display:flex;align-items:center;gap:8px;width:100%;background:#151210;border:1px solid #241e1a;border-radius:14px;padding:10px 12px;color:#fff;text-align:left}
+.iprow .iteam{max-width:12ch}
+@media (max-width:560px){
+  .top.has-island .logo .full{display:none}
+  .top.has-island .logo .mono{display:inline}
+  .island{max-width:calc(100vw - 230px)}
+  .iteam{max-width:5ch}
+}
+
+/* ---------- v1.3.1: sports overview ---------- */
+.sviews{width:100%;display:flex}
+.sviews button{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 6px}
+.cnt{display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:var(--rail);color:var(--ink);font-size:11px;font-weight:700}
+.cnt.live{background:#b1302a;color:#fff}
+.sviews button[aria-pressed="true"] .cnt{background:#1b140a;color:var(--brass)}
+.chiprow{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.chiprow::-webkit-scrollbar{display:none}
+.fchip{flex:none;border:1px solid var(--line);background:none;color:var(--muted);border-radius:999px;padding:6px 12px;font-weight:600;font-size:13px}
+.fchip[aria-pressed="true"]{border-color:var(--brass);color:var(--ink);background:rgba(209,173,98,.14)}
+.mlist{display:flex;flex-direction:column;gap:8px}
+.mcard{display:flex;align-items:stretch;gap:8px;background:var(--rail-2);border:1px solid var(--line);border-radius:12px;padding:6px 8px 6px 4px}
+.mcard.islive{border-color:rgba(255,59,48,.45)}
+.mbody{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;background:none;border:0;color:var(--ink);text-align:left;padding:4px 6px;border-radius:8px}
+.mbody:hover{background:rgba(209,173,98,.05)}
+.mtop{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);min-width:0;flex-wrap:wrap}
+.mtime{color:var(--ink);font-weight:600}
+.mlg{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.mlg.fict{color:var(--brass)}
+.mteam{display:flex;justify-content:space-between;gap:10px;font-weight:600;font-size:15px}
+.mteam>span{display:flex;align-items:center;gap:6px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mteam img{width:18px;height:18px;object-fit:contain}
+.mteam b{min-width:1.2em;text-align:right;color:var(--brass);font-size:16px}
+.mteam.w{color:#fff}
+.mteam.w b{color:var(--win)}
+.mcard:not(.islive) .mteam b{color:var(--ink)}
+.mbar{display:block;height:3px;border-radius:999px;background:#3b332b;overflow:hidden;margin-top:3px}
+.mbar i{display:block;height:100%;background:#ff3b30}
+.mbar.big{height:5px;margin-top:10px}
+.mgo{align-self:center;color:var(--muted);font-size:22px;padding:0 6px}
+.mcard .odds{align-self:center}
+.pill.live{color:#fff;background:#b1302a;border-color:#b1302a}
+.pill.big{font-size:13px;padding:4px 10px}
+.betcard{display:flex;flex-direction:column;gap:4px;width:100%;text-align:left;background:var(--rail-2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;color:var(--ink)}
+.bcm{display:flex;justify-content:space-between;gap:10px}
+@media (max-width:520px){ .mcard{flex-direction:column;padding:6px} .mcard .odds{align-self:stretch} .mcard .odds .oddbtn{flex:1} .mgo{display:none} }
+
+/* ---------- v1.3.1: live ticker ---------- */
+.scoreboard{background:radial-gradient(120% 100% at 50% 0%,#175a45,#0f3d2f 55%,#0a2a20);border:1px solid var(--line);border-radius:16px;padding:14px 16px 16px;display:flex;flex-direction:column;gap:8px}
+.scoreboard.islive{border-color:rgba(255,59,48,.5);box-shadow:0 0 0 1px rgba(255,59,48,.25)}
+.sbtop{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.sbmain{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px}
+.sbteam{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;min-width:0}
+.sbteam img{width:44px;height:44px;object-fit:contain}
+.sbteam b{font-size:15px;overflow-wrap:anywhere}
+.sbab{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:rgba(0,0,0,.3);border:1px solid var(--line);font:700 14px var(--f-num);color:var(--brass)}
+.sbscore{font-size:44px;font-weight:600;color:#fff;white-space:nowrap}
+.sbscore i{font-style:normal;color:var(--muted);margin:0 6px}
+.sbscore small{font-size:20px;color:var(--muted)}
+.tk{display:grid;grid-template-columns:3.2em 1.6em 1fr auto;gap:8px;align-items:center;padding:7px 2px;border-bottom:1px solid rgba(209,173,98,.1);font-size:14px}
+.tk.hl{background:rgba(209,173,98,.07);border-radius:8px}
+.tkmin{color:var(--muted);text-align:right}
+.tkic{text-align:center}
+.tktx{min-width:0;overflow-wrap:anywhere}
+.tk b{color:var(--brass)}
+
 @media (prefers-reduced-motion:reduce){*{animation:none!important}}
 </style>
 </head>
 <body>
 <header class="top" id="top" hidden>
   <div class="top-in">
-    <div class="logo">Legat <span>Casino</span></div>
+    <div class="logo"><span class="full">Legat <span>Casino</span></span><span class="mono" aria-hidden="true">L<span>C</span></span></div>
+    <button class="island" id="island" type="button" hidden></button>
     <button class="iconbtn" id="mute" type="button" aria-label="Ton an/aus">🔊</button>
     <div class="purse"><small id="pname">Konto</small><b id="pbal">–</b><span id="peur" class="num"></span></div>
     <nav class="tabs" role="tablist">
@@ -564,6 +650,7 @@ nav.tabs button{position:relative}
   <section id="view-account" hidden></section>
   <p class="ver" id="ver"></p>
 </main>
+<div id="islandpanel" class="islandpanel" hidden></div>
 <div id="modal" class="modal" hidden><div class="modal-card" id="modal-card" role="dialog" aria-modal="true"></div></div>
 <div id="toast" class="toast" hidden></div>
 
@@ -669,10 +756,25 @@ const scoreLabel = cards => { const s = score(cards); return (s.soft && s.t<21 ?
 const snd = { ctx:null, on: ls.get('sound', true) };
 function ac(){
   if (!snd.on) return null;
-  try { if (!snd.ctx) snd.ctx = new (window.AudioContext || window.webkitAudioContext)(); if (snd.ctx.state==='suspended') snd.ctx.resume(); } catch { return null; }
+  try {
+    if (snd.ctx && snd.ctx.state === 'closed') snd.ctx = null;
+    if (!snd.ctx){ snd.ctx = new (window.AudioContext || window.webkitAudioContext)(); cardBuf = null; }
+    if (snd.ctx.state !== 'running') snd.ctx.resume().catch(() => {});   // iPad reports 'interrupted' after switching apps
+  } catch { return null; }
   return snd.ctx;
 }
-document.addEventListener('pointerdown', () => ac(), { passive:true });
+// iPad/iPhone: after leaving the app the audio context can stay silent even when it says 'running'.
+// So after coming back, the next tap throws the old one away and builds a fresh one (taps are needed to unlock audio on iOS).
+snd.stale = false;
+document.addEventListener('visibilitychange', () => { if (document.hidden) snd.stale = true; });
+window.addEventListener('pagehide', () => { snd.stale = true; });
+function unlockAudio(){
+  if (snd.stale && snd.ctx){ snd.stale = false; try { snd.ctx.close(); } catch {} snd.ctx = null; }
+  const c = ac(); if (!c) return;
+  try { const o = c.createBufferSource(); o.buffer = c.createBuffer(1, 1, 22050); o.connect(c.destination); o.start(0); } catch {}   // silent blip unlocks iOS
+  loadCard(c);
+}
+for (const ev of ['pointerdown', 'touchend', 'click', 'keydown']) document.addEventListener(ev, unlockAudio, { passive:true, capture:true });
 function tone(f, dur, { type='sine', vol=.12, at=0, to=null }={}){
   const c = ac(); if (!c) return; const t = c.currentTime + at;
   const o = c.createOscillator(), g = c.createGain(); o.type = type; o.frequency.setValueAtTime(f, t);
@@ -690,7 +792,7 @@ function noise(dur, { vol=.2, at=0, freq=2500, q=1 }={}){
 }
 // one real card sound, cut from a recording, played quietly with a slight pitch variation
 const CARD_SND = 'data:audio/mpeg;base64,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';
-let cardBuf = null, cardLoading = false;
+var cardBuf = null, cardLoading = false;
 function loadCard(c){
   if (cardBuf || cardLoading) return; cardLoading = true;
   fetch(CARD_SND).then(r => r.arrayBuffer()).then(b => new Promise((ok, no) => c.decodeAudioData(b, ok, no)))
@@ -703,7 +805,6 @@ function playCard(at=0){
   s.buffer = cardBuf; s.playbackRate.value = 0.94 + Math.random()*0.12; g.gain.value = 0.3;
   s.connect(g).connect(c.destination); s.start(c.currentTime + at);
 }
-document.addEventListener('pointerdown', () => { const c = ac(); if (c) loadCard(c); }, { passive:true });
 const SFX = {
   card: (at=0) => playCard(at),
   chip: () => { tone(2300, .05, { type:'triangle', vol:.08 }); tone(3100, .07, { type:'triangle', vol:.06, at:.04 }); },
@@ -947,7 +1048,7 @@ function afterLogin(){
   if (seen !== APP_VERSION){ seenBefore = seen; ls.set('seenVersion', APP_VERSION); if (P.created && Date.now() - P.created > 60e3) openModal('news'); }
   setPlaying(game);
   checkAbortedShift(); checkAbortedHilo();
-  if (P.bets?.some(b => b.st==='open' && b.src==='oldb')) loadSports();
+  loadSports();
 }
 setInterval(() => { if (uid && P?.bets?.some(b => b.st==='open' && b.src==='oldb') && Date.now() - SP.lastLoad > 5*60e3) loadSports(); }, 60e3);
 /* ---------- bank: euros are safe from the table ---------- */
@@ -1492,8 +1593,14 @@ function animateCards(root){
 /* =====================================================================
    v1.1 – Casino home, Glücksrad, Roulette, Automat, Pferderennen, Sportwetten
    ===================================================================== */
-const APP_VERSION = '1.3';
+const APP_VERSION = '1.3.1';
 const CHANGELOGS = {
+  '1.3.1': [
+    'Live-Ticker: Tippe auf ein Spiel und sieh Spielstand, Minute, Torschützen und Halbzeit live',
+    'Dynamic Island oben: zeigt laufende Spiele, antippen öffnet den Ticker',
+    'Sportwetten aufgeräumt: Live, Demnächst, Ergebnisse und Meine Wetten getrennt, Ligen als Filter',
+    'iPad/iPhone: Sound ist wieder da, wenn du kurz aus der App gehst und zurückkommst',
+  ],
   '1.3': [
     'Neues Spiel: Höher oder Tiefer',
     'Chat mit Freunden und in Gruppen (neuer Tab „Chat“)',
@@ -1964,9 +2071,8 @@ async function loadSports(force){
         const ms = L.kind==='darts' ? byName(ms0) : ms0;
         const v = L.kind==='darts' ? dartsV : ratings(ms, L.kind);
         SP.data[L.sc+'/'+L.season] = { L, ms: ms.map(m => {
-          const t = Date.parse(m.matchDateTimeUTC);
           const d = L.kind==='darts' ? 1.2*(v(m.team1.teamId) - v(m.team2.teamId)) : 0.45*(v(m.team1.teamId) - v(m.team2.teamId)) + 0.25;
-          return { id: String(m.matchID), t, t1: m.team1.teamName, t2: m.team2.teamName, i1: m.team1.teamIconUrl, i2: m.team2.teamIconUrl, done: m.matchIsFinished, sc: finalScore(m), grp: m.group?.groupName || '', odds: oddsFor(L.kind, d) };
+          return mapMatch(m, L, oddsFor(L.kind, d));
         }) };
       } catch { /* one league failing doesn't stop the others */ }
     }));
@@ -2057,11 +2163,6 @@ function allMatches(){
   for (let s = s0; s <= s0 + 4; s++) for (const m of fictMatches(s)){ if (m.t + LIVE_MS < now) continue; list.push({ ...m, src:'fict', fkey:'fict' }); }
   return list.sort((a,b) => a.t - b.t);
 }
-function liveOf(m){
-  if (m.src==='fict') return fictScore(m);
-  if (Date.now() < m.t) return null;
-  return { sc: null, done: false, min: null, live: true };
-}
 function placeBet2(){
   const s = SP.slip; if (!s) return;
   const err = betError(SP.stake); if (err) return toast(err);
@@ -2073,46 +2174,263 @@ function placeBet2(){
 }
 const pickLabel = (b) => b.pick==='X' ? 'Unentschieden' : b.pick==='1' ? b.t1 : b.t2;
 const oddsFmt = o => o.toLocaleString('de-DE', { minimumFractionDigits:2, maximumFractionDigits:2 });
-function renderSports(){
-  const el = $('g-sports');
-  if (!SP.lastLoad && !SP.loading && !SP.err) loadSports();
-  const ms = allMatches();
-  const F = [['all','Alle'],['bl1','Bundesliga'],['ucl','Champions League'],['darts','Darts'],['fict','Fiktive Turniere']];
-  for (const L of SP.leagues||[]) if (L.kind==='fb' && !L.home && ms.some(m => m.fkey===L.sc)) F.splice(3, 0, [L.sc, L.name]);
-  const shown = ms.filter(m => SP.filter==='all' || m.fkey===SP.filter).slice(0, 40);
-  let lastDay = '';
-  const rows = shown.map(m => {
-    const day = new Date(m.t).toLocaleDateString('de-DE', { weekday:'long', day:'2-digit', month:'2-digit' });
-    const head = day !== lastDay ? `<h3 class="dayh">${esc(day)}</h3>` : ''; lastDay = day;
-    const live = liveOf(m), started = Date.now() >= m.t - 30e3;
-    const icon = u => u ? `<img src="${esc(u)}" alt="" loading="lazy" onerror="this.remove()">` : '';
-    const btn = k => `<button class="oddbtn${SP.slip?.m.id===m.id && SP.slip.pick===k ? ' on':''}" data-act="spick" data-id="${esc(m.id)}" data-k="${k}" ${started?'disabled':''}><small>${k}</small><b class="num">${oddsFmt(m.odds[k])}</b></button>`;
-    return `${head}<div class="match"><div class="mmeta"><span class="num">${new Date(m.t).toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})}</span><span class="lg${m.src==='fict'?' fict':''}">${esc(m.lg)}</span>${live ? `<span class="pill live">${live.done ? 'Ende' : 'Live'}${live.min ? ' ' + live.min + '′' : ''}</span>` : ''}</div>
-      <div class="teams"><span>${icon(m.i1)}${esc(m.t1)}</span>${live?.sc ? `<b class="num score2">${live.sc[0]} : ${live.sc[1]}</b>` : ''}<span>${icon(m.i2)}${esc(m.t2)}</span></div>
-      <div class="odds">${btn('1')}${m.odds.X ? btn('X') : ''}${btn('2')}</div></div>`;
-  }).join('');
-  const mine = (P.bets||[]).slice().reverse();
-  const betRow = b => {
-    let live = '';
-    if (b.st==='open' && b.src==='fict'){ const m = fictById(b.mid), s = m && fictScore(m); if (s) live = `<b class="num">${s.sc[0]} : ${s.sc[1]}</b>${s.min ? ` <span class="muted">${s.min}′</span>` : ''}`; }
-    const st = b.st==='open' ? '<span class="pill">offen</span>' : b.st==='won' ? `<span class="pill good">+${fmt(b.pay - b.stake)}</span>` : b.st==='void' ? '<span class="pill">erstattet</span>' : `<span class="pill bad">−${fmt(b.stake)}</span>`;
-    return `<div class="mybet"><div><b>${esc(b.t1)} – ${esc(b.t2)}</b>${b.res ? ` <span class="num">${b.res[0]} : ${b.res[1]}</span>` : ''} ${live}<br><span class="muted small">${esc(b.lg)} · ${timeLabel(b.ko)} · Tipp: ${esc(pickLabel(b))} @ ${oddsFmt(b.odds)} · ${fmt(b.stake)} ℒ</span></div>${st}</div>`;
-  };
-  const s = SP.slip;
-  const slip = s ? `<div class="slip"><div><b>${esc(pickLabel({ ...s.m, pick:s.pick }))}</b> <span class="muted small">${esc(s.m.t1)} – ${esc(s.m.t2)}</span><br>Quote <b class="num">${oddsFmt(s.m.odds[s.pick])}</b> · Gewinn <b class="num" style="color:var(--win)">${fmt(Math.floor(SP.stake*s.m.odds[s.pick]))} ℒ</b></div>
-    ${chipPicker(SP.stake, 'sstake')}<div class="row"><button class="btn sm" data-act="sclear">Abbrechen</button><button class="btn gold" data-act="splace">${fmt(SP.stake)} ℒ setzen</button></div></div>` : '';
-  const html = `${backBar('Sportwetten', `<button class="btn sm" data-act="sreload" ${SP.loading?'disabled':''}>${SP.loading ? 'Lädt …' : 'Aktualisieren'}</button>`)}
+/* ---------- Sportwetten 1.3.1: overview, live ticker, Dynamic Island ---------- */
+const FB_LIVE_MS = 2.6*3600e3, DARTS_LIVE_MS = 2*3600e3;
+const keyOf = m => m.src + ':' + m.id;
+const abbr = name => { const w = String(name).replace(/[„“"]/g, '').split(/\s+/).filter(Boolean); if (w.length === 1) return w[0].slice(0, 3).toUpperCase(); return w.map(x => x[0]).join('').slice(0, 3).toUpperCase(); };
+const lastName = n => { const s = String(n).replace(/„[^“]*“/g, '').trim().split(/\s+/); return s[s.length - 1] || n; };
+/** turns an OpenLigaDB match into what the app needs */
+function mapMatch(m, L, odds){
+  const results = m.matchResults || [];
+  const ht = results.find(r => r.resultTypeID === 1);
+  const goals = (m.goals || []).map(g => ({ min: g.matchMinute, a: g.scoreTeam1, b: g.scoreTeam2, who: g.goalGetterName || '', pen: !!g.isPenalty, own: !!g.isOwnGoal, et: !!g.isOvertime }))
+    .sort((x, y) => (x.min ?? 0) - (y.min ?? 0) || (x.a + x.b) - (y.a + y.b));
+  const fin = m.matchIsFinished ? finalScore(m) : null;   // during the match OpenLigaDB only has the half-time result
+  const last = goals[goals.length - 1];
+  const htSc = ht ? [ht.pointsTeam1, ht.pointsTeam2] : null;
+  const cur = fin || (last && htSc ? (last.a + last.b >= htSc[0] + htSc[1] ? [last.a, last.b] : htSc) : last ? [last.a, last.b] : htSc);
+  return { id: String(m.matchID), t: Date.parse(m.matchDateTimeUTC), t1: m.team1.teamName, t2: m.team2.teamName,
+    s1: m.team1.tla || m.team1.shortName || abbr(m.team1.teamName), s2: m.team2.tla || m.team2.shortName || abbr(m.team2.teamName),
+    i1: m.team1.teamIconUrl, i2: m.team2.teamIconUrl, done: m.matchIsFinished, sc: fin, cur, ht: ht ? [ht.pointsTeam1, ht.pointsTeam2] : null,
+    goals, grp: m.group?.groupName || '', upd: m.lastUpdateDateTime || null, odds };
+}
+function allMatchesAll(){
+  const now = Date.now(), list = [];
+  for (const D of Object.values(SP.data)) for (const m of D.ms){
+    if (m.t < now - 26*3600e3 || m.t > now + 10*864e5) continue;
+    list.push({ ...m, src:'oldb', sc_:D.L.sc, season:D.L.season, kind:D.L.kind, lg:D.L.name, fkey: D.L.kind === 'darts' ? 'darts' : D.L.sc });
+  }
+  const s0 = Math.floor((now - 3*SLOT_MS) / SLOT_MS);
+  for (let s = s0; s <= s0 + 7; s++) for (const m of fictMatches(s)) list.push({ ...m, src:'fict', fkey:'fict', s1: abbr(m.t1), s2: abbr(m.t2) });
+  return list.sort((a, b) => a.t - b.t);
+}
+/** state of a match right now: 'next' | 'live' | 'done', score, minute label */
+function matchState(m, now = Date.now()){
+  if (m.src === 'fict'){
+    if (now < m.t) return { st:'next' };
+    const s = fictScore(m, now), f = Math.min(1, (now - m.t) / LIVE_MS);
+    if (s.done) return { st:'done', sc: s.sc };
+    if (m.kind === 'darts') return { st:'live', sc: s.sc, label: `Leg ${s.sc[0] + s.sc[1] + 1}`, pct: f };
+    const min = Math.max(1, Math.round(f*90));
+    return { st:'live', sc: s.sc, label: min === 45 ? 'HZ' : min + '′', pct: f };
+  }
+  if (m.done) return { st:'done', sc: m.sc || m.cur };
+  if (now < m.t) return { st:'next' };
+  const el = (now - m.t) / 60000;
+  if (m.kind === 'darts'){ if (now - m.t > DARTS_LIVE_MS) return { st:'wait', sc: m.cur }; return { st:'live', sc: m.cur, label: 'Live', pct: null }; }
+  if (now - m.t > FB_LIVE_MS) return { st:'wait', sc: m.cur };
+  const label = el < 46 ? (el > 45 ? '45+′' : Math.max(1, Math.ceil(el)) + '′') : el < 61 ? 'HZ' : el - 15 > 90 ? '90+′' : Math.ceil(el - 15) + '′';
+  return { st:'live', sc: m.cur || [0, 0], label, pct: Math.min(1, (el < 46 ? el : el < 61 ? 45 : el - 15) / 90) };
+}
+const findMatch = key => allMatchesAll().find(m => keyOf(m) === key) || (key.startsWith('fict:') ? (() => { const m = fictById(key.slice(5)); return m && { ...m, src:'fict', fkey:'fict', s1: abbr(m.t1), s2: abbr(m.t2) }; })() : null);
+/* fictional ticker: scorers and darts legs, same for everyone */
+const SURN = ['Becker','Hoffmann','Krüger','Schulz','Wagner','Neumann','Schwarz','Zimmermann','Braun','Hartmann','Lange','Werner','Lehmann','Köhler','Herrmann','König','Walter','Peters','Möller','Jung','Hahn','Vogel','Roth','Busch'];
+function fictTicker(m){
+  const ev = fictResult(m), r = seeded('ticker-' + m.id), out = [];
+  if (m.kind === 'darts'){
+    const sc = [0, 0];
+    ev.forEach((e, i) => { sc[e.s]++; const n = e.s ? m.t2 : m.t1;
+      if (r() < .35) out.push({ f: Math.max(0, e.f - .02), icon:'🎯', txt: `180! ${lastName(n)}` });
+      const co = 40 + Math.floor(r()*131);
+      out.push({ f: e.f, icon:'✓', txt: `Leg ${i+1} an ${lastName(n)}, Checkout ${co}`, sc: [...sc], big: co >= 100 }); });
+    out.unshift({ f: 0, icon:'▶', txt: 'Anwurf' });
+  } else {
+    const sc = [0, 0];
+    out.push({ f: 0, icon:'▶', txt: 'Anpfiff' });
+    ev.forEach(e => { sc[e.s]++; const pen = r() < .12, own = !pen && r() < .05;
+      out.push({ f: e.f, min: Math.max(1, Math.round(e.f*90)), icon:'⚽', txt: `${(e.s ? m.t2 : m.t1)}: ${'ABCDEFGHJKLMNPRSTW'[Math.floor(r()*18)]}. ${SURN[Math.floor(r()*SURN.length)]}${pen ? ' (Elfmeter)' : own ? ' (Eigentor)' : ''}`, sc: [...sc] }); });
+    const htSc = ev.filter(e => e.f <= .5).reduce((a, e) => (a[e.s]++, a), [0, 0]);
+    out.push({ f: .5, min: 45, icon:'⏸', txt: `Halbzeit ${htSc[0]}:${htSc[1]}` });
+    out.push({ f: 1, min: 90, icon:'⏹', txt: 'Abpfiff' });
+  }
+  return out.sort((a, b) => a.f - b.f);
+}
+/* real ticker from OpenLigaDB: goals with minute and scorer, half time, end */
+function realTicker(m){
+  const out = [], S = matchState(m);
+  if (S.st === 'next') return out;
+  out.push({ min: 0, icon:'▶', txt: m.kind === 'darts' ? 'Anwurf' : 'Anpfiff' });
+  for (const g of m.goals){ const who = [g.who, g.pen ? '(Elfmeter)' : '', g.own ? '(Eigentor)' : '', g.et ? '(Verlängerung)' : ''].filter(Boolean).join(' ');
+    out.push({ min: g.min ?? 0, icon:'⚽', txt: who || 'Tor', sc: [g.a, g.b] }); }
+  if (m.ht && (m.kind !== 'darts')) out.push({ min: 45.5, icon:'⏸', txt: `Halbzeit ${m.ht[0]}:${m.ht[1]}` });
+  if (m.done){ const f = m.sc || m.cur; out.push({ min: 999, icon:'⏹', txt: m.kind === 'darts' ? `Spielende ${f ? f[0] + ':' + f[1] : ''}` : 'Abpfiff', sc: f }); }
+  return out.sort((a, b) => a.min - b.min);
+}
+/* keep live real matches fresh: one small request per live match every 30 s while the app is open */
+let polling = false;
+async function pollLive(){
+  if (polling || !uid) return; polling = true;
+  try {
+    const now = Date.now(), live = [];
+    for (const D of Object.values(SP.data)) for (const m of D.ms) if (!m.done && now >= m.t && now - m.t < (D.L.kind === 'darts' ? DARTS_LIVE_MS : FB_LIVE_MS) + 3600e3) live.push([D, m]);
+    await Promise.all(live.slice(0, 10).map(async ([D, m]) => {
+      try { const x = await jget(`${OLDB}/getmatchdata/${m.id}`); const nm = mapMatch(x, D.L, m.odds); D.ms = D.ms.map(y => y.id === m.id ? nm : y); } catch {}
+    }));
+    if (live.length){ settleBets(); renderAll(); }
+  } finally { polling = false; }
+}
+setInterval(pollLive, 30000);
+setInterval(() => { if (uid) renderIsland(); }, 1000);
+setInterval(() => { if (uid) loadSports(); }, 10*60e3);
+
+/* ---------- Dynamic Island: what's live right now ---------- */
+const ISL = { open: false };
+function islandItems(){
+  const mine = new Set((P?.bets || []).filter(b => b.st === 'open').map(b => b.src + ':' + b.mid));
+  return allMatchesAll().map(m => ({ m, S: matchState(m) })).filter(({ m, S }) => S.st === 'live' && (m.src === 'oldb' || mine.has(keyOf(m))))
+    .sort((a, b) => (mine.has(keyOf(b.m)) - mine.has(keyOf(a.m))) || (a.m.src === 'fict') - (b.m.src === 'fict'));
+}
+function islandRow(m, S, big){
+  const n1 = m.kind === 'darts' ? lastName(m.t1) : m.s1, n2 = m.kind === 'darts' ? lastName(m.t2) : m.s2;
+  return `<span class="idot"></span><span class="iteam">${esc(n1)}</span><b class="num">${S.sc ? S.sc[0] + ':' + S.sc[1] : '–:–'}</b><span class="iteam">${esc(n2)}</span>${S.label ? `<span class="imin num">${esc(S.label)}</span>` : ''}${big ? `<span class="ilg">${esc(m.lg)}</span>` : ''}`;
+}
+function renderIsland(){
+  const el = $('island'), panel = $('islandpanel'); if (!el) return;
+  const items = P ? islandItems() : [];
+  const top = $('top');
+  if (!items.length){ if (!el.hidden){ el.hidden = true; panel.hidden = true; ISL.open = false; top.classList.remove('has-island'); } return; }
+  top.classList.add('has-island');
+  const i = Math.floor(Date.now() / 4000) % items.length, { m, S } = items[i];
+  const html = `<span class="islide" data-k="${esc(keyOf(m))}">${islandRow(m, S)}</span>${items.length > 1 ? `<span class="imore">+${items.length - 1}</span>` : ''}`;
+  if (el.innerHTML !== html){ const swap = el.querySelector('.islide')?.dataset.k !== keyOf(m); el.innerHTML = html; if (swap) el.querySelector('.islide').classList.add('in'); }
+  el.hidden = false; el.setAttribute('aria-label', `${items.length} Live-${items.length === 1 ? 'Spiel' : 'Spiele'}`);
+  panel.hidden = !ISL.open;
+  if (ISL.open){
+    const ph = `<div class="iphead"><b>Live</b><span class="muted small">tippen für den Ticker</span></div>${items.map(({ m, S }) => `<button class="iprow" data-act="sopen" data-key="${esc(keyOf(m))}">${islandRow(m, S, true)}</button>`).join('')}`;
+    if (panel.innerHTML !== ph) panel.innerHTML = ph;
+  }
+}
+document.addEventListener('click', e => {
+  const isl = e.target.closest('#island');
+  if (isl){ const items = islandItems(); if (items.length === 1){ openMatch(keyOf(items[0].m)); } else { ISL.open = !ISL.open; renderIsland(); } return; }
+  if (ISL.open && !e.target.closest('#islandpanel')){ ISL.open = false; renderIsland(); }
+});
+function openMatch(key){
+  ISL.open = false; SP.slip = null;
+  if (tab !== 'table') setTab('table');
+  if (game !== 'sports'){ if (!standUp('sports')) return; openGame('sports'); }
+  SP.detail = key; window.scrollTo(0, 0); renderAll();
+}
+
+/* ---------- sports screens ---------- */
+SP.view = SP.view || null;   // 'live' | 'next' | 'done' | 'mine'
+SP.detail = null;
+const icon = u => u ? `<img src="${esc(u)}" alt="" loading="lazy" onerror="this.remove()">` : '';
+function oddsButtons(m, S){
+  const started = S.st !== 'next' || Date.now() >= m.t - 30e3;
+  const btn = k => `<button class="oddbtn${SP.slip && keyOf(SP.slip.m) === keyOf(m) && SP.slip.pick === k ? ' on' : ''}" data-act="spick" data-key="${esc(keyOf(m))}" data-k="${k}" ${started ? 'disabled' : ''}><small>${k === 'X' ? 'X' : k === '1' ? '1' : '2'}</small><b class="num">${oddsFmt(m.odds[k])}</b></button>`;
+  return `<div class="odds">${btn('1')}${m.odds.X ? btn('X') : ''}${btn('2')}</div>`;
+}
+function matchCard(m, mineKeys){
+  const S = matchState(m), k = keyOf(m), has = mineKeys.has(k);
+  const t = new Date(m.t).toLocaleTimeString('de-DE', { hour:'2-digit', minute:'2-digit' });
+  const status = S.st === 'live' ? `<span class="pill live">● ${esc(S.label || 'Live')}</span>` : S.st === 'done' ? '<span class="pill">Ende</span>' : S.st === 'wait' ? '<span class="pill">wartet auf Ergebnis</span>' : `<span class="num mtime">${t}</span>`;
+  const sc = S.sc ? S.sc : null;
+  const win = i => sc && S.st === 'done' && sc[i] > sc[1-i];
+  return `<div class="mcard${S.st === 'live' ? ' islive' : ''}">
+    <button class="mbody" data-act="sopen" data-key="${esc(k)}" aria-label="${esc(m.t1)} gegen ${esc(m.t2)}, Ticker öffnen">
+      <span class="mtop">${status}<span class="mlg${m.src === 'fict' ? ' fict' : ''}">${esc(m.lg)}${m.grp && m.src !== 'fict' ? ' · ' + esc(m.grp) : ''}</span>${has ? '<span class="pill good">Deine Wette</span>' : ''}</span>
+      <span class="mteam${win(0) ? ' w' : ''}"><span>${icon(m.i1)}${esc(m.t1)}</span><b class="num">${sc ? sc[0] : ''}</b></span>
+      <span class="mteam${win(1) ? ' w' : ''}"><span>${icon(m.i2)}${esc(m.t2)}</span><b class="num">${sc ? sc[1] : ''}</b></span>
+      ${S.st === 'live' && S.pct != null ? `<span class="mbar"><i style="width:${(S.pct*100).toFixed(1)}%"></i></span>` : ''}
+    </button>
+    ${S.st === 'next' ? oddsButtons(m, S) : '<span class="mgo" aria-hidden="true">›</span>'}
+  </div>`;
+}
+function betCard(b){
+  const m = findMatch(b.src + ':' + b.mid), S = m ? matchState(m) : null;
+  const sc = b.res || S?.sc;
+  const st = b.st === 'open' ? (S?.st === 'live' ? `<span class="pill live">● ${esc(S.label || 'Live')}</span>` : '<span class="pill">offen</span>') : b.st === 'won' ? `<span class="pill good">+${fmt(b.pay - b.stake)} ℒ</span>` : b.st === 'void' ? '<span class="pill">erstattet</span>' : `<span class="pill bad">−${fmt(b.stake)} ℒ</span>`;
+  return `<button class="betcard" data-act="sopen" data-key="${esc(b.src + ':' + b.mid)}"><span class="mtop">${st}<span class="mlg">${esc(b.lg)} · ${timeLabel(b.ko)}</span></span>
+    <span class="bcm"><b>${esc(b.t1)} – ${esc(b.t2)}</b>${sc ? `<b class="num score2">${sc[0]}:${sc[1]}</b>` : ''}</span>
+    <span class="muted small">Tipp: <b style="color:var(--ink)">${esc(pickLabel(b))}</b> · Quote ${oddsFmt(b.odds)} · Einsatz ${fmt(b.stake)} ℒ${b.st === 'open' ? ` · möglich ${fmt(Math.floor(b.stake*b.odds))} ℒ` : ''}</span></button>`;
+}
+function renderSportDetail(el){
+  const m = findMatch(SP.detail);
+  if (!m){ SP.detail = null; return renderSports(); }
+  const S = matchState(m), now = Date.now();
+  const fict = m.src === 'fict', darts = m.kind === 'darts';
+  let ticker = fict ? fictTicker(m).filter(x => S.st !== 'live' || x.f <= Math.min(1, (now - m.t) / LIVE_MS)) : realTicker(m);
+  if (fict && S.st === 'next') ticker = [];
+  const rows = ticker.slice().reverse().map(x => `<div class="tk${x.icon === '⚽' || x.big ? ' hl' : ''}"><span class="tkmin num">${x.min != null && x.min < 900 ? (x.min > 45 && x.min < 46 ? '45′' : x.min ? Math.round(x.min) + '′' : '') : ''}</span><span class="tkic">${x.icon}</span><span class="tktx">${esc(x.txt)}</span>${x.sc ? `<b class="num">${x.sc[0]}:${x.sc[1]}</b>` : ''}</div>`).join('');
+  const bets = (P.bets || []).filter(b => b.src + ':' + b.mid === SP.detail);
+  const statusTxt = S.st === 'live' ? `<span class="pill live big">● LIVE ${esc(S.label && S.label !== 'Live' ? S.label : '')}</span>` : S.st === 'done' ? '<span class="pill">Spielende</span>' : S.st === 'wait' ? '<span class="pill">Ergebnis folgt</span>' : `<span class="pill">${esc(timeLabel(m.t))}</span>`;
+  const sc = S.sc;
+  const note = fict ? 'Fiktives Spiel: Alle sehen denselben Spielverlauf. Ein Spiel dauert 5 Minuten.'
+    : darts ? 'Für Darts liefert OpenLigaDB nur das Endergebnis, keine einzelnen Legs. Es erscheint, sobald Freiwillige es eintragen.'
+    : `Live-Daten von OpenLigaDB (Freiwillige tragen Tore meist innerhalb weniger Minuten ein). Die Spielminute ist geschätzt.${m.upd ? ' Zuletzt aktualisiert ' + new Date(m.upd).toLocaleTimeString('de-DE', { hour:'2-digit', minute:'2-digit' }) + ' Uhr.' : ''}`;
+  const slip = SP.slip ? slipHTML() : '';
+  const html = `<div class="gamebar"><button class="btn sm" data-act="sback">← Übersicht</button><h2>${darts ? 'Darts' : 'Fußball'}</h2><span class="muted small">${esc(m.lg)}</span></div>
   <div class="stack">
-    <div class="seg segwrap">${F.map(([k,l]) => `<button data-act="sfilter" data-v="${esc(k)}" aria-pressed="${SP.filter===k}">${esc(l)}</button>`).join('')}</div>
-    ${SP.err ? `<div class="note bad">${esc(SP.err)}</div>` : ''}
-    <div class="grid-sports">
-      <div class="panel stack" style="gap:8px">${rows || `<p class="muted">${SP.loading ? 'Spiele werden geladen …' : 'In diesem Bereich stehen gerade keine Spiele an.'}</p>`}
-        <p class="muted small">Echte Spiele und Ergebnisse kommen von OpenLigaDB (Community-Daten). Gewertet wird das Ergebnis nach regulärer Spielzeit. Fiktive Turniere: alle 15 Minuten neue Spiele, Live-Ticker 5 Minuten. Wetten schließen beim Anpfiff.</p></div>
-      <div class="panel stack" style="gap:8px"><h3>Meine Wetten</h3>${mine.length ? mine.map(betRow).join('') : '<p class="muted">Noch keine Wetten. Tippe auf eine Quote.</p>'}</div>
+    <div class="scoreboard${S.st === 'live' ? ' islive' : ''}">
+      <div class="sbtop">${statusTxt}<span class="muted small">${esc(m.grp || '')}${m.grp ? ' · ' : ''}${new Date(m.t).toLocaleString('de-DE', { weekday:'short', day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' })}</span></div>
+      <div class="sbmain">
+        <div class="sbteam">${m.i1 ? `<img src="${esc(m.i1)}" alt="" onerror="this.remove()">` : `<span class="sbab">${esc(darts ? '🎯' : m.s1)}</span>`}<b>${esc(m.t1)}</b></div>
+        <div class="sbscore num">${sc ? `${sc[0]}<i>:</i>${sc[1]}` : `<small>${new Date(m.t).toLocaleTimeString('de-DE', { hour:'2-digit', minute:'2-digit' })}</small>`}</div>
+        <div class="sbteam">${m.i2 ? `<img src="${esc(m.i2)}" alt="" onerror="this.remove()">` : `<span class="sbab">${esc(darts ? '🎯' : m.s2)}</span>`}<b>${esc(m.t2)}</b></div>
+      </div>
+      ${m.ht && !darts && S.st !== 'next' ? `<div class="muted small" style="text-align:center">Halbzeit ${m.ht[0]}:${m.ht[1]}</div>` : ''}
+      ${S.st === 'live' && S.pct != null ? `<div class="mbar big"><i style="width:${(S.pct*100).toFixed(1)}%"></i></div>` : ''}
     </div>
+    ${S.st === 'next' ? `<div class="panel stack" style="gap:8px"><h3>Wetten</h3>${oddsButtons(m, S)}<p class="muted small">Wetten schließen beim ${darts ? 'Anwurf' : 'Anpfiff'}. Gewertet wird ${darts ? 'der Sieger' : 'das Ergebnis nach regulärer Spielzeit'}.</p></div>` : ''}
+    ${bets.length ? `<div class="panel stack" style="gap:6px"><h3>Deine Wetten</h3>${bets.map(betCard).join('')}</div>` : ''}
+    <div class="panel stack" style="gap:4px"><h3>Ticker</h3>${rows || `<p class="muted">${S.st === 'next' ? `Der Ticker startet mit dem ${darts ? 'Anwurf' : 'Anpfiff'}.` : 'Noch keine Ereignisse.'}</p>`}
+      <p class="muted small" style="margin-top:6px">${esc(note)}</p></div>
   </div>${slip}`;
   if (el.innerHTML !== html) el.innerHTML = html;
 }
+function slipHTML(){
+  const s = SP.slip;
+  return `<div class="slip"><div><b>${esc(pickLabel({ ...s.m, pick:s.pick }))}</b> <span class="muted small">${esc(s.m.t1)} – ${esc(s.m.t2)}</span><br>Quote <b class="num">${oddsFmt(s.m.odds[s.pick])}</b> · Gewinn <b class="num" style="color:var(--win)">${fmt(Math.floor(SP.stake*s.m.odds[s.pick]))} ℒ</b></div>
+    ${chipPicker(SP.stake, 'sstake')}<div class="row"><button class="btn sm" data-act="sclear">Abbrechen</button><button class="btn gold" data-act="splace">${fmt(SP.stake)} ℒ setzen</button></div></div>`;
+}
+function renderSports(){
+  const el = $('g-sports');
+  if (!SP.lastLoad && !SP.loading && !SP.err) loadSports();
+  if (SP.detail) return renderSportDetail(el);
+  const all = allMatchesAll(), now = Date.now();
+  const mineKeys = new Set((P.bets || []).filter(b => b.st === 'open').map(b => b.src + ':' + b.mid));
+  const F = [['all','Alle'],['bl1','Bundesliga'],['ucl','Champions League'],['darts','Darts'],['fict','Fiktiv']];
+  for (const L of SP.leagues || []) if (L.kind === 'fb' && !L.home && all.some(m => m.fkey === L.sc)) F.splice(3, 0, [L.sc, L.name]);
+  const byLeague = all.filter(m => SP.filter === 'all' || m.fkey === SP.filter).map(m => ({ m, S: matchState(m, now) }));
+  const groups = {
+    live: byLeague.filter(x => x.S.st === 'live' || x.S.st === 'wait'),
+    next: byLeague.filter(x => x.S.st === 'next' && (x.m.src === 'oldb' || x.m.t < now + 46*60e3)).slice(0, 40),
+    done: byLeague.filter(x => x.S.st === 'done' && now - x.m.t < 26*3600e3).reverse().slice(0, 30),
+  };
+  const openBets = (P.bets || []).filter(b => b.st === 'open').length;
+  if (!SP.view) SP.view = groups.live.length ? 'live' : 'next';
+  const V = [['live','Live', groups.live.length], ['next','Demnächst', 0], ['done','Ergebnisse', 0], ['mine','Meine Wetten', openBets]];
+  let body = '';
+  if (SP.view === 'mine'){
+    const mine = (P.bets || []).slice().reverse();
+    body = mine.length ? `<div class="stack" style="gap:8px">${mine.map(betCard).join('')}</div>` : '<p class="muted">Noch keine Wetten. Tippe in „Demnächst“ auf eine Quote.</p>';
+  } else {
+    let lastDay = '';
+    body = groups[SP.view].map(({ m }) => {
+      const day = new Date(m.t).toLocaleDateString('de-DE', { weekday:'long', day:'2-digit', month:'2-digit' });
+      const head = SP.view !== 'live' && day !== lastDay ? `<h3 class="dayh">${esc(day)}</h3>` : ''; lastDay = day;
+      return head + matchCard(m, mineKeys);
+    }).join('') || `<p class="muted">${SP.loading ? 'Spiele werden geladen …' : SP.view === 'live' ? 'Gerade läuft kein Spiel. Schau bei „Demnächst“ oder den fiktiven Turnieren (alle 15 Minuten).' : 'Hier ist gerade nichts.'}</p>`;
+  }
+  const html = `${backBar('Sportwetten', `<button class="btn sm" data-act="sreload" ${SP.loading ? 'disabled' : ''}>${SP.loading ? 'Lädt …' : 'Aktualisieren'}</button>`)}
+  <div class="stack">
+    <div class="seg sviews" role="tablist">${V.map(([k, l, n]) => `<button data-act="sview" data-v="${k}" aria-pressed="${SP.view === k}">${l}${n ? ` <span class="cnt${k === 'live' ? ' live' : ''}">${n}</span>` : ''}</button>`).join('')}</div>
+    ${SP.view !== 'mine' ? `<div class="chiprow">${F.map(([k, l]) => `<button class="fchip" data-act="sfilter" data-v="${esc(k)}" aria-pressed="${SP.filter === k}">${esc(l)}</button>`).join('')}</div>` : ''}
+    ${SP.err ? `<div class="note bad">${esc(SP.err)}</div>` : ''}
+    <div class="mlist">${body}</div>
+    <p class="muted small">Echte Spiele und Ergebnisse von OpenLigaDB. Tippe auf ein Spiel für den Live-Ticker. Fiktive Turniere: alle 15 Minuten neue Spiele.</p>
+  </div>${SP.slip ? slipHTML() : ''}`;
+  if (el.innerHTML !== html) el.innerHTML = html;
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-act]'); if (!b || b.disabled) return;
+  switch (b.dataset.act){
+    case 'sopen': if (!e.target.closest('#islandpanel') || true) openMatch(b.dataset.key); break;
+    case 'sback': SP.detail = null; SP.slip = null; renderAll(); break;
+    case 'sview': SP.view = b.dataset.v; renderAll(); break;
+  }
+});
 
 
 /* ---------- Tellerwäscher-Schicht: the way back after going broke ---------- */
@@ -2646,7 +2964,7 @@ function setPlaying(g){ withPlayer(d => { const v = g || null; if (d.playing ===
 function openGame(g){
   game = g; SP.slip = null; setPlaying(g);
   if (g==='bj'){ lastTableHTML = ''; anim.prime = true; }
-  if (g==='sports') loadSports();
+  if (g==='sports'){ loadSports(); SP.detail = null; }
   window.scrollTo(0, 0); renderAll();
 }
 function renderCasino(){
@@ -2686,7 +3004,7 @@ document.addEventListener('click', e => {
     case 'hnew': newRace(); renderAll(); break;
     case 'sfilter': SP.filter = b.dataset.v; renderAll(); break;
     case 'sreload': SP.lastLoad = 0; ls.set('oldbLeagues', null); loadSports(true); break;
-    case 'spick': { const m = allMatches().find(x => x.id===b.dataset.id); if (m){ SP.slip = (SP.slip?.m.id===m.id && SP.slip.pick===b.dataset.k) ? null : { m, pick:b.dataset.k }; renderAll(); } break; }
+    case 'spick': { const m = findMatch(b.dataset.key); if (m){ SP.slip = (SP.slip && keyOf(SP.slip.m)===keyOf(m) && SP.slip.pick===b.dataset.k) ? null : { m, pick:b.dataset.k }; renderAll(); } break; }
     case 'sstake': SP.stake = v; renderAll(); break;
     case 'sclear': SP.slip = null; renderAll(); break;
     case 'splace': placeBet2(); break;
@@ -2707,6 +3025,7 @@ function renderTop(){
   }
   lastBal = shown;
   b.textContent = P ? fmt(P.balance - hold)+' ℒ' : '–';
+  renderIsland();
   $('ver').textContent = `Legat Casino · Version ${APP_VERSION}`;
   { const h = P ? `${avH(P.avatar)} ${esc(P.name)}` : 'Konto'; if ($('pname').innerHTML !== h) $('pname').innerHTML = h; }
   $('peur').textContent = P ? `Bank ${fmt(P.euro)} €` : '';
