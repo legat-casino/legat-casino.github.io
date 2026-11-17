@@ -76,7 +76,7 @@ p{margin:0}
 .code{font-family:var(--f-num);font-size:22px;letter-spacing:.14em;color:var(--brass)}
 .note{border-left:3px solid var(--brass);padding:8px 12px;background:rgba(209,173,98,.08);border-radius:0 8px 8px 0}
 .note.bad{border-color:var(--lose);background:rgba(236,138,120,.08)}
-.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--rail);padding:10px 16px;border-radius:999px;font-weight:700;z-index:30;max-width:calc(100% - 32px);text-align:center}
+.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--rail);padding:10px 16px;border-radius:999px;font-weight:700;z-index:30;max-width:calc(100% - 32px);text-align:center;pointer-events:none}
 .switch{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:14px;cursor:pointer;user-select:none;flex-wrap:wrap;justify-content:center}
 .switch input{appearance:none;-webkit-appearance:none;width:38px;height:22px;border-radius:999px;background:#3b332b;position:relative;margin:0;cursor:pointer;transition:background .2s;flex:none}
 .switch input::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:var(--ink);transition:transform .2s}
@@ -245,7 +245,7 @@ table.board{width:100%;border-collapse:collapse;font-size:14px}
   .felt{border-width:7px;padding:14px 8px 16px}
   .shoe{right:10px;top:14px;width:36px;height:50px}
   .logo{font-size:19px}
-  nav.tabs button{font-size:13px;letter-spacing:0;padding-inline:2px}
+  nav.tabs button{font-size:12px;letter-spacing:0;padding-inline:1px}
 }
 
 /* ---------- v1.1: casino home ---------- */
@@ -418,6 +418,92 @@ table.board{width:100%;border-collapse:collapse;font-size:14px}
 .dishpop.bad{color:#ffb3a6}
 .dishresult{text-align:center;display:flex;flex-direction:column;gap:6px;align-items:center}
 .dishresult .big{font-size:54px}
+
+/* ---------- v1.3: picture avatars ---------- */
+.avimg{height:1em;width:auto;vertical-align:-.12em;display:inline-block}
+.prof-av .avimg{height:1em}
+.item .big .avimg{height:1em}
+.bubble.emo .avimg{height:1.1em}
+nav.tabs button{position:relative}
+.tabbadge{position:absolute;top:2px;right:calc(50% - 30px);display:grid;place-items:center;min-width:17px;height:17px;padding:0 4px;border-radius:999px;background:#b1302a;color:#fff;font-size:10px;font-weight:700;line-height:1}
+.pill.warn{color:#f3c46b;border-color:rgba(243,196,107,.5);cursor:help}
+.linkbtn{background:none;border:0;color:var(--brass);text-decoration:underline;padding:0;font-size:12px}
+
+/* ---------- Höher oder Tiefer ---------- */
+.hlfelt{display:flex;flex-direction:column;gap:10px}
+.hlhist{min-height:63px;justify-content:center;align-items:center;flex-wrap:nowrap;overflow:hidden}
+.hlhist .c{width:44px;height:63px}
+.hlhist .cf .r{font-size:15px}.hlhist .cf .s{font-size:12px;top:19px}.hlhist .cf .big{font-size:21px}
+.hlhist.cards .c + .c{margin-left:-14px}
+.hlmain{display:flex;justify-content:center;align-items:center;gap:28px;flex-wrap:wrap}
+.hlcard .c{width:120px;height:172px}
+.hlcard .cf{border-radius:12px}.hlcard .cb{border-radius:12px}
+.hlcard .cf .r{font-size:38px;top:8px;left:12px}.hlcard .cf .s{font-size:30px;top:48px;left:12px}.hlcard .cf .big{font-size:64px;right:12px;bottom:6px}
+.hlinfo{display:flex;flex-direction:column;gap:2px;min-width:150px}
+.hlinfo small{color:var(--muted);font-size:12px}
+.hlmult{font-size:40px;color:var(--brass);line-height:1.1}
+.hlacts .btn{display:flex;flex-direction:column;align-items:center;min-width:140px;padding:10px 18px;line-height:1.2}
+.hlacts .btn .num{font-size:15px}
+.hlacts .btn small{font-size:11px;font-weight:600;opacity:.75}
+.tile-hilo{grid-column:span 6;flex-direction:row}
+.tile-hilo .art{height:auto;width:42%;min-height:110px;background:radial-gradient(110% 120% at 50% 0%,#6e541a,#45340f);border-bottom:0;border-right:1px solid var(--line)}
+.tile-hilo .tinfo{justify-content:center}
+.minihl{display:flex;align-items:center;gap:10px;font-size:26px;color:#f3dc9a;font-weight:700}
+.minihl .mc{transform:none}
+.newtag{display:inline-block;margin-left:8px;font:700 11px/1 var(--f-body);letter-spacing:.1em;text-transform:uppercase;background:var(--brass);color:#1b140a;border-radius:4px;padding:3px 6px;vertical-align:4px}
+@media (max-width:760px){.tile-hilo{grid-column:span 2}}
+
+/* ---------- Chat ---------- */
+.chatapp{display:grid;grid-template-columns:minmax(0,320px) minmax(0,1fr);gap:14px;height:calc(100vh - 190px);min-height:460px}
+.chatside{display:flex;flex-direction:column;gap:10px;overflow-y:auto}
+.chatmain{display:flex;flex-direction:column;gap:8px;min-height:0;padding:12px}
+.chatempty{margin:auto;text-align:center}.chatempty .big{font-size:48px}
+.chitem{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;border:1px solid transparent;border-radius:10px;padding:8px;color:var(--ink)}
+.chitem:hover{background:rgba(209,173,98,.06)}
+.chitem.on{border-color:var(--brass-dim);background:rgba(209,173,98,.1)}
+.chitem.unread b{color:var(--brass)}
+.chav{flex:none;width:40px;height:40px;border-radius:50%;background:var(--rail);border:1px solid var(--line);display:grid;place-items:center;font-size:22px}
+.chtx{flex:1;min-width:0;display:flex;flex-direction:column}
+.chtx b,.chtx span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chmeta{display:flex;flex-direction:column;align-items:flex-end;gap:4px;color:var(--muted)}
+.udot{width:10px;height:10px;border-radius:50%;background:#b1302a;display:block}
+.chk{color:var(--brass);font-weight:700}
+.chathead{display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line);padding-bottom:8px}
+.chback{display:none}
+.chmore{position:relative}
+.chmore summary{list-style:none;cursor:pointer}
+.chmore summary::-webkit-details-marker{display:none}
+.chmenu{position:absolute;right:0;top:110%;z-index:5;background:var(--rail-2);border:1px solid var(--line);border-radius:10px;padding:8px;display:flex;flex-direction:column;gap:6px;min-width:190px;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.chatmsgs{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:4px;padding:4px 2px}
+.mrow{display:flex}
+.mrow.mine{justify-content:flex-end}
+.bub{max-width:78%;background:var(--rail);border:1px solid var(--line);border-radius:14px 14px 14px 4px;padding:7px 11px 5px;overflow-wrap:anywhere;font-size:15px}
+.mrow.mine .bub{background:var(--brass);color:#1b140a;border-color:var(--brass);border-radius:14px 14px 4px 14px}
+.bub.emo{font-size:34px;background:none;border-color:transparent;padding:0 4px}
+.mrow.mine .bub.emo{background:none;color:inherit}
+.bub .who{display:block;font-size:12px;font-weight:700;color:var(--brass);margin-bottom:1px}
+.bub time{display:block;text-align:right;font-size:10px;opacity:.6;margin-top:1px;font-family:var(--f-num)}
+.bub.emo time{font-size:10px}
+.msys{align-self:center;font-size:12px;color:var(--muted);background:rgba(0,0,0,.2);border-radius:999px;padding:3px 10px;margin:4px 0}
+.chatemo button{width:36px;height:36px;font-size:18px}
+@media (max-width:760px){
+  .chatapp{grid-template-columns:1fr;height:calc(100vh - 170px)}
+  .chatapp .chatmain{display:none}
+  .chatapp.opened .chatside{display:none}
+  .chatapp.opened .chatmain{display:flex}
+  .chback{display:inline-block}
+}
+
+/* ---------- Coin Flip ---------- */
+.flippanel select{background:var(--rail);border:1px solid var(--line);border-radius:8px;padding:9px 11px;color:var(--ink);width:100%;font:inherit}
+.flform{align-items:flex-end}
+.coinstage{perspective:900px;height:190px;display:grid;place-items:center}
+.coin{width:140px;height:140px;position:relative;transform-style:preserve-3d}
+.cface{position:absolute;inset:0;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:52px;font-family:var(--f-display);font-weight:700;color:#5a4417;
+  background:radial-gradient(circle at 35% 30%,#fff2c2,#e5c070 40%,#b8913f 75%,#8a6a28);box-shadow:inset 0 0 0 6px #c99a35,inset 0 0 0 9px #f3dc9a,0 10px 24px rgba(0,0,0,.5);backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.cface small{font:700 13px/1 var(--f-body);letter-spacing:.14em;text-transform:uppercase;margin-top:4px}
+.cz{transform:rotateY(180deg)}
+
 @media (prefers-reduced-motion:reduce){*{animation:none!important}}
 </style>
 </head>
@@ -430,6 +516,7 @@ table.board{width:100%;border-collapse:collapse;font-size:14px}
     <nav class="tabs" role="tablist">
       <button id="tab-table" role="tab" aria-selected="true" data-tab="table">Casino</button>
       <button id="tab-players" role="tab" aria-selected="false" data-tab="players">Spieler</button>
+      <button id="tab-chat" role="tab" aria-selected="false" data-tab="chat">Chat</button>
       <button id="tab-bank" role="tab" aria-selected="false" data-tab="bank">Bank</button>
       <button id="tab-shop" role="tab" aria-selected="false" data-tab="shop">Shop</button>
       <button id="tab-account" role="tab" aria-selected="false" data-tab="account">Konto</button>
@@ -460,6 +547,7 @@ table.board{width:100%;border-collapse:collapse;font-size:14px}
     <div id="g-slots" hidden></div>
     <div id="g-horses" hidden></div>
     <div id="g-sports" hidden></div>
+    <div id="g-hilo" hidden></div>
     <div id="chat" class="panel chat" hidden>
       <div class="emojis" id="emojis"></div>
       <div class="chatlog" id="chatlog" aria-live="polite"></div>
@@ -470,6 +558,7 @@ table.board{width:100%;border-collapse:collapse;font-size:14px}
     </div>
   </section>
   <section id="view-players" hidden></section>
+  <section id="view-chat" hidden></section>
   <section id="view-bank" hidden></section>
   <section id="view-shop" hidden></section>
   <section id="view-account" hidden></section>
@@ -483,7 +572,7 @@ import { firebaseConfig } from './firebase-config.js';
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut }
   from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-import { initializeFirestore, doc, collection, query, where, orderBy, limit, onSnapshot, setDoc, getDoc, getDocs, updateDoc, deleteDoc, addDoc, runTransaction }
+import { initializeFirestore, doc, collection, query, where, orderBy, limit, onSnapshot, setDoc, getDoc, getDocs, updateDoc, deleteDoc, addDoc, runTransaction, serverTimestamp }
   from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
 /* ---------- constants ---------- */
@@ -491,12 +580,12 @@ const START = 2000, MIN_BET = 100, VIP_MIN = 5000, MAX_BET = 50000, MAX_SEATS = 
 const TURN_MS = 30000, BET_MS = 15000, INS_MS = 12000, ONLINE_MS = 100000, DONE_MS = 5000;
 const CHIPS = [[50,'ch50','50'],[100,'ch100','100'],[500,'ch500','500'],[1000,'ch1k','1K'],[5000,'ch5k','5K'],[10000,'ch10k','10K'],[25000,'ch25k','25K']];
 const SUIT = {S:'♠',H:'♥',D:'♦',C:'♣'};
-const EMOJIS = ['😂','🔥','💀','😭','🤑','👏','🙏','😤','🍀','🫡'];
+const EMOJIS = ['😂','🔥','💀','😭','🤑','👏','🙏','😤','🍀','🫡','img:kippa'];
 const SHOP = {
-  av: [['🙂',0],['😎',0],['🤠',0],['🦊',0],['🐻',0],['🐸',0],['🦁',5000],['🐯',5000],['🐼',5000],['🦉',5000],['🤖',10000],['👽',10000],['🧛',15000],['🥷',15000],['🐉',25000],['🦄',25000],['🎩',50000],['👑',100000]],
-  felt: [['green','Klassisch',0,'#175a45','#0f3d2f','#0a2a20'],['blue','Royal Blau',10000,'#1f5a94','#143e6a','#0c2745'],['bordeaux','Bordeaux',10000,'#8a2338','#5e1626','#3a0d17'],
+  av: [['🙂',0],['😎',0],['🤠',0],['🦊',0],['🐻',0],['🐸',0],['🐶',500],['🐱',500],['🐧',750],['🐵',1000],['img:kippa',1000],['🐢',1000],['🐙',1500],['🦋',1500],['🎲',2500],['🍀',2500],['🦁',5000],['🐯',5000],['🐼',5000],['🦉',5000],['🤖',10000],['👽',10000],['🧛',15000],['🥷',15000],['🐉',25000],['🦄',25000],['🎩',50000],['👑',100000]],
+  felt: [['green','Klassisch',0,'#175a45','#0f3d2f','#0a2a20'],['olive','Oliv',2000,'#5e7030','#414f20','#262f12'],['teal','Petrol',2500,'#1f7373','#145050','#0b3030'],['blue','Royal Blau',10000,'#1f5a94','#143e6a','#0c2745'],['bordeaux','Bordeaux',10000,'#8a2338','#5e1626','#3a0d17'],
          ['purple','Samt Violett',20000,'#5a3590','#3d2266','#261443'],['black','Mitternacht',30000,'#3a3a3a','#222222','#121212'],['gold','Goldrausch',100000,'#a07d2a','#6e541a','#45340f']],
-  back: [['red','Rot',0,'#7d2a22','#6a221c'],['blue','Blau',5000,'#1f3f7a','#183263'],['green','Grün',5000,'#1f5a3a','#174a2f'],
+  back: [['red','Rot',0,'#7d2a22','#6a221c'],['brown','Holz',1000,'#7a5230','#5e3e22'],['teal','Petrol',1500,'#1f6b6b','#165252'],['blue','Blau',5000,'#1f3f7a','#183263'],['green','Grün',5000,'#1f5a3a','#174a2f'],
          ['purple','Violett',15000,'#4b2a78','#3b2060'],['black','Schwarz-Gold',15000,'#1a1a1a','#6b5520'],['gold','Gold',50000,'#c99a35','#8f6c1f']],
 };
 const ACH = [
@@ -679,23 +768,36 @@ function norm(d){
   d.bets ||= [];
   if (d.euro == null) d.euro = START_EURO; d.bank ||= { last:null, got:0 };
   d.claimed ||= []; d.giftedTotal ||= 0; if (d.lowMark == null) d.lowMark = d.balance;
+  d.fdone ||= [];
+  if (!d.log) d.log = [{ t: Date.now(), b: 0, e: 0, r: 'start', B: d.balance, E: d.euro ?? START_EURO }];
   if (!d.week || d.week.id !== weekId()) d.week = { id: weekId(), net:0, hands:0, best:0 };
   return d;
 }
 let newBadges = [];
 /** Change my player doc. fn(draft) returns true if it changed something. Returns whether it applied. */
-function withPlayer(fn){
+let WHY = null;
+function withPlayer(fn, why){
   if (!P) return false;
   const d = norm(structuredClone(P));
-  newBadges = [];
+  newBadges = []; WHY = null;
   if (!fn(d)) return false;
+  const reason = WHY || why || '?'; WHY = null;
+  const db_ = d.balance - P.balance, de_ = d.euro - (P.euro ?? START_EURO);
+  if (db_ || de_) d.log = [...d.log, { t: Date.now(), b: db_, e: de_, r: reason, B: d.balance, E: d.euro }].slice(-150);
   checkBalanceBadges(d);
   if (brokeDoc(d)){ if (!d.brokeAt) d.brokeAt = Date.now(); } else if (d.brokeAt) d.brokeAt = null;
   d.updated = Math.max(Date.now(), (P.updated||0) + 1); d.seen = Date.now();
   P = d; renderAll();
   slow(setDoc(doc(fs,'players',uid), d)).catch(handleWriteErr);
-  if (newBadges.length){ const b = newBadges; newBadges = []; b.forEach((k,i) => setTimeout(() => { const a = ACH.find(x=>x[0]===k); SFX.badge(); toast(`${a[1]} Erfolg freigeschaltet: ${a[2]}`); }, 400 + i*2200)); }
+  if (newBadges.length){ const b = newBadges; newBadges = []; b.forEach((k,i) => badgeLater(k, 400 + i*2200)); }
   return true;
+}
+/** achievement toasts wait until a spin or race has finished, so they never give the result away */
+function badgeLater(k, ms){
+  setTimeout(() => {
+    if (hold || R.busy || S.busy || H.busy || wheelBusy) return badgeLater(k, 300);
+    const a = ACH.find(x=>x[0]===k); SFX.badge(); toast(`${a[1]} Erfolg freigeschaltet: ${a[2]}`);
+  }, ms);
 }
 function seatWrite(data, mode='update'){
   const ref = doc(fs,'seats',uid);
@@ -779,7 +881,7 @@ getRedirectResult(auth).catch(e => console.warn(e));
 if (ls.get('ref', null)) $('loginsub').innerHTML = 'Du wurdest eingeladen! Mit diesem Link startest du mit <b style="color:var(--brass)">3.000 Legats</b> statt 2.000.';
 onAuthStateChanged(auth, u => {
   authUser = u;
-  if (!u){ stopAll(); uid=null; P=null; $('top').hidden = true; $('daily').innerHTML=''; for (const v of ['table','players','bank','shop','account']) $('view-'+v).hidden = true; $('view-login').hidden = false; return; }
+  if (!u){ stopAll(); uid=null; P=null; $('top').hidden = true; $('daily').innerHTML=''; for (const v of ['table','players','chat','bank','shop','account']) $('view-'+v).hidden = true; $('view-login').hidden = false; return; }
   uid = u.uid; $('view-login').hidden = true; $('top').hidden = false; setTab(tab); startData();
 });
 
@@ -801,10 +903,12 @@ function startData(){
   }, e => console.warn(e));
   const beat = () => { if (P && document.visibilityState==='visible') updateDoc(doc(fs,'players',uid), { seen: Date.now() }).catch(()=>{}); };
   document.addEventListener('visibilitychange', beat);
+  startChats(); startFlips();
   intervals = [setInterval(beat, 45000), setInterval(leaseLoop, 4000), setInterval(hostTick, 350), setInterval(tickTimers, 500), setInterval(renderAll, 30000)];
 }
 function stopAll(){
   unsubP && unsubP(); unsubG && unsubG(); unsubP = unsubG = null; closeTable();
+  unsubChats && unsubChats(); unsubFA && unsubFA(); unsubFB && unsubFB(); CH.unsubM && CH.unsubM(); unsubChats = unsubFA = unsubFB = null;
   intervals.forEach(clearInterval); intervals=[];
 }
 async function createPlayer(){
@@ -842,14 +946,14 @@ function afterLogin(){
   const seen = ls.get('seenVersion', null);
   if (seen !== APP_VERSION){ seenBefore = seen; ls.set('seenVersion', APP_VERSION); if (P.created && Date.now() - P.created > 60e3) openModal('news'); }
   setPlaying(game);
-  checkAbortedShift();
+  checkAbortedShift(); checkAbortedHilo();
   if (P.bets?.some(b => b.st==='open' && b.src==='oldb')) loadSports();
 }
 setInterval(() => { if (uid && P?.bets?.some(b => b.st==='open' && b.src==='oldb') && Date.now() - SP.lastLoad > 5*60e3) loadSports(); }, 60e3);
 /* ---------- bank: euros are safe from the table ---------- */
 function accrueInterest(){
   if (!P) return; const today = dayId(); let got = 0;
-  withPlayer(d => {
+  withPlayer(d => { WHY = 'Zinsen';
     if (d.bank.last === today) return false;
     if (d.bank.last){ got = Math.min(INT_MAX, Math.floor(d.euro * INT_RATE)); d.euro += got; }
     d.bank = { last: today, got };
@@ -864,7 +968,7 @@ function bankMove(kind, v){
     if (inRound()) return toast('Einzahlen geht erst, wenn deine Runde vorbei ist.');
     if (v > P.balance) return toast('So viele Legats hast du nicht.');
     const fee = Math.ceil(v * BANK_FEE);
-    const ok = withPlayer(d => {
+    const ok = withPlayer(d => { WHY = 'Bank: Einzahlung';
       if (ledgerOpen(d) || d.balance < v) return false;
       d.balance -= v; d.euro += v - fee;
       d.limits = { ...d.limits, base: (d.limits.base ?? d.balance + v) - v };   // moving money is not a win or loss
@@ -875,7 +979,7 @@ function bankMove(kind, v){
   }
   if (!(v >= 50)) return toast('Mindestens 50 € abheben.');
   if (v > P.euro) return toast('So viel liegt nicht auf der Bank.');
-  const ok = withPlayer(d => {
+  const ok = withPlayer(d => { WHY = 'Bank: Abhebung';
     if (d.euro < v) return false;
     d.euro -= v; d.balance += v;
     d.limits = { ...d.limits, base: (d.limits.base ?? d.balance - v) + v };
@@ -934,7 +1038,7 @@ function claimGifts(){
   if (!P) return;
   for (const [id, g] of Object.entries(gifts)){
     if (g.to !== uid || g.claimed) continue;
-    const did = withPlayer(d => { if (d.claimed.includes(id)) return false; d.balance += g.amount; d.claimed = [...d.claimed, id].slice(-300); return true; });
+    const did = withPlayer(d => { WHY = ({gift:'Geschenk erhalten',loan:'Geliehen bekommen',repay:'Rückzahlung erhalten',ref:'Einladungsbonus'})[g.kind] || 'Geschenk erhalten'; if (d.claimed.includes(id)) return false; d.balance += g.amount; d.claimed = [...d.claimed, id].slice(-300); return true; });
     if (did){
       SFX.coins();
       if (g.kind==='ref') toast(`${nameOf(g.from)} ist über deinen Link beigetreten: +${fmt(g.amount)} ℒ`); else
@@ -949,7 +1053,7 @@ function sendGift(to, amount, kind){
   if (inRound()) return toast('Warte, bis deine Runde vorbei ist.');
   if (amount > P.balance) return toast('So viele Legats hast du nicht.');
   const ref = doc(collection(fs,'gifts'));
-  const ok = withPlayer(d => {
+  const ok = withPlayer(d => { WHY = ({gift:'Geschenk',loan:'Verliehen',repay:'Schulden zurückgezahlt'})[kind] || 'Geschenk';
     if (d.balance < amount || ledgerOpen(d)) return false;
     d.balance -= amount;
     if (kind==='gift'){ d.giftedTotal += amount; if (d.giftedTotal >= 10000) grant(d,'generous'); }
@@ -1128,7 +1232,7 @@ function applyResult(d, r, ctx){
 }
 function reconcile(){
   if (!P || !T || !tid) return;
-  withPlayer(d => {
+  withPlayer(d => { WHY = 'Blackjack';
     let changed = false;
     const key = tid+':'+T.round;
     const L = d.ledger;
@@ -1388,8 +1492,18 @@ function animateCards(root){
 /* =====================================================================
    v1.1 – Casino home, Glücksrad, Roulette, Automat, Pferderennen, Sportwetten
    ===================================================================== */
-const APP_VERSION = '1.2';
+const APP_VERSION = '1.3';
 const CHANGELOGS = {
+  '1.3': [
+    'Neues Spiel: Höher oder Tiefer',
+    'Chat mit Freunden und in Gruppen (neuer Tab „Chat“)',
+    'Coin Flip unter Freunden, mit oder ohne Einsatz (ganz unten im Konto)',
+    'Kippa als Avatar im Shop und als Emoji am Tisch und im Chat',
+    'Günstige neue Shop-Sachen ab 500 €',
+    'Kontobuch: Jede Änderung an Legats und Euro wird mit Grund gespeichert. Passt ein Kontostand nicht dazu, steht ⚠️ in der Rangliste',
+    'Meldungen verdecken keine Knöpfe mehr, Erfolge erscheinen erst nach dem Ergebnis',
+    '2 neue Erfolge',
+  ],
   '1.2': [
     'Pleite? Jetzt verdienst du dir den Neustart mit einer Schicht als Tellerwäscher. Der Lohn (300 bis 2.500 €) kommt auf dein Bankkonto',
     'Nach einer Pleite öffnet die Küche erst nach einer Wartezeit: beim ersten Mal sofort, dann bis zu 20 Minuten',
@@ -1416,7 +1530,7 @@ const verNum = v => (v||'0').split('.').map(Number).reduce((a,x,i) => a + x * Ma
 let seenBefore = null;
 let game = null;            // null = Casino-Startseite, 'bj', 'roulette', 'slots', 'horses', 'sports'
 let hold = 0;               // Gewinn, der erst nach der Animation im Kontostand erscheint
-const GAME_NAMES = { bj:'Blackjack', roulette:'Roulette', slots:'Automat', horses:'Pferderennen', sports:'Sportwette', wheel:'Glücksrad' };
+const GAME_NAMES = { bj:'Blackjack', roulette:'Roulette', slots:'Automat', horses:'Pferderennen', sports:'Sportwette', wheel:'Glücksrad', hilo:'Höher oder Tiefer', coinflip:'Coin Flip' };
 ACH.splice(ACH.length - 2, 0,
   ['r_num','🎯','Volltreffer','Beim Roulette eine einzelne Zahl getroffen'],
   ['jackpot','7️⃣','Jackpot','Am Automaten drei Siebenen gedreht'],
@@ -1424,6 +1538,8 @@ ACH.splice(ACH.length - 2, 0,
   ['sport3','⚽','Wettkönig','Eine Sportwette mit Quote 3 oder höher gewonnen'],
   ['wheel','🎡','Glückspilz','Den Hauptgewinn am Glücksrad gedreht'],
   ['dish40','🧽','Spülmeister','40 Teller in einer Tellerwäscher-Schicht'],
+  ['hilo10','🔮','Hellseher','Bei Höher oder Tiefer 10-mal in Folge richtig'],
+  ['flip','🪙','Kopf oder Zahl','Einen Coin Flip gegen einen Freund gewonnen'],
 );
 const pick = arr => arr[rnd(arr.length)];
 const secs = ms => new Promise(r => setTimeout(r, ms));
@@ -1450,7 +1566,7 @@ function betError(amount, min=50, max=MAX_BET){
 }
 /** one instant game round: take the stake, pay out, book it. The win shows after the animation (hold). */
 function playInstant(key, stake, pay, extra){
-  const ok = withPlayer(d => {
+  const ok = withPlayer(d => { WHY = GAME_NAMES[key] || key;
     if (d.balance < stake) return false;
     d.balance += pay - stake; record(d, key, stake, pay); extra?.(d);
     return true;
@@ -1511,7 +1627,7 @@ async function spinWheel(){
   const i = rnd(WHEEL.length), s = WHEEL[i], mult = streakMult(W.streak);
   let prize = '', itemKey = null, txt = '';
   if (s.k==='I'){
-    const pool = [...SHOP.av.map(([e,p]) => ['av:'+e, p, e]), ...SHOP.felt.map(x => ['felt:'+x[0], x[2], x[1]+' (Filz)']), ...SHOP.back.map(x => ['back:'+x[0], x[2], x[1]+' (Kartenrücken)'])]
+    const pool = [...SHOP.av.map(([e,p]) => ['av:'+e, p, avText(e)]), ...SHOP.felt.map(x => ['felt:'+x[0], x[2], x[1]+' (Filz)']), ...SHOP.back.map(x => ['back:'+x[0], x[2], x[1]+' (Kartenrücken)'])]
       .filter(([k,p]) => p > 0 && p <= 25000 && !P.owned.includes(k));
     if (pool.length){ const it = pick(pool); itemKey = it[0]; txt = `🎁 ${it[2]} gewonnen!`; }
   }
@@ -1520,7 +1636,7 @@ async function spinWheel(){
   if (s.k==='E') addE = Math.round(s.v * mult);
   if (s.k==='I' && !itemKey) addE = 2500;
   if (!txt) txt = addL ? `+${fmt(addL)} Legats` : `+${fmt(addE)} €`;
-  const ok = withPlayer(d => {
+  const ok = withPlayer(d => { WHY = 'Glücksrad';
     if (d.daily.last === dayId()) return false;
     d.daily = { last: dayId(), streak: W.streak };
     d.balance += addL; d.euro += addE;
@@ -1915,7 +2031,7 @@ function settleBets(){
   }
   if (!done.length) return;
   let won = 0;
-  withPlayer(d => {
+  withPlayer(d => { WHY = 'Sportwette';
     let ch = false;
     for (const [id, sc] of done){
       const b = d.bets.find(x => x.id===id); if (!b || b.st!=='open') continue;
@@ -1952,7 +2068,7 @@ function placeBet2(){
   if (Date.now() > s.m.t - 30e3) { SP.slip = null; renderAll(); return toast('Das Spiel hat schon angefangen.'); }
   if ((P.bets||[]).filter(b => b.st==='open').length >= 30) return toast('Höchstens 30 offene Wetten gleichzeitig.');
   const m = s.m, bet = { id: Date.now().toString(36) + rnd(1e6).toString(36), src:m.src, sc:m.sc_ || null, season:m.season || null, mid:m.id, kind:m.kind, lg:m.lg, t1:m.t1, t2:m.t2, ko:m.t, pick:s.pick, odds:m.odds[s.pick], stake:SP.stake, st:'open', at:Date.now() };
-  const ok = withPlayer(d => { if (d.balance < SP.stake) return false; d.balance -= SP.stake; d.bets = [...(d.bets||[]), bet]; return true; });
+  const ok = withPlayer(d => { WHY = 'Sportwette Einsatz'; if (d.balance < SP.stake) return false; d.balance -= SP.stake; d.bets = [...(d.bets||[]), bet]; return true; });
   if (ok){ ls.set('sportstake', SP.stake); SP.slip = null; SFX.chip(); toast(`Wette platziert: ${fmt(bet.stake)} ℒ, möglicher Gewinn ${fmt(Math.floor(bet.stake*bet.odds))} ℒ`); renderAll(); }
 }
 const pickLabel = (b) => b.pick==='X' ? 'Unentschieden' : b.pick==='1' ? b.t1 : b.t2;
@@ -2094,7 +2210,7 @@ function dishStart(){
 }
 function finishRevive(earn, plates=0){
   const now = Date.now();
-  return withPlayer(d => {
+  return withPlayer(d => { WHY = 'Tellerwäscher-Schicht';
     if (!brokeDoc(d)) { if (d.shift){ d.shift = null; return true; } return false; }
     d.euro += earn; d.stats.bankrupts += 1; d.limits = { ...(d.limits||{}), base: d.balance }; d.ledger = null; d.lowMark = d.balance + d.euro;
     d.streaks = { win:0, bj:0 }; d.shift = null;
@@ -2116,6 +2232,375 @@ function checkAbortedShift(){
   if (brokeDoc(P)){ finishRevive(DISH_MIN); toast(`Deine letzte Schicht wurde abgebrochen. Mindestlohn: ${fmt(DISH_MIN)} € auf deine Bank`); }
   else withPlayer(d => { d.shift = null; return true; });
 }
+
+
+/* =====================================================================
+   v1.3 – Höher oder Tiefer, Chat, Kippa, Kontobuch, Coin Flip
+   ===================================================================== */
+/* ---------- picture avatars and emojis (there is no kippa emoji) ---------- */
+const KIPPA_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="3 8 58 45"><defs><radialGradient id="k" cx="38%" cy="28%" r="85%"><stop offset="0" stop-color="#4a72c4"/><stop offset=".55" stop-color="#1f3f7a"/><stop offset="1" stop-color="#10264f"/></radialGradient></defs><ellipse cx="32" cy="47" rx="27" ry="6" fill="#0c1d3d"/><path d="M5 46 C5 24 20 13 32 13 C44 13 59 24 59 46 C50 50 14 50 5 46 Z" fill="url(#k)"/><path d="M8.5 40 C12 28 21 21 32 21 C43 21 52 28 55.5 40" fill="none" stroke="#d9b45c" stroke-width="3.2" stroke-dasharray="4.5 2.2" stroke-linecap="round"/><path d="M6 45.5 C16 49.5 48 49.5 58 45.5" fill="none" stroke="#e7c470" stroke-width="2.2"/><ellipse cx="24" cy="23" rx="7" ry="3.2" fill="#fff" opacity=".18" transform="rotate(-20 24 23)"/></svg>`;
+const IMG = { 'img:kippa': 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(KIPPA_SVG) };
+const IMG_NAME = { 'img:kippa': 'Kippa' };
+/** an avatar or emoji as HTML: a picture for 'img:…', otherwise the (escaped) emoji */
+const avH = a => a && String(a).startsWith('img:') ? `<img class="avimg" src="${IMG[a] || ''}" alt="${esc(IMG_NAME[a] || '')}">` : esc(a || '🙂');
+const avText = a => a && String(a).startsWith('img:') ? (IMG_NAME[a] || '') : (a || '🙂');
+
+/* ---------- Kontobuch: every change of Legats or Euro, with a reason ---------- */
+/** true when a player's balance doesn't match their own account book */
+function suspicious(p){
+  const L = p?.log; if (!L || L.length < 1) return false;
+  const last = L[L.length - 1];
+  if (last.B !== p.balance || last.E !== (p.euro ?? START_EURO)) return true;
+  for (let i = 1; i < L.length; i++){
+    if (L[i-1].B + L[i].b !== L[i].B || L[i-1].E + L[i].e !== L[i].E) return true;
+    if (L[i].r === '?' && (L[i].b > 0 || L[i].e > 0)) return true;
+  }
+  return false;
+}
+function logHTML(p, n = 15){
+  const L = (p.log || []).slice(-n).reverse().filter(x => x.r !== 'start');
+  if (!L.length) return '<p class="muted small">Noch keine Einträge.</p>';
+  return `<div class="hist">${L.map(x => `<div class="h"><span class="muted num">${new Date(x.t).toLocaleString('de-DE',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</span><span>${esc(x.r)}</span><b class="num">${x.b ? `<span style="color:${x.b>0?'var(--win)':'var(--lose)'}">${sgn(x.b)} ℒ</span>` : ''}${x.b && x.e ? ' ' : ''}${x.e ? `<span style="color:${x.e>0?'var(--win)':'var(--lose)'}">${sgn(x.e)} €</span>` : ''}</b></div>`).join('')}</div>`;
+}
+
+/* ---------- Höher oder Tiefer ---------- */
+const HL = { stake: ls.get('hilostake', 500), run: null, id: 0, msg: '' };
+const HL_EDGE = 0.97, HL_MAX = 100;
+const hlP = (r, dir) => dir === 'hi' ? (14 - r) / 12 : (r - 2) / 12;          // ties don't count: 12 other ranks
+const hlFactor = (r, dir) => { const p = hlP(r, dir); return p <= 0 ? 0 : Math.max(1.01, Math.floor(HL_EDGE / p * 100) / 100); };
+const hlCard = () => ({ r: 2 + rnd(13), s: 'SHDC'[rnd(4)] });
+const hlCode = c => '23456789TJQKA'[c.r - 2] + c.s;
+const multFmt = m => '×' + m.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+function hlStart(){
+  if (HL.run && !HL.run.over) return;
+  const err = betError(HL.stake); if (err) return toast(err);
+  const stake = HL.stake;
+  if (!withPlayer(d => { if (d.balance < stake) return false; d.balance -= stake; d.hilo = { stake, at: Date.now() }; return true; }, 'Höher oder Tiefer Einsatz')) return;
+  ls.set('hilostake', stake);
+  HL.id++; HL.run = { stake, cards: [hlCard()], mult: 1, n: 0, over: false }; HL.msg = ''; SFX.chip(); renderAll();
+}
+function hlGuess(dir){
+  const R_ = HL.run; if (!R_ || R_.over) return;
+  const cur = R_.cards[R_.cards.length - 1], f = hlFactor(cur.r, dir); if (!f) return;
+  const next = hlCard(); R_.cards.push(next);
+  if (next.r === cur.r){ HL.msg = 'Gleich! Kein Verlust, rate nochmal.'; renderAll(); return; }
+  if ((dir === 'hi') === (next.r > cur.r)){
+    R_.mult = Math.round(R_.mult * f * 100) / 100; R_.n++; HL.msg = '';
+    if (R_.mult >= HL_MAX || R_.n >= 25){ renderAll(); setTimeout(hlCash, 700); return; }
+    setTimeout(() => SFX.push(), 450);
+  } else {
+    R_.over = true; R_.lost = true; HL.msg = `Leider ${dir === 'hi' ? 'tiefer' : 'höher'}. ${fmt(R_.stake)} ℒ verloren.`;
+    withPlayer(d => { record(d, 'hilo', R_.stake, 0); d.hilo = null; return true; }, 'Höher oder Tiefer');
+    setTimeout(() => SFX.lose(), 450);
+  }
+  renderAll();
+}
+function hlCash(){
+  const R_ = HL.run; if (!R_ || R_.over || R_.n < 1) return;
+  R_.over = true; const pay = Math.floor(R_.stake * R_.mult);
+  withPlayer(d => { d.balance += pay; record(d, 'hilo', R_.stake, pay); d.hilo = null; if (R_.n >= 10) grant(d, 'hilo10'); return true; }, 'Höher oder Tiefer');
+  HL.msg = `Ausgezahlt: ${fmt(pay)} ℒ (${multFmt(R_.mult)})`; SFX.win(); renderAll();
+}
+/** a game left in the middle (page closed) is lost */
+function checkAbortedHilo(){ if (P?.hilo && !(HL.run && !HL.run.over)) withPlayer(d => { record(d, 'hilo', d.hilo.stake, 0); d.hilo = null; return true; }, 'Höher oder Tiefer'); }
+function renderHilo(){
+  const el = $('g-hilo'), R_ = HL.run;
+  const cards = R_ ? R_.cards : [];
+  const cur = cards[cards.length - 1];
+  const hist = cards.slice(0, -1).slice(-8).map((c, i, a) => cardHTML(hlCode(c), `hl-${HL.id}-${cards.length - 1 - a.length + i}`, false)).join('');
+  const playing = R_ && !R_.over;
+  const hiF = cur ? hlFactor(cur.r, 'hi') : 0, loF = cur ? hlFactor(cur.r, 'lo') : 0;
+  const pct = (r, d) => Math.round(hlP(r, d) * 100);
+  const html = `${backBar('Höher oder Tiefer', '<span class="muted small">Gleich zählt nicht · Ass ist hoch</span>')}
+  <div class="felt hlfelt" style="${feltStyle(uid)}">
+    <div class="hlhist cards">${hist || '<span class="muted small">Bisher gezogen</span>'}</div>
+    <div class="hlmain">
+      <div class="hlcard">${cur ? cardHTML(hlCode(cur), `hl-${HL.id}-${cards.length - 1}`, false) : `<div class="c down"><div class="ci"><div class="cf"></div><div class="cb"></div></div></div>`}</div>
+      <div class="hlinfo">
+        <small>Multiplikator</small><b class="num hlmult">${multFmt(R_ ? R_.mult : 1)}</b>
+        <small>${R_ ? `${R_.n} richtig in Folge` : 'Rate, ob die nächste Karte höher oder tiefer ist'}</small>
+        ${R_ ? `<small>Einsatz ${fmt(R_.stake)} ℒ${playing && R_.n ? ` · jetzt <b style="color:var(--win)">${fmt(Math.floor(R_.stake * R_.mult))} ℒ</b>` : ''}</small>` : ''}
+      </div>
+    </div>
+    <div class="status">${esc(HL.msg)}</div>
+    <div class="controls">
+      ${playing ? `<div class="acts hlacts">
+          <button class="btn gold" data-act="hlhi" ${hiF ? '' : 'disabled'}>▲ Höher <span class="num">${hiF ? multFmt(hiF) : '–'}</span><small>${cur ? pct(cur.r,'hi') : 0} %</small></button>
+          <button class="btn gold" data-act="hllo" ${loF ? '' : 'disabled'}>▼ Tiefer <span class="num">${loF ? multFmt(loF) : '–'}</span><small>${cur ? pct(cur.r,'lo') : 0} %</small></button></div>
+        <button class="btn" data-act="hlcash" ${R_.n ? '' : 'disabled'}>Auszahlen${R_.n ? ` · ${fmt(Math.floor(R_.stake * R_.mult))} ℒ` : ''}</button>`
+      : `${chipPicker(HL.stake, 'hlstake')}<button class="btn gold spinbtn" data-act="hlstart">${R_ ? 'Neue Runde' : 'Spielen'} · ${fmt(HL.stake)} ℒ</button>
+         <p class="muted small" style="max-width:52ch">Jede richtige Antwort erhöht den Multiplikator. Du kannst jederzeit auszahlen, eine falsche Antwort kostet den Einsatz. Bei ${multFmt(HL_MAX)} wird automatisch ausgezahlt.</p>`}
+    </div>
+  </div>`;
+  if (el.innerHTML !== html){ el.innerHTML = html; animateCards(el); }
+}
+
+/* ---------- Chat: friends and groups ---------- */
+const CH = { list: {}, open: null, msgs: [], unsubM: null, shell: null, newMode: null, pick: new Set(), loaded: false };
+const chatRead = () => ls.get('chatRead', {});
+const dmId = (a, b) => 'dm_' + [a, b].sort().join('_');
+function chatName(c){ if (c.group) return c.name || 'Gruppe'; const o = (c.members || []).find(m => m !== uid); return nameOf(o); }
+function chatAv(c){ if (c.group) return '👥'; const o = (c.members || []).find(m => m !== uid); return avOf(o); }
+const unreadChats = () => Object.entries(CH.list).filter(([id, c]) => c.last && c.last.u !== uid && c.last.t > (chatRead()[id] || 0));
+function markRead(id){ const r = chatRead(); r[id] = Date.now(); ls.set('chatRead', r); }
+let unsubChats = null;
+function startChats(){
+  let first = true;
+  unsubChats = onSnapshot(query(collection(fs, 'chats'), where('members', 'array-contains', uid)), s => {
+    const prev = CH.list, next = {}; s.docs.forEach(d => next[d.id] = d.data()); CH.list = next; CH.loaded = true;
+    if (!first) for (const [id, c] of Object.entries(next)){
+      const old = prev[id];
+      if (c.last && c.last.u !== uid && (!old?.last || old.last.t !== c.last.t) && !(tab === 'chat' && CH.open === id)){
+        SFX.pop(); toast(`💬 ${chatName(c)}: ${c.group ? nameOf(c.last.u) + ': ' : ''}${c.last.k === 'e' ? avText(c.last.x) : c.last.x}`);
+      }
+      if (tab === 'chat' && CH.open === id) markRead(id);
+    }
+    first = false; renderAll();
+  }, e => console.warn(e));
+}
+function openChat(id){
+  CH.unsubM && CH.unsubM(); CH.open = id; CH.msgs = []; CH.newMode = null; markRead(id);
+  CH.unsubM = onSnapshot(query(collection(fs, 'chats', id, 'msgs'), orderBy('t', 'desc'), limit(80)), s => {
+    CH.msgs = s.docs.map(d => d.data()).reverse(); markRead(id); renderChatMsgs();
+  }, e => console.warn(e));
+  renderAll();
+}
+function closeChat(){ CH.unsubM && CH.unsubM(); CH.unsubM = null; CH.open = null; renderAll(); }
+let lastChatMsg = 0;
+function chatSend(x, k){
+  const id = CH.open; if (!id || !x) return;
+  if (Date.now() - lastChatMsg < 500) return; lastChatMsg = Date.now();
+  x = x.slice(0, 500); const t = Date.now();
+  addDoc(collection(fs, 'chats', id, 'msgs'), { u: uid, x, k, t }).catch(handleWriteErr);
+  updateDoc(doc(fs, 'chats', id), { last: { u: uid, x: x.slice(0, 80), k, t } }).catch(() => {});
+}
+function chatNewDM(friend){
+  const id = dmId(uid, friend);
+  setDoc(doc(fs, 'chats', id), { members: [uid, friend].sort(), group: false, by: uid, created: Date.now() }, { merge: true }).catch(handleWriteErr);
+  openChat(id);
+}
+function chatNewGroup(name){
+  name = (name || '').trim().slice(0, 40); const members = [uid, ...CH.pick];
+  if (!name) return toast('Gib der Gruppe einen Namen.');
+  if (members.length < 2) return toast('Wähl mindestens einen Freund aus.');
+  const ref = doc(collection(fs, 'chats'));
+  setDoc(ref, { name, members, group: true, by: uid, created: Date.now(), last: { u: uid, x: `${P.name} hat die Gruppe erstellt`, k: 's', t: Date.now() } }).catch(handleWriteErr);
+  CH.pick = new Set(); openChat(ref.id);
+}
+function chatLeave(){
+  const c = CH.list[CH.open]; if (!c?.group) return;
+  updateDoc(doc(fs, 'chats', CH.open), { members: c.members.filter(m => m !== uid), last: { u: uid, x: `${P.name} hat die Gruppe verlassen`, k: 's', t: Date.now() } }).catch(handleWriteErr);
+  closeChat();
+}
+function chatAdd(friend){
+  const c = CH.list[CH.open]; if (!c?.group || c.members.includes(friend)) return;
+  updateDoc(doc(fs, 'chats', CH.open), { members: [...c.members, friend], last: { u: uid, x: `${P.name} hat ${nameOf(friend)} hinzugefügt`, k: 's', t: Date.now() } }).catch(handleWriteErr);
+}
+const timeShort = t => { const d = new Date(t), now = new Date(); return d.toDateString() === now.toDateString() ? d.toLocaleTimeString('de-DE', { hour:'2-digit', minute:'2-digit' }) : d.toLocaleDateString('de-DE', { day:'2-digit', month:'2-digit' }); };
+function renderChatTab(){
+  const el = $('view-chat'); if (!P) return;
+  const key = CH.open ? 'c:' + CH.open : 'list';
+  if (CH.shell !== key || !el.innerHTML){
+    CH.shell = key;
+    el.innerHTML = `<div class="chatapp${CH.open ? ' opened' : ''}"><aside class="chatside panel" id="chside"></aside><section class="chatmain panel" id="chmain">${CH.open ? `
+      <div class="chathead" id="chhead"></div>
+      <div class="chatmsgs" id="chmsgs" aria-live="polite"></div>
+      <div class="emojis chatemo">${[...EMOJIS].map(e => `<button type="button" data-act="chemoji" data-e="${esc(e)}" aria-label="${esc(avText(e))} senden">${avH(e)}</button>`).join('')}</div>
+      <form class="chatform" id="chform" autocomplete="off"><input id="chx" maxlength="500" placeholder="Nachricht …" aria-label="Nachricht"><button class="btn gold sm" type="submit">Senden</button></form>`
+      : `<div class="chatempty"><div class="big">💬</div><p class="muted">Wähl links einen Chat oder starte einen neuen.</p></div>`}</section></div>`;
+    $('chform')?.addEventListener('submit', e => { e.preventDefault(); const i = $('chx'); const x = i.value.trim(); if (x){ chatSend(x, 't'); i.value = ''; } });
+  }
+  // side: list of chats or the "new chat" picker
+  const fr = friendIds(), list = Object.entries(CH.list).sort((a, b) => (b[1].last?.t || b[1].created || 0) - (a[1].last?.t || a[1].created || 0));
+  const read = chatRead();
+  let side = `<div class="row" style="justify-content:space-between"><h2>Chat</h2><div class="row" style="gap:6px"><button class="btn sm" data-act="chnew" data-v="dm">+ Chat</button><button class="btn sm" data-act="chnew" data-v="group">+ Gruppe</button></div></div>`;
+  if (CH.newMode === 'dm'){
+    side += `<div class="stack" style="gap:6px"><h3>Chat mit …</h3>${fr.length ? fr.map(f => `<button class="chitem" data-act="chdm" data-id="${esc(f)}"><span class="chav">${avH(avOf(f))}</span><span class="chtx"><b>${esc(nameOf(f))}</b><span class="muted small">${isOnline(f) ? 'online' : 'offline'}</span></span></button>`).join('') : '<p class="muted small">Füge zuerst Freunde hinzu (Tab „Spieler“).</p>'}
+      <button class="btn sm" data-act="chnew" data-v="">Abbrechen</button></div>`;
+  } else if (CH.newMode === 'group'){
+    side += `<div class="stack" style="gap:8px"><h3>Neue Gruppe</h3><div class="field"><label for="chgname">Name</label><input id="chgname" maxlength="40" placeholder="z. B. Freitagsrunde"></div>
+      <div class="stack" style="gap:4px">${fr.map(f => `<button class="chitem${CH.pick.has(f) ? ' on' : ''}" data-act="chpick" data-id="${esc(f)}"><span class="chav">${avH(avOf(f))}</span><span class="chtx"><b>${esc(nameOf(f))}</b></span><span class="chk">${CH.pick.has(f) ? '✓' : ''}</span></button>`).join('') || '<p class="muted small">Füge zuerst Freunde hinzu.</p>'}</div>
+      <div class="row"><button class="btn sm" data-act="chnew" data-v="">Abbrechen</button><button class="btn gold sm" data-act="chgroup">Gruppe erstellen</button></div></div>`;
+  } else {
+    side += list.length ? `<div class="stack" style="gap:2px">${list.map(([id, c]) => {
+      const un = c.last && c.last.u !== uid && c.last.t > (read[id] || 0);
+      const prev = c.last ? (c.last.k === 'e' ? avText(c.last.x) : c.last.x) : 'Noch keine Nachrichten';
+      const who = c.last && c.group && c.last.k !== 's' ? (c.last.u === uid ? 'Du: ' : nameOf(c.last.u) + ': ') : (c.last?.u === uid && c.last.k !== 's' ? 'Du: ' : '');
+      return `<button class="chitem${CH.open === id ? ' on' : ''}${un ? ' unread' : ''}" data-act="chopen" data-id="${esc(id)}"><span class="chav">${avH(chatAv(c))}</span><span class="chtx"><b>${esc(chatName(c))}</b><span class="muted small">${esc(who + prev)}</span></span><span class="chmeta">${c.last ? `<small>${timeShort(c.last.t)}</small>` : ''}${un ? '<i class="udot"></i>' : ''}</span></button>`; }).join('')}</div>`
+      : `<p class="muted">Noch keine Chats. Starte einen mit einem Freund oder mach eine Gruppe auf.</p>`;
+  }
+  const sideEl = $('chside');
+  if (sideEl && !(document.activeElement?.id === 'chgname')){ const keep = $('chgname')?.value; if (sideEl.innerHTML !== side){ sideEl.innerHTML = side; if (keep && $('chgname')) $('chgname').value = keep; } }
+  if (CH.open){
+    const c = CH.list[CH.open] || { members: [uid], group: false };
+    const add = c.group ? fr.filter(f => !c.members.includes(f)) : [];
+    const head = `<button class="btn sm chback" data-act="chclose">←</button><span class="chav">${avH(chatAv(c))}</span><div class="chtx"><b>${esc(chatName(c))}</b><span class="muted small">${c.group ? c.members.map(m => m === uid ? 'du' : nameOf(m)).join(', ') : (isOnline(c.members.find(m => m !== uid)) ? 'online' : 'offline')}</span></div>
+      ${c.group ? `<details class="chmore"><summary class="btn sm">⋯</summary><div class="chmenu">${add.map(f => `<button class="btn sm" data-act="chadd" data-id="${esc(f)}">+ ${esc(nameOf(f))}</button>`).join('')}<button class="btn sm" data-act="chleave">Gruppe verlassen</button></div></details>` : ''}`;
+    const h = $('chhead'); if (h && h.innerHTML !== head && !h.querySelector('details[open]')) h.innerHTML = head;
+    renderChatMsgs();
+  }
+}
+function renderChatMsgs(){
+  const box = $('chmsgs'); if (!box) return;
+  const c = CH.list[CH.open] || {};
+  const atBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 40;
+  const html = CH.msgs.length ? CH.msgs.map((m, i) => {
+    if (m.k === 's') return `<div class="msys">${esc(m.x)}</div>`;
+    const mine = m.u === uid, prev = CH.msgs[i-1], showName = c.group && !mine && (!prev || prev.u !== m.u);
+    return `<div class="mrow${mine ? ' mine' : ''}"><div class="bub${m.k === 'e' ? ' emo' : ''}">${showName ? `<span class="who">${avH(avOf(m.u))} ${esc(nameOf(m.u))}</span>` : ''}${m.k === 'e' ? avH(m.x) : esc(m.x)}<time>${timeShort(m.t)}</time></div></div>`;
+  }).join('') : '<p class="muted small" style="text-align:center">Schreib die erste Nachricht.</p>';
+  if (box.innerHTML !== html){ box.innerHTML = html; if (atBottom || box.dataset.first !== CH.open){ box.scrollTop = box.scrollHeight; box.dataset.first = CH.open; } }
+}
+
+/* ---------- Coin Flip between friends ---------- */
+const FL = { a: {}, b: {}, pick: 'K', busy: false, seen: new Set(ls.get('flipSeen', [])) };
+const flipAll = () => ({ ...FL.a, ...FL.b });
+const randHex = () => { const a = new Uint8Array(16); crypto.getRandomValues(a); return [...a].map(x => x.toString(16).padStart(2, '0')).join(''); };
+const flipResult = (sa, sb) => parseInt(sha256(sa + ':' + sb).slice(0, 8), 16) % 2 ? 'K' : 'Z';
+const sideName = k => k === 'K' ? 'Kopf' : 'Zahl';
+let unsubFA = null, unsubFB = null;
+function startFlips(){
+  const take = (key) => s => { const o = {}; s.docs.forEach(d => o[d.id] = d.data()); const before = FL[key]; FL[key] = o; flipsChanged(before); renderAll(); };
+  unsubFA = onSnapshot(query(collection(fs, 'flips'), where('a', '==', uid)), take('a'), e => console.warn(e));
+  unsubFB = onSnapshot(query(collection(fs, 'flips'), where('b', '==', uid)), take('b'), e => console.warn(e));
+}
+let flipsFirst = true;
+function flipsChanged(before){
+  const all = flipAll();
+  for (const [id, f] of Object.entries(all)){
+    // a new challenge for me
+    if (!flipsFirst && f.b === uid && f.st === 'open' && !before[id]) { SFX.pop(); toast(`🪙 ${nameOf(f.a)} fordert dich zum Coin Flip heraus${f.stake ? ` (${fmt(f.stake)} ℒ)` : ''}`); }
+    // I challenged, the other accepted: throw the coin with my secret
+    if (f.a === uid && f.st === 'accepted' && !f.secretA) revealFlip(id, f);
+    // my stake comes back when declined or withdrawn
+    if (f.a === uid && (f.st === 'declined' || f.st === 'cancelled') && f.stake > 0 && !f.refA)
+      if (withPlayer(d => { const k = id + ':ref'; if (d.fdone?.includes(k)) return false; d.fdone = [...(d.fdone || []), k].slice(-200); d.balance += f.stake; return true; }, 'Coin Flip zurück'))
+        updateDoc(doc(fs, 'flips', id), { refA: true }).catch(() => {});
+    // the challenger never threw the coin: after 24 h the pot goes to the other player
+    if (f.b === uid && f.st === 'accepted' && !f.secretA && f.acceptedAt && Date.now() - (f.acceptedAt.toMillis ? f.acceptedAt.toMillis() : f.acceptedAt) > 864e5 + 60e3)
+      updateDoc(doc(fs, 'flips', id), { st: 'done', winner: uid, forfeit: true, doneAt: Date.now() }).catch(() => {});
+    // finished: book it once, show the coin once
+    if (f.st === 'done' && (f.a === uid || f.b === uid)){
+      const won = f.winner === uid;
+      if (f.stake > 0) withPlayer(d => { const k = id + ':book'; if (d.fdone?.includes(k)) return false; d.fdone = [...(d.fdone || []), k].slice(-200);
+        if (won){ d.balance += f.stake * 2; grant(d, 'flip'); } record(d, 'coinflip', f.stake, won ? f.stake * 2 : 0); return true; }, 'Coin Flip');
+      else if (won) withPlayer(d => { if (d.ach.flip) return false; grant(d, 'flip'); return true; });
+      if (!FL.seen.has(id) && !flipsFirst){ FL.seen.add(id); ls.set('flipSeen', [...FL.seen].slice(-100)); showFlip(id); }
+      else if (flipsFirst){ FL.seen.add(id); }
+    }
+  }
+  if (flipsFirst){ ls.set('flipSeen', [...FL.seen].slice(-100)); flipsFirst = false; }
+}
+async function revealFlip(id, f){
+  if (FL.busy) return; FL.busy = true;
+  try {
+    const s = await getDoc(doc(fs, 'flipsecrets', id)); if (!s.exists()) return;
+    const sa = s.data().s, res = flipResult(sa, f.secretB);
+    await updateDoc(doc(fs, 'flips', id), { secretA: sa, res, winner: res === f.pickA ? f.a : f.b, st: 'done', doneAt: Date.now() });
+  } catch (e){ console.warn(e); } finally { FL.busy = false; }
+}
+async function flipChallenge(){
+  const b = $('flfriend')?.value, stake = Math.max(0, Math.floor(+($('flstake')?.value || 0)));
+  if (!b) return toast('Wähl einen Freund aus.');
+  if (stake > 0){ if (stake < 50) return toast('Einsatz: 0 (ohne Einsatz) oder ab 50 Legats.'); if (stake > MAX_BET) return toast('Höchstens 50.000 Legats.'); if (stake > P.balance) return toast('So viele Legats hast du nicht.'); }
+  if (Object.values(FL.a).filter(f => f.st === 'open').length >= 5) return toast('Höchstens 5 offene Herausforderungen.');
+  const ref = doc(collection(fs, 'flips')), secret = randHex();
+  if (stake > 0 && !withPlayer(d => { if (d.balance < stake) return false; d.balance -= stake; return true; }, 'Coin Flip Einsatz')) return;
+  try {
+    await setDoc(doc(fs, 'flipsecrets', ref.id), { a: uid, s: secret });
+    await setDoc(ref, { a: uid, b, stake, pickA: FL.pick, hashA: sha256(secret), st: 'open', t: Date.now() });
+    if ($('flstake')) $('flstake').value = '';
+    toast(`Herausforderung an ${nameOf(b)} geschickt`);
+  } catch (e){ handleWriteErr(e); }
+}
+async function flipAnswer(id, yes){
+  const ref = doc(fs, 'flips', id);
+  try {
+    const ok = await runTransaction(fs, async tx => {
+      const s = await tx.get(ref); const f = s.data(); if (!f || f.st !== 'open' || f.b !== uid) return false;
+      if (yes && f.stake > P.balance) throw { code: 'nomoney' };
+      tx.update(ref, yes ? { st: 'accepted', secretB: randHex(), acceptedAt: serverTimestamp() } : { st: 'declined' });
+      return f;
+    });
+    if (ok && yes && ok.stake > 0) withPlayer(d => { d.balance -= ok.stake; return true; }, 'Coin Flip Einsatz');
+    if (ok && yes) toast('Angenommen, die Münze fliegt …');
+  } catch (e){ if (e?.code === 'nomoney') toast('So viele Legats hast du nicht.'); else handleWriteErr(e); }
+}
+async function flipCancel(id){
+  const ref = doc(fs, 'flips', id);
+  try { await runTransaction(fs, async tx => { const s = await tx.get(ref); const f = s.data(); if (!f || f.st !== 'open' || f.a !== uid) return; tx.update(ref, { st: 'cancelled' }); }); }
+  catch (e){ handleWriteErr(e); }
+}
+function showFlip(id){ FL.show = id; openModal('flip'); }
+function flipModalHTML(){
+  const f = flipAll()[FL.show]; if (!f) return '<p class="muted">Nicht gefunden.</p>';
+  const other = f.a === uid ? f.b : f.a, won = f.winner === uid, myPick = f.a === uid ? f.pickA : (f.pickA === 'K' ? 'Z' : 'K');
+  const fair = f.forfeit || (f.secretA && sha256(f.secretA) === f.hashA && flipResult(f.secretA, f.secretB) === f.res);
+  return `<div class="stack" style="align-items:center;text-align:center">
+    <div class="row" style="justify-content:space-between;width:100%"><h2>Coin Flip</h2><button class="btn sm" data-act="closemodal">Schließen</button></div>
+    <p class="muted">Gegen ${avH(avOf(other))} <b>${esc(nameOf(other))}</b> · du hattest <b>${sideName(myPick)}</b>${f.stake ? ` · Einsatz ${fmt(f.stake)} ℒ` : ' · ohne Einsatz'}</p>
+    <div class="coinstage"><div class="coin" id="coin" style="transform:rotateY(${f.res === 'Z' ? 180 : 0}deg)"><div class="cface ck">👑<small>Kopf</small></div><div class="cface cz">ℒ<small>Zahl</small></div></div></div>
+    <p class="net" id="flipres" style="visibility:hidden;color:${won ? 'var(--win)' : 'var(--lose)'}">${f.forfeit ? (won ? 'Gewonnen: Die Münze wurde nicht geworfen' : 'Verloren: nicht rechtzeitig geworfen') : `${sideName(f.res)}! ${won ? 'Gewonnen' : 'Verloren'}${f.stake ? ` ${won ? '+' : '−'}${fmt(f.stake)} ℒ` : ''}`}</p>
+    <p class="muted small">${fair ? '✓ Fair: Das Ergebnis entsteht aus zwei Geheimzahlen, eine von jedem von euch.' : '✗ Dieser Wurf lässt sich nicht nachprüfen.'}</p>
+  </div>`;
+}
+function animateFlip(){
+  const f = flipAll()[FL.show], coin = $('coin'), res = $('flipres'); if (!f || !coin) return;
+  const end = f.res === 'Z' ? 180 : 0;
+  if (reduceMotion || f.forfeit){ res.style.visibility = 'visible'; return; }
+  coin.animate([{ transform: 'translateY(0) rotateY(0deg)' }, { transform: 'translateY(-90px) rotateY(1080deg)', offset: .5 }, { transform: `translateY(0) rotateY(${1800 + end}deg)` }], { duration: 1700, easing: 'cubic-bezier(.3,.6,.3,1)' });
+  for (let k = 0; k < 10; k++) setTimeout(() => tone(1800 + rnd(400), .03, { type: 'triangle', vol: .04 }), k * 120);
+  setTimeout(() => { res.style.visibility = 'visible'; f.winner === uid ? SFX.win() : SFX.lose(); }, 1750);
+}
+function flipPanelHTML(){
+  const all = Object.entries(flipAll()).sort((x, y) => (y[1].t || 0) - (x[1].t || 0));
+  const fr = friendIds();
+  const incoming = all.filter(([, f]) => f.b === uid && f.st === 'open');
+  const outgoing = all.filter(([, f]) => f.a === uid && f.st === 'open');
+  const waiting = all.filter(([, f]) => f.st === 'accepted');
+  const done = all.filter(([, f]) => f.st === 'done').slice(0, 5);
+  const stakeTxt = f => f.stake ? `${fmt(f.stake)} ℒ` : 'ohne Einsatz';
+  return `<div class="panel stack flippanel"><h3>🪙 Coin Flip unter Freunden</h3>
+    ${incoming.map(([id, f]) => `<div class="lobby-item"><span>${avH(avOf(f.a))} <b>${esc(nameOf(f.a))}</b> fordert dich heraus · ${stakeTxt(f)} · du hättest <b>${sideName(f.pickA === 'K' ? 'Z' : 'K')}</b></span><span class="row" style="gap:6px"><button class="btn sm gold" data-act="flyes" data-id="${esc(id)}" ${f.stake > P.balance ? 'disabled' : ''}>Annehmen</button><button class="btn sm" data-act="flno" data-id="${esc(id)}">Ablehnen</button></span></div>`).join('')}
+    ${fr.length ? `<div class="row flform">
+      <div class="field" style="flex:1 1 140px"><label for="flfriend">Gegen</label><select id="flfriend">${fr.map(f => `<option value="${esc(f)}">${esc(avText(avOf(f)))} ${esc(nameOf(f))}</option>`).join('')}</select></div>
+      <div class="field" style="flex:0 1 120px"><label for="flstake">Einsatz (ℒ)</label><input id="flstake" type="number" min="0" step="50" inputmode="numeric" placeholder="0 = ohne"></div>
+      <div class="seg" style="align-self:flex-end"><button data-act="flpick" data-v="K" aria-pressed="${FL.pick === 'K'}">Kopf</button><button data-act="flpick" data-v="Z" aria-pressed="${FL.pick === 'Z'}">Zahl</button></div>
+      <button class="btn gold sm" data-act="flgo" style="align-self:flex-end">Herausfordern</button></div>` : '<p class="muted small">Füge zuerst Freunde hinzu, dann könnt ihr euch herausfordern.</p>'}
+    ${outgoing.map(([id, f]) => `<div class="lobby-item"><span class="muted">Wartet auf ${esc(nameOf(f.b))} · ${stakeTxt(f)} · du hast ${sideName(f.pickA)}</span><button class="btn sm" data-act="flcancel" data-id="${esc(id)}">Zurückziehen</button></div>`).join('')}
+    ${waiting.map(([id, f]) => `<div class="lobby-item"><span class="muted">Gegen ${esc(nameOf(f.a === uid ? f.b : f.a))} · die Münze wird geworfen, sobald ${f.a === uid ? 'du' : esc(nameOf(f.a))} online ${f.a === uid ? 'bist' : 'ist'} …</span></div>`).join('')}
+    ${done.length ? `<div class="hist">${done.map(([id, f]) => { const o = f.a === uid ? f.b : f.a, w = f.winner === uid; return `<div class="h"><span>gegen ${esc(nameOf(o))}${f.res ? ` · ${sideName(f.res)}` : ''}</span><button class="linkbtn" data-act="flshow" data-id="${esc(id)}">ansehen</button><b class="num" style="color:${w ? 'var(--win)' : 'var(--lose)'}">${w ? 'gewonnen' : 'verloren'}${f.stake ? ` ${w ? '+' : '−'}${fmt(f.stake)}` : ''}</b></div>`; }).join('')}</div>` : ''}
+    <p class="muted small">Das Ergebnis entsteht aus zwei Geheimzahlen, eine von jedem. Keiner kann es allein bestimmen. Ohne Einsatz zählt der Wurf nicht in die Statistik.</p>
+  </div>`;
+}
+
+/* ---------- events ---------- */
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-act]'); if (!b || b.disabled) return;
+  const v = +b.dataset.v;
+  switch (b.dataset.act){
+    case 'hlstake': HL.stake = v; renderAll(); break;
+    case 'hlstart': hlStart(); break;
+    case 'hlhi': hlGuess('hi'); break;
+    case 'hllo': hlGuess('lo'); break;
+    case 'hlcash': hlCash(); break;
+    case 'chnew': CH.newMode = b.dataset.v || null; CH.pick = new Set(); if (CH.open && CH.newMode) closeChat(); renderAll(); break;
+    case 'chdm': chatNewDM(b.dataset.id); break;
+    case 'chpick': CH.pick.has(b.dataset.id) ? CH.pick.delete(b.dataset.id) : CH.pick.add(b.dataset.id); renderAll(); break;
+    case 'chgroup': chatNewGroup($('chgname')?.value); break;
+    case 'chopen': openChat(b.dataset.id); break;
+    case 'chclose': closeChat(); break;
+    case 'chemoji': chatSend(b.dataset.e, 'e'); break;
+    case 'chleave': chatLeave(); break;
+    case 'chadd': chatAdd(b.dataset.id); break;
+    case 'flpick': FL.pick = b.dataset.v; renderAll(); break;
+    case 'flgo': flipChallenge(); break;
+    case 'flyes': flipAnswer(b.dataset.id, true); break;
+    case 'flno': flipAnswer(b.dataset.id, false); break;
+    case 'flcancel': flipCancel(b.dataset.id); break;
+    case 'flshow': showFlip(b.dataset.id); break;
+  }
+});
 
 /* ---------- Casino home ---------- */
 function renderHome(){
@@ -2143,8 +2628,9 @@ function renderHome(){
       ${tile('roulette', 'Roulette', 'Europäisch, 0 bis 36', `<div class="miniwheel">${rouletteWheel().replace('id="rwheelg"','').replace('id="rball"','')}</div>`)}
       ${tile('slots', 'Automat', 'Drei Walzen, bis ×500', `<div class="minislots"><span>7️⃣</span><span>7️⃣</span><span>7️⃣</span></div>`)}
       ${tile('horses', 'Pferderennen', 'Sechs Pferde, ein Sieger', `<div class="minihorses"><span>🏇</span><span>🏇</span><span>🏇</span></div>`)}
+      ${tile('hilo', 'Höher oder Tiefer<span class="newtag">Neu</span>', 'Errate die nächste Karte, zahl aus, wann du willst', `<div class="minihl"><div class="mc">7<i>♣</i></div>▲▼<div class="mc red">?<i>♥</i></div></div>`)}
     </div>
-    ${onl.length ? `<div class="panel"><h3>Freunde online</h3><div class="row">${onl.map(id => `<button class="pill" data-act="profile" data-id="${esc(id)}">${esc(avOf(id))} ${esc(nameOf(id))}${players[id].table ? ' · am Blackjack-Tisch' : players[id].playing && players[id].playing !== 'bj' ? ' · spielt ' + (GAME_NAMES[players[id].playing] || '') : ''}</button>`).join('')}</div></div>` : ''}
+    ${onl.length ? `<div class="panel"><h3>Freunde online</h3><div class="row">${onl.map(id => `<button class="pill" data-act="profile" data-id="${esc(id)}">${avH(avOf(id))} ${esc(nameOf(id))}${players[id].table ? ' · am Blackjack-Tisch' : players[id].playing && players[id].playing !== 'bj' ? ' · spielt ' + (GAME_NAMES[players[id].playing] || '') : ''}</button>`).join('')}</div></div>` : ''}
   </div>`;
   if (el.innerHTML !== html) el.innerHTML = html;
 }
@@ -2164,7 +2650,7 @@ function openGame(g){
   window.scrollTo(0, 0); renderAll();
 }
 function renderCasino(){
-  const views = { home: game===null, tv: game==='bj', 'g-roulette': game==='roulette', 'g-slots': game==='slots', 'g-horses': game==='horses', 'g-sports': game==='sports' };
+  const views = { home: game===null, tv: game==='bj', 'g-roulette': game==='roulette', 'g-slots': game==='slots', 'g-horses': game==='horses', 'g-sports': game==='sports', 'g-hilo': game==='hilo' };
   for (const [id, show] of Object.entries(views)) $(id).hidden = !show;
   $('chat').hidden = !(game==='bj' && tid && T);
   const typing = el => { const a=document.activeElement; return a && a.tagName==='INPUT' && a.type!=='checkbox' && el.contains(a); };
@@ -2174,6 +2660,7 @@ function renderCasino(){
   else if (game==='slots') renderSlots();
   else if (game==='horses') renderHorses();
   else if (game==='sports') renderSports();
+  else if (game==='hilo') renderHilo();
 }
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-act]'); if (!b || b.disabled) return;
@@ -2221,7 +2708,7 @@ function renderTop(){
   lastBal = shown;
   b.textContent = P ? fmt(P.balance - hold)+' ℒ' : '–';
   $('ver').textContent = `Legat Casino · Version ${APP_VERSION}`;
-  $('pname').textContent = P ? `${P.avatar} ${P.name}` : 'Konto';
+  { const h = P ? `${avH(P.avatar)} ${esc(P.name)}` : 'Konto'; if ($('pname').innerHTML !== h) $('pname').innerHTML = h; }
   $('peur').textContent = P ? `Bank ${fmt(P.euro)} €` : '';
   $('mute').textContent = snd.on ? '🔊' : '🔇';
   const el = $('daily');
@@ -2240,7 +2727,7 @@ function renderLobby(){
   const tables = {};
   for (const id of fr) (tables[players[id].table] ||= []).push(id);
   const list = Object.entries(tables).map(([t, ids]) => `
-    <div class="lobby-item"><div><b>${ids.map(i=>esc(avOf(i)+' '+nameOf(i))).join(', ')}</b> <span class="muted">am Tisch</span> <span class="num">${esc(t)}</span></div>
+    <div class="lobby-item"><div><b>${ids.map(i=>avH(avOf(i))+' '+esc(nameOf(i))).join(', ')}</b> <span class="muted">am Tisch</span> <span class="num">${esc(t)}</span></div>
     <button class="btn sm gold" data-act="join" data-id="${esc(t)}">Mitspielen</button></div>`).join('');
   return `${backBar('Blackjack')}<div class="stack">
     <div class="felt" style="${feltStyle(uid)}"><div class="arc">Blackjack zahlt <em>3 zu 2</em> · Dealer steht auf allen <em>17</em></div>
@@ -2300,8 +2787,8 @@ function renderTableView(){
     else if (T.phase==='insurance' && T.hands?.[u]) sub = T.insDone?.[u] ? (T.ins?.[u] ? 'Versichert' : 'Keine Versicherung') : 'Überlegt …';
     else if (!T.hands?.[u]) sub = 'Wartet auf die nächste Runde';
     const t = turn ? `<span class="timer">noch <span data-until="${T.turn.until}"></span> s</span>` : '';
-    const bb = bubbles[u] && Date.now() - bubbles[u].at < 5000 ? `<div class="bubble${bubbles[u].k==='e'?' emo':''}">${esc(bubbles[u].x)}</div>` : '';
-    return `<div class="seat${me?' me':''}${turn?' turn':''}">${bb}<div class="nm"><span class="dot${isOnline(u)?' on':''}"></span>${esc(avOf(u))} ${esc(nameOf(u))}${me?' (du)':''}</div>
+    const bb = bubbles[u] && Date.now() - bubbles[u].at < 5000 ? `<div class="bubble${bubbles[u].k==='e'?' emo':''}">${bubbles[u].k==='e' ? avH(bubbles[u].x) : esc(bubbles[u].x)}</div>` : '';
+    return `<div class="seat${me?' me':''}${turn?' turn':''}">${bb}<div class="nm"><span class="dot${isOnline(u)?' on':''}"></span>${avH(avOf(u))} ${esc(nameOf(u))}${me?' (du)':''}</div>
       ${handsHTML(u)}<div class="sub">${sub}</div>${t}</div>`;
   }).join('');
 
@@ -2371,10 +2858,10 @@ function renderTable(){
 function renderChat(){
   const log = $('chatlog'); if (!log) return;
   const atBottom = log.scrollHeight - log.scrollTop - log.clientHeight < 30;
-  log.innerHTML = msgs.length ? msgs.map(m => `<div class="m"><b>${esc(avOf(m.u))} ${esc(nameOf(m.u))}</b>${esc(m.x)}</div>`).join('') : '<p class="muted small">Noch keine Nachrichten. Sag Hallo!</p>';
+  log.innerHTML = msgs.length ? msgs.map(m => `<div class="m"><b>${avH(avOf(m.u))} ${esc(nameOf(m.u))}</b>${m.k==='e' ? avH(m.x) : esc(m.x)}</div>`).join('') : '<p class="muted small">Noch keine Nachrichten. Sag Hallo!</p>';
   if (atBottom) log.scrollTop = log.scrollHeight;
 }
-$('emojis').innerHTML = EMOJIS.map(e => `<button type="button" data-act="emoji" data-e="${e}" aria-label="${e} senden">${e}</button>`).join('');
+$('emojis').innerHTML = EMOJIS.map(e => `<button type="button" data-act="emoji" data-e="${esc(e)}" aria-label="${esc(avText(e))} senden">${avH(e)}</button>`).join('');
 let lastMsgAt = 0;
 function sendMsg(x, k){
   if (!tid || !x) return;
@@ -2399,7 +2886,7 @@ function renderPlayers(){
       ? `<td class="r num" style="color:${w.net>=0?'var(--win)':'var(--lose)'}"><b>${sgn(w.net)}</b></td><td class="r num">${w.hands}</td><td class="r num">${sgn(w.best)}</td>`
       : `<td class="r num"><b style="color:var(--brass)">${fmt(wealth(p))}</b></td><td class="r num">${fmt(p.balance)}</td><td class="r num">${fmt(euroOf(p))}</td><td class="r num">${s.hands||0}</td><td class="r num">${s.wins||0} / ${s.losses||0} / ${s.pushes||0}</td>`;
     return `<tr class="${id===uid?'me':''}" data-act="profile" data-id="${esc(id)}"><td class="rank">${i+1}</td>
-      <td><span class="dot${isOnline(id)?' on':''}"></span><span class="av">${esc(p.avatar||'🙂')}</span><b>${esc(p.name)}</b>${id===uid?' <span class="muted">(du)</span>':''}${p.table && isOnline(id)?` <span class="pill">am Tisch</span>`:''}</td>
+      <td><span class="dot${isOnline(id)?' on':''}"></span><span class="av">${avH(p.avatar||'🙂')}</span><b>${esc(p.name)}</b>${suspicious(p) ? ' <span class="pill warn" title="Kontostand passt nicht zum Kontobuch">⚠️</span>' : ''}${id===uid?' <span class="muted">(du)</span>':''}${p.table && isOnline(id)?` <span class="pill">am Tisch</span>`:''}</td>
       ${main}
       <td class="r num">${s.bankrupts ? `<span class="pill bad">${s.bankrupts}× pleite</span>` : '0'}</td>
       <td class="r num">${owed ? `<span class="pill bad">${fmt(owed)}</span>` : '–'}</td>
@@ -2472,7 +2959,7 @@ function renderShop(){
   };
   const html = `<div class="stack">
     <div class="panel stack"><h2>Shop</h2><p class="muted">Bezahlt wird mit Euro von deinem Bankkonto (du hast <b class="num">${fmt(P.euro)} €</b>). Filz und Kartenrücken gelten für Tische, die du eröffnest, und alle Spieler daran sehen sie. Käufe zählen nicht in deine Gewinn-Bilanz.</p></div>
-    <div class="panel stack"><h3>Avatar</h3><div class="shopgrid">${SHOP.av.map(([e,p]) => item('av', e, p, `<span class="big">${e}</span>`)).join('')}</div></div>
+    <div class="panel stack"><h3>Avatar</h3><div class="shopgrid">${SHOP.av.map(([e,p]) => item('av', e, p, `<span class="big" title="${esc(avText(e))}">${avH(e)}</span>`)).join('')}</div></div>
     <div class="panel stack"><h3>Tischfilz</h3><div class="shopgrid">${SHOP.felt.map(([id,l,p,a,b]) => item('felt', id, p, `<span class="sw" style="background:radial-gradient(circle at 50% 20%,${a},${b})"></span>`, l)).join('')}</div></div>
     <div class="panel stack"><h3>Kartenrücken</h3><div class="shopgrid">${SHOP.back.map(([id,l,p,a,b]) => item('back', id, p, `<span class="bk" style="background:repeating-linear-gradient(45deg,${a} 0 6px,${b} 6px 12px)"></span>`, l)).join('')}</div></div>
   </div>`;
@@ -2485,16 +2972,17 @@ function renderAccount(){
   const L = P.limits||{}, lim = limitState(), D = debts();
   const iOwe = Object.entries(D[uid]||{}), owedToMe = Object.entries(D).flatMap(([a,m]) => m[uid] ? [[a, m[uid]]] : []);
   const hist = P.hist.slice(-10).reverse().map(h => `<div class="h"><span class="muted num">${new Date(h.t).toLocaleString('de-DE',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</span><span>${h.g ? GAME_NAMES[h.g] : 'Blackjack'} · <span class="num">Einsatz ${fmt(h.w)}</span></span><b class="num" style="color:${h.n>0?'var(--win)':h.n<0?'var(--lose)':'var(--push)'}">${sgn(h.n)}</b></div>`).join('');
+  const keepFl = { f: $('flfriend')?.value, s: $('flstake')?.value };   // coin flip inputs survive a re-render
   el.innerHTML = `<div class="stack">
     ${isBroke() ? reviveBox() : needBank() ? bankBox() : ''}
-    <div class="panel stack"><div class="row" style="justify-content:space-between"><h2>${esc(P.avatar)} ${esc(P.name)}</h2><button class="btn sm" data-act="logout">Abmelden</button></div>
+    <div class="panel stack"><div class="row" style="justify-content:space-between"><h2>${avH(P.avatar)} ${esc(P.name)}</h2><button class="btn sm" data-act="logout">Abmelden</button></div>
       <p class="muted small">Angemeldet als ${esc(authUser?.email||'')} · Version ${APP_VERSION}</p><div id="acc-stats"></div></div>
     <div class="panel stack"><h3>Verlauf</h3>${chartHTML(P.hist)}${hist ? `<div class="hist">${hist}</div>` : ''}</div>
     ${Object.keys(P.games||{}).length ? `<div class="panel stack"><h3>Andere Spiele</h3><div class="statgrid">${Object.entries(P.games).map(([k,g]) => `<div class="stat"><small>${GAME_NAMES[k]||k}</small><b style="color:${g.net>=0?'var(--win)':'var(--lose)'}">${sgn(g.net)}</b><span class="muted small"> · ${g.n}×</span></div>`).join('')}</div></div>` : ''}
     <div class="panel stack"><h3>Erfolge · ${Object.keys(P.ach).length} von ${ACH.length}</h3>${badgesHTML(P.ach, true)}</div>
     ${iOwe.length || owedToMe.length ? `<div class="panel stack"><h3>Schulden</h3>
-      ${iOwe.map(([c,v]) => `<div class="lobby-item"><span>Du schuldest <b>${esc(avOf(c)+' '+nameOf(c))}</b> <b class="num">${fmt(v)} ℒ</b></span><button class="btn sm gold" data-act="repay" data-id="${esc(c)}" data-v="${v}" ${P.balance<100?'disabled':''}>Zurückzahlen</button></div>`).join('')}
-      ${owedToMe.map(([a,v]) => `<div class="lobby-item"><span><b>${esc(avOf(a)+' '+nameOf(a))}</b> schuldet dir <b class="num">${fmt(v)} ℒ</b></span></div>`).join('')}
+      ${iOwe.map(([c,v]) => `<div class="lobby-item"><span>Du schuldest <b>${avH(avOf(c))+' '+esc(nameOf(c))}</b> <b class="num">${fmt(v)} ℒ</b></span><button class="btn sm gold" data-act="repay" data-id="${esc(c)}" data-v="${v}" ${P.balance<100?'disabled':''}>Zurückzahlen</button></div>`).join('')}
+      ${owedToMe.map(([a,v]) => `<div class="lobby-item"><span><b>${avH(avOf(a))+' '+esc(nameOf(a))}</b> schuldet dir <b class="num">${fmt(v)} ℒ</b></span></div>`).join('')}
     </div>` : ''}
     <div class="grid2">
       <div class="panel stack"><h3>Spielername</h3>
@@ -2508,7 +2996,11 @@ function renderAccount(){
         ${lim ? `<p class="${lim.hit?'note':''}">Session: <b class="num" style="color:${lim.profit>=0?'var(--win)':'var(--lose)'}">${sgn(lim.profit)} ℒ</b>${lim.hit? ' · '+(lim.hit==='win'?'Gewinnziel erreicht':'Stop-Loss erreicht'):''}</p>`:''}
       </div>
     </div>
+    <details class="panel"><summary><b>Kontobuch</b> <span class="muted small">· jede Änderung an Legats und Euro, für Freunde einsehbar</span></summary><div style="margin-top:10px">${logHTML(P, 30)}</div></details>
+    ${flipPanelHTML()}
   </div>`;
+  if (keepFl.f && $('flfriend') && [...$('flfriend').options].some(o => o.value === keepFl.f)) $('flfriend').value = keepFl.f;
+  if (keepFl.s && $('flstake')) $('flstake').value = keepFl.s;
   renderAccountStats();
 }
 function statsHTML(p){
@@ -2531,7 +3023,7 @@ function statsHTML(p){
 function renderAccountStats(){ const box = $('acc-stats'); if (box && P) box.innerHTML = statsHTML(P); }
 
 /* ---------- modal: player profile & fairness ---------- */
-function openModal(kind, id){ modalKind = kind; modalId = id; $('modal').hidden = false; renderModal(true); }
+function openModal(kind, id){ modalKind = kind; modalId = id; $('modal').hidden = false; renderModal(true); if (kind === 'flip') requestAnimationFrame(animateFlip); }
 function closeModal(){
   if (modalKind === 'dish'){ if (DISH.phase === 'run') return; if (DISH.phase === 'done' && !DISH.collected){ dishCollect(); return; } }
   modalKind = null; modalId = null; $('modal').hidden = true; }
@@ -2544,7 +3036,8 @@ function renderModal(force){
   if (!force && card.contains(document.activeElement) && document.activeElement.tagName==='INPUT') return;
   if (modalKind==='wheel' && wheelBusy) return;
   if (modalKind==='dish' && DISH.phase==='run') return;
-  const html = modalKind==='profile' ? profileHTML(modalId) : modalKind==='wheel' ? wheelHTML() : modalKind==='news' ? newsHTML() : modalKind==='dish' ? dishHTML() : fairHTML();
+  if (modalKind==='flip' && !force) return;
+  const html = modalKind==='profile' ? profileHTML(modalId) : modalKind==='wheel' ? wheelHTML() : modalKind==='news' ? newsHTML() : modalKind==='dish' ? dishHTML() : modalKind==='flip' ? flipModalHTML() : fairHTML();
   if (!force && html === lastModalHTML) return;
   lastModalHTML = html;
   const keep = $('gamt')?.value;
@@ -2562,13 +3055,15 @@ function profileHTML(id){
   const me = id===uid, friend = isFriend(id), wk = weekId(), w = p.week?.id===wk ? p.week : { net:0, hands:0 };
   const D = debts(), theyOweMe = D[id]?.[uid] || 0, iOwe = D[uid]?.[id] || 0;
   return `<div class="stack">
-    <div class="row" style="justify-content:space-between"><div class="prof-head"><div class="prof-av">${esc(p.avatar||'🙂')}</div><div><h2>${esc(p.name)}</h2>
+    <div class="row" style="justify-content:space-between"><div class="prof-head"><div class="prof-av">${avH(p.avatar||'🙂')}</div><div><h2>${esc(p.name)}</h2>
       <p class="muted small"><span class="dot${isOnline(id)?' on':''}"></span>${isOnline(id)?'Online':'Offline'}${me?' · das bist du':friend?' · Freund':''}</p></div></div>
       <button class="btn sm" data-act="closemodal">Schließen</button></div>
     ${statsHTML(p)}
     <p class="muted">Diese Woche: <b class="num" style="color:${w.net>=0?'var(--win)':'var(--lose)'}">${sgn(w.net)} ℒ</b> in ${w.hands} Händen</p>
     ${chartHTML(p.hist)}
+    ${suspicious(p) ? '<div class="note bad"><b>⚠️ Kontostand passt nicht zum Kontobuch.</b> Das Guthaben wurde vermutlich am Spiel vorbei geändert.</div>' : ''}
     <h3>Erfolge · ${Object.keys(p.ach||{}).length} von ${ACH.length}</h3>${badgesHTML(p.ach, false)}
+    <details class="panel"><summary><b>Kontobuch</b> <span class="muted small">· letzte Änderungen an Legats und Euro</span></summary><div style="margin-top:10px">${logHTML(p)}</div></details>
     ${!me && friend ? `<div class="panel stack"><h3>Legats schicken</h3>
       ${theyOweMe ? `<p>${esc(p.name)} schuldet dir <b class="num">${fmt(theyOweMe)} ℒ</b>.</p>` : ''}${iOwe ? `<p>Du schuldest ${esc(p.name)} <b class="num">${fmt(iOwe)} ℒ</b>.</p>` : ''}
       <div class="field"><label for="gamt">Betrag</label><input id="gamt" type="number" min="100" step="100" inputmode="numeric" placeholder="z. B. 1000"></div>
@@ -2612,10 +3107,12 @@ function renderAll(){
   if (rq || !uid) return; rq = true;
   requestAnimationFrame(() => {
     rq=false; renderTop();
-    const typing = el => { const a=document.activeElement; return a && a.tagName==='INPUT' && a.type!=='checkbox' && el.contains(a); };
+    const typing = el => { const a=document.activeElement; return a && (a.tagName==='INPUT' || a.tagName==='SELECT') && a.type!=='checkbox' && el.contains(a); };
     if (tab==='table') renderCasino();
     if (tab==='players' && !typing($('view-players'))) renderPlayers();
     if (tab==='bank' && !typing($('view-bank'))) renderBank();
+    if (tab==='chat') renderChatTab();
+    renderTabBadges();
     if (tab==='shop') renderShop();
     if (tab==='account'){ if (typing($('view-account'))) renderAccountStats(); else renderAccount(); }
     renderModal(false);
@@ -2629,10 +3126,16 @@ function tickTimers(){
   }
   for (const el of document.querySelectorAll('[data-until]')) el.textContent = Math.max(0, Math.ceil((+el.dataset.until - Date.now())/1000));
 }
+function renderTabBadges(){
+  const n = unreadChats().length, f = Object.values(flipAll()).filter(x => x.b === uid && x.st === 'open').length;
+  const set = (id, label, k) => { const b = $(id); const h = label + (k ? `<span class="tabbadge">${k}</span>` : ''); if (b.innerHTML !== h) b.innerHTML = h; };
+  set('tab-chat', 'Chat', n); set('tab-account', 'Konto', f);
+}
 function setTab(t){
+  if (tab === 'chat' && t !== 'chat' && CH.open) closeChat();
   tab = t; shopConfirm = null;
   for (const b of document.querySelectorAll('nav.tabs button')) b.setAttribute('aria-selected', b.dataset.tab===t);
-  for (const v of ['table','players','bank','shop','account']) $('view-'+v).hidden = v!==t;
+  for (const v of ['table','players','chat','bank','shop','account']) $('view-'+v).hidden = v!==t;
   if (t==='table') { lastTableHTML = ''; anim.prime = true; }
   renderAll();
 }
@@ -2687,7 +3190,7 @@ document.addEventListener('click', async e => {
     case 'daily': {
       b.disabled = true;
       let got = 0, streak = 0;
-      withPlayer(d => {
+      withPlayer(d => { WHY = 'Tagesbonus';
         const today = dayId(); if (d.daily.last === today) return false;
         streak = d.daily.last === dayId(Date.now()-864e5) ? d.daily.streak + 1 : 1;
         got = dailyAmount(streak); d.balance += got; d.daily = { last: today, streak };
@@ -2729,7 +3232,7 @@ document.addEventListener('click', async e => {
         if (shopConfirm !== key){ shopConfirm = key; renderAll(); return; }
       }
       shopConfirm = null;
-      const ok = withPlayer(d => {
+      const ok = withPlayer(d => { WHY = 'Shop';
         if (!owned){ if (d.euro < price || d.owned.includes(key)) return false; d.euro -= price; d.owned = [...d.owned, key]; }
         if (kind==='av') d.avatar = id; else d.sel = { ...d.sel, [kind]: id };
         return true;
