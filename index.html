@@ -1074,6 +1074,8 @@ h3{font-size:12px;letter-spacing:.09em;font-weight:700}
 .btn.loono.big{font-size:20px;padding:14px 34px}
 .slotstop{flex-wrap:wrap;justify-content:center}
 .slotstop button{padding:5px 9px;font-size:13px}
+.stuckbox{text-align:left;margin-top:10px}
+.stuckbox .diag{margin-top:4px;line-height:1.5;word-break:break-word;color:var(--ink);opacity:.85}
 @media (prefers-reduced-motion:reduce){*{animation:none!important}}
 </style>
 </head>
@@ -1905,21 +1907,49 @@ function tableStuck(){
   if (!T) return false;
   const waitFor = T.phase === 'betting' ? (T.betUntil ? BET_MS : 3000) : T.phase === 'playing' ? TURN_MS : T.phase === 'insurance' ? INS_MS : DONE_MS;
   const someoneReady = T.phase !== 'betting' || Object.values(seats).some(x => x.ready && x.round === T.round);
-  return someoneReady && Date.now() - HOST.progress > waitFor + 8000;
+  if (!someoneReady){ HOST.readySince = 0; return false; }
+  if (!HOST.readySince) HOST.readySince = Date.now();   // count from the first bet, not from the last move of the table
+  return Date.now() - Math.max(HOST.progress, HOST.readySince) > waitFor + 8000;
 }
+/** „Dealer übernehmen“: take the dealer role no matter who has it, and push the table on */
+async function forceHost(){
+  if (!tid) return;
+  try { await runTransaction(fs, async tx => { tx.set(doc(fs, 'locks', tid), { holder: uid, exp: Date.now() + 15000 }); }); amHost = true; }
+  catch (e){ HOST.err = 'Übernehmen: ' + (e?.code || e?.message || e); HOST.errAt = Date.now(); amHost = true; }
+  hostBusy = false; HOST.progress = Date.now(); HOST.forced = (HOST.forced || 0) + 1;
+  await hostTick(); renderAll();
+}
+function hostDiag(){
+  const me = seats[uid], L = HOST.lock, now = Date.now();
+  const present = Object.keys(seats).filter(presentSeat).map(u => u === uid ? 'du' : nameOf(u));
+  return [
+    `Version ${APP_VERSION} · Tisch ${tid} · Phase ${T?.phase} · Runde ${T?.round}`,
+    `Dealer: ${amHost ? 'du' : 'jemand anders'} · beschäftigt: ${hostBusy ? 'ja' : 'nein'} · Rolle bei: ${L ? (L.holder === uid ? 'dir' : L.holder ? nameOf(L.holder) + (players[L.holder] ? '' : ' (?)') : 'niemand') + ', läuft ab in ' + Math.round((L.exp - now) / 1000) + ' s' : 'unbekannt'}`,
+    `Dein Platz: ${me ? `bereit ${me.ready ? 'ja' : 'nein'}, Runde ${me.round}, Einsatz ${me.bet}` : 'fehlt'} · am Tisch gezählt: ${present.join(', ') || 'niemand'}`,
+    `Letzte Bewegung vor ${Math.round((now - HOST.progress) / 1000)} s · ungespeichert: ${SAVE.pending.size} · online: ${navigator.onLine ? 'ja' : 'nein'}`,
+    HOST.err ? `Letzter Fehler (vor ${Math.round((now - HOST.errAt) / 1000)} s): ${HOST.err}` : 'Kein Fehler gemeldet',
+  ];
+}
+function stuckHTML(){
+  if (!tableStuck()) return '';
+  return `<div class="note bad stuckbox"><b>Der Tisch hängt.</b> <button class="btn sm gold" data-act="bjfix">Dealer übernehmen</button>
+    <div class="small muted" style="margin-top:6px">Schick davon bitte einen Screenshot:</div><div class="num small diag">${hostDiag().map(esc).join('<br>')}</div></div>`;
+}
+setInterval(() => { if (tab === 'table' && game === 'bj' && tid){ const st = tableStuck(); if (st !== HOST.wasStuck){ HOST.wasStuck = st; lastTableHTML = ''; renderAll(); } else if (st) { const d = document.querySelector('.stuckbox .diag'); if (d) d.innerHTML = hostDiag().map(esc).join('<br>'); } } }, 1000);
 async function leaseLoop(){
   if (!tid || !uid || !seats[uid]){ amHost=false; return; }
   const ref = doc(fs,'locks',tid);
   try {
     amHost = await runTransaction(fs, async tx => {
       const s = await tx.get(ref); const d = s.exists() ? s.data() : {}; const now = Date.now();
+      HOST.lock = { holder: d.holder || null, exp: d.exp || 0, at: now };
       if (!d.holder || d.holder===uid || (d.exp||0) < now || !presentSeat(d.holder) || tableStuck()){
         if (d.holder===uid && (d.exp||0) - now > 8000) return true;
         tx.set(ref, { holder: uid, exp: now + 15000 }); return true;
       }
       return false;
     });
-  } catch(e){ amHost = false; }
+  } catch(e){ amHost = false; HOST.err = 'Dealer-Rolle: ' + (e?.code || e?.message || e); HOST.errAt = Date.now(); }
 }
 function presentSeat(u){ return !!seats[u] && isOnline(u) && (u===uid || players[u]?.table===tid); }
 function reshuffle(nt){
@@ -2085,7 +2115,7 @@ async function hostTick(){
       T = nt; HOST.progress = Date.now(); reconcile(); afterTable(); renderAll();
       setDoc(doc(fs,'tables',tid), nt).catch(e => console.warn(e));   // not awaited: Firestore keeps the order, the table keeps moving
     }
-  } catch(e){ console.warn(e); }
+  } catch(e){ console.warn(e); HOST.err = 'Dealer: ' + (e?.message || e); HOST.errAt = Date.now(); }
   finally { hostBusy = false; }
 }
 
@@ -2138,8 +2168,11 @@ function animateCards(root){
 /* =====================================================================
    v1.1 – Casino home, Glücksrad, Roulette, Automat, Pferderennen, Sportwetten
    ===================================================================== */
-const APP_VERSION = '1.5.7';
+const APP_VERSION = '1.5.8';
 const CHANGELOGS = {
+  '1.5.8': [
+    'Blackjack: Hängt der Tisch, erscheint „Dealer übernehmen“ und eine Diagnose',
+  ],
   '1.5.7': [
     'Blackjack: Der Tisch bleibt nicht mehr hängen („Warte auf die anderen …“). Hängt der Dealer, übernimmt automatisch ein anderer Spieler am Tisch',
   ],
@@ -5498,7 +5531,7 @@ function renderTableView(){
     const max = Math.min(MAX_BET, P?.balance||0);
     if (lim?.hit) controls = `<div class="note">${lim.hit==='win'?'Dein Gewinnziel ist erreicht':'Dein Stop-Loss ist erreicht'} (${sgn(lim.profit)} ℒ). Im Konto kannst du eine neue Session starten oder das Limit ändern.</div>`;
     else if (P.balance < tableMin()) controls = `<div class="note">An diesem Tisch ist der Mindesteinsatz ${fmt(tableMin())} Legats. Du hast nur ${fmt(P.balance)}.${P.euro > 0 ? ` Auf der Bank liegen ${fmt(P.euro)} €. <button class="btn sm gold" data-tab="bank" style="margin-left:6px">Zur Bank</button>` : ''}</div>`;
-    else if (ready) controls = `<p>Dein Einsatz: <b class="num">${fmt(mySeat.bet)} ℒ</b>. Warte auf die anderen …</p><button class="btn sm" data-act="unbet">Einsatz zurückziehen</button>${autoSwitch()}`;
+    else if (ready) controls = `<p>Dein Einsatz: <b class="num">${fmt(mySeat.bet)} ℒ</b>. Warte auf die anderen …</p><button class="btn sm" data-act="unbet">Einsatz zurückziehen</button>${autoSwitch()}${stuckHTML()}`;
     else controls = `
       <div class="chips">${CHIPS.map(([v,cl,l])=>`<button class="chip ${cl}" data-act="chip" data-v="${v}" ${bet+v>max?'disabled':''} aria-label="${fmt(v)} hinzufügen">${l}</button>`).join('')}</div>
       <div class="betline"><button class="btn sm" data-act="betclear">Löschen</button><span class="betval">${fmt(bet)}</span><button class="btn sm" data-act="betmax">Max</button></div>
@@ -5892,6 +5925,7 @@ document.addEventListener('click', async e => {
     case 'betclear': bet = 0; renderAll(); break;
     case 'betmax': bet = Math.max(0, Math.min(MAX_BET, Math.floor(P.balance/50)*50)); SFX.chip(); renderAll(); break;
     case 'bet': if (confirmBig(bet, 'bj')) placeBet(bet); break;
+    case 'bjfix': b.disabled = true; forceHost(); break;
     case 'unbet': unBet(); if (auto){ auto=false; ls.set('autobet', false); toast('Auto-Einsatz aus'); } break;
     case 'hit': case 'stand': case 'double': case 'split': case 'surrender': act(a); break;
     case 'insure': insure(true); break;
