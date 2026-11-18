@@ -1403,7 +1403,7 @@ function renderSaveWarn(){
 /** iPad/iPhone sometimes keep a dead connection after switching apps: reconnect */
 function reconnect(){
   if (Date.now() - SAVE.cycled < 20000) return; SAVE.cycled = Date.now();
-  disableNetwork(fs).then(() => enableNetwork(fs)).catch(e => console.warn(e));
+  disableNetwork(fs).catch(e => console.warn(e)).finally(() => enableNetwork(fs).catch(e => console.warn(e)));
 }
 setInterval(() => { if (unsavedMs() > 25000) reconnect(); renderSaveWarn(); }, 1000);
 let hiddenAt = 0;
@@ -1708,7 +1708,9 @@ function openTable(id){
   setTimeout(leaseLoop, 300);
   unsubT = onSnapshot(doc(fs,'tables',id), s => {
     if (!s.exists()){ if (!s.metadata.fromCache && tid===id){ T=null; renderAll(); } return; }
-    T = s.data(); pendingAct = false; reconcile(); afterTable(); renderAll();
+    T = s.data(); pendingAct = false;
+    { const sig = [T.phase, T.round, T.turn?.u, T.turn?.h, T.betUntil, Object.keys(T.hands || {}).length].join('|'); if (sig !== HOST.sig){ HOST.sig = sig; HOST.progress = Date.now(); } }
+    reconcile(); afterTable(); renderAll();
   }, e => console.warn(e));
   unsubS = onSnapshot(query(collection(fs,'seats'), where('table','==',id)), s => {
     const n = {}; s.docs.forEach(d => n[d.id] = d.data()); seats = n;
@@ -1897,13 +1899,21 @@ function reconcile(){
 }
 
 /* ---------- dealer: one browser at the table runs it (lease) ---------- */
+const HOST = { progress: Date.now(), sig: '' };
+/** someone has been waiting for longer than the table could ever need: the dealer is stuck */
+function tableStuck(){
+  if (!T) return false;
+  const waitFor = T.phase === 'betting' ? (T.betUntil ? BET_MS : 3000) : T.phase === 'playing' ? TURN_MS : T.phase === 'insurance' ? INS_MS : DONE_MS;
+  const someoneReady = T.phase !== 'betting' || Object.values(seats).some(x => x.ready && x.round === T.round);
+  return someoneReady && Date.now() - HOST.progress > waitFor + 8000;
+}
 async function leaseLoop(){
-  if (!tid || !uid){ amHost=false; return; }
+  if (!tid || !uid || !seats[uid]){ amHost=false; return; }
   const ref = doc(fs,'locks',tid);
   try {
     amHost = await runTransaction(fs, async tx => {
       const s = await tx.get(ref); const d = s.exists() ? s.data() : {}; const now = Date.now();
-      if (!d.holder || d.holder===uid || (d.exp||0) < now){
+      if (!d.holder || d.holder===uid || (d.exp||0) < now || !presentSeat(d.holder) || tableStuck()){
         if (d.holder===uid && (d.exp||0) - now > 8000) return true;
         tx.set(ref, { holder: uid, exp: now + 15000 }); return true;
       }
@@ -2072,8 +2082,8 @@ async function hostTick(){
     if (!nt.fair && nt.phase==='betting'){ reshuffle(nt); changed = true; }
     if (step(nt, Date.now())) changed = true;
     if (changed){
-      T = nt; reconcile(); afterTable(); renderAll();
-      await setDoc(doc(fs,'tables',tid), nt);
+      T = nt; HOST.progress = Date.now(); reconcile(); afterTable(); renderAll();
+      setDoc(doc(fs,'tables',tid), nt).catch(e => console.warn(e));   // not awaited: Firestore keeps the order, the table keeps moving
     }
   } catch(e){ console.warn(e); }
   finally { hostBusy = false; }
@@ -2128,8 +2138,11 @@ function animateCards(root){
 /* =====================================================================
    v1.1 – Casino home, Glücksrad, Roulette, Automat, Pferderennen, Sportwetten
    ===================================================================== */
-const APP_VERSION = '1.5.6';
+const APP_VERSION = '1.5.7';
 const CHANGELOGS = {
+  '1.5.7': [
+    'Blackjack: Der Tisch bleibt nicht mehr hängen („Warte auf die anderen …“). Hängt der Dealer, übernimmt automatisch ein anderer Spieler am Tisch',
+  ],
   '1.5.6': [
     'Blackjack: Die Nachfrage bei großen Einsätzen kommt pro Spiel und Betrag nur noch einmal, nicht jede Runde',
     'Die Verbindung wird nur noch neu aufgebaut, wenn wirklich länger nichts gespeichert wurde',
