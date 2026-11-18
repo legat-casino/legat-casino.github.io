@@ -1405,7 +1405,7 @@ function reconnect(){
   if (Date.now() - SAVE.cycled < 20000) return; SAVE.cycled = Date.now();
   disableNetwork(fs).then(() => enableNetwork(fs)).catch(e => console.warn(e));
 }
-setInterval(() => { if (unsavedMs() > 8000) reconnect(); renderSaveWarn(); }, 1000);
+setInterval(() => { if (unsavedMs() > 25000) reconnect(); renderSaveWarn(); }, 1000);
 let hiddenAt = 0;
 document.addEventListener('visibilitychange', () => {
   if (document.hidden){ hiddenAt = Date.now(); return; }
@@ -2128,8 +2128,12 @@ function animateCards(root){
 /* =====================================================================
    v1.1 – Casino home, Glücksrad, Roulette, Automat, Pferderennen, Sportwetten
    ===================================================================== */
-const APP_VERSION = '1.5.5';
+const APP_VERSION = '1.5.6';
 const CHANGELOGS = {
+  '1.5.6': [
+    'Blackjack: Die Nachfrage bei großen Einsätzen kommt pro Spiel und Betrag nur noch einmal, nicht jede Runde',
+    'Die Verbindung wird nur noch neu aufgebaut, wenn wirklich länger nichts gespeichert wurde',
+  ],
   '1.5.5': [
     'Loono: Wer das Spiel verlässt, verlässt auch die Runde (in einer laufenden Runde nach einer Nachfrage, dann spielt ein Bot weiter)',
     'Loono: mehr Zeit für „Loono!“: 3 Sekunden kann dich niemand erwischen, Bots erst nach 6 Sekunden',
@@ -4603,10 +4607,11 @@ function ctxDo(a){
 })();
 
 /* ---------- große Einsätze: einmal nachfragen ---------- */
-const BIG = { k: null, t: 0 };
+const BIG = { k: null, t: 0, ok: {} };
 function confirmBig(amount, key, always){
   if (!P || !(amount >= 10000 || (amount >= 1000 && amount > P.balance / 2))) return true;
-  if (BIG.k === key && Date.now() - BIG.t < 4000){ BIG.k = null; return true; }
+  if (amount <= (BIG.ok[key] || 0)) return true;   // asked once per game and amount, not every round
+  if (BIG.k === key && Date.now() - BIG.t < 4000){ BIG.k = null; BIG.ok[key] = amount; return true; }
   BIG.k = key; BIG.t = Date.now();
   toast(`${fmt(amount)} ℒ? Zum Bestätigen nochmal tippen`); buzz(25);
   return false;
