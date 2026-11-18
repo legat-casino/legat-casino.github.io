@@ -820,6 +820,11 @@ nav.tabs button{position:relative}
 .reactbar button:hover{background:rgba(255,255,255,.08)}
 .loinv{display:flex;flex-direction:column;gap:4px;min-width:180px}
 .bigimg{max-width:100%;max-height:75vh;border-radius:12px;display:block;margin:0 auto}
+.island.msg{max-width:min(440px,60vw);border-color:var(--brass-dim)}
+.imsg .iav{flex:none;font-size:16px;line-height:1}
+.imtx{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500}
+.imtx b{color:var(--brass);font-size:13px}
+@media (max-width:560px){.island.msg{max-width:calc(100vw - 230px)}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important}}
 </style>
 </head>
@@ -1871,8 +1876,13 @@ function animateCards(root){
 /* =====================================================================
    v1.1 – Casino home, Glücksrad, Roulette, Automat, Pferderennen, Sportwetten
    ===================================================================== */
-const APP_VERSION = '1.5';
+const APP_VERSION = '1.5.1';
 const CHANGELOGS = {
+  '1.5.1': [
+    'Loono: +2 und +4 lassen sich jetzt beliebig aufeinander stapeln',
+    'Neue Chat-Nachrichten erscheinen oben in der Dynamic Island, antippen öffnet den Chat',
+    'Automat: Auto-Spin endlos (∞), bis du stoppst oder groß gewinnst',
+  ],
   '1.5': [
     'Neues Spiel Loono: Kartenspiel mit 2 bis 8 Spielern, mit Freunden oder Bots, mit oder ohne Einsatz',
     'Loono-Regeln Stapeln (+2 auf +2, +4 auf +4) und Doppelt legen, am Tisch abschaltbar',
@@ -2208,10 +2218,10 @@ function renderSlots(){
     <div class="status" id="slotres">${res?.jp ? `<span class="jpwin">💥 JACKPOT! +${fmt(res.jp)} ℒ</span>` : res ? (res.pay ? `<span style="color:var(--win)">Gewonnen: ${fmt(res.pay)} ℒ</span>` : 'Leider nichts') : 'Drei gleiche auf der Mittellinie gewinnen'}</div>
     <div class="controls">
       ${chipPicker(S.bet, 'sbet')}
-      ${S.auto ? `<button class="btn gold spinbtn" data-act="sautostop">Auto stoppen · noch ${S.auto}</button>`
+      ${S.auto ? `<button class="btn gold spinbtn" data-act="sautostop">Auto stoppen · ${S.auto === Infinity ? `läuft (${S.spun || 0} Drehs)` : 'noch ' + S.auto}</button>`
         : `<button class="btn gold spinbtn" data-act="sspin" ${S.busy?'disabled':''}>Drehen · ${fmt(S.bet)} ℒ</button>
-           <div class="row autorow"><span class="muted small">Auto-Spin</span>${[10,25,50].map(n => `<button class="btn sm" data-act="sauto" data-v="${n}" ${S.busy?'disabled':''}>${n}×</button>`).join('')}</div>`}
-      <p class="muted small" style="max-width:52ch">Auto-Spin hält an, wenn die Legats nicht reichen, ein Limit erreicht ist oder du ×20 oder mehr gewinnst.</p>
+           <div class="row autorow"><span class="muted small">Auto-Spin</span>${[10,25,50].map(n => `<button class="btn sm" data-act="sauto" data-v="${n}" ${S.busy?'disabled':''}>${n}×</button>`).join('')}<button class="btn sm" data-act="sautoinf" ${S.busy?'disabled':''} aria-label="Endlos drehen bis Stopp oder großer Gewinn">∞</button></div>`}
+      <p class="muted small" style="max-width:52ch">Auto-Spin hält an, wenn die Legats nicht reichen, ein Limit erreicht ist oder du ×20 oder mehr gewinnst. ∞ dreht endlos, bis du stoppst.</p>
     </div>
     <div class="paytable">${pt}</div>
     <p class="muted small slotrule">Es zählt nur die <b>rote Mittellinie</b>. Kirschen zählen <b>von links</b>: eine Kirsche auf der ersten Walze gibt ×0,5, Kirschen auf der ersten <i>und</i> zweiten Walze ×3. Kirschen nur auf der zweiten oder dritten Walze zählen nicht. <i class="anysym">?</i> = beliebiges Symbol.</p>
@@ -2254,11 +2264,11 @@ async function slotSpin(){
 }
 async function slotAuto(n){
   if (S.auto || S.busy) return;
-  S.auto = n; renderAll();
+  S.auto = n; S.spun = 0; renderAll();
   while (S.auto > 0){
     if (game !== 'slots' || tab !== 'table') break;
     const r = await slotSpin(); if (!r) break;
-    if (S.auto > 0) S.auto--;
+    if (S.auto > 0) S.auto--; S.spun++;
     if (r.mult >= 9999){ toast('Jackpot! Auto-Spin gestoppt.'); break; }
     if (r.mult >= 20){ toast(`Großer Gewinn: ×${r.mult}! Auto-Spin gestoppt.`); break; }
     if (S.auto > 0){ renderAll(); await secs(500); }
@@ -2609,6 +2619,15 @@ function renderIsland(){
   const el = $('island'), panel = $('islandpanel'); if (!el) return;
   const items = P ? islandItems() : [];
   const top = $('top');
+  const msg = ISL.msg && Date.now() < ISL.msg.until ? ISL.msg : null;
+  if (msg){
+    top.classList.add('has-island');
+    const h = `<span class="islide imsg" data-k="msg${msg.t}"><span class="iav">${avH(msg.av)}</span><span class="imtx"><b>${esc(msg.name)}</b> ${esc(msg.text)}</span></span>`;
+    if (el.innerHTML !== h){ el.innerHTML = h; el.querySelector('.islide').classList.add('in'); }
+    el.classList.add('msg'); el.hidden = false; panel.hidden = true; el.setAttribute('aria-label', `Neue Nachricht von ${msg.name}, antippen zum Öffnen`);
+    return;
+  }
+  el.classList.remove('msg');
   if (!items.length){ if (!el.hidden){ el.hidden = true; panel.hidden = true; ISL.open = false; top.classList.remove('has-island'); } return; }
   top.classList.add('has-island');
   const i = Math.floor(Date.now() / 4000) % items.length, { m, S } = items[i];
@@ -2623,6 +2642,7 @@ function renderIsland(){
 }
 document.addEventListener('click', e => {
   const isl = e.target.closest('#island');
+  if (isl && ISL.msg && Date.now() < ISL.msg.until){ const cid = ISL.msg.cid; ISL.msg = null; if (tab !== 'chat') setTab('chat'); openChat(cid); renderIsland(); return; }
   if (isl){ const items = islandItems(); if (items.length === 1){ openMatch(keyOf(items[0].m)); } else { ISL.open = !ISL.open; renderIsland(); } return; }
   if (ISL.open && !e.target.closest('#islandpanel')){ ISL.open = false; renderIsland(); }
 });
@@ -3384,7 +3404,7 @@ function loDeck(){
 }
 /** may this card go on the pile right now? */
 function loCanPlay(g, c){
-  if (g.pend > 0) return !!g.rules?.stack && loVal(c) === g.ptype;
+  if (g.pend > 0) return !!g.rules?.stack && (loVal(c) === 'd' || loVal(c) === 'f');   // +2 und +4 lassen sich beliebig aufeinander stapeln
   if (g.drew && c !== g.drew) return false;
   return c[0] === 'x' || c[0] === g.color || loVal(c) === loVal(loTop(g));
 }
@@ -3666,7 +3686,7 @@ async function loInvite(chatId){
 const loMyTurn = g => g && g.st === 'play' && g.seats[g.turn]?.id === uid;
 function loTap(c){
   const g = LO.g; if (!loMyTurn(g) || LO.busy) return;
-  if (!loCanPlay(g, c)){ toast(g.pend > 0 ? `Leg eine ${g.ptype === 'd' ? '+2' : '+4'} drauf oder zieh ${g.pend} Karten.` : 'Die Karte passt nicht. Gleiche Farbe, gleiche Zahl oder Farbwahl-Karte.'); return; }
+  if (!loCanPlay(g, c)){ toast(g.pend > 0 ? `Leg eine +2 oder +4 drauf oder zieh ${g.pend} Karten.` : 'Die Karte passt nicht. Gleiche Farbe, gleiche Zahl oder Farbwahl-Karte.'); return; }
   const twin = g.rules?.double && !g.drew && (g.hands[uid] || []).filter(x => x === c).length >= 2;
   if (twin) { LO.ask = { c, step: 'two' }; renderAll(); return; }
   if (c[0] === 'x'){ LO.ask = { c, n: 1, step: 'color' }; renderAll(); return; }
@@ -3701,7 +3721,7 @@ function loHomeHTML(){
         <div><span class="muted small">Einsatz pro Spieler · der Sieger bekommt den ganzen Topf</span>
           <div class="seg" style="margin-top:6px">${stakes.map(([v, l]) => `<button data-act="lostake" data-v="${v}" aria-pressed="${LO.stake === v}">${l}</button>`).join('')}</div></div>
         <div class="stack" style="gap:6px"><span class="muted small">Regeln</span>
-          <label class="lorule"><input type="checkbox" data-act="lorule" data-k="stack" ${LO.rules.stack ? 'checked' : ''}> <b>Stapeln</b> <span class="muted small">+2 auf +2, +4 auf +4</span></label>
+          <label class="lorule"><input type="checkbox" data-act="lorule" data-k="stack" ${LO.rules.stack ? 'checked' : ''}> <b>Stapeln</b> <span class="muted small">+2 und +4 aufeinander legen</span></label>
           <label class="lorule"><input type="checkbox" data-act="lorule" data-k="double" ${LO.rules.double ? 'checked' : ''}> <b>Doppelt legen</b> <span class="muted small">zwei exakt gleiche Karten auf einmal</span></label></div>
         <div class="row"><button class="btn gold" data-act="locreate" data-v="0">Runde eröffnen</button><span class="muted small">Freunde können direkt beitreten oder du lädst sie im Chat ein.</span></div>
         <div class="row lobotrow"><span class="muted small">Oder sofort gegen</span><div class="seg">${[1, 2, 3, 5].map(n => `<button data-act="lobots" data-v="${n}" aria-pressed="${LO.bots === n}">${n} ${n === 1 ? 'Bot' : 'Bots'}</button>`).join('')}</div><button class="btn" data-act="locreate" data-v="${LO.bots}">Los</button></div>
@@ -3716,7 +3736,7 @@ function loHomeHTML(){
       <p>Jeder bekommt 7 Karten. Reihum legst du eine Karte, die in <b>Farbe</b> oder <b>Zahl/Symbol</b> zur obersten passt. Kannst oder willst du nicht, ziehst du eine Karte und darfst sie sofort legen, wenn sie passt.</p>
       <div class="lolegend">${['r5', 'gs', 'br', 'yd', 'xw', 'xf'].map(c => loCard(c)).join('')}</div>
       <p><b>⊘ Aussetzen:</b> der Nächste ist übersprungen. <b>⇄ Richtungswechsel</b> (zu zweit wie Aussetzen). <b>+2:</b> der Nächste zieht 2 und setzt aus. <b>★ Farbwahl:</b> passt immer, du wählst die Farbe. <b>+4:</b> Farbwahl und der Nächste zieht 4.</p>
-      <p><b>Stapeln:</b> Auf eine +2 darfst du eine +2 legen, auf eine +4 eine +4. Wer nicht stapeln kann, zieht alles zusammen. <b>Doppelt legen:</b> Hast du eine Karte zweimal (gleiche Farbe und Zahl), darfst du beide auf einmal legen. Die Wirkung zählt doppelt.</p>
+      <p><b>Stapeln:</b> Auf eine +2 oder +4 darfst du eine weitere +2 oder +4 legen, egal welche. Wer nicht stapeln kann, zieht alles zusammen. <b>Doppelt legen:</b> Hast du eine Karte zweimal (gleiche Farbe und Zahl), darfst du beide auf einmal legen. Die Wirkung zählt doppelt.</p>
       <p><b>Loono!</b> Hast du nur noch eine Karte, musst du „Loono!“ rufen (Knopf). Erwischt dich jemand vorher, ziehst du 2 Karten. Für jeden Zug hast du 20 Sekunden, danach wird automatisch gezogen. Wer geht, wird von einem Bot vertreten, sein Einsatz bleibt im Topf. Bots zahlen den Einsatz aus der Casinokasse.</p>
     </div></details>
   </div>`;
@@ -3775,7 +3795,7 @@ function loTableHTML(g){
     return loCard(c, `${myTurn ? (playable.has(c) ? ' ok' : ' no') : ''}${g.drew === c && myTurn ? ' drawn' : ''}${f}`, ` data-act="locard" data-c="${c}" aria-label="${esc(LO_NAMES[c[0]] || 'Schwarz')} ${esc(loSym(loVal(c)))}"`); }).join('');
   let status;
   if (g.st === 'done') status = loEvText(g);
-  else if (myTurn) status = g.pend > 0 ? `Du bist dran: ${g.rules?.stack ? `leg eine ${g.ptype === 'd' ? '+2' : '+4'} drauf oder ` : ''}zieh ${g.pend} Karten` : g.drew ? 'Gezogene Karte legen oder behalten?' : '<b>Du bist dran</b>';
+  else if (myTurn) status = g.pend > 0 ? `Du bist dran: ${g.rules?.stack ? 'leg eine +2 oder +4 drauf oder ' : ''}zieh ${g.pend} Karten` : g.drew ? 'Gezogene Karte legen oder behalten?' : '<b>Du bist dran</b>';
   else status = `${esc(cur.name)} ist dran${g.pend > 0 ? ` · ${g.pend} Karten offen` : ''}`;
   const meExposed = g.expose?.id === uid, other = g.expose && g.expose.id !== uid;
   const canCall = g.st === 'play' && mine.length <= 2 && mine.length > 0 && !g.called?.[uid];
@@ -4172,7 +4192,7 @@ function startChats(){
     if (!first) for (const [id, c] of Object.entries(next)){
       const old = prev[id];
       if (c.last && c.last.u !== uid && (!old?.last || old.last.t !== c.last.t) && !(tab === 'chat' && CH.open === id)){
-        SFX.pop(); toast(`💬 ${chatName(c)}: ${c.group ? nameOf(c.last.u) + ': ' : ''}${c.last.k === 'e' ? avText(c.last.x) : c.last.x}`);
+        SFX.pop(); ISL.msg = { cid: id, name: c.group ? `${nameOf(c.last.u)} · ${chatName(c)}` : chatName(c), av: c.group ? avOf(c.last.u) : chatAv(c), text: c.last.k === 'e' ? avText(c.last.x) : c.last.x, t: c.last.t, until: Date.now() + 6000 }; ISL.open = false; renderIsland();
       }
       if (tab === 'chat' && CH.open === id) markRead(id);
     }
@@ -4524,6 +4544,7 @@ document.addEventListener('click', e => {
     case 'sspin': slotSpin(); break;
     case 'sauto': slotAuto(v); break;
     case 'sautostop': S.auto = 0; renderAll(); break;
+    case 'sautoinf': slotAuto(Infinity); break;
     case 'hpick': H.pickI = +b.dataset.i; renderAll(); break;
     case 'hbet': H.bet = v; savePref('horsebet', v); renderAll(); break;
     case 'hrun': horseRun(); break;
