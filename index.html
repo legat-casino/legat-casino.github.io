@@ -1449,11 +1449,18 @@ async function quotaProbe(){
   catch (e){ quotaHit(e); }
   finally { QUOTA.probing = false; }
 }
+// every device checks on its own every 90 s and when you come back to the page: the limit can hit reading while saving still works
+setInterval(() => { if (uid && !document.hidden && navigator.onLine) quotaProbe(); }, 90e3);
+document.addEventListener('visibilitychange', () => { if (!document.hidden && uid) quotaProbe(); });
 setInterval(() => {
   if (!uid || !navigator.onLine) return;
   if (unsavedMs() > 15000) quotaProbe();                       // saves don't get through
   else if (!PL.meLoaded && Date.now() - (QUOTA.since || 0) > 8000) quotaProbe();   // no data at all after logging in
+  else if (!document.hidden && Date.now() - (QUOTA.probed || 0) > 120e3) quotaProbe();   // an open page that just sits there checks every 2 minutes
 }, 5000);
+// coming back to the page, or tapping something: check soon (at most once a minute)
+document.addEventListener('visibilitychange', () => { if (!document.hidden && uid) quotaProbe(); });
+document.addEventListener('pointerdown', () => { if (uid) quotaProbe(); }, { passive: true });
 function quotaHit(e){ if (e?.code === 'resource-exhausted'){ QUOTA.hit = Date.now(); closeCasino(); return true; } return false; }
 /** when the free quota resets: midnight in California (Firebase's day), shown in local time */
 function quotaReset(now = Date.now()){
@@ -2290,8 +2297,14 @@ function animateCards(root){
 /* =====================================================================
    v1.1 – Casino home, Glücksrad, Roulette, Automat, Pferderennen, Sportwetten
    ===================================================================== */
-const APP_VERSION = '1.5.11';
+const APP_VERSION = '1.5.12';
 const CHANGELOGS = {
+  '1.5.12': [
+    'Jedes Gerät prüft regelmäßig selbst, ob das Firebase-Tageslimit erreicht ist, und schließt dann, auch am PC',
+  ],
+  '1.5.12': [
+    'Auch eine offene Seite, auf der gerade nichts passiert, merkt jetzt, wenn das Tageslimit erreicht ist',
+  ],
   '1.5.11': [
     'Lädt nur noch deine Freunde statt aller Spieler: spart viel vom Firebase-Tageslimit',
     'Das Casino merkt jetzt zuverlässig, wenn das Tageslimit erreicht ist, und schließt',
