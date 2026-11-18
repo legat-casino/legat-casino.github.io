@@ -1179,7 +1179,7 @@ import { firebaseConfig } from './firebase-config.js';
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut }
   from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-import { initializeFirestore, doc, collection, query, where, orderBy, limit, onSnapshot, setDoc, getDoc, getDocs, updateDoc, deleteDoc, addDoc, runTransaction, serverTimestamp, increment, getDocFromServer, disableNetwork, enableNetwork }
+import { initializeFirestore, doc, collection, query, where, orderBy, limit, onSnapshot, setDoc, getDoc, getDocs, updateDoc, deleteDoc, addDoc, runTransaction, serverTimestamp, increment, getDocFromServer, disableNetwork, enableNetwork, documentId }
   from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
 /* ---------- constants ---------- */
@@ -1441,6 +1441,19 @@ addEventListener('pagehide', () => flushSave());
 document.addEventListener('visibilitychange', () => { if (document.hidden) flushSave(); });
 /* ---------- Firebase daily limit ---------- */
 const QUOTA = { hit: 0 };
+/** Firebase keeps retrying writes and live queries silently when the daily limit is used up. A tiny transaction reports it reliably. */
+async function quotaProbe(){
+  if (QUOTA.probing || Date.now() - (QUOTA.probed || 0) < 60e3 || !uid) return;
+  QUOTA.probing = true; QUOTA.probed = Date.now();
+  try { await runTransaction(fs, async tx => { await tx.get(doc(fs, 'meta', 'jackpot')); }); }
+  catch (e){ quotaHit(e); }
+  finally { QUOTA.probing = false; }
+}
+setInterval(() => {
+  if (!uid || !navigator.onLine) return;
+  if (unsavedMs() > 15000) quotaProbe();                       // saves don't get through
+  else if (!PL.meLoaded && Date.now() - (QUOTA.since || 0) > 8000) quotaProbe();   // no data at all after logging in
+}, 5000);
 function quotaHit(e){ if (e?.code === 'resource-exhausted'){ QUOTA.hit = Date.now(); closeCasino(); return true; } return false; }
 /** when the free quota resets: midnight in California (Firebase's day), shown in local time */
 function quotaReset(now = Date.now()){
@@ -1518,7 +1531,7 @@ function toast(msg){ const el=$('toast'); el.textContent=msg; el.classList.remov
 
 /* ---------- helpers ---------- */
 function genCode(len, alpha='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'){ let s=''; for(let i=0;i<len;i++) s+=alpha[rnd(alpha.length)]; return s; }
-const pl = id => id===uid ? P : players[id];
+const pl = id => id===uid ? P : players[id] || PL.all?.[id];
 const nameOf = id => pl(id)?.name || 'Spieler';
 const avOf = id => pl(id)?.avatar || '🙂';
 const isOnline = id => id===uid || (players[id] && Date.now() - (players[id].seen||0) < ONLINE_MS);
@@ -1586,27 +1599,68 @@ $('glogin').addEventListener('click', async () => {
 });
 getRedirectResult(auth).catch(e => console.warn(e));
 
-if (ls.get('ref', null)) $('loginsub').innerHTML = 'Du wurdest eingeladen! Mit diesem Link startest du mit <b style="color:var(--brass)">3.000 Legats</b> statt 2.000.';
+if (false) $('loginsub').innerHTML = 'Du wurdest eingeladen! Mit diesem Link startest du mit <b style="color:var(--brass)">3.000 Legats</b> statt 2.000.';
 onAuthStateChanged(auth, u => {
   authUser = u;
   if (!u){ stopAll(); uid=null; P=null; $('top').hidden = true; $('daily').innerHTML=''; for (const v of ['table','players','chat','bank','shop','account']) $('view-'+v).hidden = true; $('view-login').hidden = false; return; }
-  uid = u.uid; $('view-login').hidden = true; $('top').hidden = false; setTab(tab); startData();
+  uid = u.uid; QUOTA.since = Date.now(); $('view-login').hidden = true; $('top').hidden = false; setTab(tab); startData();
 });
 
 /* ---------- data ---------- */
 let intervals=[];
-function startData(){
-  unsubP = onSnapshot(collection(fs,'players'), snap => {
-    const next = {}; snap.docs.forEach(d => next[d.id] = d.data());
-    players = next;
-    const mine = next[uid];
+/* ---------- players: load only me, my friends, people who added me, and who sits at my table or in my chats ---------- */
+const PL = { me: null, meMeta: null, meLoaded: false, rev: {}, ch: {}, key: '', unsubs: [], unsubMe: null, unsubRev: null, all: null, allAt: 0 };
+function startPlayers(){
+  PL.unsubMe = onSnapshot(doc(fs, 'players', uid), s => { PL.me = s.exists() ? s.data() : null; PL.meMeta = s.metadata; PL.meLoaded = true; applyPlayers(); }, playersErr);
+  PL.unsubRev = onSnapshot(query(collection(fs, 'players'), where('friends', 'array-contains', uid)), s => { const o = {}; s.docs.forEach(d => o[d.id] = d.data()); PL.rev = o; applyPlayers(); }, playersErr);
+}
+function playersErr(e){ console.warn(e); if (quotaHit(e)) return; toast('Keine Verbindung zur Datenbank. Prüfe die Sicherheitsregeln.'); }
+function watchIds(){
+  const s = new Set(P?.friends || PL.me?.friends || []);
+  for (const u of Object.keys(seats || {})) s.add(u);
+  for (const c of Object.values(CH.list || {})) for (const m of c.members || []) s.add(m);
+  for (const x of LO.g?.seats || []) if (!x.bot) s.add(x.id);
+  s.delete(uid); return [...s].sort();
+}
+/** listens to the players we need, 30 per query (Firestore's limit for "in") */
+function rewatch(){
+  const ids = watchIds(), key = ids.join();
+  if (key === PL.key) return; PL.key = key;
+  PL.unsubs.forEach(f => f()); PL.unsubs = []; PL.ch = {};
+  for (let i = 0; i < ids.length; i += 30){
+    const chunk = ids.slice(i, i + 30), k = 'c' + i;
+    PL.unsubs.push(onSnapshot(query(collection(fs, 'players'), where(documentId(), 'in', chunk)), s => { const o = {}; s.docs.forEach(d => o[d.id] = d.data()); PL.ch[k] = o; applyPlayers(); }, playersErr));
+  }
+}
+function applyPlayers(){
+  const next = { ...PL.rev }; for (const o of Object.values(PL.ch)) Object.assign(next, o);
+  if (PL.me) next[uid] = PL.me;
+  players = next;
+  const mine = PL.me, meta = PL.meMeta || {};
+  if (PL.meLoaded){
     const newer = !P || ((mine?.rev || 0) !== (P.rev || 0) ? (mine?.rev || 0) > (P.rev || 0) : (mine?.updated || 0) >= (P.updated || 0));
-    if (mine && !snap.metadata.hasPendingWrites && !SAVE.pending.size && !SAVE.dirty && newer){ P = norm(structuredClone(mine)); SAVE.rev = P.rev || 0; }
-    if (!snap.metadata.fromCache && !mine && !P) createPlayer();
-    else if (!snap.metadata.fromCache && mine){ refForExisting(); accrueInterest(); afterLogin(); }
-    if (P && P.table && !tid && !leaving) openTable(P.table);
-    reconcile(); claimGifts(); renderAll();
-  }, e => { console.warn(e); if (quotaHit(e)) return; toast('Keine Verbindung zur Datenbank. Prüfe die Sicherheitsregeln.'); });
+    if (mine && !meta.hasPendingWrites && !SAVE.pending.size && !SAVE.dirty && newer){ P = norm(structuredClone(mine)); SAVE.rev = P.rev || 0; }
+    if (!meta.fromCache && !mine && !P) createPlayer();
+    else if (!meta.fromCache && mine){ refForExisting(); accrueInterest(); afterLogin(); }
+  }
+  if (P && P.table && !tid && !leaving) openTable(P.table);
+  reconcile(); claimGifts(); renderAll(); rewatch();
+}
+/** players by friend code (adding a friend, invite link): one small query instead of loading everybody */
+async function playerByCode(code){
+  const q = await getDocs(query(collection(fs, 'players'), where('code', '==', code)));
+  const d = q.docs.find(x => x.id !== uid); return d ? [d.id, d.data()] : null;
+}
+/** leaderboard "Alle": loaded once on demand, at most every 2 minutes */
+async function loadAllPlayers(){
+  if (PL.loadingAll || (PL.all && Date.now() - PL.allAt < 120e3)) return;
+  PL.loadingAll = true;
+  try { const q = await getDocs(collection(fs, 'players')); const o = {}; q.docs.forEach(d => o[d.id] = d.data()); PL.all = o; PL.allAt = Date.now(); renderAll(); }
+  catch (e){ quotaHit(e); console.warn(e); }
+  finally { PL.loadingAll = false; }
+}
+function startData(){
+  startPlayers();
   unsubG = onSnapshot(collection(fs,'gifts'), snap => {
     const g = {}; snap.docs.forEach(d => g[d.id] = d.data()); gifts = g; claimGifts(); renderAll();
   }, e => console.warn(e));
@@ -1616,7 +1670,8 @@ function startData(){
   intervals = [setInterval(beat, 45000), setInterval(leaseLoop, 4000), setInterval(hostTick, 350), setInterval(tickTimers, 500), setInterval(renderAll, 30000)];
 }
 function stopAll(){
-  unsubP && unsubP(); unsubG && unsubG(); unsubP = unsubG = null; closeTable();
+  PL.unsubMe && PL.unsubMe(); PL.unsubRev && PL.unsubRev(); PL.unsubs.forEach(f => f()); PL.unsubs = []; PL.key = ''; PL.ch = {}; PL.me = null; PL.meLoaded = false;
+  unsubG && unsubG(); unsubG = null; closeTable();
   unsubChats && unsubChats(); unsubFA && unsubFA(); unsubFB && unsubFB(); CH.unsubM && CH.unsubM(); unsubChats = unsubFA = unsubFB = null;
   unsubDU && unsubDU(); unsubJP && unsubJP(); unsubDU = unsubJP = null;
   LO.unsubL && LO.unsubL(); LO.unsub && LO.unsub(); LO.unsubL = LO.unsub = null; LO.id = null; LO.g = null;
@@ -1626,29 +1681,21 @@ async function createPlayer(){
   if (P) return;
   let name = (authUser?.displayName || '').split(' ')[0] || 'Spieler';
   name = name.slice(0,20);
-  let code; const taken = new Set(Object.values(players).map(p=>p.code));
-  do { code = genCode(6); } while (taken.has(code));
-  const refCode = ls.get('ref', null);
-  const inviter = refCode ? Object.entries(players).find(([id,p]) => p.code===refCode && id!==uid)?.[0] : null;
-  const d = norm({ name, code, balance: START + (inviter ? REF_BONUS : 0), table: null, ledger: null, created: Date.now(), updated: Date.now(), seen: Date.now() });
-  if (inviter){ d.ref = inviter; d.friends = [inviter]; }
+  const code = genCode(6);   // 32^6 possible codes: a clash is practically impossible
+  const d = norm({ name, code, balance: START, table: null, ledger: null, created: Date.now(), updated: Date.now(), seen: Date.now() });
   d.limits.base = d.balance; d.lowMark = d.balance;
   P = d; renderAll();
-  ls.set('ref', null);
-  try {
-    await slow(setDoc(doc(fs,'players',uid), d));
-    if (inviter){
-      await slow(setDoc(doc(fs,'gifts','ref_'+uid), { from:uid, to:inviter, amount:REF_BONUS, kind:'ref', claimed:false, t:Date.now() }));
-      SFX.coins(); toast(`Willkommen! ${nameOf(inviter)} hat dich eingeladen: +${fmt(REF_BONUS)} ℒ Startbonus`);
-    }
-  } catch(e){ handleWriteErr(e); }
+  try { await slow(setDoc(doc(fs,'players',uid), d)); }
+  catch(e){ handleWriteErr(e); }
+  refForExisting();   // an old invite link still makes you friends, just without a bonus
 }
 /** an existing player who opens someone's invite link simply becomes their friend */
 function refForExisting(){
   const refCode = ls.get('ref', null); if (!refCode || !P) return;
   ls.set('ref', null);
-  const hit = Object.entries(players).find(([id,p]) => p.code===refCode && id!==uid);
-  if (hit && !friendIds().includes(hit[0])){ withPlayer(d => { d.friends = [...new Set([...d.friends, hit[0]])]; return true; }); toast(`Du bist jetzt mit ${hit[1].name} befreundet`); }
+  playerByCode(refCode).then(hit => {
+    if (hit && !friendIds().includes(hit[0])){ withPlayer(d => { d.friends = [...new Set([...d.friends, hit[0]])]; return true; }); toast(`Du bist jetzt mit ${hit[1].name} befreundet`); }
+  }).catch(e => quotaHit(e));
 }
 
 let loggedOnce = false;
@@ -2243,8 +2290,13 @@ function animateCards(root){
 /* =====================================================================
    v1.1 – Casino home, Glücksrad, Roulette, Automat, Pferderennen, Sportwetten
    ===================================================================== */
-const APP_VERSION = '1.5.10';
+const APP_VERSION = '1.5.11';
 const CHANGELOGS = {
+  '1.5.11': [
+    'Lädt nur noch deine Freunde statt aller Spieler: spart viel vom Firebase-Tageslimit',
+    'Das Casino merkt jetzt zuverlässig, wenn das Tageslimit erreicht ist, und schließt',
+    'Der Einladungsbonus ist weg. Freunde fügst du über den Freundescode hinzu',
+  ],
   '1.5.10': [
     'Ist das Firebase-Tageslimit erreicht, schließt das Casino sicher und zeigt, wann es wieder öffnet. So geht kein Spielstand verloren',
   ],
@@ -5697,7 +5749,8 @@ function renderPlayers(){
   const el = $('view-players');
   if (!P){ el.innerHTML = `<div class="panel"><p class="muted">Lädt …</p></div>`; return; }
   const D = debts(), wk = weekId();
-  const ids = boardMode==='friends' ? [uid, ...friendIds()] : [...new Set([uid, ...Object.keys(players)])];
+  if (boardMode === 'all') loadAllPlayers();
+  const ids = boardMode==='friends' ? [uid, ...friendIds()] : [...new Set([uid, ...Object.keys(PL.all || players)])];
   const val = p => boardScope==='week' ? (p.week?.id===wk ? p.week.net : 0) : wealth(p);
   const rows = ids.map(id => [id, pl(id)]).filter(r=>r[1]).sort((a,b)=>val(b[1])-val(a[1]));
   const tr = rows.map(([id,p],i)=>{
@@ -5728,12 +5781,6 @@ function renderPlayers(){
       <tbody>${tr}</tbody></table></div>
       ${boardMode==='friends' && rows.length<2 ? '<p class="muted">Noch keine Freunde. Tausche unten eure Freundescodes aus.</p>' : ''}
       <p class="muted small">${boardScope==='week' ? 'Gewinn und Verlust seit Montag. Jeden Montag fängt die Wochenwertung bei null an.' : 'Vermögen = Legats + Euro auf der Bank. S / N / U = gewonnene / verlorene / unentschiedene Hände. Jede Pleite mit Wiederbelebung zählt als Niederlage.'} Tippe auf einen Spieler für sein Profil.</p>
-    </div>
-    <div class="panel stack"><h3>Freunde einladen · +${fmt(REF_BONUS)} ℒ</h3>
-      <p>Wer sich über deinen Link <b>neu anmeldet</b>, startet mit ${fmt(START+REF_BONUS)} statt ${fmt(START)} Legats, und du bekommst ${fmt(REF_BONUS)} Legats. Ihr seid dann automatisch befreundet.</p>
-      <div class="row"><span class="num" style="word-break:break-all;color:var(--brass);flex:1 1 220px;min-width:0">${esc(inviteLink())}</span>
-      <button class="btn gold sm" data-act="copyinvite">Link kopieren</button>${navigator.share ? '<button class="btn sm" data-act="shareinvite">Teilen</button>' : ''}</div>
-      ${(() => { const n = Object.values(gifts).filter(g => g.kind==='ref' && g.to===uid).length; return n ? `<p class="muted small">Schon ${n} ${n===1?'Spieler':'Spieler'} über deinen Link beigetreten.</p>` : ''; })()}
     </div>
     <div class="grid2">
       <div class="panel stack"><h3>Dein Freundescode</h3><div class="row"><span class="code">${esc(P.code)}</span><button class="btn sm" data-act="copycode">Kopieren</button></div>
@@ -5930,7 +5977,7 @@ function fairHTML(){
 
 let rq = false;
 function renderAll(){
-  if (rq || !uid) return; if (P && (P.loono || null) !== LO.id) loWatch(); rq = true;
+  if (rq || !uid) return; if (PL.meLoaded) rewatch(); if (P && (P.loono || null) !== LO.id) loWatch(); rq = true;
   requestAnimationFrame(() => {
     rq=false; renderTop();
     const typing = el => { const a=document.activeElement; return a && (a.tagName==='INPUT' || a.tagName==='SELECT') && a.type!=='checkbox' && el.contains(a); };
@@ -6045,11 +6092,13 @@ document.addEventListener('click', async e => {
     case 'scope': boardScope = b.dataset.v; renderAll(); break;
     case 'addfriend': case 'befriend': {
       let hit;
-      if (a==='befriend') hit = [b.dataset.id, players[b.dataset.id]];
+      if (a==='befriend') hit = [b.dataset.id, pl(b.dataset.id)];
       else {
         const code = $('fcode').value.trim().toUpperCase();
+        if (!/^[A-Z0-9]{6}$/.test(code)) return toast('Ein Freundescode hat 6 Zeichen.');
         hit = Object.entries(players).find(([id,p]) => p.code===code);
-        if (!hit) return toast('Kein Spieler mit diesem Code.');
+        if (!hit){ playerByCode(code).then(h => { if (!h) return toast('Kein Spieler mit diesem Code.'); if (friendIds().includes(h[0])) return toast('Ihr seid schon befreundet.');
+          withPlayer(d => { d.friends = [...new Set([...(d.friends||[]), h[0]])]; return true; }); if ($('fcode')) $('fcode').value=''; toast('Du bist jetzt mit '+h[1].name+' befreundet'); }).catch(e => { if (!quotaHit(e)) toast('Suche fehlgeschlagen.'); }); break; }
       }
       if (hit[0]===uid) return toast('Das ist dein eigener Code.');
       if (friendIds().includes(hit[0])) return toast('Ihr seid schon befreundet.');
