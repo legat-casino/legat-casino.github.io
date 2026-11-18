@@ -972,6 +972,105 @@ h3{font-size:12px;letter-spacing:.09em;font-weight:700}
 .tutdots{display:flex;gap:6px;justify-content:center}
 .tutdots i{width:7px;height:7px;border-radius:50%;background:var(--fill-2);transition:width .3s var(--spring),background .3s}
 .tutdots i.on{width:22px;border-radius:4px;background:var(--brass)}
+
+/* ================= v1.5.4 ================= */
+/* bell */
+.iconbtn.bell{position:relative;color:var(--ink)}
+.iconbtn.bell svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.bellbadge{position:absolute;top:-3px;right:-4px;min-width:17px;height:17px;padding:0 4px;border-radius:999px;background:#ff3b30;color:#fff;font:700 10px/17px var(--f-body);text-align:center;box-shadow:0 0 0 2px #1b140f;animation:pop .3s var(--spring)}
+.notes{display:flex;flex-direction:column;gap:6px}
+.note-i{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:10px 12px;border-radius:14px;border:1px solid var(--hair);background:rgba(255,255,255,.03);color:var(--ink)}
+.note-i.new{background:rgba(209,173,98,.09);border-color:rgba(209,173,98,.25)}
+.note-ic{flex:none;width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:var(--fill);font-size:18px}
+.note-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;font-size:14px;line-height:1.35}
+.note-tx small{color:var(--muted);font-size:12px}
+.note-go{color:var(--muted);font-size:20px}
+
+/* friends feed */
+.feed{gap:8px}
+.feed-i{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:none;border:0;padding:6px 2px;color:var(--ink);border-radius:12px}
+.feed-av{position:relative;flex:none;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:var(--fill);font-size:20px}
+.feed-av i{position:absolute;right:-4px;bottom:-4px;font-style:normal;font-size:13px;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:#1b140f}
+.feed-tx{min-width:0;display:flex;flex-direction:column;font-size:14px;line-height:1.35}
+.feed-tx small{color:var(--muted);font-size:12px}
+
+/* context menu on game tiles */
+.ctxshade{position:fixed;inset:0;z-index:40;background:rgba(8,6,5,.35);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);animation:fadein .2s ease both}
+@keyframes fadein{from{opacity:0}}
+.ctxmenu{position:fixed;z-index:42;display:flex;flex-direction:column;overflow:hidden;border-radius:16px;background:rgba(40,32,26,.82);border:1px solid rgba(255,255,255,.12);-webkit-backdrop-filter:blur(30px) saturate(180%);backdrop-filter:blur(30px) saturate(180%);box-shadow:0 20px 50px rgba(0,0,0,.55);animation:ctxin .28s var(--spring) both}
+@keyframes ctxin{from{opacity:0;transform:scale(.85)}}
+.ctxmenu button{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:13px 16px;background:none;border:0;border-top:1px solid rgba(255,255,255,.08);color:var(--ink);font-size:16px;text-align:left}
+.ctxmenu button:first-child{border-top:0}
+.ctxmenu button:active{background:rgba(255,255,255,.08)}
+.ctxmenu button i{font-style:normal;color:var(--brass);min-width:20px;text-align:center}
+.ctxclone{position:fixed!important;z-index:41;margin:0;pointer-events:none;animation:lift .28s var(--spring) both;box-shadow:0 24px 50px rgba(0,0,0,.6)}
+@keyframes lift{to{transform:scale(1.04)}}
+.tile{-webkit-touch-callout:none;user-select:none;-webkit-user-select:none}
+
+/* quick stakes */
+.stakebox{display:flex;flex-direction:column;align-items:center;gap:8px}
+.qstake{display:inline-flex;align-items:center;gap:4px;background:var(--fill);border-radius:12px;padding:3px}
+.qstake button{border:0;background:none;color:var(--ink);font-weight:700;padding:6px 12px;border-radius:9px;min-width:44px}
+.qstake button:not(:disabled):active{background:rgba(255,255,255,.12)}
+.qstake button:disabled{opacity:.35}
+.qcur{padding:0 8px;color:var(--brass);font-size:13px}
+
+/* chat extras */
+.typing{color:var(--brass)}
+.typing i{display:inline-block;width:4px;height:4px;margin-left:2px;border-radius:50%;background:currentColor;animation:tdot 1.2s infinite}
+.typing i:nth-child(2){animation-delay:.2s}.typing i:nth-child(3){animation-delay:.4s}
+@keyframes tdot{0%,60%,100%{opacity:.25;transform:none}30%{opacity:1;transform:translateY(-2px)}}
+.tick{margin-left:4px;font-size:11px;letter-spacing:-2px;opacity:.7}
+.tick.read{color:#2f6fcf;opacity:1}
+.mrow.mine .tick.read{color:#1d4f9e}
+.dsep{display:flex;justify-content:center;margin:10px 0 4px}
+.dsep span{font-size:12px;font-weight:600;color:var(--muted);background:var(--fill);border-radius:999px;padding:3px 10px}
+
+/* settings rows */
+.setrow{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:6px 0;border-top:1px solid var(--hair)}
+.setrow:first-of-type{border-top:0}
+.setrow>span{display:flex;flex-direction:column;gap:2px}
+.setrow small{font-size:12px}
+.setrow input{appearance:none;-webkit-appearance:none;width:46px;height:28px;border-radius:999px;background:var(--fill-2);position:relative;margin:0;flex:none;cursor:pointer;transition:background .25s}
+.setrow input::after{content:"";position:absolute;top:2px;left:2px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 2px 5px rgba(0,0,0,.35);transition:transform .3s var(--spring)}
+.setrow input:checked{background:var(--brass)}
+.setrow input:checked::after{transform:translateX(18px)}
+
+/* island extras */
+.island.crash,.island.loono{gap:8px}
+.icr b{min-width:4.2em;text-align:center}
+.icr b.fly{color:#fff}.icr b.win,.icrbig.win{color:var(--win)}.icr b.lose,.icrbig.lose{color:#ff6b5f}
+.icrbig{font-size:46px;color:#fff;line-height:1.1}
+.ilo b{color:var(--brass)}
+.island.out{animation:islout .22s ease-in both}
+@keyframes islout{to{transform:scale(.7);opacity:0}}
+
+/* smoother everything */
+.vin-r{animation:vinr .32s cubic-bezier(.2,.8,.3,1) both}
+.vin-l{animation:vinl .32s cubic-bezier(.2,.8,.3,1) both}
+@keyframes vinr{from{opacity:0;transform:translateX(28px)}}
+@keyframes vinl{from{opacity:0;transform:translateX(-28px)}}
+.gin{animation:gin .3s cubic-bezier(.2,.8,.3,1) both}
+@keyframes gin{from{opacity:0;transform:translateY(10px) scale(.99)}}
+.toast.tin{animation:tin .32s var(--spring) both}
+@keyframes tin{from{opacity:0;transform:translate(-50%,16px) scale(.95)}}
+.toast.out{animation:tout .22s ease-in both}
+@keyframes tout{to{opacity:0;transform:translate(-50%,10px) scale(.97)}}
+.modal.closing{animation:fadeout .2s ease-in both}
+.modal.closing .modal-card{animation:sheetout .2s ease-in both}
+@keyframes fadeout{to{opacity:0}}
+@keyframes sheetout{to{transform:translateY(30px);opacity:0}}
+.modal{animation:fadein .2s ease both}
+/* touch screens: no hover effects that stay "stuck" after a tap */
+@media (hover:none){
+  .tile:hover{transform:none;border-color:var(--hair)}
+  .btn:hover{border-color:transparent}
+  .btn:not(.gold):not(.danger):hover{background:rgba(209,173,98,.11)}
+  .btn.gold:hover{filter:none}
+  .mbody:hover{background:none}
+  .lohand.myturn .lc.ok:hover{transform:translateY(-10px)}
+  .mcell:not(:disabled):hover{transform:none;border-color:rgba(255,255,255,.12)}
+}
 @media (prefers-reduced-motion:reduce){*{animation:none!important}}
 </style>
 </head>
@@ -980,7 +1079,7 @@ h3{font-size:12px;letter-spacing:.09em;font-weight:700}
   <div class="top-in">
     <div class="logo"><span class="full">Legat <span>Casino</span></span><span class="mono" aria-hidden="true">L<span>C</span></span></div>
     <button class="island" id="island" type="button" hidden></button>
-    <button class="iconbtn" id="mute" type="button" aria-label="Ton an/aus">🔊</button>
+    <button class="iconbtn bell" id="bell" type="button" data-act="bell" aria-label="Mitteilungen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 2H4.5z"/><path d="M10 20.5a2.2 2.2 0 0 0 4 0"/></svg><span class="bellbadge" id="bellbadge" hidden></span></button>
     <div class="purse"><small id="pname">Konto</small><b id="pbal">–</b><span id="peur" class="num"></span></div>
     <nav class="tabs" role="tablist" id="tabs">
       <span class="tabind" id="tabind" aria-hidden="true"></span>
@@ -1042,6 +1141,8 @@ h3{font-size:12px;letter-spacing:.09em;font-weight:700}
 <div id="islandpanel" class="islandpanel" hidden></div>
 <div id="modal" class="modal" hidden><div class="modal-card" id="modal-card" role="dialog" aria-modal="true"></div></div>
 <div id="toast" class="toast" hidden></div>
+<div id="ctxshade" class="ctxshade" hidden></div>
+<div id="ctxmenu" class="ctxmenu" role="menu" hidden></div>
 
 <script type="module">
 import { firebaseConfig } from './firebase-config.js';
@@ -1323,7 +1424,7 @@ async function resyncPlayer(){
 function badgeLater(k, ms){
   setTimeout(() => {
     if (hold || R.busy || S.busy || H.busy || wheelBusy) return badgeLater(k, 300);
-    const a = ACH.find(x=>x[0]===k); SFX.badge(); toast(`${a[1]} Erfolg freigeschaltet: ${a[2]}`);
+    const a = ACH.find(x=>x[0]===k); SFX.badge(); toast(`${a[1]} Erfolg freigeschaltet: ${a[2]}`); notify(a[1], `Erfolg freigeschaltet: ${a[2]}`, { tab: 'account' });
   }, ms);
 }
 function seatWrite(data, mode='update'){
@@ -1333,7 +1434,7 @@ function seatWrite(data, mode='update'){
 }
 
 let toastT;
-function toast(msg){ const el=$('toast'); el.textContent=msg; el.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>el.hidden=true, 3400); }
+function toast(msg){ const el=$('toast'); el.textContent=msg; el.classList.remove('out'); if (el.hidden){ el.hidden=false; el.classList.remove('tin'); void el.offsetWidth; el.classList.add('tin'); } clearTimeout(toastT); toastT=setTimeout(()=>{ el.classList.add('out'); toastT = setTimeout(() => { el.hidden = true; el.classList.remove('out'); }, 220); }, 3400); }
 
 /* ---------- helpers ---------- */
 function genCode(len, alpha='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'){ let s=''; for(let i=0;i<len;i++) s+=alpha[rnd(alpha.length)]; return s; }
@@ -2024,8 +2125,19 @@ function animateCards(root){
 /* =====================================================================
    v1.1 – Casino home, Glücksrad, Roulette, Automat, Pferderennen, Sportwetten
    ===================================================================== */
-const APP_VERSION = '1.5.3';
+const APP_VERSION = '1.5.4';
 const CHANGELOGS = {
+  '1.5.4': [
+    'Dynamic Island: Loono „Du bist dran“, laufende Crash-Runde (lange drücken zum Auszahlen), Coin Flips und Wett-Herausforderungen (lange drücken zum Annehmen)',
+    'Mitteilungszentrale: die Glocke oben sammelt Nachrichten, Herausforderungen, Gewinne und Level-Ups',
+    'Startseite: was bei deinen Freunden los ist',
+    'Lange auf eine Spielkachel drücken: Schnellstart-Menü',
+    'Einsatz-Knöpfe ½, 2× und Max, und eine Nachfrage bei großen Einsätzen',
+    'Chat: „schreibt …“, Gelesen-Häkchen und Datumstrennung',
+    'Kontobuch nach Spiel filtern',
+    'Zwischen den Tabs wischen; Ton und Vibration jetzt im Konto',
+    'Viele Animationen weicher: Kontostand zählt mit, Seitenwechsel, Hinweise und Fenster gleiten',
+  ],
   '1.5.3': [
     'Anleitung für jedes Spiel: erscheint beim ersten Öffnen, danach jederzeit über das „?“ oben',
     'Blackjack und Sportwetten stehen auf dem Handy jetzt nebeneinander',
@@ -2162,9 +2274,12 @@ function playInstant(key, stake, pay, extra){
   return ok;
 }
 function release(){ hold = 0; renderAll(); }
-function chipPicker(sel, act){
-  return `<div class="chips small-chips">${[[50,'ch50','50'],[100,'ch100','100'],[500,'ch500','500'],[1000,'ch1k','1K'],[5000,'ch5k','5K']].map(([v,c,l]) =>
+function chipPicker(sel, act, max = MAX_BET){
+  const chips = `<div class="chips small-chips">${[[50,'ch50','50'],[100,'ch100','100'],[500,'ch500','500'],[1000,'ch1k','1K'],[5000,'ch5k','5K']].map(([v,c,l]) =>
     `<button class="chip ${c}${sel===v?' on':''}" data-act="${act}" data-v="${v}" aria-pressed="${sel===v}">${l}</button>`).join('')}</div>`;
+  if (!max || !P) return chips;
+  const top = Math.max(50, Math.min(max, Math.floor(P.balance))), half = Math.max(50, Math.round(sel / 2)), dbl = Math.min(top, sel * 2);
+  return `<div class="stakebox">${chips}<div class="qstake"><button data-act="${act}" data-v="${half}" ${half === sel ? 'disabled' : ''}>½</button><span class="num qcur">${fmt(sel)} ℒ</span><button data-act="${act}" data-v="${dbl}" ${dbl === sel ? 'disabled' : ''}>2×</button><button data-act="${act}" data-v="${top}" ${top === sel ? 'disabled' : ''}>Max</button></div></div>`;
 }
 function backBar(title, extra=''){
   return `<div class="gamebar"><button class="btn sm" data-act="home">← Casino</button><h2>${title}</h2>${tutBtn(game)}${extra}</div>`;
@@ -2313,7 +2428,7 @@ function renderRoulette(force){
     </div>
     <div class="rboard">${cells}</div>
     <div class="controls">
-      ${chipPicker(R.chip, 'rchip')}
+      ${chipPicker(R.chip, 'rchip', 0)}
       <div class="betline"><button class="btn sm" data-act="rclear" ${R.busy?'disabled':''}>Löschen</button><button class="btn sm" data-act="rdouble" ${R.busy?'disabled':''}>Verdoppeln</button><button class="btn sm" data-act="rrepeat" ${R.busy||!R.last?'disabled':''}>Wiederholen</button>
       <span class="betval">${fmt(total)}</span></div>
       <button class="btn gold" data-act="rspin" ${R.busy||!total?'disabled':''}>${R.busy ? 'Kugel rollt …' : 'Drehen'}</button>
@@ -2375,7 +2490,7 @@ function renderSlots(){
     ${jpBar()}
     <div class="status" id="slotres">${res?.jp ? `<span class="jpwin">💥 JACKPOT! +${fmt(res.jp)} ℒ</span>` : res ? (res.pay ? `<span style="color:var(--win)">Gewonnen: ${fmt(res.pay)} ℒ</span>` : 'Leider nichts') : 'Drei gleiche auf der Mittellinie gewinnen'}</div>
     <div class="controls">
-      ${chipPicker(S.bet, 'sbet')}
+      ${chipPicker(S.bet, 'sbet', 5000)}
       ${S.auto ? `<button class="btn gold spinbtn" data-act="sautostop">Auto stoppen · ${S.auto === Infinity ? `läuft (${S.spun || 0} Drehs)` : 'noch ' + S.auto}</button>`
         : `<button class="btn gold spinbtn" data-act="sspin" ${S.busy?'disabled':''}>Drehen · ${fmt(S.bet)} ℒ</button>
            <div class="row autorow"><span class="muted small">Auto-Spin</span>${[10,25,50].map(n => `<button class="btn sm" data-act="sauto" data-v="${n}" ${S.busy?'disabled':''}>${n}×</button>`).join('')}<button class="btn sm" data-act="sautoinf" ${S.busy?'disabled':''} aria-label="Endlos drehen bis Stopp oder großer Gewinn">∞</button></div>`}
@@ -2764,7 +2879,7 @@ setInterval(() => { if (uid) renderIsland(); }, 1000);
 setInterval(() => { if (uid) loadSports(); }, 10*60e3);
 
 /* ---------- Dynamic Island: what's live right now ---------- */
-const ISL = { open: false, big: false, msg: null, key: '', swap: '', pkey: '', lp: false };
+const ISL = { open: false, big: false, msg: null, key: '', swap: '', pkey: '', lp: false, mode: null, raf: 0 };
 function islandItems(){
   const mine = new Set((P?.bets || []).filter(b => b.st === 'open').map(b => b.src + ':' + b.mid));
   return allMatchesAll().map(m => ({ m, S: matchState(m) })).filter(({ m, S }) => S.st === 'live' && (m.src === 'oldb' || mine.has(keyOf(m))))
@@ -2774,11 +2889,22 @@ function islandRow(m, S, big){
   const n1 = m.kind === 'darts' ? lastName(m.t1) : m.s1, n2 = m.kind === 'darts' ? lastName(m.t2) : m.s2;
   return `<span class="idot"></span><span class="iteam">${esc(n1)}</span><b class="num">${S.sc ? S.sc[0] + ':' + S.sc[1] : '–:–'}</b><span class="iteam">${esc(n2)}</span>${S.label ? `<span class="imin num">${esc(S.label)}</span>` : ''}${big ? `<span class="ilg">${esc(m.lg)}</span>` : ''}`;
 }
-/* what the island shows, most important first: a new chat message, the slot machine running in the background, live matches */
+/* what the island shows, most important first:
+   a message or challenge, your Loono turn, your Crash bet, the slot machine in the background, live matches */
+const islandHere = g => game === g && tab === 'table';
+function islandCrash(){
+  const c = P?.crash; if (!c || islandHere('crash')) return null;
+  const r = crashRound(c.r); if (!r) return null;
+  const t = NOW();
+  if (c.out != null) return t < r.boom + 2500 ? r : null;   // keep the result for a moment
+  return t < r.end ? r : null;
+}
 function islandMode(){
   if (!P) return null;
   if (ISL.msg && Date.now() < ISL.msg.until) return 'msg';
-  if ((S.busy || S.auto > 0 || Date.now() < (S.endAt || 0)) && !(game === 'slots' && tab === 'table')) return 'slots';
+  if (LO.g && LO.g.st === 'play' && LO.g.seats[LO.g.turn]?.id === uid && !islandHere('loono')) return 'loono';
+  if (islandCrash()) return 'crash';
+  if ((S.busy || S.auto > 0 || Date.now() < (S.endAt || 0)) && !islandHere('slots')) return 'slots';
   return islandItems().length ? 'live' : null;
 }
 const SLOT_STRIP = () => `<span class="istrip">${[...SLOT_SYMS, SLOT_SYMS[0]].map(x => `<i>${x}</i>`).join('')}</span>`;
@@ -2787,7 +2913,7 @@ function islandSlotsHTML(big){
   const reels = center.map((s, i) => `<span class="ireel${spin ? ' spin' : ''}${!spin && S.res && S.win[i] ? ' hit' : ''}">${spin ? SLOT_STRIP() : `<i>${SLOT_SYMS[s]}</i>`}</span>`).join('');
   const auto = S.auto === Infinity ? `∞ · ${S.spun || 0}` : S.auto > 0 ? `noch ${S.auto}` : '';
   const res = S.res?.jp ? `<b class="num iwin">+${fmt(S.res.jp)}</b>` : spin ? '<b class="num">…</b>' : S.res?.pay ? `<b class="num iwin">+${fmt(S.res.pay)}</b>` : '<b class="num">–</b>';
-  if (!big) return `<span class="islide islot" data-k="slot"><span class="ireels">${reels}</span>${res}${auto ? `<span class="imore">${auto}</span>` : ''}</span>`;
+  if (!big) return `<span class="islide islot"><span class="ireels">${reels}</span>${res}${auto ? `<span class="imore">${auto}</span>` : ''}</span>`;
   const msg = S.res?.jp ? `💥 JACKPOT! +${fmt(S.res.jp)} ℒ` : spin ? 'Die Walzen drehen …' : S.res?.pay ? `Gewonnen: ${fmt(S.res.pay)} ℒ` : S.res ? 'Leider nichts' : '';
   return `<div class="ibig">
     <div class="ibighead"><span>🎰 Automat</span><span class="muted small">${S.auto === Infinity ? `Auto ∞ · ${S.spun || 0} Drehs` : S.auto > 0 ? `Auto · noch ${S.auto}` : `Einsatz ${fmt(S.bet)} ℒ`}</span></div>
@@ -2796,20 +2922,53 @@ function islandSlotsHTML(big){
     <div class="row" style="justify-content:center;gap:8px">${S.auto > 0 ? '<button class="btn sm" data-act="sautostop" data-keep="1">Auto stoppen</button>' : ''}<span class="muted small">Antippen: zum Automaten</span></div>
   </div>`;
 }
+function islandCrashHTML(big){
+  if (!big) return `<span class="islide icr"><span class="icrr" id="icrr">🚀</span><b class="num" id="icrm">–</b><span class="imore num" id="icrs"></span></span>`;
+  return `<div class="ibig">
+    <div class="ibighead"><span>🚀 Crash</span><span class="muted small" id="icrb">Einsatz ${fmt(P.crash?.bet || 0)} ℒ</span></div>
+    <b class="num icrbig" id="icrm2">–</b>
+    <button class="btn gold" data-act="crcash" data-keep="1" id="icrbtn">Auszahlen</button>
+    <span class="muted small">Antippen: zu Crash</span>
+  </div>`;
+}
+function islandAskHTML(m, big){
+  if (!big) return `<span class="islide imsg"><span class="iav">${m.icon ? m.icon : avH(m.av)}</span><span class="imtx"><b>${esc(m.name)}</b> ${esc(m.text)}</span></span>`;
+  const yes = m.kind === 'flip' ? 'flyes' : 'duyes', no = m.kind === 'flip' ? 'flno' : 'duno';
+  return `<div class="ibig">
+    <div class="ibighead"><span>${m.icon} ${m.kind === 'flip' ? 'Coin Flip' : 'Freundeswette'}</span><span class="muted small">von ${esc(m.name)}</span></div>
+    <p style="margin:0;text-align:center">${esc(m.text)}</p>
+    <div class="row" style="justify-content:center"><button class="btn gold" data-act="${yes}" data-id="${esc(m.id)}" data-keep="1" data-close="1">Annehmen</button><button class="btn" data-act="${no}" data-id="${esc(m.id)}" data-keep="1" data-close="1">Ablehnen</button></div>
+  </div>`;
+}
+const ISL_BIG = new Set(['slots', 'crash', 'ask']);
 function renderIsland(){
   const el = $('island'), panel = $('islandpanel'); if (!el) return;
   const top = $('top'), mode = islandMode();
+  ISL.mode = mode;
   if (!mode){
-    if (!el.hidden){ el.hidden = true; panel.hidden = true; ISL.open = ISL.big = false; ISL.key = ''; top.classList.remove('has-island'); }
+    if (!el.hidden && !el.classList.contains('out')){
+      el.classList.add('out'); panel.hidden = true; ISL.open = ISL.big = false; ISL.key = ''; ISL.swap = '';
+      setTimeout(() => { if (!islandMode()){ el.hidden = true; el.classList.remove('out'); top.classList.remove('has-island'); } else el.classList.remove('out'); }, 220);
+    }
     return;
   }
+  el.classList.remove('out');
   top.classList.add('has-island'); el.hidden = false;
-  el.classList.toggle('msg', mode === 'msg'); el.classList.toggle('slots', mode === 'slots');
+  const ask = mode === 'msg' && ISL.msg.kind !== 'chat';
+  for (const k of ['msg', 'slots', 'crash', 'loono']) el.classList.toggle(k, mode === k);
   let key, html, label, swapKey;
   if (mode === 'msg'){
-    const m = ISL.msg; swapKey = 'msg' + m.t;
-    key = swapKey; label = `Neue Nachricht von ${m.name}, antippen zum Öffnen`;
-    html = `<span class="islide imsg"><span class="iav">${avH(m.av)}</span><span class="imtx"><b>${esc(m.name)}</b> ${esc(m.text)}</span></span>`;
+    const m = ISL.msg; swapKey = key = 'msg' + m.t;
+    label = ask ? `${m.text}. Antippen zum Öffnen, lange drücken zum Antworten` : `Neue Nachricht von ${m.name}, antippen zum Öffnen`;
+    html = islandAskHTML(m, false);
+  } else if (mode === 'loono'){
+    swapKey = key = 'loono' + LO.g.n;
+    label = 'Loono: Du bist dran. Antippen zum Spielen';
+    html = `<span class="islide ilo"><span class="iav">🎴</span><b>Du bist dran</b><span class="imore num" id="ilot"></span></span>`;
+  } else if (mode === 'crash'){
+    const r = islandCrash(); swapKey = 'crash'; key = 'crash' + r.id;
+    label = 'Crash läuft. Antippen: zu Crash, lange drücken: Auszahlen';
+    html = islandCrashHTML(false);
   } else if (mode === 'slots'){
     swapKey = 'slots'; key = ['slots', S.busy, S.reels.map(r => r[1]).join(), S.res?.pay, S.res?.jp, S.auto, S.spun].join('|');
     label = 'Automat läuft. Antippen: zum Automaten, lange drücken: vergrößern';
@@ -2823,23 +2982,46 @@ function renderIsland(){
   // compare keys, not innerHTML: the browser writes some characters back differently, which made the island re-animate (flicker)
   if (ISL.key !== key){ const swap = ISL.swap !== swapKey; ISL.key = key; ISL.swap = swapKey; el.innerHTML = html; if (swap) el.querySelector('.islide')?.classList.add('in'); }
   el.setAttribute('aria-label', label);
-  if (mode === 'slots' && ISL.big){
-    const ph = islandSlotsHTML(true), pk = 'big|' + key;
+  const bigMode = mode === 'msg' ? (ask ? 'ask' : null) : mode;
+  if (ISL.big && ISL_BIG.has(bigMode)){
+    const pk = 'big|' + (mode === 'crash' ? key : key);
     panel.hidden = false; panel.classList.add('isbig');
-    if (ISL.pkey !== pk){ ISL.pkey = pk; panel.innerHTML = ph; }
-    return;
+    if (ISL.pkey !== pk){ ISL.pkey = pk; panel.innerHTML = mode === 'slots' ? islandSlotsHTML(true) : mode === 'crash' ? islandCrashHTML(true) : islandAskHTML(ISL.msg, true); }
+  } else {
+    panel.classList.remove('isbig'); ISL.big = false;
+    panel.hidden = !(mode === 'live' && ISL.open);
+    if (mode === 'live' && ISL.open){
+      const items = islandItems();
+      const pk = 'live|' + items.map(({ m, S: st }) => keyOf(m) + st.sc + st.label).join();
+      if (ISL.pkey !== pk){ ISL.pkey = pk; panel.innerHTML = `<div class="iphead"><b>Live</b><span class="muted small">tippen für den Ticker</span></div>${items.map(({ m, S: st }) => `<button class="iprow" data-act="sopen" data-key="${esc(keyOf(m))}">${islandRow(m, st, true)}</button>`).join('')}`; }
+    }
   }
-  panel.classList.remove('isbig');
-  if (mode !== 'slots') ISL.big = false;
-  panel.hidden = !(mode === 'live' && ISL.open);
-  if (mode === 'live' && ISL.open){
-    const items = islandItems();
-    const ph = `<div class="iphead"><b>Live</b><span class="muted small">tippen für den Ticker</span></div>${items.map(({ m, S: st }) => `<button class="iprow" data-act="sopen" data-key="${esc(keyOf(m))}">${islandRow(m, st, true)}</button>`).join('')}`;
-    const pk = 'live|' + items.map(({ m, S: st }) => keyOf(m) + st.sc + st.label).join();
-    if (ISL.pkey !== pk){ ISL.pkey = pk; panel.innerHTML = ph; }
-  }
+  if ((mode === 'crash' || mode === 'loono') && !ISL.raf) ISL.raf = requestAnimationFrame(islandFrame);
 }
-function openSlotsFromIsland(){ ISL.big = false; ISL.open = false; if (tab !== 'table') setTab('table'); if (game !== 'slots' && standUp('slots')) openGame('slots'); renderIsland(); }
+/** live numbers inside the island (Crash multiplier, Loono turn clock) */
+function islandFrame(){
+  ISL.raf = 0;
+  const mode = ISL.mode;
+  if (mode === 'crash'){
+    const c = P?.crash, r = c && crashRound(c.r); if (!r) return;
+    const t = NOW(), m = $('icrm'), s = $('icrs'), m2 = $('icrm2'), btn = $('icrbtn'), rr = $('icrr');
+    let big, small, cls = '';
+    if (c.out != null){ big = c.out > 0 ? crFmt(c.out) : '💥'; small = c.out > 0 ? '+' + fmt(c.pay) : 'weg'; cls = c.out > 0 ? 'win' : 'lose'; }
+    else if (t < r.fly){ big = ((r.fly - t) / 1000).toFixed(1).replace('.', ',') + ' s'; small = 'Start'; }
+    else if (t < r.boom){ const x = crMult(r, t); big = crFmt(x); small = fmt(Math.floor(c.bet * x)); cls = 'fly'; }
+    else { big = crFmt(r.cp); small = '💥'; cls = 'lose'; }
+    for (const e of [m, m2]) if (e){ e.textContent = big; e.className = 'num ' + (e === m2 ? 'icrbig ' : '') + cls; }
+    if (s) s.textContent = small;
+    if (rr) rr.textContent = cls === 'lose' ? '💥' : '🚀';
+    if (btn){ const can = c.out == null && t >= r.fly && t < r.boom; btn.disabled = !can; btn.textContent = can ? `Auszahlen · ${fmt(Math.floor(c.bet * crMult(r, t)))} ℒ` : c.out > 0 ? `Ausgezahlt bei ${crFmt(c.out)}` : t < r.fly ? 'Gleich geht’s los' : 'Vorbei'; }
+  }
+  if (mode === 'loono'){ const e = $('ilot'), g = LO.g; if (e && g) e.textContent = Math.max(0, Math.ceil((g.dl - Date.now()) / 1000)) + ' s'; }
+  if (mode === 'crash' || mode === 'loono') ISL.raf = requestAnimationFrame(islandFrame);
+}
+function goTo(t, g){ ISL.big = false; ISL.open = false; if (tab !== t) setTab(t); if (g && game !== g && standUp(g)) openGame(g); renderIsland(); }
+const openSlotsFromIsland = () => goTo('table', 'slots');
+/** show something in the island for a few seconds (and keep it in the notification centre) */
+function islandNotice(n){ ISL.msg = { t: Date.now(), until: Date.now() + (n.kind === 'chat' ? 8000 : 12000), ...n }; ISL.open = false; ISL.big = false; ISL.pkey = ''; renderIsland(); }
 // long press makes the island bigger (like on the iPhone), a tap opens what it shows
 (() => {
   let t = 0;
@@ -2847,9 +3029,9 @@ function openSlotsFromIsland(){ ISL.big = false; ISL.open = false; if (tab !== '
     ISL.lp = false;
     if (!e.target.closest('#island')) return;
     clearTimeout(t);
-    t = setTimeout(() => { if (islandMode() === 'slots'){ ISL.lp = true; ISL.big = true; ISL.pkey = ''; navigator.vibrate?.(12); renderIsland(); } }, 420);
+    t = setTimeout(() => { const m = islandMode(), b = m === 'msg' ? (ISL.msg.kind !== 'chat' ? 'ask' : null) : m; if (ISL_BIG.has(b)){ ISL.lp = true; ISL.big = true; ISL.pkey = ''; buzz(12); renderIsland(); } }, 420);
   });
-  for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) document.addEventListener(ev, () => clearTimeout(t));
+  for (const ev of ['pointerup', 'pointercancel']) document.addEventListener(ev, () => clearTimeout(t));
   document.addEventListener('contextmenu', e => { if (e.target.closest('#island')) e.preventDefault(); });
 })();
 document.addEventListener('click', e => {
@@ -2858,12 +3040,19 @@ document.addEventListener('click', e => {
   if (ISL.lp){ ISL.lp = false; return; }
   if (isl){
     const mode = islandMode();
-    if (mode === 'msg'){ const cid = ISL.msg.cid; ISL.msg = null; ISL.key = ''; if (tab !== 'chat') setTab('chat'); openChat(cid); renderIsland(); return; }
+    if (mode === 'msg'){ const m = ISL.msg; ISL.msg = null; ISL.key = ''; if (m.kind === 'chat'){ goTo('chat'); openChat(m.cid); } else if (m.kind === 'flip') goTo('account'); else { SP.view = 'mine'; SP.detail = null; goTo('table', 'sports'); } return; }
+    if (mode === 'loono') return goTo('table', 'loono');
+    if (mode === 'crash') return goTo('table', 'crash');
     if (mode === 'slots') return openSlotsFromIsland();
     const items = islandItems(); if (items.length === 1){ openMatch(keyOf(items[0].m)); } else { ISL.open = !ISL.open; ISL.pkey = ''; renderIsland(); }
     return;
   }
-  if (pan && ISL.big){ if (!e.target.closest('[data-keep]')) openSlotsFromIsland(); return; }
+  if (pan && ISL.big){
+    const k = e.target.closest('[data-keep]');
+    if (k){ if (k.dataset.close){ ISL.msg = null; ISL.big = false; ISL.key = ''; setTimeout(renderIsland, 50); } return; }
+    const mode = islandMode(); if (mode === 'crash') goTo('table', 'crash'); else if (mode === 'msg'){ const m = ISL.msg; ISL.msg = null; if (m.kind === 'flip') goTo('account'); else { SP.view = 'mine'; goTo('table', 'sports'); } } else openSlotsFromIsland();
+    return;
+  }
   if ((ISL.open || ISL.big) && !pan){ ISL.open = false; ISL.big = false; renderIsland(); }
 });
 function openMatch(key){
@@ -3019,7 +3208,8 @@ function levelLater(L, ms){
   setTimeout(() => {
     if (hold || R.busy || S.busy || H.busy || wheelBusy) return levelLater(L, 300);
     const r = lvlReward(L), newTitle = titleOf(L) !== titleOf(L - 1);
-    SFX.bj(); toast(`⬆️ Level ${L}${newTitle ? ` · neuer Titel: ${titleOf(L)}` : ''} · +${fmt(r.l)} ℒ${r.e ? ` und ${fmt(r.e)} €` : ''}`);
+    const tx = `Level ${L}${newTitle ? ` · neuer Titel: ${titleOf(L)}` : ''} · +${fmt(r.l)} ℒ${r.e ? ` und ${fmt(r.e)} €` : ''}`;
+    SFX.bj(); buzz([20, 40, 20]); toast('⬆️ ' + tx); notify('⬆️', tx, { tab: 'table' });
   }, ms);
 }
 /** every finished bet: XP and daily tasks */
@@ -3111,7 +3301,7 @@ function startJackpot(){
   unsubJP = onSnapshot(ref, s => {
     if (!s.exists()){ setDoc(ref, { pot: JP_SEED }).catch(() => {}); return; }
     const d = s.data(), lt = tsMs(d.last?.t);
-    if (!JP.first && d.last && lt && lt !== tsMs(JP.last?.t) && d.last.uid !== uid){ SFX.bj(); toast(`💥 ${d.last.name} hat den Jackpot geknackt: ${fmt(d.last.amt)} ℒ!`); }
+    if (!JP.first && d.last && lt && lt !== tsMs(JP.last?.t) && d.last.uid !== uid){ SFX.bj(); toast(`💥 ${d.last.name} hat den Jackpot geknackt: ${fmt(d.last.amt)} ℒ!`); notify('💥', `${d.last.name} hat den Jackpot geknackt: ${fmt(d.last.amt)} ℒ`, { tab: 'table', game: 'slots' }); }
     JP.pot = d.pot; JP.last = d.last || null; JP.first = false; renderAll();
   }, e => console.warn(e));
 }
@@ -3399,7 +3589,7 @@ function tpPrize(){
     const tb = tpTable(ms).filter(r => r.n > 0); if (tb.length < 2) continue;
     const me = tb.find(r => r.id === uid); if (!me || me.pts <= 0 || me.pts < tb[0].pts) continue;
     if (withPlayer(d => { d.tipWon ||= []; if (d.tipWon.includes(key)) return false; d.tipWon = [...d.tipWon, key].slice(-60); d.balance += TP_PRIZE; grant(d, 'tipp'); return true; }, 'Tipprunde Spieltagssieger')){
-      SFX.coins(); toast(`📋 Spieltagssieger in der Tipprunde (${k}. Spieltag): +${fmt(TP_PRIZE)} ℒ`);
+      SFX.coins(); toast(`📋 Spieltagssieger in der Tipprunde (${k}. Spieltag): +${fmt(TP_PRIZE)} ℒ`); notify('📋', `Spieltagssieger in der Tipprunde (${k}. Spieltag): +${fmt(TP_PRIZE)} ℒ`, { tab: 'table', game: 'tipp' });
     }
   }
 }
@@ -3483,7 +3673,7 @@ function duelsChanged(before = DU.all){
   const now = Date.now();
   for (const [id, du] of Object.entries(DU.all)){
     const other = du.a === uid ? du.b : du.a;
-    if (!DU.first && du.b === uid && du.st === 'open' && !before[id]){ SFX.pop(); toast(`🤝 ${nameOf(du.a)} will gegen dich wetten: ${du.t1} – ${du.t2}, ${fmt(du.stake)} ℒ`); }
+    if (!DU.first && du.b === uid && du.st === 'open' && !before[id]){ SFX.pop(); const tx = `will wetten: ${du.t1} – ${du.t2}, ${fmt(du.stake)} ℒ`; islandNotice({ kind: 'duel', id, name: nameOf(du.a), icon: '🤝', text: tx }); notify('🤝', `${nameOf(du.a)} ${tx}`, { tab: 'table', game: 'sports', view: 'mine' }); }
     // the challenger gets the stake back: declined, withdrawn or not accepted before kick-off
     if (du.a === uid && !du.refA && (du.st === 'declined' || du.st === 'cancelled' || (du.st === 'open' && now > du.ko))){
       withPlayer(d => { if (!fdoneOnce(d, 'du:' + id + ':ref')) return false; d.balance += du.stake; return true; }, 'Freundeswette zurück');
@@ -3497,7 +3687,8 @@ function duelsChanged(before = DU.all){
     if (du.st === 'done'){
       const won = du.winner === uid;
       if (withPlayer(d => { if (!fdoneOnce(d, 'du:' + id + ':book')) return false; if (won){ d.balance += du.stake * 2; grant(d, 'duel'); } record(d, 'duel', du.stake, won ? du.stake * 2 : 0); return true; }, 'Freundeswette')){
-        won ? SFX.win() : SFX.lose(); toast(`🤝 ${du.t1} – ${du.t2} ${du.score ? du.score[0] + ':' + du.score[1] : ''}: Wette gegen ${nameOf(other)} ${won ? `gewonnen, +${fmt(du.stake * 2)} ℒ` : 'verloren'}`);
+        const tx = `${du.t1} – ${du.t2} ${du.score ? du.score[0] + ':' + du.score[1] : ''}: Wette gegen ${nameOf(other)} ${won ? `gewonnen, +${fmt(du.stake * 2)} ℒ` : 'verloren'}`;
+        won ? SFX.win() : SFX.lose(); toast('🤝 ' + tx); notify('🤝', tx, { tab: 'table', game: 'sports', view: 'mine' });
       }
     }
     if (du.st === 'void') withPlayer(d => { if (!fdoneOnce(d, 'du:' + id + ':void')) return false; d.balance += du.stake; return true; }, 'Freundeswette ungültig');
@@ -3581,11 +3772,11 @@ document.addEventListener('click', e => {
     case 'taskclaim': taskClaim(b.dataset.k); break;
     case 'crbet': CR.bet = v; CR.key = ''; renderAll(); break;
     case 'crauto': CR.auto = v; savePref('crashauto', v); CR.key = ''; renderAll(); break;
-    case 'crgo': crashBet(); break;
+    case 'crgo': if (confirmBig(CR.bet, 'crash')) crashBet(); break;
     case 'crcash': crashCash(); break;
     case 'mnstake': MN.stake = v; renderAll(); break;
     case 'mnn': MN.n = v; renderAll(); break;
-    case 'mnstart': mnStart(); break;
+    case 'mnstart': if (confirmBig(MN.stake, 'mines')) mnStart(); break;
     case 'mnpick': mnPick(+b.dataset.i); break;
     case 'mncash': mnCash(); break;
     case 'tpp': tpSet(b.dataset.id, +b.dataset.s, v); break;
@@ -3869,11 +4060,11 @@ function loChanged(a, g){
     }
     if (g.seats[g.turn]?.id === uid && LO.lastTurnN !== g.n){ LO.lastTurnN = g.n; if (a && a.n !== g.n) setTimeout(() => tone(880, .08, { type: 'triangle', vol: .06 }), 180); }
   }
-  if (g.st === 'play' && a?.st === 'lobby' && g.seats.some(s => s.id === uid) && !here && game !== 'bj') toast('🎴 Deine Loono-Runde hat angefangen!');
+  if (g.st === 'play' && a?.st === 'lobby' && g.seats.some(s => s.id === uid) && !here && game !== 'bj'){ toast('🎴 Deine Loono-Runde hat angefangen!'); notify('🎴', 'Deine Loono-Runde hat angefangen', { tab: 'table', game: 'loono' }); }
   if (g.st === 'done' && a?.st === 'play'){
     const won = g.winner === uid;
     if (won) SFX.bj(); else SFX.lose();
-    if (!here) toast(won ? '🎴 Du hast Loono gewonnen!' : `🎴 ${loName(g, g.winner)} hat Loono gewonnen`);
+    if (!here){ const tx = won ? 'Du hast Loono gewonnen!' : `${loName(g, g.winner)} hat Loono gewonnen`; toast('🎴 ' + tx); notify('🎴', tx, { tab: 'table', game: 'loono' }); }
   }
 }
 /** stake in when the round starts, pot out to the winner, once each */
@@ -4162,7 +4353,7 @@ function loInviteBubble(m){
 // long press (phone) or right click (PC) on a message opens the reactions
 (() => {
   let t = 0;
-  const start = e => { const bub = e.target.closest?.('#chmsgs .bub[data-id]'); if (!bub || e.target.closest('button,img')) return; clearTimeout(t); t = setTimeout(() => { CH.react = bub.dataset.id; renderChatMsgs(); navigator.vibrate?.(15); }, 450); };
+  const start = e => { const bub = e.target.closest?.('#chmsgs .bub[data-id]'); if (!bub || e.target.closest('button,img')) return; clearTimeout(t); t = setTimeout(() => { CH.react = bub.dataset.id; renderChatMsgs(); buzz(15); }, 450); };
   const stop = () => clearTimeout(t);
   document.addEventListener('pointerdown', start); document.addEventListener('pointerup', stop); document.addEventListener('pointercancel', stop); document.addEventListener('pointermove', e => { if (e.movementX * e.movementX + e.movementY * e.movementY > 16) stop(); });
   document.addEventListener('contextmenu', e => { const bub = e.target.closest?.('#chmsgs .bub[data-id]'); if (!bub) return; e.preventDefault(); CH.react = bub.dataset.id; renderChatMsgs(); });
@@ -4280,6 +4471,216 @@ document.addEventListener('click', e => {
     if (dx < -50 && TUT.i < n - 1){ TUT.i++; renderModal(true); } else if (dx > 50 && TUT.i > 0){ TUT.i--; renderModal(true); }
   });
 })();
+
+
+/* ================= v1.5.4: Komfort ================= */
+/* ---------- Vibration (getrennt vom Ton) ---------- */
+const buzz = ms => { if (ls.get('vib', true)) try { navigator.vibrate?.(ms); } catch {} };
+
+/* ---------- Mitteilungszentrale ---------- */
+const NOTE = { list: ls.get('notes', []), seen: ls.get('notesSeen', 0) };
+function notify(icon, text, go){
+  NOTE.list = [{ t: Date.now(), icon, text: String(text).slice(0, 160), go: go || null }, ...NOTE.list].slice(0, 60);
+  ls.set('notes', NOTE.list); renderBell();
+}
+function renderBell(){
+  const b = $('bellbadge'); if (!b) return;
+  const n = NOTE.list.filter(x => x.t > NOTE.seen).length;
+  b.hidden = !n; b.textContent = n > 9 ? '9+' : n;
+}
+const ago = t => { const s = (Date.now() - t) / 1000; return s < 60 ? 'gerade eben' : s < 3600 ? `vor ${Math.floor(s / 60)} Min.` : s < 86400 ? `vor ${Math.floor(s / 3600)} Std.` : new Date(t).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' }); };
+function notesHTML(){
+  const L = NOTE.list;
+  return `<div class="stack">
+    <div class="row" style="justify-content:space-between"><h2 style="margin:0">Mitteilungen</h2><div class="row" style="gap:6px">${L.length ? '<button class="btn sm" data-act="notesclear">Leeren</button>' : ''}<button class="btn sm" data-act="closemodal">Fertig</button></div></div>
+    ${L.length ? `<div class="notes">${L.map((x, i) => `<button class="note-i${x.t > NOTE.prev ? ' new' : ''}" data-act="notego" data-i="${i}"><span class="note-ic">${x.icon}</span><span class="note-tx">${esc(x.text)}<small>${ago(x.t)}</small></span>${x.go ? '<span class="note-go">›</span>' : ''}</button>`).join('')}</div>`
+      : '<div class="chatempty" style="padding:30px 0"><div class="big">🔔</div><p class="muted">Keine Mitteilungen. Herausforderungen, Gewinne und Nachrichten landen hier.</p></div>'}
+  </div>`;
+}
+function openNotes(){ NOTE.prev = NOTE.seen; NOTE.seen = Date.now(); ls.set('notesSeen', NOTE.seen); openModal('notes'); renderBell(); }
+function noteGo(go){
+  closeModal(); if (!go) return;
+  if (go.chat){ goTo('chat'); openChat(go.chat); return; }
+  if (go.view) SP.view = go.view;
+  goTo(go.tab || 'table', go.game || null);
+  if (go.tab === 'table' && !go.game && game !== null && standUp(null)){ game = null; setPlaying(null); renderAll(); }
+}
+
+/* ---------- Aktivität der Freunde ---------- */
+function feedItems(){
+  const out = [], now = Date.now();
+  for (const id of friendIds()){
+    const p = players[id]; if (!p) continue;
+    for (const h of p.hist || []){
+      if (now - h.t > 864e5 || !(h.n > 0)) continue;
+      const x = h.w ? (h.n + h.w) / h.w : 0;
+      if (h.n >= 2500 || x >= 8) out.push({ t: h.t, id, txt: `hat ${h.g ? 'bei ' + (GAME_NAMES[h.g] || h.g) : 'beim Blackjack'} ${fmt(h.n)} ℒ gewonnen${x >= 2.5 ? ` (×${x.toLocaleString('de-DE', { maximumFractionDigits: 1 })})` : ''}`, ic: x >= 8 ? '🚀' : '💰' });
+    }
+    for (const [k, t] of Object.entries(p.ach || {})){
+      if (now - t > 2 * 864e5) continue; const a = ACH.find(z => z[0] === k);
+      if (a && !a[4]) out.push({ t, id, txt: `hat „${a[2]}“ freigeschaltet`, ic: a[1] });
+    }
+  }
+  if (JP.last && now - tsMs(JP.last.t) < 2 * 864e5 && JP.last.uid !== uid && friendIds().includes(JP.last.uid)) out.push({ t: tsMs(JP.last.t), id: JP.last.uid, txt: `hat den Jackpot geknackt: ${fmt(JP.last.amt)} ℒ`, ic: '💥' });
+  return out.sort((a, b) => b.t - a.t).slice(0, 6);
+}
+function feedHTML(){
+  const it = feedItems(); if (!it.length) return '';
+  return `<div class="panel stack feed"><h3>Bei deinen Freunden</h3>${it.map(x => `<button class="feed-i" data-act="profile" data-id="${esc(x.id)}"><span class="feed-av">${avH(avOf(x.id))}<i>${x.ic}</i></span><span class="feed-tx"><b>${esc(nameOf(x.id))}</b> ${esc(x.txt)}<small>${ago(x.t)}</small></span></button>`).join('')}</div>`;
+}
+
+/* ---------- Kontextmenü: lange auf eine Spielkachel drücken ---------- */
+const CTX_ACTS = {
+  bj: [['Öffnen', 'open', '▶︎'], ['Tisch eröffnen', 'bjnew', '➕'], ['Anleitung', 'tut', '?']],
+  sports: [['Live-Spiele', 'live', '●'], ['Meine Wetten', 'mine', '🧾'], ['Anleitung', 'tut', '?']],
+  loono: [['Gegen 2 Bots', 'lobots', '🤖'], ['Runde eröffnen', 'lonew', '➕'], ['Anleitung', 'tut', '?']],
+  crash: [['Mit Auto-Auszahlung 2×', 'crash2', '🚀'], ['Öffnen', 'open', '▶︎'], ['Anleitung', 'tut', '?']],
+  mines: [['3 Minen', 'mines3', '💎'], ['10 Minen', 'mines10', '💣'], ['Anleitung', 'tut', '?']],
+  tipp: [['Tippen', 'open', '✏️'], ['Rangliste', 'rank', '🏆'], ['Anleitung', 'tut', '?']],
+  slots: [['50 Auto-Spins', 'slots50', '🔁'], ['Endlos drehen', 'slotsinf', '∞'], ['Anleitung', 'tut', '?']],
+  roulette: [['Öffnen', 'open', '▶︎'], ['Anleitung', 'tut', '?']],
+  horses: [['Öffnen', 'open', '▶︎'], ['Anleitung', 'tut', '?']],
+  hilo: [['Öffnen', 'open', '▶︎'], ['Anleitung', 'tut', '?']],
+};
+const CTX = { g: null, lp: false };
+function openCtx(tile){
+  const g = tile.dataset.g, acts = CTX_ACTS[g]; if (!acts) return;
+  closeCtx(); CTX.g = g; buzz(12);
+  const r = tile.getBoundingClientRect(), menu = $('ctxmenu'), shade = $('ctxshade');
+  menu.innerHTML = acts.map(([l, a, ic]) => `<button data-act="ctxdo" data-v2="${a}"><span>${esc(l)}</span><i>${ic}</i></button>`).join('');
+  shade.hidden = false; menu.hidden = false;
+  // a copy of the tile floats sharp above the blur (the real one sits inside the page's layers)
+  const clone = tile.cloneNode(true); clone.removeAttribute('data-act'); clone.classList.add('ctxclone');
+  Object.assign(clone.style, { left: r.left + 'px', top: r.top + 'px', width: r.width + 'px', height: r.height + 'px' });
+  document.body.appendChild(clone);
+  const w = Math.min(260, innerWidth - 24), h = menu.offsetHeight;
+  const below = r.bottom + 10 + h < innerHeight;
+  menu.style.width = w + 'px';
+  menu.style.left = Math.max(12, Math.min(innerWidth - w - 12, r.left + r.width / 2 - w / 2)) + 'px';
+  menu.style.top = (below ? r.bottom + 10 : Math.max(12, r.top - h - 10)) + 'px';
+  menu.style.transformOrigin = below ? '50% 0' : '50% 100%';
+}
+function closeCtx(){ $('ctxmenu').hidden = true; $('ctxshade').hidden = true; document.querySelectorAll('.ctxclone').forEach(t => t.remove()); CTX.g = null; }
+function ctxDo(a){
+  const g = CTX.g; closeCtx(); if (!g) return;
+  if (a === 'tut') return openTut(g);
+  if (!standUp(g)) return;
+  if (a === 'live' || a === 'mine') SP.view = a;
+  if (a === 'rank') TP.view = 'rank';
+  if (a === 'crash2'){ CR.auto = 2; savePref('crashauto', 2); }
+  if (a === 'mines3' || a === 'mines10'){ MN.n = a === 'mines3' ? 3 : 10; savePref('minesn', MN.n); }
+  openGame(g);
+  if (a === 'bjnew') createTable(false);
+  if (a === 'lobots'){ LO.bots = 2; loCreate(2); }
+  if (a === 'lonew') loCreate(0);
+  if (a === 'slots50' && confirmBig(S.bet, 'slotsauto', true)) slotAuto(50);
+  if (a === 'slotsinf' && confirmBig(S.bet, 'slotsauto', true)) slotAuto(Infinity);
+}
+(() => {
+  let t = 0, x0 = 0, y0 = 0;
+  document.addEventListener('pointerdown', e => {
+    CTX.lp = false; const tile = e.target.closest?.('#home .tile[data-g]'); if (!tile) return;
+    x0 = e.clientX; y0 = e.clientY; clearTimeout(t);
+    t = setTimeout(() => { CTX.lp = true; openCtx(tile); }, 480);
+  });
+  document.addEventListener('pointermove', e => { if (t && (Math.abs(e.clientX - x0) > 8 || Math.abs(e.clientY - y0) > 8)) { clearTimeout(t); t = 0; } });
+  for (const ev of ['pointerup', 'pointercancel']) document.addEventListener(ev, () => { clearTimeout(t); t = 0; });
+  document.addEventListener('contextmenu', e => { const tile = e.target.closest?.('#home .tile[data-g]'); if (tile){ e.preventDefault(); CTX.lp = true; openCtx(tile); } });
+  // the click that ends the long press must not open the game
+  document.addEventListener('click', e => { if (CTX.lp && e.target.closest('#home .tile')){ e.stopPropagation(); e.preventDefault(); CTX.lp = false; } }, true);
+})();
+
+/* ---------- große Einsätze: einmal nachfragen ---------- */
+const BIG = { k: null, t: 0 };
+function confirmBig(amount, key, always){
+  if (!P || !(amount >= 10000 || (amount >= 1000 && amount > P.balance / 2))) return true;
+  if (BIG.k === key && Date.now() - BIG.t < 4000){ BIG.k = null; return true; }
+  BIG.k = key; BIG.t = Date.now();
+  toast(`${fmt(amount)} ℒ? Zum Bestätigen nochmal tippen`); buzz(25);
+  return false;
+}
+
+/* ---------- Chat: „schreibt …“, Gelesen-Häkchen, Datumstrennung ---------- */
+let typT = 0;
+document.addEventListener('input', e => {
+  if (e.target.id !== 'chx' || !CH.open || !e.target.value) return;
+  if (Date.now() - typT < 3000) return; typT = Date.now();
+  updateDoc(doc(fs, 'chats', CH.open), { ['typing.' + uid]: Date.now() }).catch(() => {});
+});
+function chatStatus(c){
+  const others = (c.members || []).filter(m => m !== uid), now = Date.now();
+  const typing = others.filter(m => (c.typing?.[m] || 0) > now - 6000);
+  if (typing.length) return `<span class="typing">${c.group ? esc(typing.map(nameOf).join(', ')) + ' ' : ''}schreibt<i></i><i></i><i></i></span>`;
+  return c.group ? esc(c.members.map(m => m === uid ? 'du' : nameOf(m)).join(', ')) : (isOnline(others[0]) ? 'online' : 'offline');
+}
+function markReadServer(id){
+  const c = CH.list[id]; if (!c?.last || c.last.u === uid || (c.read?.[uid] || 0) >= c.last.t) return;
+  updateDoc(doc(fs, 'chats', id), { ['read.' + uid]: Date.now() }).catch(() => {});
+}
+function tickHTML(m, c){
+  if (m.u !== uid) return '';
+  const others = (c.members || []).filter(x => x !== uid);
+  const read = others.length && others.every(x => (c.read?.[x] || 0) >= m.t);
+  return `<span class="tick${read ? ' read' : ''}" aria-label="${read ? 'gelesen' : 'gesendet'}">${read ? '✓✓' : '✓'}</span>`;
+}
+const dayLabel = t => { const d = new Date(t), n = new Date(); const y = new Date(n); y.setDate(n.getDate() - 1);
+  return d.toDateString() === n.toDateString() ? 'Heute' : d.toDateString() === y.toDateString() ? 'Gestern' : d.toLocaleDateString('de-DE', { weekday: 'long', day: '2-digit', month: '2-digit' }); };
+setInterval(() => { if (tab === 'chat' && CH.open) renderChatTab(); }, 2000);
+
+/* ---------- Kontobuch-Filter ---------- */
+const KB = { f: 'all' };
+const kbKey = r => String(r || '').replace(/ \+ Level \d+/g, '').replace(/ Einsatz$| zurück$| ungültig$| Spieltagssieger$/, '').replace(/^Bank: .*/, 'Bank').replace(/^Coin Flip.*/, 'Coin Flip');
+
+/* ---------- zwischen den Tabs wischen ---------- */
+const TAB_ORDER = ['table', 'players', 'chat', 'bank', 'shop', 'account'];
+(() => {
+  let s = null;
+  const blocked = el => el.closest('header, #modal, .felt, .lohand, .chiprow, .scroll, .bub, input, textarea, select, .seg, .sviews, .tile, .mgrid, .crstage, .chatmsgs, .ctxmenu, .loseats, table, .islandpanel');
+  document.addEventListener('pointerdown', e => { s = null; if (!P || e.pointerType === 'mouse' || blocked(e.target)) return; if (tab === 'table' && game !== null) return; if (tab === 'chat' && CH.open) return; s = { x: e.clientX, y: e.clientY, t: Date.now() }; });
+  document.addEventListener('pointerup', e => {
+    if (!s) return; const dx = e.clientX - s.x, dy = e.clientY - s.y, dt = Date.now() - s.t; s = null;
+    if (dt > 600 || Math.abs(dx) < 70 || Math.abs(dy) > Math.abs(dx) * 0.6) return;
+    const i = TAB_ORDER.indexOf(tab) + (dx < 0 ? 1 : -1); if (i < 0 || i >= TAB_ORDER.length) return;
+    SLIDE.dir = dx < 0 ? 1 : -1; setTab(TAB_ORDER[i]);
+  });
+  document.addEventListener('pointercancel', () => { s = null; });
+})();
+const SLIDE = { dir: 0 };
+
+/* ---------- Kleinigkeiten, die es flüssiger machen ---------- */
+const SCROLL = {};
+/** balance counts up and down instead of jumping */
+const BAL = { shown: null, raf: 0 };
+function tweenBalance(to){
+  const el = $('pbal'); if (!el) return;
+  if (BAL.shown == null || reduceMotion || Math.abs(to - BAL.shown) < 2){ BAL.shown = to; el.textContent = fmt(to) + ' ℒ'; return; }
+  const from = BAL.shown, t0 = performance.now(), d = 520;
+  cancelAnimationFrame(BAL.raf);
+  const step = now => { const k = Math.min(1, (now - t0) / d), e = 1 - Math.pow(1 - k, 3); const v = Math.round(from + (to - from) * e); BAL.shown = v; el.textContent = fmt(v) + ' ℒ'; if (k < 1) BAL.raf = requestAnimationFrame(step); };
+  BAL.raf = requestAnimationFrame(step);
+}
+/** settings in Konto: sound and vibration */
+function settingsHTML(){
+  return `<div class="panel stack"><h3>Einstellungen</h3>
+    <label class="setrow"><span><b>Ton</b><small class="muted">Kartengeräusche, Gewinne und Hinweise</small></span><input type="checkbox" data-act="setsound" ${snd.on ? 'checked' : ''}></label>
+    <label class="setrow"><span><b>Vibration</b><small class="muted">Kurzes Feedback bei Gesten und Gewinnen${/iPhone|iPad|Macintosh/.test(navigator.userAgent) && !('vibrate' in navigator) ? ' · iPhone und iPad unterstützen das im Browser leider nicht' : ''}</small></span><input type="checkbox" data-act="setvib" ${ls.get('vib', true) ? 'checked' : ''}></label>
+  </div>`;
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-act]'); if (!b || b.disabled) return;
+  switch (b.dataset.act){
+    case 'bell': openNotes(); break;
+    case 'notego': noteGo(NOTE.list[+b.dataset.i]?.go); break;
+    case 'notesclear': NOTE.list = []; ls.set('notes', []); renderModal(true); renderBell(); break;
+    case 'ctxdo': ctxDo(b.dataset.v2); break;
+    case 'kbf': KB.f = b.dataset.v; renderModal(true); if (tab === 'account') renderAccount(); break;
+    case 'setsound': snd.on = b.checked; ls.set('sound', snd.on); if (snd.on) SFX.chip(); break;
+    case 'setvib': ls.set('vib', b.checked); if (b.checked) buzz(20); break;
+  }
+});
+$('ctxshade')?.addEventListener('click', closeCtx);
+// finished entrance animations are removed again, so they don't trap z-index (e.g. the lifted tile above the blur)
+document.addEventListener('animationend', e => { const c = e.target.classList; if (!c) return; if (e.animationName === 'vinr' || e.animationName === 'vinl') c.remove('vin-r', 'vin-l'); if (e.animationName === 'gin') c.remove('gin'); });
 
 /* ---------- Tellerwäscher-Schicht: the way back after going broke ---------- */
 const DISH_MS = 30000, DISH_PAY = 50, DISH_GOLD = 150, DISH_ROACH = -200, DISH_MIN = 300, DISH_MAX = 2500;
@@ -4424,9 +4825,14 @@ function suspicious(p){
   return false;
 }
 function logHTML(p, n = 15){
-  const L = (p.log || []).slice(-n).reverse().filter(x => x.r !== 'start');
-  if (!L.length) return '<p class="muted small">Noch keine Einträge.</p>';
-  return `<div class="hist">${L.map(x => `<div class="h"><span class="muted num">${new Date(x.t).toLocaleString('de-DE',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</span><span>${esc(x.r)}</span><b class="num">${x.b ? `<span style="color:${x.b>0?'var(--win)':'var(--lose)'}">${sgn(x.b)} ℒ</span>` : ''}${x.b && x.e ? ' ' : ''}${x.e ? `<span style="color:${x.e>0?'var(--win)':'var(--lose)'}">${sgn(x.e)} €</span>` : ''}</b></div>`).join('')}</div>`;
+  const all = (p.log || []).filter(x => x.r !== 'start');
+  if (!all.length) return '<p class="muted small">Noch keine Einträge.</p>';
+  const keys = [...new Set(all.map(x => kbKey(x.r)))];
+  if (KB.f !== 'all' && !keys.includes(KB.f)) KB.f = 'all';
+  const L = (KB.f === 'all' ? all.slice(-n) : all.filter(x => kbKey(x.r) === KB.f)).slice().reverse();
+  const sum = KB.f === 'all' ? null : L.reduce((a, x) => [a[0] + x.b, a[1] + x.e], [0, 0]);
+  const chips = keys.length > 2 ? `<div class="chiprow" style="margin-bottom:8px"><button class="fchip" data-act="kbf" data-v="all" aria-pressed="${KB.f === 'all'}">Alle</button>${keys.map(k => `<button class="fchip" data-act="kbf" data-v="${esc(k)}" aria-pressed="${KB.f === k}">${esc(k)}</button>`).join('')}</div>` : '';
+  return `${chips}${sum ? `<p class="small" style="margin:0 0 6px">Summe aller Einträge: <b class="num" style="color:${sum[0] >= 0 ? 'var(--win)' : 'var(--lose)'}">${sgn(sum[0])} ℒ</b>${sum[1] ? ` · <b class="num">${sgn(sum[1])} €</b>` : ''}</p>` : ''}<div class="hist">${L.map(x => `<div class="h"><span class="muted num">${new Date(x.t).toLocaleString('de-DE',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</span><span>${esc(x.r)}</span><b class="num">${x.b ? `<span style="color:${x.b > 0 ? 'var(--win)' : 'var(--lose)'}">${sgn(x.b)} ℒ</span>` : ''}${x.b && x.e ? ' ' : ''}${x.e ? `<span style="color:${x.e > 0 ? 'var(--win)' : 'var(--lose)'}">${sgn(x.e)} €</span>` : ''}</b></div>`).join('')}</div>`;
 }
 
 /* ---------- Höher oder Tiefer ---------- */
@@ -4508,7 +4914,7 @@ const dmId = (a, b) => 'dm_' + [a, b].sort().join('_');
 function chatName(c){ if (c.group) return c.name || 'Gruppe'; const o = (c.members || []).find(m => m !== uid); return nameOf(o); }
 function chatAv(c){ if (c.group) return '👥'; const o = (c.members || []).find(m => m !== uid); return avOf(o); }
 const unreadChats = () => Object.entries(CH.list).filter(([id, c]) => c.last && c.last.u !== uid && c.last.t > (chatRead()[id] || 0));
-function markRead(id){ const r = chatRead(); r[id] = Date.now(); ls.set('chatRead', r); }
+function markRead(id){ const r = chatRead(); r[id] = Date.now(); ls.set('chatRead', r); markReadServer(id); }
 let unsubChats = null;
 function startChats(){
   let first = true;
@@ -4517,7 +4923,8 @@ function startChats(){
     if (!first) for (const [id, c] of Object.entries(next)){
       const old = prev[id];
       if (c.last && c.last.u !== uid && (!old?.last || old.last.t !== c.last.t) && !(tab === 'chat' && CH.open === id)){
-        SFX.pop(); ISL.msg = { cid: id, name: c.group ? `${nameOf(c.last.u)} · ${chatName(c)}` : chatName(c), av: c.group ? avOf(c.last.u) : chatAv(c), text: c.last.k === 'e' ? avText(c.last.x) : c.last.x, t: c.last.t, until: Date.now() + 8000 }; ISL.open = false; renderIsland();
+        SFX.pop(); const nm = c.group ? `${nameOf(c.last.u)} · ${chatName(c)}` : chatName(c), tx = c.last.k === 'e' ? avText(c.last.x) : c.last.x;
+        islandNotice({ kind: 'chat', cid: id, name: nm, av: c.group ? avOf(c.last.u) : chatAv(c), text: tx }); notify('💬', `${nm}: ${tx}`, { chat: id });
       }
       if (tab === 'chat' && CH.open === id) markRead(id);
     }
@@ -4538,6 +4945,7 @@ function chatSend(x, k, extra){
   if (Date.now() - lastChatMsg < 500) return; lastChatMsg = Date.now();
   x = x.slice(0, 500); const t = Date.now();
   const re = CH.reply; if (re){ CH.reply = null; renderReplyBar(); }
+  if (typT){ typT = 0; updateDoc(doc(fs, 'chats', id), { ['typing.' + uid]: 0 }).catch(() => {}); }
   addDoc(collection(fs, 'chats', id, 'msgs'), { u: uid, x, k, t, ...(re ? { re } : {}), ...(extra || {}) }).catch(handleWriteErr);
   updateDoc(doc(fs, 'chats', id), { last: { u: uid, x: x.slice(0, 80), k, t } }).catch(() => {});
 }
@@ -4603,7 +5011,7 @@ function renderChatTab(){
   if (CH.open){
     const c = CH.list[CH.open] || { members: [uid], group: false };
     const add = c.group ? fr.filter(f => !c.members.includes(f)) : [];
-    const head = `<button class="btn sm chback" data-act="chclose">←</button><span class="chav">${avH(chatAv(c))}</span><div class="chtx"><b>${esc(chatName(c))}</b><span class="muted small">${c.group ? c.members.map(m => m === uid ? 'du' : nameOf(m)).join(', ') : (isOnline(c.members.find(m => m !== uid)) ? 'online' : 'offline')}</span></div>
+    const head = `<button class="btn sm chback" data-act="chclose">←</button><span class="chav">${avH(chatAv(c))}</span><div class="chtx"><b>${esc(chatName(c))}</b><span class="muted small">${chatStatus(c)}</span></div>
       ${c.group ? `<details class="chmore"><summary class="btn sm">⋯</summary><div class="chmenu">${add.map(f => `<button class="btn sm" data-act="chadd" data-id="${esc(f)}">+ ${esc(nameOf(f))}</button>`).join('')}<button class="btn sm" data-act="chleave">Gruppe verlassen</button></div></details>` : ''}`;
     const h = $('chhead'); if (h && h.innerHTML !== head && !h.querySelector('details[open]')) h.innerHTML = head;
     renderChatMsgs(); renderReplyBar();
@@ -4614,12 +5022,13 @@ function renderChatMsgs(){
   const c = CH.list[CH.open] || {};
   const atBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 40;
   const html = CH.msgs.length ? CH.msgs.map((m, i) => {
-    if (m.k === 's') return `<div class="msys">${esc(m.x)}</div>`;
+    const dsep = !CH.msgs[i-1] || new Date(CH.msgs[i-1].t).toDateString() !== new Date(m.t).toDateString() ? `<div class="dsep"><span>${dayLabel(m.t)}</span></div>` : '';
+    if (m.k === 's') return dsep + `<div class="msys">${esc(m.x)}</div>`;
     const mine = m.u === uid, prev = CH.msgs[i-1], showName = c.group && !mine && (!prev || prev.u !== m.u);
     const okImg = m.k === 'img' && /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/=]+$/.test(m.img || '');
     const body = m.k === 'e' ? avH(m.x) : okImg ? `<img class="chimg" src="${m.img}" alt="Bild von ${esc(nameOf(m.u))}" data-act="chimgview">` : m.k === 'lo' ? loInviteBubble(m) : esc(m.x);
     const bar = CH.react === m.id ? `<span class="reactbar">${REACTS.map(e => `<button data-act="chreact" data-id="${esc(m.id)}" data-e="${e}" aria-label="mit ${e} reagieren">${e}</button>`).join('')}</span>` : '';
-    return `<div class="mrow${mine ? ' mine' : ''}"><div class="bub${m.k === 'e' ? ' emo' : ''}${okImg ? ' pic' : ''}" data-id="${esc(m.id || '')}">${showName ? `<span class="who">${avH(avOf(m.u))} ${esc(nameOf(m.u))}</span>` : ''}${quoteHTML(m)}${body}<time>${timeShort(m.t)}</time>${bar}</div>${reactsHTML(m)}</div>`;
+    return dsep + `<div class="mrow${mine ? ' mine' : ''}"><div class="bub${m.k === 'e' ? ' emo' : ''}${okImg ? ' pic' : ''}" data-id="${esc(m.id || '')}">${showName ? `<span class="who">${avH(avOf(m.u))} ${esc(nameOf(m.u))}</span>` : ''}${quoteHTML(m)}${body}<time>${timeShort(m.t)}${tickHTML(m, c)}</time>${bar}</div>${reactsHTML(m)}</div>`;
   }).join('') : '<p class="muted small" style="text-align:center">Schreib die erste Nachricht.</p>';
   if (box.innerHTML !== html){ box.innerHTML = html; if (atBottom || box.dataset.first !== CH.open){ box.scrollTop = box.scrollHeight; box.dataset.first = CH.open; } }
 }
@@ -4630,7 +5039,7 @@ const msgSnippet = m => m.k === 'img' ? '📷 Bild' : m.k === 'lo' ? '🎴 Loono
 function setReply(m){
   CH.reply = m ? { id: m.id, u: m.u, x: msgSnippet(m) } : null;
   renderReplyBar();
-  if (m){ $('chx')?.focus(); navigator.vibrate?.(10); }
+  if (m){ $('chx')?.focus(); buzz(10); }
 }
 function renderReplyBar(){
   const el = $('chreply'); if (!el) return;
@@ -4652,7 +5061,7 @@ const quoteHTML = m => m.re ? `<button type="button" class="quote" data-act="chq
     if (!s.on){ if (Math.abs(dy) > 12 && Math.abs(dy) > Math.abs(dx)) { s = null; return; } if (dx > 12 && dx > Math.abs(dy) * 1.4){ s.on = true; s.bub.classList.add('swiping'); } else return; }
     s.dx = Math.max(0, Math.min(dx, 96));
     s.bub.style.transform = `translateX(${s.dx}px)`; s.bub.style.setProperty('--sw', Math.min(1, s.dx / 64));
-    if (s.dx >= 64 && !s.buzz){ s.buzz = true; navigator.vibrate?.(8); }
+    if (s.dx >= 64 && !s.buzz){ s.buzz = true; buzz(8); }
   });
   const end = () => {
     if (!s) return; const { bub, on, dx } = s; s = null; if (!on) return;
@@ -4689,7 +5098,7 @@ function flipsChanged(before){
   const all = flipAll();
   for (const [id, f] of Object.entries(all)){
     // a new challenge for me
-    if (!flipsFirst && f.b === uid && f.st === 'open' && !before[id]) { SFX.pop(); toast(`🪙 ${nameOf(f.a)} fordert dich zum Coin Flip heraus${f.stake ? ` (${fmt(f.stake)} ℒ)` : ''}`); }
+    if (!flipsFirst && f.b === uid && f.st === 'open' && !before[id]) { SFX.pop(); const tx = `fordert dich zum Coin Flip heraus${f.stake ? ` (${fmt(f.stake)} ℒ)` : ' (ohne Einsatz)'}`; islandNotice({ kind: 'flip', id, name: nameOf(f.a), icon: '🪙', text: tx }); notify('🪙', `${nameOf(f.a)} ${tx}`, { tab: 'account' }); }
     // I challenged, the other accepted: throw the coin with my secret
     if (f.a === uid && f.st === 'accepted' && !f.secretA) revealFlip(id, f);
     // my stake comes back when declined or withdrawn
@@ -4800,7 +5209,7 @@ document.addEventListener('click', e => {
   const v = +b.dataset.v;
   switch (b.dataset.act){
     case 'hlstake': HL.stake = v; renderAll(); break;
-    case 'hlstart': hlStart(); break;
+    case 'hlstart': if (confirmBig(HL.stake, 'hilo')) hlStart(); break;
     case 'hlhi': hlGuess('hi'); break;
     case 'hllo': hlGuess('lo'); break;
     case 'hlcash': hlCash(); break;
@@ -4855,6 +5264,7 @@ function renderHome(){
       ${tile('horses', 'Pferderennen', 'Sechs Pferde, ein Sieger', `<div class="minihorses"><span>🏇</span><span>🏇</span><span>🏇</span></div>`)}
       ${tile('hilo', 'Höher oder Tiefer', 'Errate die nächste Karte, zahl aus, wann du willst', `<div class="minihl"><div class="mc">7<i>♣</i></div>▲▼<div class="mc red">?<i>♥</i></div></div>`)}
     </div>
+    ${P ? feedHTML() : ''}
     ${onl.length ? `<div class="panel"><h3>Freunde online</h3><div class="row">${onl.map(id => `<span class="fon"><button class="pill" data-act="profile" data-id="${esc(id)}">${avH(avOf(id))} ${esc(nameOf(id))}${players[id].table ? ' · am Blackjack-Tisch' : loOpenOf(id) ? ' · wartet bei Loono' : players[id].playing && players[id].playing !== 'bj' ? ' · spielt ' + (GAME_NAMES[players[id].playing] || '') : ''}</button>${players[id].table && players[id].table !== tid ? `<button class="btn sm gold" data-act="fjoin" data-g="bj" data-id="${esc(players[id].table)}">Mitspielen</button>` : loOpenOf(id) ? `<button class="btn sm gold" data-act="fjoin" data-g="loono" data-id="${esc(loOpenOf(id))}">Mitspielen</button>` : ''}</span>`).join('')}</div></div>` : ''}
   </div>`;
   if (el.innerHTML !== html) el.innerHTML = html;
@@ -4878,6 +5288,7 @@ function standUp(target){
 function setPlaying(g){ withPlayer(d => { const v = g || null; if (d.playing === v) return false; d.playing = v; return true; }); }
 function openGame(g){
   game = g; SP.slip = null; setPlaying(g);
+  requestAnimationFrame(() => { const v = $({ bj: 'tv' }[g] || 'g-' + g); if (v){ v.classList.remove('gin'); void v.offsetWidth; v.classList.add('gin'); } });
   if (TUTS[g] && !tutSeen(g)) setTimeout(() => { if (game === g && !modalKind) openTut(g, true); }, 350);
   if (g==='bj'){ lastTableHTML = ''; anim.prime = true; }
   if (g==='sports'){ loadSports(); SP.detail = null; }
@@ -4906,7 +5317,7 @@ document.addEventListener('click', e => {
   const b = e.target.closest('[data-act]'); if (!b || b.disabled) return;
   const v = +b.dataset.v;
   switch (b.dataset.act){
-    case 'home': if (standUp(null)){ game = null; setPlaying(null); window.scrollTo(0,0); renderAll(); } break;
+    case 'home': if (standUp(null)){ game = null; setPlaying(null); window.scrollTo(0,0); renderAll(); requestAnimationFrame(() => { const v = $('home'); v.classList.remove('gin'); void v.offsetWidth; v.classList.add('gin'); }); } break;
     case 'game': if (standUp(b.dataset.g)) openGame(b.dataset.g); break;
     case 'openwheel': wheelMsg = ''; openModal('wheel'); break;
     case 'spinwheel': spinWheel(); break;
@@ -4915,25 +5326,25 @@ document.addEventListener('click', e => {
     case 'rclear': R.bets = {}; renderAll(); break;
     case 'rdouble': { const t = rTotal(R.bets); if (t*2 > Math.min(MAX_BET, P.balance)) { toast('Nicht genug Legats.'); break; } R.bets = Object.fromEntries(Object.entries(R.bets).map(([k,x]) => [k, x*2])); SFX.chip(); renderAll(); break; }
     case 'rrepeat': if (R.last && rTotal(R.last) <= Math.min(MAX_BET, P.balance)){ R.bets = { ...R.last }; SFX.chip(); renderAll(); } else toast('Nicht genug Legats.'); break;
-    case 'rspin': rSpin(); break;
+    case 'rspin': if (confirmBig(rTotal(R.bets), 'roulette')) rSpin(); break;
     case 'sbet': S.bet = v; savePref('slotbet', v); renderAll(); break;
-    case 'sspin': slotSpin(); break;
-    case 'sauto': slotAuto(v); break;
+    case 'sspin': if (confirmBig(S.bet, 'slots')) slotSpin(); break;
+    case 'sauto': if (confirmBig(S.bet, 'slotsauto')) slotAuto(v); break;
     case 'sautostop': S.auto = 0; renderAll(); break;
-    case 'sautoinf': slotAuto(Infinity); break;
+    case 'sautoinf': if (confirmBig(S.bet, 'slotsauto')) slotAuto(Infinity); break;
     case 'hpick': H.pickI = +b.dataset.i; renderAll(); break;
     case 'hbet': H.bet = v; savePref('horsebet', v); renderAll(); break;
-    case 'hrun': horseRun(); break;
+    case 'hrun': if (confirmBig(H.bet, 'horses')) horseRun(); break;
     case 'hnew': newRace(); renderAll(); break;
     case 'sfilter': SP.filter = b.dataset.v; renderAll(); break;
     case 'sreload': SP.lastLoad = 0; ls.set('oldbLeagues', null); loadSports(true); break;
     case 'spick': { const m = findMatch(b.dataset.key); if (m){ SP.slip = (SP.slip && keyOf(SP.slip.m)===keyOf(m) && SP.slip.pick===b.dataset.k) ? null : { m, pick:b.dataset.k }; renderAll(); } break; }
     case 'sstake': SP.stake = v; renderAll(); break;
     case 'sclear': SP.slip = null; renderAll(); break;
-    case 'splace': placeBet2(); break;
+    case 'splace': if (confirmBig(SP.stake, 'sports')) placeBet2(); break;
   }
 });
-document.addEventListener('keydown', e => { if ((e.code==='Space' || e.key==='Enter') && game==='slots' && tab==='table' && !S.auto && !modalKind && !['INPUT','BUTTON'].includes(document.activeElement?.tagName)){ e.preventDefault(); slotSpin(); } });
+document.addEventListener('keydown', e => { if ((e.code==='Space' || e.key==='Enter') && game==='slots' && tab==='table' && !S.auto && !modalKind && !['INPUT','BUTTON'].includes(document.activeElement?.tagName)){ e.preventDefault(); if (confirmBig(S.bet, 'slots')) slotSpin(); } });
 // fictional live tickers and bet settlement tick along
 setInterval(() => { if (!uid) return; settleBets(); if (tab==='table' && (game==='sports' || game===null)) renderAll(); }, 5000);
 
@@ -4947,12 +5358,12 @@ function renderTop(){
     setTimeout(()=>b.classList.remove('up','down'), 1200);
   }
   lastBal = shown;
-  b.textContent = P ? fmt(P.balance - hold)+' ℒ' : '–';
+  if (P) tweenBalance(P.balance - hold); else { b.textContent = '–'; BAL.shown = null; }
   renderIsland();
   $('ver').textContent = `Legat Casino · Version ${APP_VERSION}`;
   { const h = P ? `${avH(P.avatar)} ${esc(P.name)}` : 'Konto'; if ($('pname').innerHTML !== h) $('pname').innerHTML = h; }
   $('peur').textContent = P ? `Bank ${fmt(P.euro)} €` : '';
-  $('mute').textContent = snd.on ? '🔊' : '🔇';
+  renderBell();
   const el = $('daily');
   if (el.innerHTML) el.innerHTML = '';   // the daily bonus is now the Glücksrad on the casino home
   if (true) return;
@@ -5219,6 +5630,7 @@ function renderAccount(){
     ${isBroke() ? reviveBox() : needBank() ? bankBox() : ''}
     <div class="panel stack"><div class="row" style="justify-content:space-between"><h2>${avH(P.avatar)} ${esc(P.name)}</h2><button class="btn sm" data-act="logout">Abmelden</button></div>
       <p class="muted small">Angemeldet als ${esc(authUser?.email||'')} · Version ${APP_VERSION}</p><div id="acc-stats"></div></div>
+    ${settingsHTML()}
     <div class="panel stack"><h3>Verlauf</h3>${chartHTML(P.hist)}${hist ? `<div class="hist">${hist}</div>` : ''}</div>
     ${Object.keys(P.games||{}).length ? `<div class="panel stack"><h3>Andere Spiele</h3><div class="statgrid">${Object.entries(P.games).map(([k,g]) => `<div class="stat"><small>${GAME_NAMES[k]||k}</small><b style="color:${g.net>=0?'var(--win)':'var(--lose)'}">${sgn(g.net)}</b><span class="muted small"> · ${g.n}×</span></div>`).join('')}</div></div>` : ''}
     <div class="panel stack"><h3>Erfolge · ${Object.keys(P.ach).length} von ${ACH.length}</h3>${badgesHTML(P.ach, true)}</div>
@@ -5265,10 +5677,12 @@ function statsHTML(p){
 function renderAccountStats(){ const box = $('acc-stats'); if (box && P) box.innerHTML = statsHTML(P); }
 
 /* ---------- modal: player profile & fairness ---------- */
-function openModal(kind, id){ modalKind = kind; modalId = id; $('modal').hidden = false; renderModal(true); if (kind === 'flip') requestAnimationFrame(animateFlip); }
+function openModal(kind, id){ modalKind = kind; modalId = id; $('modal').classList.remove('closing'); $('modal').hidden = false; renderModal(true); if (kind === 'flip') requestAnimationFrame(animateFlip); }
 function closeModal(){
   if (modalKind === 'dish'){ if (DISH.phase === 'run') return; if (DISH.phase === 'done' && !DISH.collected){ dishCollect(); return; } }
-  modalKind = null; modalId = null; $('modal').hidden = true; }
+  modalKind = null; modalId = null;
+  const m = $('modal'); if (reduceMotion){ m.hidden = true; return; }
+  m.classList.add('closing'); setTimeout(() => { m.classList.remove('closing'); if (!modalKind) m.hidden = true; }, 200); }
 $('modal').addEventListener('click', e => { if (e.target.id==='modal') closeModal(); });
 document.addEventListener('keydown', e => { if (e.key==='Escape' && modalKind) closeModal(); });
 let lastModalHTML = '';
@@ -5279,7 +5693,7 @@ function renderModal(force){
   if (modalKind==='wheel' && wheelBusy) return;
   if (modalKind==='dish' && DISH.phase==='run') return;
   if (modalKind==='flip' && !force) return;
-  const html = modalKind==='tut' ? tutHTML() : modalKind==='img' ? `<div class="stack"><div class="row" style="justify-content:flex-end"><button class="btn sm" data-act="closemodal">Schließen</button></div><img class="bigimg" src="${CH.view || ''}" alt="Bild"></div>` : modalKind==='profile' ? profileHTML(modalId) : modalKind==='wheel' ? wheelHTML() : modalKind==='news' ? newsHTML() : modalKind==='dish' ? dishHTML() : modalKind==='flip' ? flipModalHTML() : fairHTML();
+  const html = modalKind==='notes' ? notesHTML() : modalKind==='tut' ? tutHTML() : modalKind==='img' ? `<div class="stack"><div class="row" style="justify-content:flex-end"><button class="btn sm" data-act="closemodal">Schließen</button></div><img class="bigimg" src="${CH.view || ''}" alt="Bild"></div>` : modalKind==='profile' ? profileHTML(modalId) : modalKind==='wheel' ? wheelHTML() : modalKind==='news' ? newsHTML() : modalKind==='dish' ? dishHTML() : modalKind==='flip' ? flipModalHTML() : fairHTML();
   if (!force && html === lastModalHTML) return;
   lastModalHTML = html;
   const keep = $('gamt')?.value;
@@ -5384,10 +5798,16 @@ addEventListener('resize', () => moveTabInd());
 new ResizeObserver(() => moveTabInd()).observe(document.getElementById('top'));
 function setTab(t){
   if (tab === 'chat' && t !== 'chat' && CH.open) closeChat();
+  const from = tab; SCROLL[from] = window.scrollY; closeCtx();
   tab = t; shopConfirm = null;
   for (const b of document.querySelectorAll('nav.tabs button')) b.setAttribute('aria-selected', b.dataset.tab===t);
   moveTabInd();
   for (const v of ['table','players','chat','bank','shop','account']) $('view-'+v).hidden = v!==t;
+  if (from !== t){
+    const dir = SLIDE.dir || (TAB_ORDER.indexOf(t) > TAB_ORDER.indexOf(from) ? 1 : -1); SLIDE.dir = 0;
+    const v = $('view-' + t); v.classList.remove('vin-l', 'vin-r'); void v.offsetWidth; v.classList.add(dir > 0 ? 'vin-r' : 'vin-l');
+    requestAnimationFrame(() => window.scrollTo(0, SCROLL[t] || 0));
+  }
   if (t==='table') { lastTableHTML = ''; anim.prime = true; }
   renderAll();
 }
@@ -5396,7 +5816,6 @@ function setTab(t){
 async function copy(text, label){
   try { await navigator.clipboard.writeText(text); toast(label+' kopiert'); } catch { toast(label+': '+text); }
 }
-$('mute').addEventListener('click', () => { snd.on = !snd.on; ls.set('sound', snd.on); if (snd.on) SFX.chip(); renderTop(); });
 document.addEventListener('change', e => {
   if (e.target.id==='autobet'){
     auto = e.target.checked; ls.set('autobet', auto);
@@ -5427,7 +5846,7 @@ document.addEventListener('click', async e => {
     case 'chip': bet = Math.min(MAX_BET, P.balance, bet + +b.dataset.v); SFX.chip(); renderAll(); break;
     case 'betclear': bet = 0; renderAll(); break;
     case 'betmax': bet = Math.max(0, Math.min(MAX_BET, Math.floor(P.balance/50)*50)); SFX.chip(); renderAll(); break;
-    case 'bet': placeBet(bet); break;
+    case 'bet': if (confirmBig(bet, 'bj')) placeBet(bet); break;
     case 'unbet': unBet(); if (auto){ auto=false; ls.set('autobet', false); toast('Auto-Einsatz aus'); } break;
     case 'hit': case 'stand': case 'double': case 'split': case 'surrender': act(a); break;
     case 'insure': insure(true); break;
