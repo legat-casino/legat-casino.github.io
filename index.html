@@ -294,7 +294,7 @@ table.board{width:100%;border-collapse:collapse;font-size:14px}
 .minihorses span:nth-child(2){animation-delay:-.8s}.minihorses span:nth-child(3){animation-delay:-1.6s}
 @keyframes trot{from{margin-left:0}to{margin-left:calc(100% - 30px)}}
 .minisports{font-size:44px;display:flex;gap:18px}
-@media (max-width:760px){.tiles{grid-template-columns:1fr 1fr}.tile,.tile-bj,.tile-sports{grid-column:span 1}.tile-bj{grid-column:span 2}.tile .art{height:96px}.tinfo b{font-size:19px}}
+@media (max-width:760px){.tiles{grid-template-columns:1fr 1fr}.tile,.tile-bj,.tile-sports{grid-column:span 1}.tile .art{height:96px}.tinfo b{font-size:19px}}
 .ver{text-align:center;color:var(--muted);font-size:12px;margin-top:22px;font-family:var(--f-num)}
 
 /* ---------- shared game chrome ---------- */
@@ -954,6 +954,24 @@ h3{font-size:12px;letter-spacing:.09em;font-weight:700}
 @keyframes istripbig{to{transform:translateY(-444px)}}
 .ibigmsg{font-weight:700;min-height:20px}
 .ibigmsg.win{color:var(--win)}
+/* ---------- v1.5.3: Anleitungen ---------- */
+.gamebar h2:has(+ .tutbtn){margin-right:0}
+.gamebar .tutbtn{margin-right:auto;width:30px;height:30px;padding:0;display:grid;place-items:center;font-weight:800}
+.tut{gap:14px}
+.tutstage{min-height:150px;display:grid;place-items:center;border-radius:20px;background:radial-gradient(120% 100% at 50% 0%,#175a45,#0f3d2f 55%,#0a2a20);border:1px solid var(--hair);padding:18px;animation:tutin .35s var(--spring) both}
+@keyframes tutin{from{opacity:0;transform:translateY(10px) scale(.97)}}
+.tutvis{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap}
+.tutvis .mc{width:60px;height:84px;font-size:24px}
+.tutvis .lc{width:56px;height:84px}
+.tutemo{font-size:52px;line-height:1;filter:drop-shadow(0 6px 10px rgba(0,0,0,.4))}
+.tutbox{display:inline-block;padding:8px 14px;border-radius:12px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.12);font-weight:700;color:#fff;white-space:nowrap}
+.tutbox.gold{background:linear-gradient(180deg,#e3c47f,var(--brass));color:#1b140a;border-color:transparent}
+.tutbox.green{background:#1d7a4c}
+.tuttext h2{margin:0 0 6px}
+.tuttext p{color:var(--ink);opacity:.9;line-height:1.5}
+.tutdots{display:flex;gap:6px;justify-content:center}
+.tutdots i{width:7px;height:7px;border-radius:50%;background:var(--fill-2);transition:width .3s var(--spring),background .3s}
+.tutdots i.on{width:22px;border-radius:4px;background:var(--brass)}
 @media (prefers-reduced-motion:reduce){*{animation:none!important}}
 </style>
 </head>
@@ -2006,8 +2024,12 @@ function animateCards(root){
 /* =====================================================================
    v1.1 – Casino home, Glücksrad, Roulette, Automat, Pferderennen, Sportwetten
    ===================================================================== */
-const APP_VERSION = '1.5.2';
+const APP_VERSION = '1.5.3';
 const CHANGELOGS = {
+  '1.5.3': [
+    'Anleitung für jedes Spiel: erscheint beim ersten Öffnen, danach jederzeit über das „?“ oben',
+    'Blackjack und Sportwetten stehen auf dem Handy jetzt nebeneinander',
+  ],
   '1.5.2': [
     'Neues Design im iOS-Stil: Glas-Leiste oben zum Wechseln zwischen Casino, Chat und Co., aufgeräumte Flächen und Knöpfe',
     'Chat-Nachrichten in der Dynamic Island flackern nicht mehr und bleiben länger',
@@ -2145,7 +2167,7 @@ function chipPicker(sel, act){
     `<button class="chip ${c}${sel===v?' on':''}" data-act="${act}" data-v="${v}" aria-pressed="${sel===v}">${l}</button>`).join('')}</div>`;
 }
 function backBar(title, extra=''){
-  return `<div class="gamebar"><button class="btn sm" data-act="home">← Casino</button><h2>${title}</h2>${extra}</div>`;
+  return `<div class="gamebar"><button class="btn sm" data-act="home">← Casino</button><h2>${title}</h2>${tutBtn(game)}${extra}</div>`;
 }
 
 /* ---------- Glücksrad (daily) ---------- */
@@ -4007,7 +4029,7 @@ function loTableHTML(g){
   const done = g.st === 'done' ? `<div class="lodone"><div class="lowin">${avH(g.seats.find(s => s.id === g.winner)?.av || '🎴')}</div><h2>${g.winner === uid ? 'Gewonnen!' : esc(loName(g, g.winner)) + ' gewinnt'}</h2>
       ${g.stake ? `<p class="num" style="color:${g.winner === uid ? 'var(--win)' : 'var(--muted)'}">${g.winner === uid ? '+' + fmt(g.pot) + ' ℒ' : `Topf: ${fmt(g.pot)} ℒ`}</p>` : '<p class="muted">Runde ohne Einsatz</p>'}
       <div class="row" style="justify-content:center">${g.host === uid ? '<button class="btn gold" data-act="lorematch">Nochmal (gleiche Runde)</button>' : `<span class="muted small">${esc(g.name)} kann eine neue Runde starten</span>`}<button class="btn" data-act="loleave">Verlassen</button></div></div>` : '';
-  return `<div class="gamebar"><button class="btn sm" data-act="home">← Casino</button><h2>Loono</h2>${g.stake ? `<span class="pill jp">Topf ${fmt(g.pot)} ℒ</span>` : '<span class="muted small">ohne Einsatz</span>'}${g.st === 'play' ? '<button class="btn sm" data-act="loleave" style="margin-left:auto">Aufgeben</button>' : ''}</div>
+  return `<div class="gamebar"><button class="btn sm" data-act="home">← Casino</button><h2>Loono</h2>${tutBtn('loono')}${g.stake ? `<span class="pill jp">Topf ${fmt(g.pot)} ℒ</span>` : '<span class="muted small">ohne Einsatz</span>'}${g.st === 'play' ? '<button class="btn sm" data-act="loleave" style="margin-left:auto">Aufgeben</button>' : ''}</div>
   <div class="felt lofelt" style="${feltStyle(uid)}">
     <div class="loopps">${opps}</div>
     <div class="locenter">
@@ -4153,6 +4175,111 @@ document.addEventListener('click', e => {
     case 'chimgview': CH.view = b.dataset.src || b.getAttribute('src'); openModal('img'); break;
   }
 });
+
+
+/* ---------- v1.5.3: Anleitung für jedes Spiel (beim ersten Öffnen und über „?“) ---------- */
+const tvis = (...xs) => `<div class="tutvis">${xs.join('')}</div>`;
+const tchip = (l, c = 'ch1k') => `<span class="chip ${c}" style="pointer-events:none">${l}</span>`;
+const tbox = (t, cls = '') => `<span class="tutbox${cls}">${t}</span>`;
+const tmini = (r, s, red) => `<div class="mc${red ? ' red' : ''}" style="transform:none">${r}<i>${s}</i></div>`;
+const TUTS = {
+  bj: { t: 'Blackjack', steps: [
+    [tvis(tmini('A', '♠'), tmini('K', '♥', 1)), 'Das Ziel', 'Komm mit deinen Karten näher an <b>21</b> als der Dealer, aber nicht darüber. Zahlen zählen ihren Wert, Bube, Dame und König 10, das Ass 1 oder 11.'],
+    [tvis(tchip('100', 'ch100'), tchip('1K'), tchip('5K', 'ch5k')), 'Tisch und Einsatz', 'Eröffne einen Tisch und gib den Code an Freunde, oder setz dich zu ihnen. Wähl einen Chip und setz. Alle am Tisch spielen gleichzeitig gegen den Dealer.'],
+    [tvis(tbox('Karte'), tbox('Stehen'), tbox('Verdoppeln'), tbox('Teilen')), 'Deine Züge', '<b>Karte:</b> noch eine ziehen. <b>Stehen:</b> fertig. <b>Verdoppeln:</b> doppelter Einsatz, genau eine Karte. <b>Teilen:</b> zwei gleiche Karten werden zwei Hände. <b>Aufgeben:</b> halber Einsatz zurück.'],
+    [tvis(tbox('1 : 1'), tbox('3 : 2', ' gold')), 'Auszahlung', 'Ein Gewinn zahlt 1:1, ein <b>Blackjack</b> (Ass + 10er) 3:2. Der Dealer zieht bis 16 und bleibt ab 17 stehen. Zeigt er ein Ass, kannst du dich versichern.'],
+  ]},
+  sports: { t: 'Sportwetten', steps: [
+    [tvis('<span class="tutemo">⚽</span><span class="tutemo">🎯</span>'), 'Spiele finden', 'Oben wechselst du zwischen <b>Live</b>, <b>Demnächst</b>, <b>Ergebnisse</b> und <b>Meine Wetten</b>. Darunter filterst du nach Liga: Bundesliga, Champions League, Darts oder fiktive Turniere.'],
+    [tvis(tbox('1 · 1,85'), tbox('X · 3,60'), tbox('2 · 4,10')), 'Quoten', 'Tipp auf <b>1</b> (Heimsieg), <b>X</b> (Unentschieden) oder <b>2</b> (Auswärtssieg). Dein Gewinn ist Einsatz × Quote. Eine hohe Quote heißt: unwahrscheinlich, aber lohnend.'],
+    [tvis('<span class="tutemo">📺</span>'), 'Live-Ticker', 'Tipp ein Spiel an, dann siehst du Spielstand, Minute und Torschützen. Laufende Spiele erscheinen auch oben in der Dynamic Island.'],
+    [tvis('<span class="tutemo">🤝</span>'), 'Gegen Freunde wetten', 'In der Ansicht eines echten Spiels kannst du einen Freund herausfordern: Ihr setzt gleich viel, wer recht hat, bekommt beides. Fiktive Turniere starten alle 15 Minuten.'],
+  ]},
+  loono: { t: 'Loono', steps: [
+    [() => tvis(loCard('r7'), loCard('y7'), loCard('ys')), 'Das Ziel', 'Wer zuerst alle Karten los ist, gewinnt. Leg eine Karte, die in <b>Farbe</b> oder <b>Zahl/Symbol</b> zur obersten passt. Kannst du nicht, ziehst du eine.'],
+    [() => tvis(loCard('gs'), loCard('br'), loCard('yd'), loCard('xw'), loCard('xf')), 'Sonderkarten', '<b>⊘</b> der Nächste setzt aus. <b>⇄</b> Richtungswechsel. <b>+2</b> der Nächste zieht 2. <b>★</b> du wählst die Farbe. <b>+4</b> Farbwahl und der Nächste zieht 4.'],
+    [() => tvis(loCard('rd'), loCard('xf'), loCard('b5'), loCard('b5')), 'Stapeln und doppelt legen', 'Auf +2 oder +4 darfst du weitere +2 oder +4 legen, wer nicht kann, zieht alles. Zwei exakt gleiche Karten darfst du zusammen legen.'],
+    [tvis(tbox('Loono!', ' gold')), '„Loono!“ rufen', 'Hast du nur noch zwei Karten, tipp auf <b>Loono!</b>. Vergisst du es und jemand tippt „Erwischt!“, ziehst du 2 Strafkarten. Für jeden Zug hast du 20 Sekunden.'],
+    [tvis('<span class="tutemo">🤖</span><span class="tutemo">🦊</span>'), 'Mitspieler', 'Eröffne eine Runde und füg Bots hinzu oder lade Freunde im Chat ein. Mit Einsatz zahlt jeder gleich viel in den Topf, der Sieger bekommt alles.'],
+  ]},
+  crash: { t: 'Crash', steps: [
+    [tvis('<span class="tutemo">🚀</span>', tbox('1,00× → 2,47×')), 'Die Rakete', 'Nach dem Start steigt der Multiplikator immer weiter, bis die Rakete explodiert. Wann das passiert, weiß vorher niemand.'],
+    [tvis(tbox('8 s zum Setzen')), 'Setzen', 'Vor jeder Runde hast du 8 Sekunden, um deinen Einsatz zu setzen. Alle Freunde fliegen in derselben Runde mit.'],
+    [tvis(tbox('Auszahlen', ' gold'), '<span class="tutemo">💥</span>'), 'Rechtzeitig aussteigen', 'Tipp auf <b>Auszahlen</b>, bevor sie explodiert: Du bekommst Einsatz × Multiplikator. Explodiert sie vorher, ist der Einsatz weg.'],
+    [tvis(tbox('Auto 2×')), 'Auto-Auszahlung', 'Stell vorher einen Multiplikator ein, dann wird dort automatisch ausgezahlt, auch wenn du die App schließt.'],
+  ]},
+  mines: { t: 'Mines', steps: [
+    [tvis('<div class="minimines">' + [...'💎💎💣💎💎💣💎💎💎'].map(x => `<i>${x}</i>`).join('') + '</div>'), 'Das Feld', 'Unter 25 Feldern liegen Diamanten und Minen. Du wählst vorher, wie viele Minen es sind: 1, 3, 5, 10 oder 24.'],
+    [tvis('<span class="tutemo">💎</span>', tbox('×1,13 → ×1,29')), 'Aufdecken', 'Jeder Diamant erhöht deinen Multiplikator. Je mehr Minen im Feld, desto schneller steigt er.'],
+    [tvis(tbox('Auszahlen', ' gold'), '<span class="tutemo">💣</span>'), 'Aufhören oder weiter?', 'Du kannst nach jedem Diamanten auszahlen. Triffst du eine Mine, ist der Einsatz weg. Die Minen liegen schon beim Start fest.'],
+  ]},
+  tipp: { t: 'Tipprunde', steps: [
+    [tvis(tbox('2 : 1', ' gold')), 'Ergebnisse tippen', 'Tipp für jedes Bundesliga-Spiel das genaue Ergebnis, mit + und −. Bis zum Anpfiff kannst du ändern.'],
+    [tvis(tbox('exakt 4'), tbox('Differenz 3'), tbox('Tendenz 2')), 'Punkte', 'Genau richtig: 4 Punkte. Richtige Tordifferenz: 3. Nur der richtige Sieger oder Unentschieden: 2.'],
+    [tvis('<span class="tutemo">🏆</span>'), 'Spieltagssieger', 'In der Rangliste trittst du gegen deine Freunde an. Wer am Ende eines Spieltags vorne liegt, bekommt 5.000 ℒ. Die Tipps der anderen siehst du ab Anpfiff.'],
+  ]},
+  roulette: { t: 'Roulette', steps: [
+    [tvis('<span class="tutemo">🎡</span>'), 'Setzen', 'Wähl einen Chip und tipp auf Zahlen oder Felder. Du kannst beliebig viele Einsätze verteilen, dann drehen.'],
+    [tvis(tbox('Zahl 35:1'), tbox('Dutzend 2:1'), tbox('Rot 1:1')), 'Auszahlungen', 'Eine einzelne Zahl zahlt 35:1, Dutzend und Kolonne 2:1, Rot/Schwarz, Gerade/Ungerade und 1-18/19-36 zahlen 1:1.'],
+    [tvis(tbox('0', ' green')), 'Die Null', 'Kommt die grüne 0, verlieren alle Einsätze außer einem direkten Tipp auf die 0. Mit „Wiederholen“ und „Verdoppeln“ geht’s schnell weiter.'],
+  ]},
+  slots: { t: 'Automat', steps: [
+    [tvis('<div class="minislots"><span>7️⃣</span><span>7️⃣</span><span>7️⃣</span></div>'), 'Die Mittellinie', 'Nur die <b>rote Mittellinie</b> zählt. Drei gleiche Symbole gewinnen, 7-7-7 zahlt ×500. Kirschen zählen von links.'],
+    [tvis('<span class="tutemo">💥</span>'), 'Progressiver Jackpot', 'Ein Teil jedes Einsatzes wandert in einen Topf für alle. Jeder Dreh kann ihn knacken, je höher der Einsatz, desto größer die Chance.'],
+    [tvis(tbox('10×'), tbox('25×'), tbox('50×'), tbox('∞', ' gold')), 'Auto-Spin', 'Lass den Automaten 10, 25, 50 Mal oder endlos drehen. Er stoppt bei ×20 und mehr, beim Jackpot oder wenn das Geld nicht reicht.'],
+    [tvis('<span class="tutemo">🏝️</span>'), 'Im Hintergrund', 'Geh ruhig raus: Der Automat dreht weiter und läuft oben in der Dynamic Island mit. Lange drücken vergrößert, tippen bringt dich zurück.'],
+  ]},
+  horses: { t: 'Pferderennen', steps: [
+    [tvis('<span class="tutemo">🏇</span>'), 'Sechs Pferde', 'Jedes Rennen hat sechs Pferde mit eigener Quote. Wähl eins aus und setz deinen Einsatz.'],
+    [tvis(tbox('2,1 Favorit'), tbox('9,5 Außenseiter', ' gold')), 'Quoten', 'Eine kleine Quote heißt Favorit: gewinnt oft, zahlt wenig. Außenseiter gewinnen selten, zahlen aber viel. Gewinn = Einsatz × Quote.'],
+  ]},
+  hilo: { t: 'Höher oder Tiefer', steps: [
+    [tvis(tmini('7', '♣'), '<span class="tutemo">▲▼</span>'), 'Raten', 'Eine Karte liegt offen. Rate, ob die nächste <b>höher</b> oder <b>tiefer</b> ist. Ass ist die höchste Karte.'],
+    [tvis(tbox('▲ ×1,62'), tbox('▼ ×2,43')), 'Multiplikator', 'Jede richtige Antwort erhöht deinen Multiplikator. Auf den Knöpfen steht, um wie viel, je unwahrscheinlicher, desto mehr. Gleich zählt nicht, dann rätst du nochmal.'],
+    [tvis(tbox('Auszahlen', ' gold')), 'Auszahlen', 'Du kannst jederzeit auszahlen. Eine falsche Antwort kostet den Einsatz. Bei ×100 wird automatisch ausgezahlt.'],
+  ]},
+};
+const TUT = { g: null, i: 0 };
+const tutSeen = g => !!(P?.prefs?.tut?.[g] || ls.get('tut', {})[g]);
+function openTut(g, auto){
+  if (!TUTS[g]) return;
+  TUT.g = g; TUT.i = 0; openModal('tut');
+  if (!tutSeen(g)){ const t = { ...(P?.prefs?.tut || ls.get('tut', {})), [g]: 1 }; savePref('tut', t); }
+}
+function tutHTML(){
+  const T = TUTS[TUT.g]; if (!T) return '';
+  const st = T.steps, i = Math.min(TUT.i, st.length - 1), [vis, h, txt] = st[i], last = i === st.length - 1;
+  return `<div class="stack tut">
+    <div class="row" style="justify-content:space-between"><span class="muted small">Anleitung · ${esc(T.t)}</span><button class="btn sm" data-act="closemodal">Überspringen</button></div>
+    <div class="tutstage" key="${i}">${typeof vis === 'function' ? vis() : vis}</div>
+    <div class="tuttext"><h2>${h}</h2><p>${txt}</p></div>
+    <div class="tutdots" aria-hidden="true">${st.map((_, k) => `<i class="${k === i ? 'on' : ''}"></i>`).join('')}</div>
+    <div class="row" style="justify-content:space-between">
+      <button class="btn" data-act="tutprev" ${i ? '' : 'style="visibility:hidden"'}>Zurück</button>
+      <span class="muted small">${i + 1} / ${st.length}</span>
+      <button class="btn gold" data-act="${last ? 'closemodal' : 'tutnext'}">${last ? 'Los geht\'s' : 'Weiter'}</button>
+    </div>
+  </div>`;
+}
+const tutBtn = g => TUTS[g] ? `<button class="btn sm tutbtn" data-act="tut" data-g="${g}" aria-label="Anleitung für ${esc(TUTS[g].t)}">?</button>` : '';
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-act]'); if (!b || b.disabled) return;
+  switch (b.dataset.act){
+    case 'tut': openTut(b.dataset.g); break;
+    case 'tutnext': TUT.i++; renderModal(true); break;
+    case 'tutprev': TUT.i = Math.max(0, TUT.i - 1); renderModal(true); break;
+  }
+});
+// swipe left/right inside the tutorial
+(() => {
+  let x0 = null;
+  document.addEventListener('pointerdown', e => { x0 = modalKind === 'tut' && e.target.closest('#modal-card') ? e.clientX : null; });
+  document.addEventListener('pointerup', e => {
+    if (x0 == null || modalKind !== 'tut') return; const dx = e.clientX - x0; x0 = null;
+    const n = TUTS[TUT.g]?.steps.length || 0;
+    if (dx < -50 && TUT.i < n - 1){ TUT.i++; renderModal(true); } else if (dx > 50 && TUT.i > 0){ TUT.i--; renderModal(true); }
+  });
+})();
 
 /* ---------- Tellerwäscher-Schicht: the way back after going broke ---------- */
 const DISH_MS = 30000, DISH_PAY = 50, DISH_GOLD = 150, DISH_ROACH = -200, DISH_MIN = 300, DISH_MAX = 2500;
@@ -4751,6 +4878,7 @@ function standUp(target){
 function setPlaying(g){ withPlayer(d => { const v = g || null; if (d.playing === v) return false; d.playing = v; return true; }); }
 function openGame(g){
   game = g; SP.slip = null; setPlaying(g);
+  if (TUTS[g] && !tutSeen(g)) setTimeout(() => { if (game === g && !modalKind) openTut(g, true); }, 350);
   if (g==='bj'){ lastTableHTML = ''; anim.prime = true; }
   if (g==='sports'){ loadSports(); SP.detail = null; }
   if (g==='tipp'){ loadSports(); TP.md = null; }
@@ -5151,7 +5279,7 @@ function renderModal(force){
   if (modalKind==='wheel' && wheelBusy) return;
   if (modalKind==='dish' && DISH.phase==='run') return;
   if (modalKind==='flip' && !force) return;
-  const html = modalKind==='img' ? `<div class="stack"><div class="row" style="justify-content:flex-end"><button class="btn sm" data-act="closemodal">Schließen</button></div><img class="bigimg" src="${CH.view || ''}" alt="Bild"></div>` : modalKind==='profile' ? profileHTML(modalId) : modalKind==='wheel' ? wheelHTML() : modalKind==='news' ? newsHTML() : modalKind==='dish' ? dishHTML() : modalKind==='flip' ? flipModalHTML() : fairHTML();
+  const html = modalKind==='tut' ? tutHTML() : modalKind==='img' ? `<div class="stack"><div class="row" style="justify-content:flex-end"><button class="btn sm" data-act="closemodal">Schließen</button></div><img class="bigimg" src="${CH.view || ''}" alt="Bild"></div>` : modalKind==='profile' ? profileHTML(modalId) : modalKind==='wheel' ? wheelHTML() : modalKind==='news' ? newsHTML() : modalKind==='dish' ? dishHTML() : modalKind==='flip' ? flipModalHTML() : fairHTML();
   if (!force && html === lastModalHTML) return;
   lastModalHTML = html;
   const keep = $('gamt')?.value;
