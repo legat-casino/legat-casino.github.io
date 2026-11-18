@@ -700,6 +700,126 @@ nav.tabs button{position:relative}
 .dupick button{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:8px 8px}
 .duitem>span:first-child{min-width:0}
 .savewarn{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:60;background:#8f1f1a;color:#fff;border:1px solid #ff8a7a;border-radius:12px;padding:12px 14px;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,.6);max-width:640px;margin:0 auto}
+
+/* ---------- v1.5: Loono ---------- */
+.lc{--c1:#c8323f;--c2:#7d1622;position:relative;flex:none;width:64px;height:96px;border-radius:10px;padding:0;border:2px solid #f6efe0;background:linear-gradient(150deg,var(--c1),var(--c2));color:#fff;box-shadow:0 3px 8px rgba(0,0,0,.45);display:grid;place-items:center;font:700 14px/1 var(--f-num);user-select:none;-webkit-user-select:none}
+.lc-r{--c1:#d13b48;--c2:#7d1622}.lc-y{--c1:#e7b53a;--c2:#9a6d10}.lc-g{--c1:#33a86b;--c2:#145a37}.lc-b{--c1:#3b7fe0;--c2:#173f87}
+.lc-x{--c1:#2a2420;--c2:#0e0b09}
+.lc .lgem{width:58%;aspect-ratio:1;transform:rotate(45deg);border-radius:8px;background:linear-gradient(135deg,rgba(255,255,255,.95),rgba(255,255,255,.75));display:grid;place-items:center;box-shadow:inset 0 0 0 2px rgba(0,0,0,.08)}
+.lc .lgem b{transform:rotate(-45deg);color:var(--c2);font-size:22px;letter-spacing:-.04em}
+.lc-x .lgem{background:conic-gradient(#d13b48 0 25%,#e7b53a 0 50%,#33a86b 0 75%,#3b7fe0 0)}
+.lc-x .lgem b{color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.8)}
+.lc .lci{position:absolute;top:5px;left:6px;font-size:12px;text-shadow:0 1px 2px rgba(0,0,0,.4)}
+.lc .lci.lcb{top:auto;left:auto;bottom:5px;right:6px;transform:rotate(180deg)}
+.lc.lv-s .lgem b,.lc.lv-r .lgem b{font-size:24px}
+.lback{--c1:#3a2617;--c2:#1b120b;border-color:var(--brass-dim);background:repeating-linear-gradient(45deg,#2d1d12 0 6px,#24170e 6px 12px)}
+.lback .lgem{width:46%;background:linear-gradient(135deg,var(--brass),#8f6c1f)}
+.lback .lgem b{color:#1b140a;font-family:var(--f-display);font-size:18px}
+.lc.big{width:92px;height:138px;border-radius:13px}
+.lc.big .lgem b{font-size:32px}.lc.big .lci{font-size:16px}
+.lc.drop{animation:lodrop .35s cubic-bezier(.2,1.3,.4,1) both}
+@keyframes lodrop{from{transform:translate(-30px,60px) rotate(-25deg) scale(.7);opacity:.2}}
+.lohero{display:flex;gap:18px;align-items:center;flex-wrap:wrap;padding:6px 2px}
+.lofan{position:relative;width:170px;height:110px;flex:none}
+.lofan .lc{position:absolute;left:50%;bottom:0;transform-origin:50% 120%}
+.lofan .f0{transform:translateX(-50%) rotate(-24deg)}.lofan .f1{transform:translateX(-50%) rotate(-12deg)}.lofan .f2{transform:translateX(-50%) rotate(0)}.lofan .f3{transform:translateX(-50%) rotate(12deg)}.lofan .f4{transform:translateX(-50%) rotate(24deg)}
+.lorule{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.lorule input{width:18px;height:18px;accent-color:var(--brass)}
+.lobotrow{gap:8px}
+.lolegend{display:flex;gap:8px;flex-wrap:wrap}
+.lolegend .lc{width:46px;height:69px}.lolegend .lc .lgem b{font-size:15px}.lolegend .lc .lci{font-size:9px}
+.lorules p{margin:0}
+.loseats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.loseat{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;padding:12px 6px;border-radius:12px;border:1px solid var(--line);background:var(--rail-2);min-width:0}
+.loseat b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.loseat.me{border-color:var(--brass-dim)}
+.loseat.empty{border-style:dashed;justify-content:center;min-height:92px;background:none}
+.loseat.add{color:var(--brass);font-weight:700;cursor:pointer}
+.loav{font-size:30px;line-height:1}
+.loX{position:absolute;top:4px;right:6px;background:none;border:0;color:var(--muted);font-size:14px;padding:4px}
+@media (max-width:560px){.loseats{grid-template-columns:repeat(2,1fr)}}
+.lofelt{display:flex;flex-direction:column;gap:10px;align-items:stretch;position:relative}
+.loopps{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.loopp{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:12px;background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.08);min-width:0;transition:box-shadow .2s,border-color .2s}
+.loopp .loav{font-size:24px}
+.loopp.turn{border-color:var(--brass);box-shadow:0 0 0 3px rgba(209,173,98,.3)}
+.loopp.win{border-color:var(--win)}
+.lonm{display:flex;flex-direction:column;gap:2px;min-width:0}
+.lonm b{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:110px}
+.lofanmini{display:flex;height:14px}
+.lofanmini i{width:9px;height:14px;border-radius:2px;background:linear-gradient(135deg,var(--brass),#6e541a);border:1px solid #1b140a}
+.lofanmini i+i{margin-left:-4px}
+.locenter{display:flex;align-items:center;justify-content:center;gap:clamp(16px,5vw,40px);padding:10px 0}
+.lodeck{position:relative;width:76px;height:108px;padding:0;border:0;background:none}
+.lodeck .lc{position:absolute;left:0;top:0}
+.lodeck .d2{transform:translate(4px,-3px)}.lodeck .d3{transform:translate(8px,-6px)}
+.lodeck>span{position:absolute;left:0;right:-8px;bottom:-20px;text-align:center;color:var(--muted)}
+.lodeck:not(:disabled){cursor:pointer}
+.lodeck:not(:disabled) .d3{box-shadow:0 0 0 3px rgba(209,173,98,.45),0 3px 8px rgba(0,0,0,.45)}
+.lopile{position:relative;width:92px;height:138px}
+.lopile>.lc{position:absolute;inset:0}
+.lounder{position:absolute;inset:0}
+.lounder .lc{width:92px;height:138px;border-radius:13px}
+.lounder.u0{transform:rotate(-14deg) translate(-6px,4px);opacity:.75}.lounder.u1{transform:rotate(9deg) translate(5px,2px);opacity:.85}
+.lostate{display:flex;flex-direction:column;align-items:center;gap:8px}
+.locol{display:flex;align-items:center;gap:6px;font-weight:700;padding:6px 10px;border-radius:999px;background:rgba(0,0,0,.35);border:2px solid var(--c1)}
+.locol .lgem{width:14px;height:14px;transform:rotate(45deg);border-radius:3px;background:linear-gradient(135deg,var(--c1),var(--c2))}
+.lodir{font-size:30px;color:var(--brass);animation:slowspin 6s linear infinite}
+.lostatus{text-align:center;font-size:15px;min-height:22px}
+.lostatus.my{color:var(--brass)}
+.lotimer{height:5px;border-radius:999px;background:rgba(0,0,0,.35);overflow:hidden;margin:0 auto;width:min(420px,90%)}
+.lotimer i{display:block;height:100%;background:#8aa59a;transition:width .25s linear}
+.lotimer.mine i{background:var(--brass)}.lotimer.low i{background:#ff6b5f}
+.loacts{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;min-height:40px}
+.btn.danger{background:#8f1f1a;border-color:#ff8a7a;color:#fff}
+.btn.hot{animation:crpulse .7s ease-in-out infinite alternate}
+.btn.loono{font-weight:800;letter-spacing:.04em}
+.lohand{display:flex;justify-content:center;padding:14px 10px 6px;overflow-x:auto;overflow-y:visible;scrollbar-width:thin}
+.lohand .lc{margin-left:-14px;transition:transform .15s}
+.lohand .lc:first-child{margin-left:0}
+.lohand.myturn .lc.ok{transform:translateY(-10px);box-shadow:0 0 0 3px rgba(209,173,98,.7),0 6px 14px rgba(0,0,0,.5);cursor:pointer}
+.lohand.myturn .lc.ok:hover{transform:translateY(-16px)}
+.lohand.myturn .lc.no{filter:brightness(.55) saturate(.6)}
+.lohand .lc.drawn{outline:3px solid #fff;outline-offset:1px}
+.lohand .lc.new{animation:lonew .4s ease-out both}
+@keyframes lonew{from{transform:translateY(-60px) scale(.7);opacity:0}}
+@media (max-width:560px){.lc{width:52px;height:78px}.lc .lgem b{font-size:17px}.lohand .lc{margin-left:-18px}.lc.big,.lounder .lc,.lopile{width:76px;height:114px}.lodeck{width:62px;height:88px}.lonm b{max-width:70px}}
+.loev{text-align:center;margin:0}
+.loask{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:rgba(8,6,5,.82);border-radius:inherit;text-align:center;padding:16px}
+.loask p{font-weight:700;font-size:17px;margin:0}
+.locolors{display:grid;grid-template-columns:repeat(2,minmax(110px,1fr));gap:10px}
+.lopick{display:flex;align-items:center;gap:10px;padding:14px 16px;border-radius:14px;border:2px solid #f6efe0;color:#fff;font-weight:700;font-size:16px;background:linear-gradient(150deg,var(--c1),var(--c2))}
+.lopick .lgem{width:20px;height:20px;transform:rotate(45deg);border-radius:4px;background:rgba(255,255,255,.9)}
+.lodone{position:absolute;inset:0;z-index:4;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:rgba(8,6,5,.8);border-radius:inherit;text-align:center;padding:16px;animation:up .3s ease-out both}
+.lodone h2{margin:0;font-size:28px}
+.lowin{font-size:56px;animation:pop .4s ease-out}
+.tile-loono{grid-column:span 6;flex-direction:row}
+.tile-loono .art{height:auto;width:42%;min-height:120px;background:radial-gradient(110% 120% at 50% 0%,#2b3f6e,#121c33);border-bottom:0;border-right:1px solid var(--line)}
+.tile-loono .tinfo{justify-content:center}
+.miniloono{display:flex}
+.miniloono .lc{width:44px;height:66px;border-width:2px}.miniloono .lc .lgem b{font-size:14px}.miniloono .lc .lci{display:none}
+.miniloono .lc+.lc{margin-left:-10px}
+.miniloono .lc:nth-child(1){transform:rotate(-14deg)}.miniloono .lc:nth-child(2){transform:rotate(-5deg) translateY(-4px)}.miniloono .lc:nth-child(3){transform:rotate(5deg) translateY(-4px)}.miniloono .lc:nth-child(4){transform:rotate(14deg)}
+@media (max-width:760px){.tile-loono{grid-column:span 2}}
+.fon{display:inline-flex;align-items:center;gap:4px}
+
+/* ---------- v1.5: Chat-Bilder, Reaktionen, Einladungen ---------- */
+.chpic{cursor:pointer;flex:none}
+.bub.pic{padding:4px}
+.chimg{display:block;max-width:min(260px,62vw);max-height:320px;border-radius:10px;cursor:zoom-in}
+.bub.pic time{padding:0 6px 2px}
+.bub{position:relative}
+.reacts{display:flex;gap:4px;flex-wrap:wrap;margin-top:-4px}
+.mrow{flex-direction:column;align-items:flex-start;gap:2px}
+.mrow.mine{align-items:flex-end}
+.rx{border:1px solid var(--line);background:var(--rail-2);border-radius:999px;padding:2px 7px;font-size:13px;color:var(--ink)}
+.rx.me{border-color:var(--brass-dim);background:rgba(209,173,98,.15)}
+.reactbar{position:absolute;bottom:calc(100% + 4px);left:0;display:flex;gap:2px;background:#0b0908;border:1px solid var(--line);border-radius:999px;padding:4px;z-index:5;box-shadow:0 8px 20px rgba(0,0,0,.5)}
+.mrow.mine .reactbar{left:auto;right:0}
+.reactbar button{background:none;border:0;font-size:22px;padding:2px 5px;border-radius:999px}
+.reactbar button:hover{background:rgba(255,255,255,.08)}
+.loinv{display:flex;flex-direction:column;gap:4px;min-width:180px}
+.bigimg{max-width:100%;max-height:75vh;border-radius:12px;display:block;margin:0 auto}
 @media (prefers-reduced-motion:reduce){*{animation:none!important}}
 </style>
 </head>
@@ -749,6 +869,7 @@ nav.tabs button{position:relative}
     <div id="g-crash" hidden></div>
     <div id="g-mines" hidden></div>
     <div id="g-tipp" hidden></div>
+    <div id="g-loono" hidden></div>
     <div id="chat" class="panel chat" hidden>
       <div class="emojis" id="emojis"></div>
       <div class="chatlog" id="chatlog" aria-live="polite"></div>
@@ -1157,13 +1278,14 @@ function startData(){
   }, e => console.warn(e));
   const beat = () => { if (P && document.visibilityState==='visible') updateDoc(doc(fs,'players',uid), { seen: Date.now() }).catch(()=>{}); };
   document.addEventListener('visibilitychange', beat);
-  startChats(); startFlips(); startDuels(); startJackpot();
+  startChats(); startFlips(); startDuels(); startJackpot(); startLoono();
   intervals = [setInterval(beat, 45000), setInterval(leaseLoop, 4000), setInterval(hostTick, 350), setInterval(tickTimers, 500), setInterval(renderAll, 30000)];
 }
 function stopAll(){
   unsubP && unsubP(); unsubG && unsubG(); unsubP = unsubG = null; closeTable();
   unsubChats && unsubChats(); unsubFA && unsubFA(); unsubFB && unsubFB(); CH.unsubM && CH.unsubM(); unsubChats = unsubFA = unsubFB = null;
   unsubDU && unsubDU(); unsubJP && unsubJP(); unsubDU = unsubJP = null;
+  LO.unsubL && LO.unsubL(); LO.unsub && LO.unsub(); LO.unsubL = LO.unsub = null; LO.id = null; LO.g = null;
   intervals.forEach(clearInterval); intervals=[];
 }
 async function createPlayer(){
@@ -1201,6 +1323,7 @@ function afterLogin(){
   const seen = ls.get('seenVersion', null);
   if (seen !== APP_VERSION){ seenBefore = seen; ls.set('seenVersion', APP_VERSION); if (P.created && Date.now() - P.created > 60e3) openModal('news'); }
   setPlaying(game);
+  applyPrefs(); loWatch();
   checkAbortedShift(); checkAbortedHilo(); checkAbortedMines(); crashSettle(); syncClock();
   loadSports();
 }
@@ -1409,7 +1532,7 @@ function canBet(amount){
 function placeBet(amount = bet){
   if (!T || T.phase!=='betting') return false;
   const err = canBet(amount); if (err){ toast(err); return false; }
-  ls.set('lastBet', amount); bet = amount;
+  savePref('lastBet', amount); bet = amount;
   seatWrite({ ready:true, round:T.round, bet:amount });
   SFX.chip();
   return true;
@@ -1748,8 +1871,18 @@ function animateCards(root){
 /* =====================================================================
    v1.1 – Casino home, Glücksrad, Roulette, Automat, Pferderennen, Sportwetten
    ===================================================================== */
-const APP_VERSION = '1.4.1';
+const APP_VERSION = '1.5';
 const CHANGELOGS = {
+  '1.5': [
+    'Neues Spiel Loono: Kartenspiel mit 2 bis 8 Spielern, mit Freunden oder Bots, mit oder ohne Einsatz',
+    'Loono-Regeln Stapeln (+2 auf +2, +4 auf +4) und Doppelt legen, am Tisch abschaltbar',
+    'Freunde können offenen Runden direkt beitreten, oder du lädst sie im Chat ein',
+    'Bilder im Chat schicken, antippen zum Vergrößern',
+    'Auf Nachrichten reagieren: lange drücken (am PC Rechtsklick)',
+    '„Mitspielen“-Knopf bei Freunde online, wenn ein Freund am Tisch sitzt oder bei Loono wartet',
+    'Statistik pro Spiel im Profil',
+    'Deine Einsätze und Einstellungen werden auf allen Geräten gemerkt',
+  ],
   '1.4.1': [
     'Wichtige Reparatur: Ein Gerät oder Tab mit altem Stand kann deinen Spielstand nicht mehr überschreiben',
     'Bricht die Verbindung zu Firebase ab, erscheint eine Warnung und du kannst nicht weiterspielen, bis wieder gespeichert wird',
@@ -1806,7 +1939,7 @@ const verNum = v => (v||'0').split('.').map(Number).reduce((a,x,i) => a + x * Ma
 let seenBefore = null;
 let game = null;            // null = Casino-Startseite, 'bj', 'roulette', 'slots', 'horses', 'sports'
 let hold = 0;               // Gewinn, der erst nach der Animation im Kontostand erscheint
-const GAME_NAMES = { bj:'Blackjack', roulette:'Roulette', slots:'Automat', horses:'Pferderennen', sports:'Sportwette', wheel:'Glücksrad', hilo:'Höher oder Tiefer', coinflip:'Coin Flip', crash:'Crash', mines:'Mines', tipp:'Tipprunde', duel:'Freundeswette' };
+const GAME_NAMES = { bj:'Blackjack', roulette:'Roulette', slots:'Automat', horses:'Pferderennen', sports:'Sportwette', wheel:'Glücksrad', hilo:'Höher oder Tiefer', coinflip:'Coin Flip', crash:'Crash', mines:'Mines', tipp:'Tipprunde', duel:'Freundeswette', loono:'Loono' };
 ACH.splice(ACH.length - 2, 0,
   ['r_num','🎯','Volltreffer','Beim Roulette eine einzelne Zahl getroffen'],
   ['jackpot','7️⃣','Jackpot','Am Automaten drei Siebenen gedreht'],
@@ -1823,6 +1956,7 @@ ACH.splice(ACH.length - 2, 0,
   ['duel','🤝','Ehrensache','Eine Wette gegen einen Freund gewonnen'],
   ['tasks','✅','Fleißig','An einem Tag alle drei Tagesaufgaben geschafft'],
   ['lvl10','🎖️','Aufsteiger','Level 10 erreicht'],
+  ['loono','🎴','Loono!','Eine Runde Loono gewonnen'],
 );
 const pick = arr => arr[rnd(arr.length)];
 const secs = ms => new Promise(r => setTimeout(r, ms));
@@ -2357,7 +2491,7 @@ function placeBet2(){
   if ((P.bets||[]).filter(b => b.st==='open').length >= 30) return toast('Höchstens 30 offene Wetten gleichzeitig.');
   const m = s.m, bet = { id: Date.now().toString(36) + rnd(1e6).toString(36), src:m.src, sc:m.sc_ || null, season:m.season || null, mid:m.id, kind:m.kind, lg:m.lg, t1:m.t1, t2:m.t2, ko:m.t, pick:s.pick, odds:m.odds[s.pick], stake:SP.stake, st:'open', at:Date.now() };
   const ok = withPlayer(d => { WHY = 'Sportwette Einsatz'; if (d.balance < SP.stake) return false; d.balance -= SP.stake; d.bets = [...(d.bets||[]), bet]; taskBump(d, 'sports_bet', 1); return true; });
-  if (ok){ ls.set('sportstake', SP.stake); SP.slip = null; SFX.chip(); toast(`Wette platziert: ${fmt(bet.stake)} ℒ, möglicher Gewinn ${fmt(Math.floor(bet.stake*bet.odds))} ℒ`); renderAll(); }
+  if (ok){ savePref('sportstake', SP.stake); SP.slip = null; SFX.chip(); toast(`Wette platziert: ${fmt(bet.stake)} ℒ, möglicher Gewinn ${fmt(Math.floor(bet.stake*bet.odds))} ℒ`); renderAll(); }
 }
 const pickLabel = (b) => b.pick==='X' ? 'Unentschieden' : b.pick==='1' ? b.t1 : b.t2;
 const oddsFmt = o => o.toLocaleString('de-DE', { minimumFractionDigits:2, maximumFractionDigits:2 });
@@ -2805,7 +2939,7 @@ function crashBet(){
   const err = betError(CR.bet); if (err) return toast(err);
   if (s.r.fly - NOW() < 300) return toast('Zu spät, die Rakete startet.');
   const stake = CR.bet, auto = CR.auto || null;
-  if (withPlayer(d => { if (d.balance < stake) return false; d.balance -= stake; d.crash = { r: s.r.id, bet: stake, auto, out: null }; return true; }, 'Crash Einsatz')){ ls.set('crashbet', stake); SFX.chip(); }
+  if (withPlayer(d => { if (d.balance < stake) return false; d.balance -= stake; d.crash = { r: s.r.id, bet: stake, auto, out: null }; return true; }, 'Crash Einsatz')){ savePref('crashbet', stake); SFX.chip(); }
 }
 /** cash out now, or at the auto multiplier (also works later, when the app was closed) */
 function crashCash(at){
@@ -2912,7 +3046,7 @@ function mnStart(){
   if (!withPlayer(d => { if (d.balance < stake) return false; d.balance -= stake; d.mines = { stake, n, at: Date.now() }; return true; }, 'Mines Einsatz')) return;
   const set = new Set(); while (set.size < n) set.add(rnd(25));
   MN.id++; MN.run = { stake, n, mines: set, open: [], over: false, lost: false, boom: -1 };
-  ls.set('minesstake', stake); ls.set('minesn', n); SFX.chip(); renderAll();
+  savePref('minesstake', stake); savePref('minesn', n); SFX.chip(); renderAll();
 }
 function mnPick(i){
   const R_ = MN.run; if (!R_ || R_.over || R_.open.includes(i)) return;
@@ -3206,7 +3340,7 @@ document.addEventListener('click', e => {
   switch (b.dataset.act){
     case 'taskclaim': taskClaim(b.dataset.k); break;
     case 'crbet': CR.bet = v; CR.key = ''; renderAll(); break;
-    case 'crauto': CR.auto = v; ls.set('crashauto', v); CR.key = ''; renderAll(); break;
+    case 'crauto': CR.auto = v; savePref('crashauto', v); CR.key = ''; renderAll(); break;
     case 'crgo': crashBet(); break;
     case 'crcash': crashCash(); break;
     case 'mnstake': MN.stake = v; renderAll(); break;
@@ -3228,6 +3362,579 @@ document.addEventListener('click', e => {
 // Crash auto cash-out and settlement keep running in every view
 setInterval(() => { if (P?.crash && P.crash.out == null) crashSettle(); }, 250);
 setInterval(() => { if (!uid || !P) return; duelsChanged(); tpPrize(); }, 60e3);
+
+
+/* ---------- v1.5: Loono – Kartenspiel mit Freunden und Bots ---------- */
+const LO_TURN = 20000, LO_MAX = 8, LO_CATCH = 2500;
+const LO_NAMES = { r: 'Rubin', y: 'Gold', g: 'Smaragd', b: 'Saphir' };
+const LO_BOTS = [['Bot Kalle','🤖'],['Bot Mia','👾'],['Bot Otto','🦾'],['Bot Lina','🦊'],['Bot Ede','🐙'],['Bot Ida','🦉'],['Bot Fritz','🐸'],['Bot Uschi','🐧']];
+const LO = { id: null, g: null, unsub: null, lobbies: {}, unsubL: null, stake: ls.get('lostake', 0), rules: ls.get('lorules', { stack: true, double: true }), bots: ls.get('lobots', 2),
+  busy: false, ask: null, invite: false, animN: -1, prevHand: [], lastTurnN: -1 };
+const loVal = c => c.slice(1);
+const loTop = g => g.pile[g.pile.length - 1];
+const loSym = v => ({ s: '⊘', r: '⇄', d: '+2', w: '★', f: '+4' })[v] ?? v;
+const LO_ORDER = 'rygbx', LO_VORDER = '0123456789srdwf';
+const loSort = h => h.slice().sort((a, b) => LO_ORDER.indexOf(a[0]) - LO_ORDER.indexOf(b[0]) || LO_VORDER.indexOf(loVal(a)) - LO_VORDER.indexOf(loVal(b)));
+function loShuffle(a){ for (let i = a.length - 1; i > 0; i--){ const j = rnd(i + 1); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function loDeck(){
+  const d = [];
+  for (const c of 'rygb'){ d.push(c + '0'); for (const v of '123456789srd') d.push(c + v, c + v); }
+  for (let i = 0; i < 4; i++) d.push('xw', 'xf');
+  return loShuffle(d);   // 108 Karten
+}
+/** may this card go on the pile right now? */
+function loCanPlay(g, c){
+  if (g.pend > 0) return !!g.rules?.stack && loVal(c) === g.ptype;
+  if (g.drew && c !== g.drew) return false;
+  return c[0] === 'x' || c[0] === g.color || loVal(c) === loVal(loTop(g));
+}
+const loStep = (g, from, steps) => { const n = g.seats.length; return ((from + g.dir * steps) % n + n) % n; };
+function loDraw(g, id, k){
+  const out = [];
+  for (let i = 0; i < k; i++){
+    if (!g.deck.length){ const top = g.pile.pop(); g.deck = loShuffle(g.pile.slice()); g.pile = [top]; }
+    if (!g.deck.length) break;
+    out.push(g.deck.pop());
+  }
+  g.hands[id] = [...(g.hands[id] || []), ...out];
+  g.called = { ...(g.called || {}), [id]: false };
+  return out;
+}
+function loNext(g, steps = 1){
+  if (g.seats.length === 2 && steps > 1) steps = 2;   // zu zweit: Aussetzen heißt nochmal dran
+  g.turn = loStep(g, g.turn, steps); g.drew = null; g.n++;
+  g.dl = Date.now() + (g.seats[g.turn].bot ? 1100 + rnd(900) : LO_TURN);
+}
+function loDeal(g){
+  g.deck = loDeck(); g.hands = {};
+  for (const s of g.seats) g.hands[s.id] = g.deck.splice(-7);
+  let top = null;
+  while (!top){ const c = g.deck.pop(); if (c[0] === 'x' || 'srd'.includes(loVal(c))) g.deck.unshift(c); else top = c; }
+  Object.assign(g, { pile: [top], color: top[0], dir: 1, turn: rnd(g.seats.length), pend: 0, ptype: null, drew: null, called: {}, expose: null,
+    st: 'play', open: true, winner: null, round: (g.round || 0) + 1, n: (g.n || 0) + 1, ev: { a: 'start' }, pot: (g.stake || 0) * g.seats.length, started: Date.now() });
+  g.seats = g.seats.map(s => ({ ...s, to: 0 }));
+  g.dl = Date.now() + (g.seats[g.turn].bot ? 1800 : LO_TURN);
+}
+function loPlay(g, id, cards, color){
+  const h = g.hands[id].slice();
+  if (!cards.length || !loCanPlay(g, cards[0])) return false;
+  if (cards.length > 1 && (!g.rules?.double || cards.length > 2 || cards[1] !== cards[0] || g.drew)) return false;
+  for (const c of cards){ const i = h.indexOf(c); if (i < 0) return false; h.splice(i, 1); }
+  g.hands[id] = h; g.pile = [...g.pile, ...cards];
+  const c = cards[0], v = loVal(c), k = cards.length;
+  g.color = c[0] === 'x' ? (LO_NAMES[color] ? color : 'r') : c[0];
+  let skip = 0;
+  if (v === 's') skip = k;
+  if (v === 'r'){ if (k % 2) g.dir *= -1; if (g.seats.length === 2) skip = k; }
+  if (v === 'd' || v === 'f'){ g.pend = (g.pend || 0) + (v === 'd' ? 2 : 4) * k; g.ptype = v; }
+  g.called ||= {};
+  g.expose = h.length === 1 && !g.called[id] ? { id, t: Date.now() } : null;
+  if (!h.length){ g.st = 'done'; g.open = false; g.winner = id; g.end = Date.now(); g.n++; g.ev = { n: g.n, id, a: 'play', c: cards, col: g.color }; return true; }
+  loNext(g, 1 + skip);
+  g.ev = { n: g.n, id, a: 'play', c: cards, col: g.color };
+  return true;
+}
+/** draw: the open +2/+4 stack, or one card (which may be played right away) */
+function loDrawAct(g, id){
+  g.expose = null;
+  if (g.pend > 0){ const k = g.pend; loDraw(g, id, k); g.pend = 0; g.ptype = null; loNext(g, 1); g.ev = { n: g.n, id, a: 'take', k }; return true; }
+  if (g.drew) return false;
+  const [c] = loDraw(g, id, 1);
+  if (c && loCanPlay({ ...g, drew: c }, c)){ g.drew = c; g.n++; g.ev = { n: g.n, id, a: 'draw', k: 1 }; g.dl = Date.now() + (g.seats[g.turn].bot ? 900 : LO_TURN); return 'can'; }
+  loNext(g, 1); g.ev = { n: g.n, id, a: 'draw', k: 1 };
+  return true;
+}
+function loKeep(g, id){ if (!g.drew) return false; loNext(g, 1); g.ev = { n: g.n, id, a: 'keep' }; return true; }
+function loCall(g, id){
+  if ((g.hands[id] || []).length > 2) return false;
+  g.called = { ...(g.called || {}), [id]: true };
+  if (g.expose?.id === id) g.expose = null;
+  g.ev = { ...(g.ev || {}), call: id, ct: Date.now() };
+  return true;
+}
+function loCatch(g, by){
+  const v = g.expose?.id; if (!v || v === by) return false;
+  g.expose = null;
+  if ((g.hands[v] || []).length !== 1) return false;
+  loDraw(g, v, 2); g.ev = { ...(g.ev || {}), caught: v, by, ct: Date.now() };
+  return true;
+}
+function loTimeout(g){
+  const s = g.seats[g.turn], id = s.id;
+  s.to = (s.to || 0) + 1;
+  if (s.to >= 2 && !s.bot && !isOnline(id)){ s.bot = true; s.afk = true; }   // wer weg ist, wird von einem Bot vertreten
+  if (g.drew) return loKeep(g, id);
+  const r = loDrawAct(g, id);
+  if (r === 'can') return loKeep(g, id);
+  return r;
+}
+function loBestColor(h){ const cnt = {}; h.forEach(c => { if (c[0] !== 'x') cnt[c[0]] = (cnt[c[0]] || 0) + 1; }); return Object.keys(cnt).sort((a, b) => cnt[b] - cnt[a])[0] || 'rygb'[rnd(4)]; }
+function loBot(g){
+  const s = g.seats[g.turn], id = s.id, h = g.hands[id];
+  if (g.drew){ if (loCanPlay(g, g.drew)) return loPlay(g, id, [g.drew], loBestColor(h.filter(c => c !== g.drew))); return loKeep(g, id); }
+  const opts = [...new Set(h.filter(c => loCanPlay(g, c)))];
+  if (!opts.length){
+    const r = loDrawAct(g, id);
+    if (r === 'can') return loPlay(g, id, [g.drew], loBestColor(g.hands[id].filter(c => c !== g.drew)));
+    return r;
+  }
+  const nxt = g.seats[loStep(g, g.turn, 1)].id, danger = (g.hands[nxt] || []).length <= 2;
+  const cnt = {}; h.forEach(c => cnt[c[0]] = (cnt[c[0]] || 0) + 1);
+  const score = c => {
+    const v = loVal(c); let sc = c[0] === 'x' ? (v === 'f' ? 1 : 3) : 'srd'.includes(v) ? 7 : 10;
+    if (danger && 'sdfr'.includes(v)) sc += 12;
+    if (c[0] !== 'x') sc += cnt[c[0]] || 0;
+    if (h.length <= 2 && c[0] === 'x') sc += 6;
+    return sc + Math.random() * 2;
+  };
+  const c = opts.sort((a, b) => score(b) - score(a))[0];
+  const two = g.rules?.double && g.pend === 0 && h.filter(x => x === c).length >= 2;
+  const left = h.length - (two ? 2 : 1);
+  if (left === 1 && Math.random() < 0.85) g.called = { ...(g.called || {}), [id]: true };
+  const rest = h.filter(x => x !== c);
+  return loPlay(g, id, two ? [c, c] : [c], loBestColor(rest.length ? rest : h));
+}
+/* who runs the bots and the turn clock: the first human at the table who is online */
+const loHostId = g => g.seats.filter(s => !s.bot).map(s => s.id).find(id => isOnline(id)) || null;
+async function loTx(fn, quiet){
+  const id = LO.id; if (!id) return false;
+  LO.busy = true;
+  try {
+    return await runTransaction(fs, async tx => {
+      const ref = doc(fs, 'loono', id), s = await tx.get(ref); if (!s.exists()) return false;
+      const g = s.data(); const r = fn(g); if (!r) return false;
+      tx.set(ref, g); return r;
+    });
+  } catch (e){ console.warn(e); if (!quiet) handleWriteErr(e); return false; }
+  finally { LO.busy = false; }
+}
+async function loTick(){
+  const g = LO.g; if (!g || g.st !== 'play' || LO.busy || !uid || !g.seats.some(s => s.id === uid)) return;
+  const late = loHostId(g) === uid ? 0 : 6000, now = Date.now(), cur = g.seats[g.turn];
+  if (g.expose && now - g.expose.t > LO_CATCH + late){
+    const victim = g.seats.find(s => s.id === g.expose.id), bot = g.seats.find(s => s.bot && s.id !== g.expose.id);
+    if (victim && !victim.bot && bot){ const t = g.expose.t; await loTx(x => x.expose && x.expose.t === t ? loCatch(x, bot.id) : false, true); return; }
+  }
+  if (now < g.dl + late) return;
+  const n = g.n;
+  await loTx(x => x.n === n && x.st === 'play' ? (x.seats[x.turn].bot ? loBot(x) : loTimeout(x)) : false, true);
+}
+setInterval(loTick, 400);
+
+/* ---------- lobby ---------- */
+function loNewBot(seats){
+  const used = new Set(seats.map(s => s.name)); const b = LO_BOTS.find(([nm]) => !used.has(nm)) || LO_BOTS[0];
+  return { id: 'bot' + rnd(1e9).toString(36), name: b[0], av: b[1], bot: true };
+}
+function loMySeat(){ return { id: uid, name: P.name, av: P.avatar || '🙂' }; }
+function loSetMine(id){ withPlayer(d => { if (d.loono === id) return false; d.loono = id; return true; }); loWatch(); }
+async function loCreate(bots){
+  if (!P) return;
+  const err = LO.stake > 0 ? betError(LO.stake, 100) : null; if (err) return toast(err);
+  if (P.loono && LO.g && LO.g.st === 'play' && LO.g.seats.some(s => s.id === uid && !s.left)) return toast('Du sitzt noch in einer laufenden Runde.');
+  if (P.loono) await loLeave(true);
+  const seats = [loMySeat()];
+  for (let i = 0; i < bots; i++) seats.push(loNewBot(seats));
+  const g = { host: uid, name: P.name, st: 'lobby', open: true, stake: LO.stake, rules: { ...LO.rules }, seats, members: [uid], created: Date.now(), round: 0, n: 0 };
+  if (bots) loDeal(g);
+  const ref = doc(collection(fs, 'loono'));
+  try { await setDoc(ref, g); loSetMine(ref.id); SFX.chip(); } catch (e){ handleWriteErr(e); }
+}
+async function loJoin(id){
+  if (!P) return;
+  if (P.loono === id){ loWatch(); return; }
+  if (P.loono) await loLeave(true);
+  const ref = doc(fs, 'loono', id);
+  try {
+    await runTransaction(fs, async tx => {
+      const s = await tx.get(ref); const g = s.data();
+      if (!g || g.st !== 'lobby' || !g.open) throw { code: 'closed' };
+      if (g.seats.some(x => x.id === uid)) return true;
+      if (g.seats.length >= LO_MAX) throw { code: 'full' };
+      if (g.stake > P.balance) throw { code: 'money' };
+      g.seats = [...g.seats, loMySeat()]; g.members = [...new Set([...(g.members || []), uid])];
+      tx.set(ref, g); return true;
+    });
+    loSetMine(id); SFX.chip();
+  } catch (e){
+    if (e?.code === 'closed') toast('Diese Runde läuft schon oder ist vorbei.');
+    else if (e?.code === 'full') toast('Die Runde ist voll (8 Spieler).');
+    else if (e?.code === 'money') toast('Für den Einsatz dieser Runde hast du nicht genug Legats.');
+    else handleWriteErr(e);
+  }
+}
+async function loLeave(silent){
+  const id = P?.loono; if (!id) return;
+  const g = LO.id === id ? LO.g : null;
+  if (g && g.st === 'play' && g.stake > 0 && g.seats.some(s => s.id === uid && !s.left))
+    withPlayer(d => { if (!fdoneOnce(d, 'lo:' + id + ':' + g.round + ':end')) return false; record(d, 'loono', g.stake, 0); return true; }, 'Loono');
+  const ref = doc(fs, 'loono', id);
+  try {
+    await runTransaction(fs, async tx => {
+      const s = await tx.get(ref); const x = s.data(); if (!x) return;
+      if (x.st === 'lobby'){
+        x.seats = x.seats.filter(s => s.id !== uid);
+        const humans = x.seats.filter(s => !s.bot);
+        if (!humans.length){ x.open = false; x.st = 'closed'; }
+        else if (x.host === uid){ x.host = humans[0].id; x.name = humans[0].name; }
+      } else if (x.st === 'play'){
+        x.seats = x.seats.map(s => s.id === uid ? { ...s, bot: true, left: true } : s);
+        if (!x.seats.some(s => !s.bot)){ x.open = false; x.st = 'closed'; }
+      } else if (x.st === 'done'){
+        x.seats = x.seats.map(s => s.id === uid ? { ...s, left: true } : s);
+      }
+      tx.set(ref, x);
+    });
+  } catch (e){ console.warn(e); }
+  withPlayer(d => { if (!d.loono) return false; d.loono = null; return true; });
+  LO.ask = null; LO.invite = false; loWatch();
+  if (!silent) toast('Du hast die Runde verlassen.');
+}
+async function loStart(){
+  const g = LO.g; if (!g || g.host !== uid || g.st !== 'lobby') return;
+  if (g.seats.length < 2) return toast('Mindestens 2 Spieler. Füg einen Bot hinzu.');
+  if (g.stake > 0){
+    const poor = g.seats.filter(s => !s.bot && (pl(s.id)?.balance || 0) < g.stake);
+    if (poor.length) return toast(`${poor.map(s => s.name).join(', ')} ${poor.length === 1 ? 'hat' : 'haben'} nicht genug Legats für den Einsatz.`);
+  }
+  await loTx(x => { if (x.st !== 'lobby' || x.seats.length < 2) return false; loDeal(x); return true; });
+}
+async function loRematch(){ await loTx(x => {
+  if (x.st !== 'done' || x.host !== uid) return false;
+  x.seats = x.seats.filter(s => !s.left).map(s => s.afk ? { ...s, bot: false, afk: false } : s);
+  if (!x.seats.some(s => !s.bot)) return false;
+  Object.assign(x, { st: 'lobby', open: true, hands: {}, deck: [], pile: [], winner: null, expose: null, pend: 0, ptype: null, drew: null });
+  return true;
+}); }
+function loWatch(){
+  const id = P?.loono || null;
+  if (id === LO.id) return;
+  LO.unsub && LO.unsub(); LO.unsub = null; LO.id = id; LO.g = null; LO.ask = null; LO.animN = -1;
+  if (!id){ renderAll(); return; }
+  LO.unsub = onSnapshot(doc(fs, 'loono', id), s => { const before = LO.g; LO.g = s.exists() ? s.data() : null; loChanged(before, LO.g); renderAll(); }, e => console.warn(e));
+}
+function startLoono(){
+  LO.unsubL = onSnapshot(query(collection(fs, 'loono'), where('open', '==', true)), s => { const o = {}; s.docs.forEach(d => o[d.id] = d.data()); LO.lobbies = o; renderAll(); }, e => console.warn(e));
+}
+const loName = (g, id) => g.seats.find(s => s.id === id)?.name || nameOf(id);
+function loChanged(a, g){
+  if (!g || !P) return;
+  loBook(g);
+  const here = tab === 'table' && game === 'loono';
+  if (g.st === 'play' && g.ev && (!a || a.n !== g.n || a.ev?.ct !== g.ev?.ct)){
+    if (g.ev.caught && g.ev.ct !== a?.ev?.ct){ SFX.bust(); toast(`${g.ev.caught === uid ? 'Erwischt! Du' : loName(g, g.ev.caught)} hat nicht „Loono!“ gerufen: +2 Karten`); }
+    else if (g.ev.call && g.ev.ct !== a?.ev?.ct && here){ SFX.pop(); }
+    if (a && a.n !== g.n && here){
+      if (g.ev.a === 'play') SFX.card(); else if (g.ev.a === 'take' || g.ev.a === 'draw') SFX.chip();
+    }
+    if (g.seats[g.turn]?.id === uid && LO.lastTurnN !== g.n){ LO.lastTurnN = g.n; if (a && a.n !== g.n) setTimeout(() => tone(880, .08, { type: 'triangle', vol: .06 }), 180); }
+  }
+  if (g.st === 'play' && a?.st === 'lobby' && g.seats.some(s => s.id === uid) && !here && game !== 'bj') toast('🎴 Deine Loono-Runde hat angefangen!');
+  if (g.st === 'done' && a?.st === 'play'){
+    const won = g.winner === uid;
+    if (won) SFX.bj(); else SFX.lose();
+    if (!here) toast(won ? '🎴 Du hast Loono gewonnen!' : `🎴 ${loName(g, g.winner)} hat Loono gewonnen`);
+  }
+}
+/** stake in when the round starts, pot out to the winner, once each */
+function loBook(g){
+  const me = g.seats?.find(s => s.id === uid); if (!me || !g.round || !LO.id) return;
+  const key = 'lo:' + LO.id + ':' + g.round;
+  if (g.stake > 0 && (g.st === 'play' || g.st === 'done') && !P.fdone?.includes(key + ':in'))
+    withPlayer(d => { if (!fdoneOnce(d, key + ':in')) return false; d.balance = Math.max(0, d.balance - g.stake); return true; }, 'Loono Einsatz');
+  if (g.st === 'done' && !me.left && !P.fdone?.includes(key + ':end')){
+    const won = g.winner === uid;
+    withPlayer(d => {
+      if (!fdoneOnce(d, key + ':end')) return false;
+      if (g.stake > 0){ if (won) d.balance += g.pot; record(d, 'loono', g.stake, won ? g.pot : 0); }
+      if (won) grant(d, 'loono');
+      return true;
+    }, 'Loono');
+  }
+}
+async function loInvite(chatId){
+  const g = LO.g; if (!g || !LO.id) return;
+  const t = Date.now(), x = `🎴 Loono-Einladung von ${P.name}`;
+  try {
+    await addDoc(collection(fs, 'chats', chatId, 'msgs'), { u: uid, x, k: 'lo', g: LO.id, t });
+    updateDoc(doc(fs, 'chats', chatId), { last: { u: uid, x, k: 'lo', t } }).catch(() => {});
+    toast('Einladung geschickt'); LO.invite = false; renderAll();
+  } catch (e){ handleWriteErr(e); }
+}
+
+/* ---------- player actions ---------- */
+const loMyTurn = g => g && g.st === 'play' && g.seats[g.turn]?.id === uid;
+function loTap(c){
+  const g = LO.g; if (!loMyTurn(g) || LO.busy) return;
+  if (!loCanPlay(g, c)){ toast(g.pend > 0 ? `Leg eine ${g.ptype === 'd' ? '+2' : '+4'} drauf oder zieh ${g.pend} Karten.` : 'Die Karte passt nicht. Gleiche Farbe, gleiche Zahl oder Farbwahl-Karte.'); return; }
+  const twin = g.rules?.double && !g.drew && (g.hands[uid] || []).filter(x => x === c).length >= 2;
+  if (twin) { LO.ask = { c, step: 'two' }; renderAll(); return; }
+  if (c[0] === 'x'){ LO.ask = { c, n: 1, step: 'color' }; renderAll(); return; }
+  loDo([c]);
+}
+function loDo(cards, color){
+  LO.ask = null; const n = LO.g?.n;
+  loTx(x => { if (x.n !== n || x.seats[x.turn]?.id !== uid) return false; x.seats[x.turn].to = 0; return loPlay(x, uid, cards, color); });
+}
+const loDrawBtn = () => { const n = LO.g?.n; if (!loMyTurn(LO.g) || LO.busy) return; loTx(x => x.n === n && x.seats[x.turn]?.id === uid ? (x.seats[x.turn].to = 0, loDrawAct(x, uid)) : false); };
+const loKeepBtn = () => { const n = LO.g?.n; loTx(x => x.n === n && x.seats[x.turn]?.id === uid ? loKeep(x, uid) : false); };
+const loCallBtn = () => { SFX.pop(); loTx(x => loCall(x, uid)); };
+const loCatchBtn = () => { const t = LO.g?.expose?.t; loTx(x => x.expose && x.expose.t === t ? loCatch(x, uid) : false); };
+
+/* ---------- screens ---------- */
+function loCard(c, cls = '', act = ''){
+  const v = loVal(c), sym = loSym(v), tag = act ? 'button' : 'div';
+  return `<${tag} class="lc lc-${c[0]} lv-${v}${cls}"${act}><span class="lci">${sym}</span><span class="lgem"><b>${sym}</b></span><span class="lci lcb">${sym}</span></${tag}>`;
+}
+const loBack = (cls = '') => `<div class="lc lback${cls}"><span class="lgem"><b>L</b></span></div>`;
+function loHomeHTML(){
+  const fr = new Set(friendIds());
+  const open = Object.entries(LO.lobbies).filter(([id, g]) => g.st === 'lobby' && g.seats?.some(s => !s.bot && fr.has(s.id)));
+  const stakes = [[0, 'Ohne'], [100, '100'], [500, '500'], [1000, '1K'], [5000, '5K']];
+  return `${backBar('Loono', '<span class="muted small">2 bis 8 Spieler</span>')}
+  <div class="stack">
+    <div class="lohero"><div class="lofan">${['r7', 'yr', 'gd', 'b9', 'xf'].map((c, i) => loCard(c, ' f' + i)).join('')}</div>
+      <div><h2 style="margin:0">Wer zuerst alle Karten los ist, gewinnt.</h2><p class="muted" style="margin:6px 0 0">Leg gleiche Farbe oder gleiche Zahl. Bei der vorletzten Karte „Loono!“ rufen, sonst gibt's 2 Strafkarten.</p></div></div>
+    <div class="grid2">
+      <div class="panel stack">
+        <h3>Neue Runde</h3>
+        <div><span class="muted small">Einsatz pro Spieler · der Sieger bekommt den ganzen Topf</span>
+          <div class="seg" style="margin-top:6px">${stakes.map(([v, l]) => `<button data-act="lostake" data-v="${v}" aria-pressed="${LO.stake === v}">${l}</button>`).join('')}</div></div>
+        <div class="stack" style="gap:6px"><span class="muted small">Regeln</span>
+          <label class="lorule"><input type="checkbox" data-act="lorule" data-k="stack" ${LO.rules.stack ? 'checked' : ''}> <b>Stapeln</b> <span class="muted small">+2 auf +2, +4 auf +4</span></label>
+          <label class="lorule"><input type="checkbox" data-act="lorule" data-k="double" ${LO.rules.double ? 'checked' : ''}> <b>Doppelt legen</b> <span class="muted small">zwei exakt gleiche Karten auf einmal</span></label></div>
+        <div class="row"><button class="btn gold" data-act="locreate" data-v="0">Runde eröffnen</button><span class="muted small">Freunde können direkt beitreten oder du lädst sie im Chat ein.</span></div>
+        <div class="row lobotrow"><span class="muted small">Oder sofort gegen</span><div class="seg">${[1, 2, 3, 5].map(n => `<button data-act="lobots" data-v="${n}" aria-pressed="${LO.bots === n}">${n} ${n === 1 ? 'Bot' : 'Bots'}</button>`).join('')}</div><button class="btn" data-act="locreate" data-v="${LO.bots}">Los</button></div>
+      </div>
+      <div class="panel stack">
+        <h3>Offene Runden deiner Freunde</h3>
+        ${open.length ? open.map(([id, g]) => `<div class="lobby-item"><span><b>${esc(g.name)}</b> <span class="muted small">· ${g.seats.length}/${LO_MAX} · ${g.stake ? fmt(g.stake) + ' ℒ Einsatz' : 'ohne Einsatz'}</span><br><span class="small">${g.seats.map(s => avH(s.av)).join(' ')}</span></span><button class="btn sm gold" data-act="lojoin" data-id="${esc(id)}" ${g.stake > P.balance ? 'disabled' : ''}>Beitreten</button></div>`).join('')
+          : '<p class="muted">Gerade wartet keine Runde. Eröffne selbst eine und lade Freunde im Chat ein.</p>'}
+      </div>
+    </div>
+    <details class="panel"><summary><b>Alle Regeln</b></summary><div class="stack lorules" style="margin-top:10px">
+      <p>Jeder bekommt 7 Karten. Reihum legst du eine Karte, die in <b>Farbe</b> oder <b>Zahl/Symbol</b> zur obersten passt. Kannst oder willst du nicht, ziehst du eine Karte und darfst sie sofort legen, wenn sie passt.</p>
+      <div class="lolegend">${['r5', 'gs', 'br', 'yd', 'xw', 'xf'].map(c => loCard(c)).join('')}</div>
+      <p><b>⊘ Aussetzen:</b> der Nächste ist übersprungen. <b>⇄ Richtungswechsel</b> (zu zweit wie Aussetzen). <b>+2:</b> der Nächste zieht 2 und setzt aus. <b>★ Farbwahl:</b> passt immer, du wählst die Farbe. <b>+4:</b> Farbwahl und der Nächste zieht 4.</p>
+      <p><b>Stapeln:</b> Auf eine +2 darfst du eine +2 legen, auf eine +4 eine +4. Wer nicht stapeln kann, zieht alles zusammen. <b>Doppelt legen:</b> Hast du eine Karte zweimal (gleiche Farbe und Zahl), darfst du beide auf einmal legen. Die Wirkung zählt doppelt.</p>
+      <p><b>Loono!</b> Hast du nur noch eine Karte, musst du „Loono!“ rufen (Knopf). Erwischt dich jemand vorher, ziehst du 2 Karten. Für jeden Zug hast du 20 Sekunden, danach wird automatisch gezogen. Wer geht, wird von einem Bot vertreten, sein Einsatz bleibt im Topf. Bots zahlen den Einsatz aus der Casinokasse.</p>
+    </div></details>
+  </div>`;
+}
+function loLobbyHTML(g){
+  const host = g.host === uid, seats = g.seats;
+  const slots = Array.from({ length: LO_MAX }, (_, i) => {
+    const s = seats[i];
+    if (s) return `<div class="loseat${s.id === uid ? ' me' : ''}"><span class="loav">${avH(s.av)}</span><b>${esc(s.name)}</b><span class="muted small">${s.bot ? 'Bot' : s.id === g.host ? '👑 eröffnet' : isOnline(s.id) ? 'bereit' : 'offline'}</span>${host && s.bot ? `<button class="loX" data-act="lokick" data-id="${esc(s.id)}" aria-label="${esc(s.name)} entfernen">✕</button>` : ''}</div>`;
+    if (i === seats.length && host) return `<button class="loseat empty add" data-act="loaddbot">＋ Bot</button>`;
+    return `<div class="loseat empty"><span class="muted small">frei</span></div>`;
+  }).join('');
+  const chats = Object.entries(CH.list).sort((a, b) => (b[1].last?.t || 0) - (a[1].last?.t || 0));
+  return `${backBar('Loono', `<span class="pill">${g.stake ? fmt(g.stake) + ' ℒ Einsatz' : 'ohne Einsatz'}</span>`)}
+  <div class="stack">
+    <div class="panel stack">
+      <div class="row" style="justify-content:space-between"><h2 style="margin:0">Runde von ${esc(g.name)}</h2><span class="muted small">${seats.length} von ${LO_MAX} Plätzen</span></div>
+      <div class="loseats">${slots}</div>
+      <div class="row" style="gap:14px">
+        <label class="lorule"><input type="checkbox" data-act="lolrule" data-k="stack" ${g.rules?.stack ? 'checked' : ''} ${host ? '' : 'disabled'}> Stapeln</label>
+        <label class="lorule"><input type="checkbox" data-act="lolrule" data-k="double" ${g.rules?.double ? 'checked' : ''} ${host ? '' : 'disabled'}> Doppelt legen</label>
+        ${g.stake ? `<span class="muted small">Topf beim Start: ${fmt(g.stake * seats.length)} ℒ</span>` : ''}
+      </div>
+      <div class="row">
+        ${host ? `<button class="btn gold" data-act="lostart" ${seats.length < 2 ? 'disabled' : ''}>Starten</button>` : `<span class="muted">Warte, bis ${esc(g.name)} startet …</span>`}
+        <button class="btn" data-act="loinvite">${LO.invite ? 'Schließen' : '💬 Im Chat einladen'}</button>
+        <button class="btn" data-act="loleave">Verlassen</button>
+      </div>
+      ${LO.invite ? `<div class="stack" style="gap:4px">${chats.length ? chats.map(([id, c]) => `<button class="chitem" data-act="loinv" data-id="${esc(id)}"><span class="chav">${avH(chatAv(c))}</span><span class="chtx"><b>${esc(chatName(c))}</b></span><span class="muted small">einladen</span></button>`).join('') : '<p class="muted small">Noch keine Chats. Starte im Chat-Tab einen Chat mit einem Freund.</p>'}</div>` : ''}
+      <p class="muted small">Freunde sehen die Runde auch direkt unter Loono und bei „Freunde online“ und können ohne Einladung beitreten.</p>
+    </div>
+  </div>`;
+}
+function loEvText(g){
+  const e = g.ev || {}, who = id => id === uid ? 'Du' : loName(g, id);
+  if (g.st === 'done') return g.winner === uid ? '🏆 Du hast gewonnen!' : `🏆 ${loName(g, g.winner)} hat gewonnen`;
+  if (e.a === 'start') return 'Die Karten sind verteilt.';
+  if (e.a === 'play'){ const c = e.c[0], two = e.c.length > 1 ? ' doppelt' : ''; return `${who(e.id)} ${e.id === uid ? 'legst' : 'legt'}${two} ${c[0] === 'x' ? (loVal(c) === 'f' ? '+4' : 'Farbwahl') + ' → ' + LO_NAMES[e.col] : loSym(loVal(c)) + ' ' + LO_NAMES[c[0]]}`; }
+  if (e.a === 'take') return `${who(e.id)} ${e.id === uid ? 'ziehst' : 'zieht'} ${e.k} Karten`;
+  if (e.a === 'draw') return `${who(e.id)} ${e.id === uid ? 'ziehst' : 'zieht'} eine Karte`;
+  if (e.a === 'keep') return `${who(e.id)} ${e.id === uid ? 'behältst' : 'behält'} die Karte`;
+  return '';
+}
+function loTableHTML(g){
+  const me = g.seats.findIndex(s => s.id === uid), mine = loSort(g.hands?.[uid] || []), myTurn = loMyTurn(g), cur = g.seats[g.turn];
+  const order = me >= 0 ? [...g.seats.slice(me + 1), ...g.seats.slice(0, me)] : g.seats;
+  const opps = order.map(s => { const n = (g.hands?.[s.id] || []).length, turn = g.st === 'play' && s.id === cur.id;
+    return `<div class="loopp${turn ? ' turn' : ''}${g.winner === s.id ? ' win' : ''}"><span class="loav">${avH(s.av)}</span><span class="lonm"><b>${esc(s.name)}</b><span class="lofanmini">${Array.from({ length: Math.min(n, 7) }, () => '<i></i>').join('')}</span><span class="num small">${n} ${n === 1 ? 'Karte' : 'Karten'}</span></span>${n === 1 && g.st === 'play' ? `<span class="pill ${g.called?.[s.id] ? 'good' : 'warn'}">${g.called?.[s.id] ? 'Loono!' : '1 Karte'}</span>` : ''}${s.left ? '<span class="muted small">gegangen</span>' : s.afk ? '<span class="muted small">Bot vertritt</span>' : ''}</div>`; }).join('');
+  const isNew = LO.animN !== g.n;
+  const prevTop = g.pile.slice(-3, -1).map((c, i) => `<div class="lounder u${i}">${loCard(c)}</div>`).join('');
+  const top = loCard(loTop(g), ` big${isNew && g.ev?.a === 'play' ? ' drop' : ''}`);
+  const playable = new Set(myTurn ? mine.filter(c => loCanPlay(g, c)) : []);
+  const prev = LO.prevHand.slice(), fresh = [];
+  for (const c of mine){ const i = prev.indexOf(c); if (i >= 0) prev.splice(i, 1); else fresh.push(c); }
+  const hand = mine.map((c, i) => { const f = isNew && fresh.includes(c) && LO.prevHand.length ? (fresh.splice(fresh.indexOf(c), 1), ' new') : '';
+    return loCard(c, `${myTurn ? (playable.has(c) ? ' ok' : ' no') : ''}${g.drew === c && myTurn ? ' drawn' : ''}${f}`, ` data-act="locard" data-c="${c}" aria-label="${esc(LO_NAMES[c[0]] || 'Schwarz')} ${esc(loSym(loVal(c)))}"`); }).join('');
+  let status;
+  if (g.st === 'done') status = loEvText(g);
+  else if (myTurn) status = g.pend > 0 ? `Du bist dran: ${g.rules?.stack ? `leg eine ${g.ptype === 'd' ? '+2' : '+4'} drauf oder ` : ''}zieh ${g.pend} Karten` : g.drew ? 'Gezogene Karte legen oder behalten?' : '<b>Du bist dran</b>';
+  else status = `${esc(cur.name)} ist dran${g.pend > 0 ? ` · ${g.pend} Karten offen` : ''}`;
+  const meExposed = g.expose?.id === uid, other = g.expose && g.expose.id !== uid;
+  const canCall = g.st === 'play' && mine.length <= 2 && mine.length > 0 && !g.called?.[uid];
+  const acts = g.st !== 'play' ? '' : `
+    ${myTurn ? (g.drew ? `<button class="btn" data-act="lokeep">Behalten</button>` : `<button class="btn${g.pend ? ' danger' : ''}" data-act="lodraw">${g.pend ? `${g.pend} Karten ziehen` : 'Karte ziehen'}</button>`) : ''}
+    ${canCall ? `<button class="btn gold loono${meExposed || mine.length === 1 ? ' hot' : ''}" data-act="locall">Loono!</button>` : ''}
+    ${other ? `<button class="btn danger hot" data-act="locatch">Erwischt! ${esc(loName(g, g.expose.id))}</button>` : ''}`;
+  let ask = '';
+  if (LO.ask?.step === 'two') ask = `<div class="loask"><p>Du hast die Karte zweimal. Wie viele legst du?</p><div class="row"><button class="btn" data-act="loone">Eine</button><button class="btn gold" data-act="lotwo">Beide</button><button class="btn sm" data-act="lonoask">Abbrechen</button></div></div>`;
+  if (LO.ask?.step === 'color') ask = `<div class="loask"><p>Welche Farbe wünschst du dir?</p><div class="locolors">${[...'rygb'].map(k => `<button class="lopick lc-${k}" data-act="locolor" data-v="${k}"><span class="lgem"></span>${LO_NAMES[k]}</button>`).join('')}</div><button class="btn sm" data-act="lonoask">Abbrechen</button></div>`;
+  const done = g.st === 'done' ? `<div class="lodone"><div class="lowin">${avH(g.seats.find(s => s.id === g.winner)?.av || '🎴')}</div><h2>${g.winner === uid ? 'Gewonnen!' : esc(loName(g, g.winner)) + ' gewinnt'}</h2>
+      ${g.stake ? `<p class="num" style="color:${g.winner === uid ? 'var(--win)' : 'var(--muted)'}">${g.winner === uid ? '+' + fmt(g.pot) + ' ℒ' : `Topf: ${fmt(g.pot)} ℒ`}</p>` : '<p class="muted">Runde ohne Einsatz</p>'}
+      <div class="row" style="justify-content:center">${g.host === uid ? '<button class="btn gold" data-act="lorematch">Nochmal (gleiche Runde)</button>' : `<span class="muted small">${esc(g.name)} kann eine neue Runde starten</span>`}<button class="btn" data-act="loleave">Verlassen</button></div></div>` : '';
+  return `<div class="gamebar"><button class="btn sm" data-act="home">← Casino</button><h2>Loono</h2>${g.stake ? `<span class="pill jp">Topf ${fmt(g.pot)} ℒ</span>` : '<span class="muted small">ohne Einsatz</span>'}${g.st === 'play' ? '<button class="btn sm" data-act="loleave" style="margin-left:auto">Aufgeben</button>' : ''}</div>
+  <div class="felt lofelt" style="${feltStyle(uid)}">
+    <div class="loopps">${opps}</div>
+    <div class="locenter">
+      <button class="lodeck" data-act="lodraw" ${myTurn && !g.drew ? '' : 'disabled'} aria-label="Karte ziehen">${loBack(' d1')}${loBack(' d2')}${loBack(' d3')}<span class="num small">${g.deck?.length || 0}</span></button>
+      <div class="lopile">${prevTop}${top}</div>
+      <div class="lostate"><span class="locol lc-${g.color}"><span class="lgem"></span>${LO_NAMES[g.color] || ''}</span><span class="lodir">${g.dir > 0 ? '↻' : '↺'}</span>${g.pend ? `<span class="pill bad">+${g.pend}</span>` : ''}</div>
+    </div>
+    <div class="lostatus${myTurn ? ' my' : ''}">${status}</div>
+    <div class="lotimer" id="lotimer"><i></i></div>
+    <div class="loacts">${acts}</div>
+    <div class="lohand${myTurn ? ' myturn' : ''}">${hand || '<span class="muted">Keine Karten</span>'}</div>
+    <p class="muted small loev">${esc(loEvText(g))}</p>
+    ${ask}${done}
+  </div>`;
+}
+function renderLoono(){
+  const el = $('g-loono'), g = LO.g;
+  let html;
+  if (!LO.id || !g || g.st === 'closed' || !g.seats?.some(s => s.id === uid)) html = loHomeHTML();
+  else if (g.st === 'lobby') html = loLobbyHTML(g);
+  else html = loTableHTML(g);
+  if (el.innerHTML !== html){ el.innerHTML = html; }
+  if (g && g.st !== 'lobby'){ LO.animN = g.n; LO.prevHand = (g.hands?.[uid] || []).slice(); }
+  loTimer();
+}
+function loTimer(){
+  const t = $('lotimer'), g = LO.g; if (!t || !g || g.st !== 'play'){ if (t) t.hidden = true; return; }
+  const cur = g.seats[g.turn], left = Math.max(0, g.dl - Date.now()), total = cur.bot ? 2000 : LO_TURN;
+  t.hidden = false; t.classList.toggle('mine', cur.id === uid); t.classList.toggle('low', !cur.bot && left < 6000);
+  t.firstElementChild.style.width = Math.min(100, left / total * 100).toFixed(1) + '%';
+}
+setInterval(() => { if (game === 'loono' && tab === 'table') loTimer(); }, 250);
+/* friends whose Loono lobby is open (for "Freunde online") */
+const loOpenOf = id => { const gid = players[id]?.loono, g = gid && LO.lobbies[gid]; return g && g.st === 'lobby' && gid !== LO.id ? gid : null; };
+
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-act]'); if (!b || b.disabled) return;
+  const v = +b.dataset.v;
+  switch (b.dataset.act){
+    case 'lostake': LO.stake = v; savePref('lostake', v); renderAll(); break;
+    case 'lorule': LO.rules = { ...LO.rules, [b.dataset.k]: b.checked }; savePref('lorules', LO.rules); break;
+    case 'lolrule': if (LO.g?.host === uid){ const k = b.dataset.k, on = b.checked; loTx(x => x.st === 'lobby' ? (x.rules = { ...x.rules, [k]: on }, true) : false); } break;
+    case 'lobots': LO.bots = v; savePref('lobots', v); renderAll(); break;
+    case 'locreate': loCreate(v); break;
+    case 'lojoin': if (tab !== 'table') setTab('table'); if (game !== 'loono' && standUp('loono')) openGame('loono'); loJoin(b.dataset.id); break;
+    case 'loleave': loLeave(); break;
+    case 'lostart': loStart(); break;
+    case 'loaddbot': loTx(x => x.st === 'lobby' && x.host === uid && x.seats.length < LO_MAX ? (x.seats = [...x.seats, loNewBot(x.seats)], true) : false); break;
+    case 'lokick': { const id = b.dataset.id; loTx(x => x.st === 'lobby' && x.host === uid ? (x.seats = x.seats.filter(s => s.id !== id), true) : false); break; }
+    case 'loinvite': LO.invite = !LO.invite; renderAll(); break;
+    case 'loinv': loInvite(b.dataset.id); break;
+    case 'locard': loTap(b.dataset.c); break;
+    case 'loone': { const c = LO.ask?.c; if (!c) break; if (c[0] === 'x'){ LO.ask = { c, n: 1, step: 'color' }; renderAll(); } else loDo([c]); break; }
+    case 'lotwo': { const c = LO.ask?.c; if (!c) break; if (c[0] === 'x'){ LO.ask = { c, n: 2, step: 'color' }; renderAll(); } else loDo([c, c]); break; }
+    case 'locolor': { const a = LO.ask; if (!a) break; loDo(a.n === 2 ? [a.c, a.c] : [a.c], b.dataset.v); break; }
+    case 'lonoask': LO.ask = null; renderAll(); break;
+    case 'lodraw': loDrawBtn(); break;
+    case 'lokeep': loKeepBtn(); break;
+    case 'locall': loCallBtn(); break;
+    case 'locatch': loCatchBtn(); break;
+    case 'lorematch': loRematch(); break;
+    case 'fjoin': if (b.dataset.g === 'bj'){ if (game !== 'bj' && standUp('bj')) openGame('bj'); sitAt(b.dataset.id); } else { if (standUp('loono')) openGame('loono'); loJoin(b.dataset.id); } break;
+  }
+});
+
+/* ---------- v1.5: Einsätze geräteübergreifend merken ---------- */
+const PREF = { pending: {}, timer: 0 };
+function savePref(k, v){
+  ls.set(k, v); PREF.pending[k] = v;
+  clearTimeout(PREF.timer);
+  PREF.timer = setTimeout(() => { const p = PREF.pending; PREF.pending = {}; withPlayer(d => { const n = { ...(d.prefs || {}), ...p }; if (JSON.stringify(n) === JSON.stringify(d.prefs || {})) return false; d.prefs = n; return true; }); }, 2500);
+}
+function applyPrefs(){
+  const p = P?.prefs; if (!p) return;
+  const set = (k, f) => { if (p[k] != null){ ls.set(k, p[k]); f(p[k]); } };
+  set('lastBet', v => { bet = v; }); set('slotbet', v => { S.bet = v; }); set('horsebet', v => { H.bet = v; }); set('sportstake', v => { SP.stake = v; });
+  set('hilostake', v => { HL.stake = v; }); set('minesstake', v => { MN.stake = v; }); set('minesn', v => { MN.n = v; });
+  set('crashbet', v => { CR.bet = v; }); set('crashauto', v => { CR.auto = v; });
+  set('lostake', v => { LO.stake = v; }); set('lorules', v => { LO.rules = v; }); set('lobots', v => { LO.bots = v; });
+}
+
+/* ---------- v1.5: Statistik pro Spiel ---------- */
+function gameStatsHTML(p){
+  const g = p.games || {}, s = p.stats || {};
+  const sum = Object.values(g).reduce((a, x) => a + (x.net || 0), 0);
+  const rows = [];
+  if (s.hands) rows.push(['Blackjack', s.hands, (s.net || 0) - sum, null]);
+  for (const [k, x] of Object.entries(g)) if (x.n) rows.push([GAME_NAMES[k] || k, x.n, x.net || 0, x.best || 0]);
+  if (!rows.length) return '';
+  rows.sort((a, b) => b[1] - a[1]);
+  return `<details class="panel"><summary><b>Statistik pro Spiel</b></summary><div class="scroll" style="margin-top:8px"><table class="board"><thead><tr><th>Spiel</th><th class="r">Runden</th><th class="r">Gewinn/Verlust</th><th class="r">Bester Gewinn</th></tr></thead><tbody>
+    ${rows.map(([nm, n, net, best]) => `<tr><td>${esc(nm)}</td><td class="r num">${fmt(n)}</td><td class="r num" style="color:${net >= 0 ? 'var(--win)' : 'var(--lose)'}">${sgn(net)}</td><td class="r num">${best == null ? '–' : sgn(best)}</td></tr>`).join('')}
+  </tbody></table></div><p class="muted small">Runden mit Einsatz. Blackjack zählt Hände.</p></details>`;
+}
+
+/* ---------- v1.5: Bilder und Reaktionen im Chat ---------- */
+const REACTS = ['👍', '😂', '🔥', '❤️', '😮', '😢'];
+async function chatImage(file){
+  if (!file || !CH.open) return;
+  if (!/^image\//.test(file.type)) return toast('Das ist kein Bild.');
+  toast('Bild wird vorbereitet …');
+  try {
+    const url = URL.createObjectURL(file), img = new Image(); img.src = url; await img.decode();
+    let max = 1280, q = 0.8, data = '';
+    for (let i = 0; i < 7; i++){
+      const s = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight)), c = document.createElement('canvas');
+      c.width = Math.max(1, Math.round(img.naturalWidth * s)); c.height = Math.max(1, Math.round(img.naturalHeight * s));
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); data = c.toDataURL('image/jpeg', q);
+      if (data.length < 280000) break; max *= 0.8; q = Math.max(0.5, q - 0.07);
+    }
+    URL.revokeObjectURL(url);
+    if (data.length >= 380000) return toast('Das Bild ist zu groß.');
+    chatSend('📷 Bild', 'img', { img: data });
+  } catch (e){ console.warn(e); toast('Das Bild konnte nicht geladen werden.'); }
+}
+function chatReact(mid, e){
+  const m = CH.msgs.find(x => x.id === mid); if (!m || !CH.open) return;
+  const cur = m.r?.[uid];
+  CH.react = null;
+  updateDoc(doc(fs, 'chats', CH.open, 'msgs', mid), { ['r.' + uid]: cur === e ? null : e }).catch(handleWriteErr);
+  renderChatMsgs();
+}
+const reactsHTML = m => { const cnt = {}; for (const [u, e] of Object.entries(m.r || {})) if (e) (cnt[e] ||= []).push(u);
+  const ks = Object.keys(cnt); return ks.length ? `<span class="reacts">${ks.map(e => `<button class="rx${cnt[e].includes(uid) ? ' me' : ''}" data-act="chreact" data-id="${esc(m.id)}" data-e="${esc(e)}" title="${esc(cnt[e].map(u => u === uid ? 'du' : nameOf(u)).join(', '))}">${e}${cnt[e].length > 1 ? ' ' + cnt[e].length : ''}</button>`).join('')}</span>` : ''; };
+function loInviteBubble(m){
+  const g = LO.lobbies[m.g], ok = g && g.st === 'lobby';
+  return `<span class="loinv"><b>🎴 Loono</b><span class="small">${g ? `Runde von ${esc(g.name)} · ${g.seats.length}/${LO_MAX} · ${g.stake ? fmt(g.stake) + ' ℒ' : 'ohne Einsatz'}` : 'Runde ist vorbei'}</span>
+    ${m.u !== uid ? (ok ? `<button class="btn sm gold" data-act="lojoin" data-id="${esc(m.g)}">Beitreten</button>` : `<span class="muted small">${g ? 'läuft schon' : ''}</span>`) : '<span class="muted small">Einladung verschickt</span>'}</span>`;
+}
+// long press (phone) or right click (PC) on a message opens the reactions
+(() => {
+  let t = 0;
+  const start = e => { const bub = e.target.closest?.('#chmsgs .bub[data-id]'); if (!bub || e.target.closest('button,img')) return; clearTimeout(t); t = setTimeout(() => { CH.react = bub.dataset.id; renderChatMsgs(); navigator.vibrate?.(15); }, 450); };
+  const stop = () => clearTimeout(t);
+  document.addEventListener('pointerdown', start); document.addEventListener('pointerup', stop); document.addEventListener('pointercancel', stop); document.addEventListener('pointermove', e => { if (e.movementX * e.movementX + e.movementY * e.movementY > 16) stop(); });
+  document.addEventListener('contextmenu', e => { const bub = e.target.closest?.('#chmsgs .bub[data-id]'); if (!bub) return; e.preventDefault(); CH.react = bub.dataset.id; renderChatMsgs(); });
+})();
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-act]');
+  if (!b){ if (CH.react && !e.target.closest('.reactbar')){ CH.react = null; renderChatMsgs(); } return; }
+  switch (b.dataset.act){
+    case 'chreact': chatReact(b.dataset.id, b.dataset.e); break;
+    case 'chimgview': CH.view = b.dataset.src || b.getAttribute('src'); openModal('img'); break;
+  }
+});
 
 /* ---------- Tellerwäscher-Schicht: the way back after going broke ---------- */
 const DISH_MS = 30000, DISH_PAY = 50, DISH_GOLD = 150, DISH_ROACH = -200, DISH_MIN = 300, DISH_MAX = 2500;
@@ -3390,7 +4097,7 @@ function hlStart(){
   const err = betError(HL.stake); if (err) return toast(err);
   const stake = HL.stake;
   if (!withPlayer(d => { if (d.balance < stake) return false; d.balance -= stake; d.hilo = { stake, at: Date.now() }; return true; }, 'Höher oder Tiefer Einsatz')) return;
-  ls.set('hilostake', stake);
+  savePref('hilostake', stake);
   HL.id++; HL.run = { stake, cards: [hlCard()], mult: 1, n: 0, over: false }; HL.msg = ''; SFX.chip(); renderAll();
 }
 function hlGuess(dir){
@@ -3475,17 +4182,17 @@ function startChats(){
 function openChat(id){
   CH.unsubM && CH.unsubM(); CH.open = id; CH.msgs = []; CH.newMode = null; markRead(id);
   CH.unsubM = onSnapshot(query(collection(fs, 'chats', id, 'msgs'), orderBy('t', 'desc'), limit(80)), s => {
-    CH.msgs = s.docs.map(d => d.data()).reverse(); markRead(id); renderChatMsgs();
+    CH.msgs = s.docs.map(d => ({ id: d.id, ...d.data() })).reverse(); markRead(id); renderChatMsgs();
   }, e => console.warn(e));
   renderAll();
 }
 function closeChat(){ CH.unsubM && CH.unsubM(); CH.unsubM = null; CH.open = null; renderAll(); }
 let lastChatMsg = 0;
-function chatSend(x, k){
+function chatSend(x, k, extra){
   const id = CH.open; if (!id || !x) return;
   if (Date.now() - lastChatMsg < 500) return; lastChatMsg = Date.now();
   x = x.slice(0, 500); const t = Date.now();
-  addDoc(collection(fs, 'chats', id, 'msgs'), { u: uid, x, k, t }).catch(handleWriteErr);
+  addDoc(collection(fs, 'chats', id, 'msgs'), { u: uid, x, k, t, ...(extra || {}) }).catch(handleWriteErr);
   updateDoc(doc(fs, 'chats', id), { last: { u: uid, x: x.slice(0, 80), k, t } }).catch(() => {});
 }
 function chatNewDM(friend){
@@ -3520,8 +4227,9 @@ function renderChatTab(){
       <div class="chathead" id="chhead"></div>
       <div class="chatmsgs" id="chmsgs" aria-live="polite"></div>
       <div class="emojis chatemo">${[...EMOJIS].map(e => `<button type="button" data-act="chemoji" data-e="${esc(e)}" aria-label="${esc(avText(e))} senden">${avH(e)}</button>`).join('')}</div>
-      <form class="chatform" id="chform" autocomplete="off"><input id="chx" maxlength="500" placeholder="Nachricht …" aria-label="Nachricht"><button class="btn gold sm" type="submit">Senden</button></form>`
+      <form class="chatform" id="chform" autocomplete="off"><label class="btn sm chpic" title="Bild senden" aria-label="Bild senden">📷<input type="file" accept="image/*" id="chfile" hidden></label><input id="chx" maxlength="500" placeholder="Nachricht …" aria-label="Nachricht"><button class="btn gold sm" type="submit">Senden</button></form>`
       : `<div class="chatempty"><div class="big">💬</div><p class="muted">Wähl links einen Chat oder starte einen neuen.</p></div>`}</section></div>`;
+    $('chfile')?.addEventListener('change', e => { chatImage(e.target.files[0]); e.target.value = ''; });
     $('chform')?.addEventListener('submit', e => { e.preventDefault(); const i = $('chx'); const x = i.value.trim(); if (x){ chatSend(x, 't'); i.value = ''; } });
   }
   // side: list of chats or the "new chat" picker
@@ -3561,7 +4269,10 @@ function renderChatMsgs(){
   const html = CH.msgs.length ? CH.msgs.map((m, i) => {
     if (m.k === 's') return `<div class="msys">${esc(m.x)}</div>`;
     const mine = m.u === uid, prev = CH.msgs[i-1], showName = c.group && !mine && (!prev || prev.u !== m.u);
-    return `<div class="mrow${mine ? ' mine' : ''}"><div class="bub${m.k === 'e' ? ' emo' : ''}">${showName ? `<span class="who">${avH(avOf(m.u))} ${esc(nameOf(m.u))}</span>` : ''}${m.k === 'e' ? avH(m.x) : esc(m.x)}<time>${timeShort(m.t)}</time></div></div>`;
+    const okImg = m.k === 'img' && /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/=]+$/.test(m.img || '');
+    const body = m.k === 'e' ? avH(m.x) : okImg ? `<img class="chimg" src="${m.img}" alt="Bild von ${esc(nameOf(m.u))}" data-act="chimgview">` : m.k === 'lo' ? loInviteBubble(m) : esc(m.x);
+    const bar = CH.react === m.id ? `<span class="reactbar">${REACTS.map(e => `<button data-act="chreact" data-id="${esc(m.id)}" data-e="${e}" aria-label="mit ${e} reagieren">${e}</button>`).join('')}</span>` : '';
+    return `<div class="mrow${mine ? ' mine' : ''}"><div class="bub${m.k === 'e' ? ' emo' : ''}${okImg ? ' pic' : ''}" data-id="${esc(m.id || '')}">${showName ? `<span class="who">${avH(avOf(m.u))} ${esc(nameOf(m.u))}</span>` : ''}${body}<time>${timeShort(m.t)}</time>${bar}</div>${reactsHTML(m)}</div>`;
   }).join('') : '<p class="muted small" style="text-align:center">Schreib die erste Nachricht.</p>';
   if (box.innerHTML !== html){ box.innerHTML = html; if (atBottom || box.dataset.first !== CH.open){ box.scrollTop = box.scrollHeight; box.dataset.first = CH.open; } }
 }
@@ -3740,17 +4451,24 @@ function renderHome(){
     <div class="tiles">
       ${tile('bj', 'Blackjack', 'Mit Freunden am Tisch, bis zu 5 Spieler', `<div class="minicards"><div class="mc">A<i>♠</i></div><div class="mc red">K<i>♥</i></div></div>`, atTables ? `<span class="pill good">${atTables} ${atTables===1?'Freund':'Freunde'} am Tisch</span>` : tid ? '<span class="pill good">Du sitzt am Tisch</span>' : '')}
       ${tile('sports', 'Sportwetten', 'Bundesliga · Champions League · Darts', `<div class="minisports"><span>⚽</span><span>🎯</span></div>`, duIncoming() ? `<span class="pill good">🤝 ${duIncoming()} ${duIncoming() === 1 ? 'Herausforderung' : 'Herausforderungen'}</span>` : next ? `<span class="small muted">Nächstes: ${esc(next.t1)} – ${esc(next.t2)}, ${timeLabel(next.t)}</span>` : '<span class="small muted">Plus fiktive Turniere alle 15 Minuten</span>')}
-      ${tile('crash', 'Crash<span class="newtag">Neu</span>', 'Zahl aus, bevor die Rakete explodiert', `<div class="minicrash"><svg viewBox="0 0 120 70" aria-hidden="true"><path d="M5 65 Q70 62 105 12" fill="none" stroke="#ff5a4f" stroke-width="4" stroke-linecap="round"/></svg><span>🚀</span><b class="num">2,47×</b></div>`, crashFriends())}
-      ${tile('mines', 'Mines<span class="newtag">Neu</span>', 'Diamanten finden, Minen meiden', `<div class="minimines">${[...'💎💎💣💎💎💣💎💎💎'].map(x => `<i>${x}</i>`).join('')}</div>`)}
-      ${tile('tipp', 'Tipprunde<span class="newtag">Neu</span>', 'Bundesliga-Ergebnisse tippen gegen Freunde', `<div class="minitipp"><b class="num">2:1</b><small>dein Tipp</small></div>`, tippExtra())}
+      ${tile('loono', 'Loono<span class="newtag">Neu</span>', 'Kartenspiel mit Freunden und Bots, 2 bis 8 Spieler, mit oder ohne Einsatz', `<div class="miniloono">${['r7','gs','yd','xf'].map(c => loCard(c)).join('')}</div>`, loTileExtra())}
+      ${tile('crash', 'Crash', 'Zahl aus, bevor die Rakete explodiert', `<div class="minicrash"><svg viewBox="0 0 120 70" aria-hidden="true"><path d="M5 65 Q70 62 105 12" fill="none" stroke="#ff5a4f" stroke-width="4" stroke-linecap="round"/></svg><span>🚀</span><b class="num">2,47×</b></div>`, crashFriends())}
+      ${tile('mines', 'Mines', 'Diamanten finden, Minen meiden', `<div class="minimines">${[...'💎💎💣💎💎💣💎💎💎'].map(x => `<i>${x}</i>`).join('')}</div>`)}
+      ${tile('tipp', 'Tipprunde', 'Bundesliga-Ergebnisse tippen gegen Freunde', `<div class="minitipp"><b class="num">2:1</b><small>dein Tipp</small></div>`, tippExtra())}
       ${tile('roulette', 'Roulette', 'Europäisch, 0 bis 36', `<div class="miniwheel">${rouletteWheel().replace('id="rwheelg"','').replace('id="rball"','')}</div>`)}
       ${tile('slots', 'Automat', 'Drei Walzen, bis ×500', `<div class="minislots"><span>7️⃣</span><span>7️⃣</span><span>7️⃣</span></div>`, `<span class="pill jp">Jackpot ${fmt(JP.pot ?? JP_SEED)} ℒ</span>`)}
       ${tile('horses', 'Pferderennen', 'Sechs Pferde, ein Sieger', `<div class="minihorses"><span>🏇</span><span>🏇</span><span>🏇</span></div>`)}
       ${tile('hilo', 'Höher oder Tiefer', 'Errate die nächste Karte, zahl aus, wann du willst', `<div class="minihl"><div class="mc">7<i>♣</i></div>▲▼<div class="mc red">?<i>♥</i></div></div>`)}
     </div>
-    ${onl.length ? `<div class="panel"><h3>Freunde online</h3><div class="row">${onl.map(id => `<button class="pill" data-act="profile" data-id="${esc(id)}">${avH(avOf(id))} ${esc(nameOf(id))}${players[id].table ? ' · am Blackjack-Tisch' : players[id].playing && players[id].playing !== 'bj' ? ' · spielt ' + (GAME_NAMES[players[id].playing] || '') : ''}</button>`).join('')}</div></div>` : ''}
+    ${onl.length ? `<div class="panel"><h3>Freunde online</h3><div class="row">${onl.map(id => `<span class="fon"><button class="pill" data-act="profile" data-id="${esc(id)}">${avH(avOf(id))} ${esc(nameOf(id))}${players[id].table ? ' · am Blackjack-Tisch' : loOpenOf(id) ? ' · wartet bei Loono' : players[id].playing && players[id].playing !== 'bj' ? ' · spielt ' + (GAME_NAMES[players[id].playing] || '') : ''}</button>${players[id].table && players[id].table !== tid ? `<button class="btn sm gold" data-act="fjoin" data-g="bj" data-id="${esc(players[id].table)}">Mitspielen</button>` : loOpenOf(id) ? `<button class="btn sm gold" data-act="fjoin" data-g="loono" data-id="${esc(loOpenOf(id))}">Mitspielen</button>` : ''}</span>`).join('')}</div></div>` : ''}
   </div>`;
   if (el.innerHTML !== html) el.innerHTML = html;
+}
+function loTileExtra(){
+  if (LO.g && LO.g.st === 'play' && LO.g.seats.some(s => s.id === uid && !s.left)) return '<span class="pill good">Deine Runde läuft</span>';
+  if (LO.g && LO.g.st === 'lobby') return '<span class="pill good">Du wartest in einer Runde</span>';
+  const fr = new Set(friendIds()), n = Object.values(LO.lobbies).filter(g => g.st === 'lobby' && g.seats?.some(s => !s.bot && fr.has(s.id))).length;
+  return n ? `<span class="pill good">${n} offene ${n === 1 ? 'Runde' : 'Runden'} von Freunden</span>` : '';
 }
 function crashFriends(){ const s = crashAt(), n = crashPlayers(s).filter(([id]) => id !== uid).length; return n ? `<span class="pill good">${n} ${n === 1 ? 'Freund fliegt' : 'Freunde fliegen'} mit</span>` : ''; }
 function tippExtra(){ const t = tpInfo(); if (!t) return ''; return t.open ? `<span class="small muted">${t.k}. Spieltag · ${t.tipped} von ${t.n} getippt</span>` : `<span class="small muted">${t.k}. Spieltag läuft</span>`; }
@@ -3772,7 +4490,7 @@ function openGame(g){
   window.scrollTo(0, 0); renderAll();
 }
 function renderCasino(){
-  const views = { home: game===null, tv: game==='bj', 'g-roulette': game==='roulette', 'g-slots': game==='slots', 'g-horses': game==='horses', 'g-sports': game==='sports', 'g-hilo': game==='hilo', 'g-crash': game==='crash', 'g-mines': game==='mines', 'g-tipp': game==='tipp' };
+  const views = { home: game===null, tv: game==='bj', 'g-roulette': game==='roulette', 'g-slots': game==='slots', 'g-horses': game==='horses', 'g-sports': game==='sports', 'g-hilo': game==='hilo', 'g-crash': game==='crash', 'g-mines': game==='mines', 'g-tipp': game==='tipp', 'g-loono': game==='loono' };
   for (const [id, show] of Object.entries(views)) $(id).hidden = !show;
   $('chat').hidden = !(game==='bj' && tid && T);
   const typing = el => { const a=document.activeElement; return a && (a.tagName==='INPUT' || a.tagName==='SELECT') && a.type!=='checkbox' && el.contains(a); };
@@ -3786,6 +4504,7 @@ function renderCasino(){
   else if (game==='crash') renderCrash();
   else if (game==='mines') renderMines();
   else if (game==='tipp') renderTipp();
+  else if (game==='loono') renderLoono();
 }
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-act]'); if (!b || b.disabled) return;
@@ -3801,12 +4520,12 @@ document.addEventListener('click', e => {
     case 'rdouble': { const t = rTotal(R.bets); if (t*2 > Math.min(MAX_BET, P.balance)) { toast('Nicht genug Legats.'); break; } R.bets = Object.fromEntries(Object.entries(R.bets).map(([k,x]) => [k, x*2])); SFX.chip(); renderAll(); break; }
     case 'rrepeat': if (R.last && rTotal(R.last) <= Math.min(MAX_BET, P.balance)){ R.bets = { ...R.last }; SFX.chip(); renderAll(); } else toast('Nicht genug Legats.'); break;
     case 'rspin': rSpin(); break;
-    case 'sbet': S.bet = v; ls.set('slotbet', v); renderAll(); break;
+    case 'sbet': S.bet = v; savePref('slotbet', v); renderAll(); break;
     case 'sspin': slotSpin(); break;
     case 'sauto': slotAuto(v); break;
     case 'sautostop': S.auto = 0; renderAll(); break;
     case 'hpick': H.pickI = +b.dataset.i; renderAll(); break;
-    case 'hbet': H.bet = v; ls.set('horsebet', v); renderAll(); break;
+    case 'hbet': H.bet = v; savePref('horsebet', v); renderAll(); break;
     case 'hrun': horseRun(); break;
     case 'hnew': newRace(); renderAll(); break;
     case 'sfilter': SP.filter = b.dataset.v; renderAll(); break;
@@ -4163,7 +4882,7 @@ function renderModal(force){
   if (modalKind==='wheel' && wheelBusy) return;
   if (modalKind==='dish' && DISH.phase==='run') return;
   if (modalKind==='flip' && !force) return;
-  const html = modalKind==='profile' ? profileHTML(modalId) : modalKind==='wheel' ? wheelHTML() : modalKind==='news' ? newsHTML() : modalKind==='dish' ? dishHTML() : modalKind==='flip' ? flipModalHTML() : fairHTML();
+  const html = modalKind==='img' ? `<div class="stack"><div class="row" style="justify-content:flex-end"><button class="btn sm" data-act="closemodal">Schließen</button></div><img class="bigimg" src="${CH.view || ''}" alt="Bild"></div>` : modalKind==='profile' ? profileHTML(modalId) : modalKind==='wheel' ? wheelHTML() : modalKind==='news' ? newsHTML() : modalKind==='dish' ? dishHTML() : modalKind==='flip' ? flipModalHTML() : fairHTML();
   if (!force && html === lastModalHTML) return;
   lastModalHTML = html;
   const keep = $('gamt')?.value;
@@ -4188,6 +4907,7 @@ function profileHTML(id){
     ${statsHTML(p)}
     <p class="muted">Diese Woche: <b class="num" style="color:${w.net>=0?'var(--win)':'var(--lose)'}">${sgn(w.net)} ℒ</b> in ${w.hands} Händen</p>
     ${chartHTML(p.hist)}
+    ${gameStatsHTML(p)}
     ${suspicious(p) ? '<div class="note bad"><b>⚠️ Kontostand passt nicht zum Kontobuch.</b> Das Guthaben wurde vermutlich am Spiel vorbei geändert.</div>' : ''}
     <h3>Erfolge · ${Object.keys(p.ach||{}).length} von ${ACH.length}</h3>${badgesHTML(p.ach, false)}
     <details class="panel"><summary><b>Kontobuch</b> <span class="muted small">· letzte Änderungen an Legats und Euro</span></summary><div style="margin-top:10px">${logHTML(p)}</div></details>
@@ -4231,7 +4951,7 @@ function fairHTML(){
 
 let rq = false;
 function renderAll(){
-  if (rq || !uid) return; rq = true;
+  if (rq || !uid) return; if (P && (P.loono || null) !== LO.id) loWatch(); rq = true;
   requestAnimationFrame(() => {
     rq=false; renderTop();
     const typing = el => { const a=document.activeElement; return a && (a.tagName==='INPUT' || a.tagName==='SELECT') && a.type!=='checkbox' && el.contains(a); };
