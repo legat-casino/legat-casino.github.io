@@ -1076,6 +1076,15 @@ h3{font-size:12px;letter-spacing:.09em;font-weight:700}
 .slotstop button{padding:5px 9px;font-size:13px}
 .stuckbox{text-align:left;margin-top:10px}
 .stuckbox .diag{margin-top:4px;line-height:1.5;word-break:break-word;color:var(--ink);opacity:.85}
+.closed{position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:24px;background:radial-gradient(120% 80% at 50% 0%,#2a1d14,#120d0a 70%);overflow:auto}
+.closedcard{max-width:460px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:12px;animation:gin .4s ease both}
+.closedsign{font-size:64px;filter:grayscale(.6) drop-shadow(0 10px 20px rgba(0,0,0,.5))}
+.closed h1{font-family:var(--f-display);font-size:clamp(28px,7vw,40px);line-height:1.1;margin:0}
+.closedwhen{font-size:18px;margin:0}
+.closedwhen b{color:var(--brass);font-size:22px}
+.closedinfo{text-align:left;display:flex;flex-direction:column;gap:10px;background:var(--rail-2);border:1px solid var(--hair);border-radius:16px;padding:16px;line-height:1.5;animation:gin .3s ease both}
+.closedinfo .btn{align-self:flex-start}
+body.isclosed{overflow:hidden}
 @media (prefers-reduced-motion:reduce){*{animation:none!important}}
 </style>
 </head>
@@ -1101,6 +1110,22 @@ h3{font-size:12px;letter-spacing:.09em;font-weight:700}
 <main class="wrap">
   <div id="daily"></div>
   <div id="savewarn" class="savewarn" role="alert" hidden></div>
+  <div id="closed" class="closed" role="alertdialog" aria-labelledby="closedh" hidden>
+    <div class="closedcard">
+      <div class="closedsign" aria-hidden="true">🎰</div>
+      <h1 id="closedh">Legat Casino hat gerade geschlossen</h1>
+      <p class="closedwhen">Wir öffnen wieder um <b id="closedat">9:00</b> Uhr</p>
+      <p class="muted num" id="closedin"></p>
+      <button class="btn gold" type="button" id="closedmore">Mehr Infos</button>
+      <div class="closedinfo" id="closedinfo" hidden>
+        <p>Legat Casino speichert alles bei <b>Firebase</b>, einem kostenlosen Dienst von Google. Der kostenlose Tarif erlaubt pro Tag eine bestimmte Anzahl an Lese- und Speichervorgängen (50.000 Lesen, 20.000 Speichern). Heute ist dieses Tageslimit aufgebraucht.</p>
+        <p>Ohne Speichern könnten Gewinne, Einsätze und Spielstände verloren gehen. Damit das nicht passiert, macht das Casino zu, bis das Limit zurückgesetzt wird. Das passiert jeden Tag um Mitternacht kalifornischer Zeit, bei uns also um <b id="closedat2">9:00</b> Uhr.</p>
+        <p>Dein Spielstand ist sicher: Alles, was vor dem Schließen gespeichert wurde, ist noch da. Nur die allerletzte Aktion kurz vor dem Schließen kann fehlen.</p>
+        <p class="muted small">Zur Öffnungszeit lädt sich die Seite von selbst neu.</p>
+        <button class="btn sm" type="button" id="closedretry">Trotzdem nochmal versuchen</button>
+      </div>
+    </div>
+  </div>
   <section id="view-login" class="login" hidden>
     <div class="fan" aria-hidden="true">
       <div class="c" style="transform:rotate(-14deg) translateX(-34px)"><div class="ci"><div class="cf"><span class="r">A</span><span class="s">♠</span><span class="big">♠</span></div><div class="cb"></div></div></div>
@@ -1353,7 +1378,7 @@ function slow(pr){
 function handleWriteErr(e){
   console.warn(e);
   if (e?.code==='permission-denied') toast('Keine Berechtigung. Sind die neuen Sicherheitsregeln in Firebase eingetragen? Sonst lade die Seite neu.');
-  else if (e?.code==='resource-exhausted') toast('Das kostenlose Tageslimit von Firebase ist erreicht.');
+  else if (quotaHit(e)) {}
   else toast('Speichern fehlgeschlagen, bitte nochmal versuchen.');
 }
 function norm(d){
@@ -1383,21 +1408,71 @@ function withPlayer(fn, why){
   checkBalanceBadges(d);
   if (brokeDoc(d)){ if (!d.brokeAt) d.brokeAt = Date.now(); } else if (d.brokeAt) d.brokeAt = null;
   d.updated = Math.max(Date.now(), (P.updated||0) + 1); d.seen = Date.now();
-  d.rev = (P.rev || 0) + 1;   // the server only takes the next number: an outdated device can't overwrite newer progress
+  d.rev = P.rev;
   P = d; renderAll();
-  const wid = ++SAVE.seq; SAVE.pending.set(wid, Date.now());
-  slow(setDoc(doc(fs,'players',uid), d))
-    .then(() => { SAVE.pending.delete(wid); renderSaveWarn(); })
-    .catch(e => { SAVE.pending.delete(wid); renderSaveWarn(); if (e?.code === 'permission-denied') resyncPlayer(); else handleWriteErr(e); });
+  queueSave();
   if (newBadges.length){ const b = newBadges; newBadges = []; b.forEach((k,i) => badgeLater(k, 400 + i*2200)); }
   if (lvlUps.length){ const ups = lvlUps.splice(0); ups.forEach((L,i) => levelLater(L, 900 + i*2600)); }
   return true;
 }
 /* ---------- saving: never play on while nothing reaches the server ---------- */
-const SAVE = { seq: 0, pending: new Map(), cycled: 0, resyncing: false };
+const SAVE = { seq: 0, pending: new Map(), cycled: 0, resyncing: false, dirty: false, timer: 0, rev: null, last: 0 };
+const SAVE_DELAY = window.__saveDelay ?? 1500;
+/** changes are collected for a moment and written together: saves Firebase's daily quota (every write is read again by every friend online) */
+function queueSave(){
+  SAVE.dirty = true;
+  if (SAVE.timer) return;
+  const win = typeof S !== 'undefined' && S.auto > 0 && SAVE_DELAY ? 10000 : SAVE_DELAY;   // auto-spin: one save every 10 s instead of every spin
+  const wait = win - (Date.now() - SAVE.last);   // a single change goes out at once, quick series are bundled
+  if (wait <= 0) flushSave(); else SAVE.timer = setTimeout(flushSave, wait);
+}
+function flushSave(){
+  clearTimeout(SAVE.timer); SAVE.timer = 0;
+  if (!SAVE.dirty || !P || !uid) return;
+  SAVE.dirty = false;
+  const rev = (SAVE.rev ?? P.rev ?? 0) + 1;   // the server only takes the next number: an outdated device can't overwrite newer progress
+  SAVE.rev = rev; P.rev = rev; SAVE.last = Date.now();
+  const out = { ...P, rev }, wid = ++SAVE.seq; SAVE.pending.set(wid, Date.now());
+  slow(setDoc(doc(fs,'players',uid), out))
+    .then(() => { SAVE.pending.delete(wid); renderSaveWarn(); })
+    .catch(e => { SAVE.pending.delete(wid); renderSaveWarn(); if (e?.code === 'permission-denied') resyncPlayer(); else handleWriteErr(e); });
+}
+addEventListener('pagehide', () => flushSave());
+document.addEventListener('visibilitychange', () => { if (document.hidden) flushSave(); });
+/* ---------- Firebase daily limit ---------- */
+const QUOTA = { hit: 0 };
+function quotaHit(e){ if (e?.code === 'resource-exhausted'){ QUOTA.hit = Date.now(); closeCasino(); return true; } return false; }
+/** when the free quota resets: midnight in California (Firebase's day), shown in local time */
+function quotaReset(now = Date.now()){
+  const parts = Object.fromEntries(new Intl.DateTimeFormat('en-US', { timeZone: 'America/Los_Angeles', hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' }).formatToParts(new Date(now)).map(x => [x.type, x.value]));
+  const into = ((+parts.hour % 24) * 3600 + +parts.minute * 60 + +parts.second) * 1000;
+  return now - into + 864e5 - (now % 1000);
+}
+/** the free daily limit is used up: nothing can be saved safely any more, so the casino closes until it resets */
+function closeCasino(until){
+  until = until || quotaReset();
+  ls.set('closedUntil', until);
+  try { S.auto = 0; } catch {}
+  const el = $('closed'); if (!el) return;
+  const at = new Date(until).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+  $('closedat').textContent = at; $('closedat2').textContent = at;
+  el.hidden = false; document.body.classList.add('isclosed');
+  clearInterval(QUOTA.timer);
+  const tick = () => {
+    const left = until - Date.now();
+    if (left <= 0){ ls.set('closedUntil', 0); location.reload(); return; }
+    const h = Math.floor(left / 3600e3), m = Math.floor(left % 3600e3 / 60e3);
+    $('closedin').textContent = `noch ${h ? h + ' Std. ' : ''}${m} Min.`;
+  };
+  tick(); QUOTA.timer = setInterval(tick, 20000);
+}
+$('closedmore')?.addEventListener('click', () => { const i = $('closedinfo'); i.hidden = !i.hidden; $('closedmore').textContent = i.hidden ? 'Mehr Infos' : 'Weniger Infos'; });
+$('closedretry')?.addEventListener('click', () => { ls.set('closedUntil', 0); location.reload(); });
+setTimeout(() => { const cu = ls.get('closedUntil', 0); if (cu && Date.now() < cu) closeCasino(cu); }, 0);   // still closed after a reload
 const unsavedMs = () => { let o = Infinity; for (const t of SAVE.pending.values()) o = Math.min(o, t); return o === Infinity ? 0 : Date.now() - o; };
 function renderSaveWarn(){
   const el = $('savewarn'); if (!el) return;
+  if (Date.now() - QUOTA.hit < 10 * 60e3){ el.hidden = false; el.textContent = '⚠️ Das kostenlose Tageslimit von Firebase ist für heute aufgebraucht. Spielen und Speichern gehen erst wieder, wenn es zurückgesetzt wird (morgens gegen 9 Uhr).'; return; }
   const bad = unsavedMs() > 12000;
   if (bad) el.textContent = '⚠️ Dein Spielstand wird gerade nicht gespeichert, weil keine Verbindung zu Firebase besteht. Spiel bitte erst weiter, wenn diese Meldung verschwindet.';
   el.hidden = !bad;
@@ -1420,7 +1495,7 @@ async function resyncPlayer(){
   if (SAVE.resyncing) return; SAVE.resyncing = true;
   try {
     const s = await getDocFromServer(doc(fs, 'players', uid));
-    if (s.exists()){ P = norm(structuredClone(s.data())); HL.run = null; MN.run = null; renderAll();
+    if (s.exists()){ P = norm(structuredClone(s.data())); SAVE.rev = P.rev || 0; SAVE.dirty = false; HL.run = null; MN.run = null; renderAll();
       toast('Dein Spielstand wurde auf einem anderen Gerät oder Tab geändert. Hier ist jetzt der aktuelle Stand geladen.'); }
   } catch (e){ console.warn(e); toast('Speichern abgelehnt. Bitte lade die Seite neu.'); }
   finally { setTimeout(() => { SAVE.resyncing = false; }, 3000); }
@@ -1526,16 +1601,16 @@ function startData(){
     players = next;
     const mine = next[uid];
     const newer = !P || ((mine?.rev || 0) !== (P.rev || 0) ? (mine?.rev || 0) > (P.rev || 0) : (mine?.updated || 0) >= (P.updated || 0));
-    if (mine && !snap.metadata.hasPendingWrites && !SAVE.pending.size && newer) P = norm(structuredClone(mine));
+    if (mine && !snap.metadata.hasPendingWrites && !SAVE.pending.size && !SAVE.dirty && newer){ P = norm(structuredClone(mine)); SAVE.rev = P.rev || 0; }
     if (!snap.metadata.fromCache && !mine && !P) createPlayer();
     else if (!snap.metadata.fromCache && mine){ refForExisting(); accrueInterest(); afterLogin(); }
     if (P && P.table && !tid && !leaving) openTable(P.table);
     reconcile(); claimGifts(); renderAll();
-  }, e => { console.warn(e); toast('Keine Verbindung zur Datenbank. Prüfe die Sicherheitsregeln.'); });
+  }, e => { console.warn(e); if (quotaHit(e)) return; toast('Keine Verbindung zur Datenbank. Prüfe die Sicherheitsregeln.'); });
   unsubG = onSnapshot(collection(fs,'gifts'), snap => {
     const g = {}; snap.docs.forEach(d => g[d.id] = d.data()); gifts = g; claimGifts(); renderAll();
   }, e => console.warn(e));
-  const beat = () => { if (P && document.visibilityState==='visible') updateDoc(doc(fs,'players',uid), { seen: Date.now() }).catch(()=>{}); };
+  const beat = () => { if (P && document.visibilityState==='visible' && Date.now() - SAVE.last > 40000) updateDoc(doc(fs,'players',uid), { seen: Date.now() }).catch(()=>{}); };
   document.addEventListener('visibilitychange', beat);
   startChats(); startFlips(); startDuels(); startJackpot(); startLoono();
   intervals = [setInterval(beat, 45000), setInterval(leaseLoop, 4000), setInterval(hostTick, 350), setInterval(tickTimers, 500), setInterval(renderAll, 30000)];
@@ -1949,7 +2024,7 @@ async function leaseLoop(){
       }
       return false;
     });
-  } catch(e){ amHost = false; HOST.err = 'Dealer-Rolle: ' + (e?.code || e?.message || e); HOST.errAt = Date.now(); }
+  } catch(e){ amHost = false; quotaHit(e); HOST.err = 'Dealer-Rolle: ' + (e?.code || e?.message || e); HOST.errAt = Date.now(); }
 }
 function presentSeat(u){ return !!seats[u] && isOnline(u) && (u===uid || players[u]?.table===tid); }
 function reshuffle(nt){
@@ -2168,8 +2243,15 @@ function animateCards(root){
 /* =====================================================================
    v1.1 – Casino home, Glücksrad, Roulette, Automat, Pferderennen, Sportwetten
    ===================================================================== */
-const APP_VERSION = '1.5.8';
+const APP_VERSION = '1.5.10';
 const CHANGELOGS = {
+  '1.5.10': [
+    'Ist das Firebase-Tageslimit erreicht, schließt das Casino sicher und zeigt, wann es wieder öffnet. So geht kein Spielstand verloren',
+  ],
+  '1.5.9': [
+    'Das Spiel spart jetzt stark beim kostenlosen Firebase-Tageslimit: Speichern wird gebündelt, Jackpot und Loono-Lobbys verbrauchen viel weniger',
+    'Ist das Tageslimit erreicht, sagt das Spiel es jetzt klar, statt einfach zu hängen',
+  ],
   '1.5.8': [
     'Blackjack: Hängt der Tisch, erscheint „Dealer übernehmen“ und eine Diagnose',
   ],
@@ -2607,7 +2689,7 @@ async function slotAuto(n){
     if (S.stop === 'x20' ? r.mult >= 20 : S.stop !== 'jp' && r.pay >= S.stop){ toast(`Großer Gewinn: ${fmt(r.pay)} ℒ! Auto-Spin gestoppt.`); break; }
     if (S.auto > 0){ renderAll(); await secs(500); }
   }
-  S.auto = 0; renderAll();
+  S.auto = 0; renderAll(); if (SAVE.dirty) flushSave();
 }
 
 /* ---------- Pferderennen ---------- */
@@ -3361,17 +3443,26 @@ function startJackpot(){
     if (!s.exists()){ setDoc(ref, { pot: JP_SEED }).catch(() => {}); return; }
     const d = s.data(), lt = tsMs(d.last?.t);
     if (!JP.first && d.last && lt && lt !== tsMs(JP.last?.t) && d.last.uid !== uid){ SFX.bj(); toast(`💥 ${d.last.name} hat den Jackpot geknackt: ${fmt(d.last.amt)} ℒ!`); notify('💥', `${d.last.name} hat den Jackpot geknackt: ${fmt(d.last.amt)} ℒ`, { tab: 'table', game: 'slots' }); }
-    JP.pot = d.pot; JP.last = d.last || null; JP.first = false; renderAll();
+    JP.pot = d.pot + (JP.acc || 0); JP.last = d.last || null; JP.first = false; renderAll();
   }, e => console.warn(e));
 }
 function jpFeed(stake){
   const add = Math.max(1, Math.round(stake * JP_SHARE));
-  JP.pot = (JP.pot ?? JP_SEED) + add;
-  updateDoc(doc(fs, 'meta', 'jackpot'), { pot: increment(add) }).catch(() => {});
+  JP.pot = (JP.pot ?? JP_SEED) + add; JP.acc = (JP.acc || 0) + add;
+  if (!JP.t) JP.t = setTimeout(jpFlush, 30000);
 }
+function jpFlush(){
+  clearTimeout(JP.t); JP.t = 0;
+  let a = JP.acc || 0; JP.acc = 0;
+  const ps = [];
+  while (a > 0){ const c = Math.min(a, 1000); a -= c; ps.push(updateDoc(doc(fs, 'meta', 'jackpot'), { pot: increment(c) }).catch(e => { quotaHit(e); })); }   // the rules allow +1.000 per write
+  return Promise.all(ps);
+}
+document.addEventListener('visibilitychange', () => { if (document.hidden && JP.acc) jpFlush(); });
 async function jpWin(){
   const ref = doc(fs, 'meta', 'jackpot');
   try {
+    if (JP.acc) await jpFlush();
     const amt = await runTransaction(fs, async tx => {
       const s = await tx.get(ref); const pot = s.exists() ? s.data().pot : JP_SEED;
       tx.update(ref, { pot: JP_SEED, last: { uid, name: P.name, amt: pot, t: serverTimestamp() } });
@@ -3996,7 +4087,7 @@ async function loTx(fn, quiet){
       const g = s.data(); const r = fn(g); if (!r) return false;
       tx.set(ref, g); return r;
     });
-  } catch (e){ console.warn(e); if (!quiet) handleWriteErr(e); return false; }
+  } catch (e){ console.warn(e); if (!quotaHit(e) && !quiet) handleWriteErr(e); return false; }
   finally { LO.busy = false; }
 }
 async function loTick(){
@@ -4105,7 +4196,7 @@ function loWatch(){
   LO.unsub = onSnapshot(doc(fs, 'loono', id), s => { const before = LO.g; LO.g = s.exists() ? s.data() : null; loChanged(before, LO.g); renderAll(); }, e => console.warn(e));
 }
 function startLoono(){
-  LO.unsubL = onSnapshot(query(collection(fs, 'loono'), where('open', '==', true)), s => { const o = {}; s.docs.forEach(d => o[d.id] = d.data()); LO.lobbies = o; renderAll(); }, e => console.warn(e));
+  LO.unsubL = onSnapshot(query(collection(fs, 'loono'), where('st', '==', 'lobby')), s => { const o = {}; s.docs.forEach(d => o[d.id] = d.data()); LO.lobbies = o; renderAll(); }, e => console.warn(e));
 }
 const loName = (g, id) => g.seats.find(s => s.id === id)?.name || nameOf(id);
 function loChanged(a, g){
@@ -4409,7 +4500,7 @@ const reactsHTML = m => { const cnt = {}; for (const [u, e] of Object.entries(m.
   const ks = Object.keys(cnt); return ks.length ? `<span class="reacts">${ks.map(e => `<button class="rx${cnt[e].includes(uid) ? ' me' : ''}" data-act="chreact" data-id="${esc(m.id)}" data-e="${esc(e)}" title="${esc(cnt[e].map(u => u === uid ? 'du' : nameOf(u)).join(', '))}">${e}${cnt[e].length > 1 ? ' ' + cnt[e].length : ''}</button>`).join('')}</span>` : ''; };
 function loInviteBubble(m){
   const g = LO.lobbies[m.g], ok = g && g.st === 'lobby';
-  return `<span class="loinv"><b>🎴 Loono</b><span class="small">${g ? `Runde von ${esc(g.name)} · ${g.seats.length}/${LO_MAX} · ${g.stake ? fmt(g.stake) + ' ℒ' : 'ohne Einsatz'}` : 'Runde ist vorbei'}</span>
+  return `<span class="loinv"><b>🎴 Loono</b><span class="small">${g ? `Runde von ${esc(g.name)} · ${g.seats.length}/${LO_MAX} · ${g.stake ? fmt(g.stake) + ' ℒ' : 'ohne Einsatz'}` : 'Runde läuft schon oder ist vorbei'}</span>
     ${m.u !== uid ? (ok ? `<button class="btn sm gold" data-act="lojoin" data-id="${esc(m.g)}">Beitreten</button>` : `<span class="muted small">${g ? 'läuft schon' : ''}</span>`) : '<span class="muted small">Einladung verschickt</span>'}</span>`;
 }
 // long press (phone) or right click (PC) on a message opens the reactions
