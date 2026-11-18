@@ -1071,6 +1071,9 @@ h3{font-size:12px;letter-spacing:.09em;font-weight:700}
   .lohand.myturn .lc.ok:hover{transform:translateY(-10px)}
   .mcell:not(:disabled):hover{transform:none;border-color:rgba(255,255,255,.12)}
 }
+.btn.loono.big{font-size:20px;padding:14px 34px}
+.slotstop{flex-wrap:wrap;justify-content:center}
+.slotstop button{padding:5px 9px;font-size:13px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important}}
 </style>
 </head>
@@ -2125,8 +2128,13 @@ function animateCards(root){
 /* =====================================================================
    v1.1 – Casino home, Glücksrad, Roulette, Automat, Pferderennen, Sportwetten
    ===================================================================== */
-const APP_VERSION = '1.5.4';
+const APP_VERSION = '1.5.5';
 const CHANGELOGS = {
+  '1.5.5': [
+    'Loono: Wer das Spiel verlässt, verlässt auch die Runde (in einer laufenden Runde nach einer Nachfrage, dann spielt ein Bot weiter)',
+    'Loono: mehr Zeit für „Loono!“: 3 Sekunden kann dich niemand erwischen, Bots erst nach 6 Sekunden',
+    'Automat: einstellbar, ab welchem Gewinn der Auto-Spin stoppt',
+  ],
   '1.5.4': [
     'Dynamic Island: Loono „Du bist dran“, laufende Crash-Runde (lange drücken zum Auszahlen), Coin Flips und Wett-Herausforderungen (lange drücken zum Annehmen)',
     'Mitteilungszentrale: die Glocke oben sammelt Nachrichten, Herausforderungen, Gewinne und Level-Ups',
@@ -2462,7 +2470,8 @@ async function rSpin(){
 
 /* ---------- Automat ---------- */
 const SLOT_SYMS = ['🍒','🍋','🔔','⭐','💎','7️⃣'], SLOT_W = [30,25,20,14,8,3], SLOT_PAY3 = [6,10,20,40,100,500];
-const S = { bet: ls.get('slotbet', 100), busy: false, reels: [[1,0,2],[3,0,1],[2,0,4]], res: null, win: [0,0,0], auto: 0 };
+const SLOT_STOPS = [['x20', '×20'], [1000, '1.000'], [5000, '5.000'], [10000, '10.000'], [50000, '50.000'], ['jp', 'nur Jackpot']];
+const S = { stop: ls.get('slotstop', 'x20'), bet: ls.get('slotbet', 100), busy: false, reels: [[1,0,2],[3,0,1],[2,0,4]], res: null, win: [0,0,0], auto: 0 };
 /** which reels on the centre line made the win */
 function slotMask(c){
   if (c[0]===c[1] && c[1]===c[2]) return [1,1,1];
@@ -2494,7 +2503,8 @@ function renderSlots(){
       ${S.auto ? `<button class="btn gold spinbtn" data-act="sautostop">Auto stoppen · ${S.auto === Infinity ? `läuft (${S.spun || 0} Drehs)` : 'noch ' + S.auto}</button>`
         : `<button class="btn gold spinbtn" data-act="sspin" ${S.busy?'disabled':''}>Drehen · ${fmt(S.bet)} ℒ</button>
            <div class="row autorow"><span class="muted small">Auto-Spin</span>${[10,25,50].map(n => `<button class="btn sm" data-act="sauto" data-v="${n}" ${S.busy?'disabled':''}>${n}×</button>`).join('')}<button class="btn sm" data-act="sautoinf" ${S.busy?'disabled':''} aria-label="Endlos drehen bis Stopp oder großer Gewinn">∞</button></div>`}
-      <p class="muted small" style="max-width:52ch">Auto-Spin hält an, wenn die Legats nicht reichen, ein Limit erreicht ist oder du ×20 oder mehr gewinnst. ∞ dreht endlos, bis du stoppst.</p>
+      <div class="row autorow"><span class="muted small">Stoppen bei Gewinn ab</span><div class="seg slotstop">${SLOT_STOPS.map(([v, l]) => `<button data-act="sstop" data-s="${v}" aria-pressed="${String(S.stop) === String(v)}">${l}</button>`).join('')}</div></div>
+      <p class="muted small" style="max-width:52ch">Auto-Spin hält an, wenn ein Gewinn die eingestellte Grenze erreicht (×20 heißt: 20-facher Einsatz), beim Jackpot, wenn die Legats nicht reichen oder ein Limit erreicht ist. ∞ dreht endlos, bis du stoppst.</p>
     </div>
     <div class="paytable">${pt}</div>
     <p class="muted small slotrule">Es zählt nur die <b>rote Mittellinie</b>. Kirschen zählen <b>von links</b>: eine Kirsche auf der ersten Walze gibt ×0,5, Kirschen auf der ersten <i>und</i> zweiten Walze ×3. Kirschen nur auf der zweiten oder dritten Walze zählen nicht. <i class="anysym">?</i> = beliebiges Symbol.</p>
@@ -2544,7 +2554,7 @@ async function slotAuto(n){
     const r = await slotSpin(); if (!r) break;
     if (S.auto > 0) S.auto--; S.spun++;
     if (r.mult >= 9999){ toast('Jackpot! Auto-Spin gestoppt.'); break; }
-    if (r.mult >= 20){ toast(`Großer Gewinn: ×${r.mult}! Auto-Spin gestoppt.`); break; }
+    if (S.stop === 'x20' ? r.mult >= 20 : S.stop !== 'jp' && r.pay >= S.stop){ toast(`Großer Gewinn: ${fmt(r.pay)} ℒ! Auto-Spin gestoppt.`); break; }
     if (S.auto > 0){ renderAll(); await secs(500); }
   }
   S.auto = 0; renderAll();
@@ -2902,7 +2912,6 @@ function islandCrash(){
 function islandMode(){
   if (!P) return null;
   if (ISL.msg && Date.now() < ISL.msg.until) return 'msg';
-  if (LO.g && LO.g.st === 'play' && LO.g.seats[LO.g.turn]?.id === uid && !islandHere('loono')) return 'loono';
   if (islandCrash()) return 'crash';
   if ((S.busy || S.auto > 0 || Date.now() < (S.endAt || 0)) && !islandHere('slots')) return 'slots';
   return islandItems().length ? 'live' : null;
@@ -3796,7 +3805,7 @@ setInterval(() => { if (!uid || !P) return; duelsChanged(); tpPrize(); }, 60e3);
 
 
 /* ---------- v1.5: Loono – Kartenspiel mit Freunden und Bots ---------- */
-const LO_TURN = 20000, LO_MAX = 8, LO_CATCH = 2500;
+const LO_TURN = 20000, LO_MAX = 8, LO_CATCH = 6000, LO_GRACE = 3000;   // 3 s nobody can catch you, bots after 6 s
 const LO_NAMES = { r: 'Rubin', y: 'Gold', g: 'Smaragd', b: 'Saphir' };
 const LO_BOTS = [['Bot Kalle','🤖'],['Bot Mia','👾'],['Bot Otto','🦾'],['Bot Lina','🦊'],['Bot Ede','🐙'],['Bot Ida','🦉'],['Bot Fritz','🐸'],['Bot Uschi','🐧']];
 const LO = { id: null, g: null, unsub: null, lobbies: {}, unsubL: null, stake: ls.get('lostake', 0), rules: ls.get('lorules', { stack: true, double: true }), bots: ls.get('lobots', 2),
@@ -3885,6 +3894,7 @@ function loCall(g, id){
 }
 function loCatch(g, by){
   const v = g.expose?.id; if (!v || v === by) return false;
+  if (Date.now() - g.expose.t < LO_GRACE) return false;
   g.expose = null;
   if ((g.hands[v] || []).length !== 1) return false;
   loDraw(g, v, 2); g.ev = { ...(g.ev || {}), caught: v, by, ct: Date.now() };
@@ -4212,8 +4222,8 @@ function loTableHTML(g){
   const canCall = g.st === 'play' && mine.length <= 2 && mine.length > 0 && !g.called?.[uid];
   const acts = g.st !== 'play' ? '' : `
     ${myTurn ? (g.drew ? `<button class="btn" data-act="lokeep">Behalten</button>` : `<button class="btn${g.pend ? ' danger' : ''}" data-act="lodraw">${g.pend ? `${g.pend} Karten ziehen` : 'Karte ziehen'}</button>`) : ''}
-    ${canCall ? `<button class="btn gold loono${meExposed || mine.length === 1 ? ' hot' : ''}" data-act="locall">Loono!</button>` : ''}
-    ${other ? `<button class="btn danger hot" data-act="locatch">Erwischt! ${esc(loName(g, g.expose.id))}</button>` : ''}`;
+    ${canCall ? `<button class="btn gold loono${meExposed || mine.length === 1 ? ' hot big' : ''}" data-act="locall">Loono!</button>` : ''}
+    ${other ? `<button class="btn danger hot" data-act="locatch" ${Date.now() - g.expose.t < LO_GRACE ? 'hidden' : ''}>Erwischt! ${esc(loName(g, g.expose.id))}</button>` : ''}`;
   let ask = '';
   if (LO.ask?.step === 'two') ask = `<div class="loask"><p>Du hast die Karte zweimal. Wie viele legst du?</p><div class="row"><button class="btn" data-act="loone">Eine</button><button class="btn gold" data-act="lotwo">Beide</button><button class="btn sm" data-act="lonoask">Abbrechen</button></div></div>`;
   if (LO.ask?.step === 'color') ask = `<div class="loask"><p>Welche Farbe wünschst du dir?</p><div class="locolors">${[...'rygb'].map(k => `<button class="lopick lc-${k}" data-act="locolor" data-v="${k}"><span class="lgem"></span>${LO_NAMES[k]}</button>`).join('')}</div><button class="btn sm" data-act="lonoask">Abbrechen</button></div>`;
@@ -4247,7 +4257,9 @@ function renderLoono(){
   loTimer();
 }
 function loTimer(){
-  const t = $('lotimer'), g = LO.g; if (!t || !g || g.st !== 'play'){ if (t) t.hidden = true; return; }
+  const t = $('lotimer'), g = LO.g;
+  const cb = document.querySelector('#g-loono [data-act="locatch"]');   // „Erwischt!“ only after the grace period
+  if (cb && g?.expose) cb.hidden = Date.now() - g.expose.t < LO_GRACE; if (!t || !g || g.st !== 'play'){ if (t) t.hidden = true; return; }
   const cur = g.seats[g.turn], left = Math.max(0, g.dl - Date.now()), total = cur.bot ? 2000 : LO_TURN;
   t.hidden = false; t.classList.toggle('mine', cur.id === uid); t.classList.toggle('low', !cur.bot && left < 6000);
   t.firstElementChild.style.width = Math.min(100, left / total * 100).toFixed(1) + '%';
@@ -4296,7 +4308,7 @@ function savePref(k, v){
 function applyPrefs(){
   const p = P?.prefs; if (!p) return;
   const set = (k, f) => { if (p[k] != null){ ls.set(k, p[k]); f(p[k]); } };
-  set('lastBet', v => { bet = v; }); set('slotbet', v => { S.bet = v; }); set('horsebet', v => { H.bet = v; }); set('sportstake', v => { SP.stake = v; });
+  set('lastBet', v => { bet = v; }); set('slotbet', v => { S.bet = v; }); set('slotstop', v => { S.stop = v; }); set('horsebet', v => { H.bet = v; }); set('sportstake', v => { SP.stake = v; });
   set('hilostake', v => { HL.stake = v; }); set('minesstake', v => { MN.stake = v; }); set('minesn', v => { MN.n = v; });
   set('crashbet', v => { CR.bet = v; }); set('crashauto', v => { CR.auto = v; });
   set('lostake', v => { LO.stake = v; }); set('lorules', v => { LO.rules = v; }); set('lobots', v => { LO.bots = v; });
@@ -5278,7 +5290,20 @@ function loTileExtra(){
 function crashFriends(){ const s = crashAt(), n = crashPlayers(s).filter(([id]) => id !== uid).length; return n ? `<span class="pill good">${n} ${n === 1 ? 'Freund fliegt' : 'Freunde fliegen'} mit</span>` : ''; }
 function tippExtra(){ const t = tpInfo(); if (!t) return ''; return t.open ? `<span class="small muted">${t.k}. Spieltag · ${t.tipped} von ${t.n} getippt</span>` : `<span class="small muted">${t.k}. Spieltag läuft</span>`; }
 /** leaving the blackjack view means leaving the table; a running hand needs a second tap */
+/** leaving the Loono screen means leaving the round; a running round needs a second tap */
+const LOX = { t: 0 };
+function loExitOk(){
+  const g = LO.g;
+  if (!LO.id || !g || g.st === 'closed' || !g.seats?.some(s => s.id === uid && !s.left)) return true;
+  if (g.st === 'play'){
+    if (Date.now() - LOX.t > 4000){ LOX.t = Date.now(); toast('Nochmal tippen, um die Runde zu verlassen. Ein Bot spielt für dich weiter, dein Einsatz ist weg.'); buzz(25); return false; }
+    LOX.t = 0;
+  }
+  loLeave(true); toast('Du hast die Loono-Runde verlassen.');
+  return true;
+}
 function standUp(target){
+  if (game === 'loono' && target !== 'loono' && !loExitOk()) return false;
   if (game !== 'bj' || !tid || target === 'bj') return true;
   const was = confirmLeave;
   leaveTable();
@@ -5331,6 +5356,7 @@ document.addEventListener('click', e => {
     case 'sspin': if (confirmBig(S.bet, 'slots')) slotSpin(); break;
     case 'sauto': if (confirmBig(S.bet, 'slotsauto')) slotAuto(v); break;
     case 'sautostop': S.auto = 0; renderAll(); break;
+    case 'sstop': { const x = b.dataset.s; S.stop = /^\d+$/.test(x) ? +x : x; savePref('slotstop', S.stop); renderAll(); break; }
     case 'sautoinf': if (confirmBig(S.bet, 'slotsauto')) slotAuto(Infinity); break;
     case 'hpick': H.pickI = +b.dataset.i; renderAll(); break;
     case 'hbet': H.bet = v; savePref('horsebet', v); renderAll(); break;
@@ -5797,6 +5823,7 @@ function moveTabInd(){
 addEventListener('resize', () => moveTabInd());
 new ResizeObserver(() => moveTabInd()).observe(document.getElementById('top'));
 function setTab(t){
+  if (tab === 'table' && t !== 'table' && game === 'loono' && !loExitOk()) return;
   if (tab === 'chat' && t !== 'chat' && CH.open) closeChat();
   const from = tab; SCROLL[from] = window.scrollY; closeCtx();
   tab = t; shopConfirm = null;
