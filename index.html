@@ -699,6 +699,7 @@ nav.tabs button{position:relative}
 .dupick{width:100%;display:flex}
 .dupick button{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:8px 8px}
 .duitem>span:first-child{min-width:0}
+.savewarn{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:60;background:#8f1f1a;color:#fff;border:1px solid #ff8a7a;border-radius:12px;padding:12px 14px;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,.6);max-width:640px;margin:0 auto}
 @media (prefers-reduced-motion:reduce){*{animation:none!important}}
 </style>
 </head>
@@ -722,6 +723,7 @@ nav.tabs button{position:relative}
 
 <main class="wrap">
   <div id="daily"></div>
+  <div id="savewarn" class="savewarn" role="alert" hidden></div>
   <section id="view-login" class="login" hidden>
     <div class="fan" aria-hidden="true">
       <div class="c" style="transform:rotate(-14deg) translateX(-34px)"><div class="ci"><div class="cf"><span class="r">A</span><span class="s">♠</span><span class="big">♠</span></div><div class="cb"></div></div></div>
@@ -772,7 +774,7 @@ import { firebaseConfig } from './firebase-config.js';
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut }
   from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-import { initializeFirestore, doc, collection, query, where, orderBy, limit, onSnapshot, setDoc, getDoc, getDocs, updateDoc, deleteDoc, addDoc, runTransaction, serverTimestamp, increment }
+import { initializeFirestore, doc, collection, query, where, orderBy, limit, onSnapshot, setDoc, getDoc, getDocs, updateDoc, deleteDoc, addDoc, runTransaction, serverTimestamp, increment, getDocFromServer, disableNetwork, enableNetwork }
   from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
 /* ---------- constants ---------- */
@@ -970,7 +972,7 @@ function slow(pr){
 }
 function handleWriteErr(e){
   console.warn(e);
-  if (e?.code==='permission-denied') toast('Keine Berechtigung. Sind die neuen Sicherheitsregeln in Firebase eingetragen?');
+  if (e?.code==='permission-denied') toast('Keine Berechtigung. Sind die neuen Sicherheitsregeln in Firebase eingetragen? Sonst lade die Seite neu.');
   else if (e?.code==='resource-exhausted') toast('Das kostenlose Tageslimit von Firebase ist erreicht.');
   else toast('Speichern fehlgeschlagen, bitte nochmal versuchen.');
 }
@@ -1001,11 +1003,47 @@ function withPlayer(fn, why){
   checkBalanceBadges(d);
   if (brokeDoc(d)){ if (!d.brokeAt) d.brokeAt = Date.now(); } else if (d.brokeAt) d.brokeAt = null;
   d.updated = Math.max(Date.now(), (P.updated||0) + 1); d.seen = Date.now();
+  d.rev = (P.rev || 0) + 1;   // the server only takes the next number: an outdated device can't overwrite newer progress
   P = d; renderAll();
-  slow(setDoc(doc(fs,'players',uid), d)).catch(handleWriteErr);
+  const wid = ++SAVE.seq; SAVE.pending.set(wid, Date.now());
+  slow(setDoc(doc(fs,'players',uid), d))
+    .then(() => { SAVE.pending.delete(wid); renderSaveWarn(); })
+    .catch(e => { SAVE.pending.delete(wid); renderSaveWarn(); if (e?.code === 'permission-denied') resyncPlayer(); else handleWriteErr(e); });
   if (newBadges.length){ const b = newBadges; newBadges = []; b.forEach((k,i) => badgeLater(k, 400 + i*2200)); }
   if (lvlUps.length){ const ups = lvlUps.splice(0); ups.forEach((L,i) => levelLater(L, 900 + i*2600)); }
   return true;
+}
+/* ---------- saving: never play on while nothing reaches the server ---------- */
+const SAVE = { seq: 0, pending: new Map(), cycled: 0, resyncing: false };
+const unsavedMs = () => { let o = Infinity; for (const t of SAVE.pending.values()) o = Math.min(o, t); return o === Infinity ? 0 : Date.now() - o; };
+function renderSaveWarn(){
+  const el = $('savewarn'); if (!el) return;
+  const bad = unsavedMs() > 12000;
+  if (bad) el.textContent = '⚠️ Dein Spielstand wird gerade nicht gespeichert, weil keine Verbindung zu Firebase besteht. Spiel bitte erst weiter, wenn diese Meldung verschwindet.';
+  el.hidden = !bad;
+}
+/** iPad/iPhone sometimes keep a dead connection after switching apps: reconnect */
+function reconnect(){
+  if (Date.now() - SAVE.cycled < 20000) return; SAVE.cycled = Date.now();
+  disableNetwork(fs).then(() => enableNetwork(fs)).catch(e => console.warn(e));
+}
+setInterval(() => { if (unsavedMs() > 8000) reconnect(); renderSaveWarn(); }, 1000);
+let hiddenAt = 0;
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden){ hiddenAt = Date.now(); return; }
+  // back after a long break (iPad keeps old windows for days): start fresh with the current state and the newest version
+  if (hiddenAt && Date.now() - hiddenAt > 10 * 60e3 && !SAVE.pending.size){ location.reload(); return; }
+  if (SAVE.pending.size) reconnect();
+});
+/** a save was refused (another device or an old tab got there first): load the real state from the server */
+async function resyncPlayer(){
+  if (SAVE.resyncing) return; SAVE.resyncing = true;
+  try {
+    const s = await getDocFromServer(doc(fs, 'players', uid));
+    if (s.exists()){ P = norm(structuredClone(s.data())); HL.run = null; MN.run = null; renderAll();
+      toast('Dein Spielstand wurde auf einem anderen Gerät oder Tab geändert. Hier ist jetzt der aktuelle Stand geladen.'); }
+  } catch (e){ console.warn(e); toast('Speichern abgelehnt. Bitte lade die Seite neu.'); }
+  finally { setTimeout(() => { SAVE.resyncing = false; }, 3000); }
 }
 /** achievement toasts wait until a spin or race has finished, so they never give the result away */
 function badgeLater(k, ms){
@@ -1107,7 +1145,8 @@ function startData(){
     const next = {}; snap.docs.forEach(d => next[d.id] = d.data());
     players = next;
     const mine = next[uid];
-    if (mine && !snap.metadata.hasPendingWrites && (!P || (mine.updated||0) >= (P.updated||0))) P = norm(structuredClone(mine));
+    const newer = !P || ((mine?.rev || 0) !== (P.rev || 0) ? (mine?.rev || 0) > (P.rev || 0) : (mine?.updated || 0) >= (P.updated || 0));
+    if (mine && !snap.metadata.hasPendingWrites && !SAVE.pending.size && newer) P = norm(structuredClone(mine));
     if (!snap.metadata.fromCache && !mine && !P) createPlayer();
     else if (!snap.metadata.fromCache && mine){ refForExisting(); accrueInterest(); afterLogin(); }
     if (P && P.table && !tid && !leaving) openTable(P.table);
@@ -1709,8 +1748,13 @@ function animateCards(root){
 /* =====================================================================
    v1.1 – Casino home, Glücksrad, Roulette, Automat, Pferderennen, Sportwetten
    ===================================================================== */
-const APP_VERSION = '1.4';
+const APP_VERSION = '1.4.1';
 const CHANGELOGS = {
+  '1.4.1': [
+    'Wichtige Reparatur: Ein Gerät oder Tab mit altem Stand kann deinen Spielstand nicht mehr überschreiben',
+    'Bricht die Verbindung zu Firebase ab, erscheint eine Warnung und du kannst nicht weiterspielen, bis wieder gespeichert wird',
+    'Nach dem Zurückkehren in die App baut das Spiel die Verbindung neu auf',
+  ],
   '1.4': [
     'Level und Erfahrungspunkte: XP für jeden Einsatz, Belohnung bei jedem Level, Titel von Neuling bis Legat-Kaiser',
     'Tagesaufgaben: jeden Tag drei Aufgaben mit Belohnung, alle drei geben einen Extra-Bonus',
@@ -1797,6 +1841,7 @@ function record(d, key, stake, pay){
   progress(d, key, stake, pay);
 }
 function betError(amount, min=50, max=MAX_BET){
+  if (unsavedMs() > 12000) return 'Dein Spielstand wird gerade nicht gespeichert. Warte, bis die Verbindung wieder da ist.';
   const lim = limitState();
   if (lim?.hit) return lim.hit==='win' ? 'Gewinnziel erreicht. Starte im Konto eine neue Session.' : 'Stop-Loss erreicht. Starte im Konto eine neue Session.';
   if (!(amount >= min)) return `Mindesteinsatz: ${fmt(min)} Legats.`;
