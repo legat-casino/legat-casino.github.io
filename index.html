@@ -825,6 +825,135 @@ nav.tabs button{position:relative}
 .imtx{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500}
 .imtx b{color:var(--brass);font-size:13px}
 @media (max-width:560px){.island.msg{max-width:calc(100vw - 230px)}}
+
+/* ================= v1.5.2: aufgeräumt im iOS-Stil (Farben bleiben) ================= */
+:root{
+  --f-body:-apple-system, BlinkMacSystemFont, "SF Pro Text", "Manrope", system-ui, "Segoe UI", sans-serif;
+  --hair:rgba(255,255,255,.08); --fill:rgba(118,118,128,.2); --fill-2:rgba(118,118,128,.3);
+  --r-card:18px; --spring:cubic-bezier(.3,1.3,.5,1);
+}
+body{letter-spacing:-.005em;-webkit-font-smoothing:antialiased}
+.wrap{padding-block:16px 48px}
+.stack{gap:16px}
+
+/* header: frosted glass that the page scrolls under */
+header.top{background:rgba(23,17,13,.62);-webkit-backdrop-filter:blur(24px) saturate(170%);backdrop-filter:blur(24px) saturate(170%);border-bottom:1px solid var(--hair)}
+body::before{background:rgba(23,17,13,.62);-webkit-backdrop-filter:blur(24px);backdrop-filter:blur(24px)}
+.top-in{padding-block:8px 10px;row-gap:10px}
+.iconbtn{border:0;background:var(--fill);width:34px;height:34px;transition:transform .15s}
+.iconbtn:active{transform:scale(.92)}
+.purse b{font-size:18px}
+
+/* Liquid-Glass tab bar */
+nav.tabs{position:relative;display:flex;gap:2px;width:100%;padding:4px;border-radius:999px;
+  background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.03));
+  border:1px solid rgba(255,255,255,.13);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.22),inset 0 -1px 1px rgba(0,0,0,.25),0 10px 28px rgba(0,0,0,.35);
+  -webkit-backdrop-filter:blur(26px) saturate(180%);backdrop-filter:blur(26px) saturate(180%)}
+nav.tabs button{position:relative;z-index:1;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-width:0;
+  border:0!important;border-radius:999px;padding:6px 2px 5px;background:none;color:var(--muted);font-size:11px;font-weight:600;letter-spacing:0;transition:color .25s,transform .15s}
+nav.tabs button:active{transform:scale(.94)}
+nav.tabs button[aria-selected="true"]{color:var(--brass)}
+nav.tabs .ti{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:none}
+nav.tabs .ti .f{fill:currentColor;stroke:none}
+nav.tabs .tl{white-space:nowrap}
+.tabind{position:absolute;z-index:0;top:4px;bottom:4px;left:0;width:0;border-radius:999px;opacity:0;
+  background:linear-gradient(180deg,rgba(209,173,98,.30),rgba(209,173,98,.10));
+  border:1px solid rgba(209,173,98,.38);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.28),inset 0 -2px 6px rgba(0,0,0,.2),0 6px 16px rgba(0,0,0,.3);
+  transition:transform .42s var(--spring),width .42s var(--spring),opacity .2s}
+.tabind.on{opacity:1}
+nav.tabs .tabbadge{position:absolute;top:1px;left:calc(50% + 6px);margin:0;min-width:17px;height:17px;padding:0 5px;border-radius:999px;background:#ff3b30;color:#fff;font:700 10px/17px var(--f-body);text-align:center;box-shadow:0 0 0 2px #1b140f}
+@media (min-width:700px){
+  nav.tabs{flex:1 0 100%;max-width:720px;margin:0 auto}
+  nav.tabs button{flex-direction:row;gap:7px;font-size:14px;padding:8px 6px}
+  nav.tabs .ti{width:20px;height:20px}
+  nav.tabs .tabbadge{position:static;margin-left:2px;box-shadow:none}
+}
+
+/* cards, lists, sections */
+.panel{border-radius:var(--r-card);background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.012)),var(--rail-2);border:1px solid var(--hair);box-shadow:inset 0 1px 0 rgba(255,255,255,.03),0 12px 30px rgba(0,0,0,.18);padding:18px}
+h3{font-size:12px;letter-spacing:.09em;font-weight:700}
+.note{border-radius:12px;border-left-width:3px}
+.lobby-item,.betcard,.mcard,.tprow,.task,.chitem{border-radius:14px}
+.lobby-item{border-color:var(--hair)}
+.wallet>div{border-radius:16px;border-color:var(--hair);background:rgba(255,255,255,.04)}
+.wheelbanner{border-radius:18px}
+.tile{border-radius:22px;border-color:var(--hair);box-shadow:0 12px 28px rgba(0,0,0,.22);transition:transform .25s var(--spring),border-color .2s}
+.tile:active{transform:scale(.98)}
+.mdnav,.scoreboard{border-radius:18px}
+
+/* buttons: filled gold, tinted secondary, springy press */
+.btn{border-radius:999px;transition:transform .14s ease,filter .15s,background .15s,border-color .15s}
+.btn:active:not(:disabled){transform:scale(.96)}
+.btn:not(.gold):not(.danger){background:rgba(209,173,98,.11);border-color:transparent;color:var(--ink)}
+.btn:not(.gold):not(.danger):hover{background:rgba(209,173,98,.19)}
+.btn.gold{background:linear-gradient(180deg,#e3c47f,var(--brass));border-color:transparent;box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 6px 16px rgba(209,173,98,.2)}
+.btn.danger{border-color:transparent;box-shadow:0 6px 16px rgba(143,31,26,.35)}
+.linkbtn{color:var(--brass)}
+
+/* segmented controls */
+.seg{background:var(--fill);border:0;border-radius:11px;padding:2px;gap:2px}
+.seg button{border-radius:9px;transition:background .22s,color .22s,box-shadow .22s}
+.seg button[aria-pressed="true"]{background:linear-gradient(180deg,#e3c47f,var(--brass));color:#1b140a;box-shadow:0 2px 8px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.35)}
+
+/* inputs and switches */
+.field input,.field select,select,.chatform input{background:var(--fill);border:1px solid transparent;border-radius:12px;color:var(--ink);padding:10px 12px}
+.field input:focus,.chatform input:focus,select:focus{border-color:var(--brass-dim);outline:none}
+.switch input,.lorule input[type=checkbox]{appearance:none;-webkit-appearance:none;width:46px;height:28px;border-radius:999px;background:var(--fill-2);position:relative;margin:0;flex:none;cursor:pointer;transition:background .25s}
+.switch input::after,.lorule input[type=checkbox]::after{content:"";position:absolute;top:2px;left:2px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 2px 5px rgba(0,0,0,.35);transition:transform .3s var(--spring)}
+.switch input:checked,.lorule input[type=checkbox]:checked{background:var(--brass)}
+.switch input:checked::after,.lorule input[type=checkbox]:checked::after{transform:translateX(18px)}
+.lorule input[type=checkbox]:disabled{opacity:.5}
+
+/* toast as a glass capsule, sheets with a grabber */
+.toast{background:rgba(32,25,20,.8);color:var(--ink);border:1px solid rgba(255,255,255,.12);-webkit-backdrop-filter:blur(22px) saturate(170%);backdrop-filter:blur(22px) saturate(170%);box-shadow:0 12px 32px rgba(0,0,0,.45);font-weight:600}
+.modal{-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);background:rgba(10,7,5,.55)}
+.modal-card{border-radius:26px 26px 0 0;border:1px solid var(--hair);box-shadow:0 -12px 40px rgba(0,0,0,.45);animation:sheet .38s var(--spring) both}
+.modal-card::before{content:"";display:block;width:38px;height:5px;border-radius:3px;background:rgba(255,255,255,.22);margin:-6px auto 12px}
+@keyframes sheet{from{transform:translateY(40px);opacity:.4}}
+@media (min-width:700px){.modal-card{border-radius:24px}.modal-card::before{display:none}}
+
+/* chat like Messages */
+.bub{border-radius:18px 18px 18px 6px;touch-action:pan-y}
+.mrow.mine .bub{border-radius:18px 18px 6px 18px}
+.bub.swiping{transition:none}
+.bub.swipeback{transition:transform .26s var(--spring)}
+.bub::before{content:"↩";position:absolute;left:-34px;top:50%;width:26px;height:26px;margin-top:-13px;border-radius:50%;display:grid;place-items:center;background:var(--fill);color:var(--brass);font-size:15px;opacity:var(--sw,0);transform:scale(calc(.5 + var(--sw,0) * .5));pointer-events:none}
+.bub.flash{animation:bflash 1.4s ease}
+@keyframes bflash{0%,45%{box-shadow:0 0 0 3px var(--brass)}}
+.quote{display:flex;flex-direction:column;align-items:flex-start;text-align:left;width:100%;max-width:260px;border:0;border-left:3px solid var(--brass);background:rgba(0,0,0,.2);border-radius:9px;padding:4px 9px;margin:2px 0 6px;font-size:13px;line-height:1.3;color:inherit}
+.mrow.mine .quote{border-left-color:#1b140a;background:rgba(0,0,0,.1)}
+.quote span{opacity:.8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.replybar{display:flex;align-items:center;gap:10px;padding:8px 10px;margin:0 0 6px;border-radius:14px;background:var(--fill);border-left:3px solid var(--brass)}
+.replybar .rqt{flex:1;min-width:0;display:flex;flex-direction:column;font-size:13px;line-height:1.3}
+.replybar .rqt b{color:var(--brass)}
+.replybar .rqt span{color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* Dynamic Island: messages and the slot machine */
+.island{transition:max-width .35s var(--spring)}
+.island.slots{gap:8px;padding-right:8px}
+.ireels{position:relative;display:inline-flex;gap:3px;flex:none}
+.ireels::after{content:"";position:absolute;left:-3px;right:-3px;top:50%;height:2px;margin-top:-1px;background:#ff3b30;border-radius:2px;box-shadow:0 0 6px rgba(255,59,48,.85)}
+.ireel{width:22px;height:24px;border-radius:6px;background:#fbf8f1;overflow:hidden;font-size:14px;line-height:1;display:block}
+.ireel i{font-style:normal;display:block;height:24px;line-height:24px;text-align:center}
+.ireel.spin .istrip{display:block;animation:istrip .42s linear infinite}
+.ireel:nth-child(2).spin .istrip{animation-duration:.36s}.ireel:nth-child(3).spin .istrip{animation-duration:.48s}
+@keyframes istrip{to{transform:translateY(-144px)}}
+.ireel.hit{box-shadow:0 0 0 2px #ffcf6b,0 0 10px rgba(255,207,107,.7)}
+.iwin{color:var(--win)}
+.islandpanel.isbig{width:min(380px,calc(100% - 20px));top:calc(env(safe-area-inset-top,0px) + 6px);border-radius:36px;background:#000;border-color:#1e1e1e;padding:16px 18px 14px;transform-origin:50% 0;animation:isgrow .38s var(--spring) both;cursor:pointer}
+@keyframes isgrow{from{transform:translateX(-50%) scale(.42,.24);opacity:0;border-radius:999px}}
+.ibig{display:flex;flex-direction:column;gap:12px;align-items:center;color:#fff}
+.ibighead{display:flex;justify-content:space-between;align-items:center;width:100%;font-weight:700}
+.ireels.big{gap:8px}
+.ireels.big::after{height:3px;margin-top:-1.5px}
+.ireels.big .ireel{width:66px;height:74px;border-radius:14px;font-size:40px}
+.ireels.big .ireel i{height:74px;line-height:74px}
+.ireels.big .ireel.spin .istrip{animation-name:istripbig}
+@keyframes istripbig{to{transform:translateY(-444px)}}
+.ibigmsg{font-weight:700;min-height:20px}
+.ibigmsg.win{color:var(--win)}
 @media (prefers-reduced-motion:reduce){*{animation:none!important}}
 </style>
 </head>
@@ -835,13 +964,14 @@ nav.tabs button{position:relative}
     <button class="island" id="island" type="button" hidden></button>
     <button class="iconbtn" id="mute" type="button" aria-label="Ton an/aus">🔊</button>
     <div class="purse"><small id="pname">Konto</small><b id="pbal">–</b><span id="peur" class="num"></span></div>
-    <nav class="tabs" role="tablist">
-      <button id="tab-table" role="tab" aria-selected="true" data-tab="table">Casino</button>
-      <button id="tab-players" role="tab" aria-selected="false" data-tab="players">Spieler</button>
-      <button id="tab-chat" role="tab" aria-selected="false" data-tab="chat">Chat</button>
-      <button id="tab-bank" role="tab" aria-selected="false" data-tab="bank">Bank</button>
-      <button id="tab-shop" role="tab" aria-selected="false" data-tab="shop">Shop</button>
-      <button id="tab-account" role="tab" aria-selected="false" data-tab="account">Konto</button>
+    <nav class="tabs" role="tablist" id="tabs">
+      <span class="tabind" id="tabind" aria-hidden="true"></span>
+      <button id="tab-table" role="tab" aria-selected="true" data-tab="table"><svg class="ti" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/><circle cx="8.5" cy="8.5" r="1.2" class="f"/><circle cx="15.5" cy="15.5" r="1.2" class="f"/><circle cx="15.5" cy="8.5" r="1.2" class="f"/><circle cx="8.5" cy="15.5" r="1.2" class="f"/><circle cx="12" cy="12" r="1.2" class="f"/></svg><span class="tl">Casino</span><span class="tabbadge" hidden></span></button>
+      <button id="tab-players" role="tab" aria-selected="false" data-tab="players"><svg class="ti" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17" cy="9" r="2.4"/><path d="M16.5 14.3c2.6.4 4.5 2.7 4.5 5.7"/></svg><span class="tl">Spieler</span><span class="tabbadge" hidden></span></button>
+      <button id="tab-chat" role="tab" aria-selected="false" data-tab="chat"><svg class="ti" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4.5h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H10l-4.5 3.5V17.5H5a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2z"/></svg><span class="tl">Chat</span><span class="tabbadge" hidden></span></button>
+      <button id="tab-bank" role="tab" aria-selected="false" data-tab="bank"><svg class="ti" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9.5 12 4l9 5.5"/><path d="M5.5 10v7.5M10 10v7.5M14 10v7.5M18.5 10v7.5"/><path d="M3.5 20h17"/></svg><span class="tl">Bank</span><span class="tabbadge" hidden></span></button>
+      <button id="tab-shop" role="tab" aria-selected="false" data-tab="shop"><svg class="ti" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l-1.2 12H6.2L5 8z"/><path d="M9 8a3 3 0 0 1 6 0"/></svg><span class="tl">Shop</span><span class="tabbadge" hidden></span></button>
+      <button id="tab-account" role="tab" aria-selected="false" data-tab="account"><svg class="ti" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg><span class="tl">Konto</span><span class="tabbadge" hidden></span></button>
     </nav>
   </div>
 </header>
@@ -1876,8 +2006,14 @@ function animateCards(root){
 /* =====================================================================
    v1.1 – Casino home, Glücksrad, Roulette, Automat, Pferderennen, Sportwetten
    ===================================================================== */
-const APP_VERSION = '1.5.1';
+const APP_VERSION = '1.5.2';
 const CHANGELOGS = {
+  '1.5.2': [
+    'Neues Design im iOS-Stil: Glas-Leiste oben zum Wechseln zwischen Casino, Chat und Co., aufgeräumte Flächen und Knöpfe',
+    'Chat-Nachrichten in der Dynamic Island flackern nicht mehr und bleiben länger',
+    'Automat dreht weiter, wenn du rausgehst, und läuft oben in der Dynamic Island mit. Lange drücken vergrößert, tippen bringt dich zurück',
+    'Im Chat nach rechts wischen, um auf eine Nachricht zu antworten',
+  ],
   '1.5.1': [
     'Loono: +2 und +4 lassen sich jetzt beliebig aufeinander stapeln',
     'Neue Chat-Nachrichten erscheinen oben in der Dynamic Island, antippen öffnet den Chat',
@@ -2248,13 +2384,14 @@ async function slotSpin(){
     const dist = (filler.length + 3) * H;
     strip.style.transition = `transform ${1.1 + i*0.45}s cubic-bezier(.25,.1,.25,1.05)`;
     strip.style.transform = `translateY(-${dist}px)`;
-    for (let k=0;k<8+i*3;k++) setTimeout(() => tone(900 + rnd(200), .02, { type:'square', vol:.02 }), k*120);
-    setTimeout(() => SFX.card(), (1.1 + i*0.45)*1000);
+    if (slotHere()){ for (let k=0;k<8+i*3;k++) setTimeout(() => slotHere() && tone(900 + rnd(200), .02, { type:'square', vol:.02 }), k*120); }
+    setTimeout(() => slotHere() && SFX.card(), (1.1 + i*0.45)*1000);
   }
   await secs(2150);
   S.reels = reels; S.busy = false; S.res = { pay }; S.win = pay ? slotMask(center) : [0,0,0];
   release();
-  if (center.every(s => s===5)) SFX.bj(); else if (pay > S.bet) SFX.win(); else if (pay > 0) SFX.push();
+  S.endAt = Date.now() + 5000;
+  if (center.every(s => s===5)) SFX.bj(); else if (!slotHere()) {} else if (pay > S.bet) SFX.win(); else if (pay > 0) SFX.push();
   if (jp){
     S.busy = true; const amt = await jpWin(); S.busy = false;
     if (amt){ S.res = { pay, jp: amt }; SFX.bj(); setTimeout(() => SFX.coins(), 600); renderAll(); return { pay, mult: 9999 }; }
@@ -2262,11 +2399,11 @@ async function slotSpin(){
   }
   return { pay, mult };
 }
+const slotHere = () => game === 'slots' && tab === 'table';
 async function slotAuto(n){
   if (S.auto || S.busy) return;
   S.auto = n; S.spun = 0; renderAll();
   while (S.auto > 0){
-    if (game !== 'slots' || tab !== 'table') break;
     const r = await slotSpin(); if (!r) break;
     if (S.auto > 0) S.auto--; S.spun++;
     if (r.mult >= 9999){ toast('Jackpot! Auto-Spin gestoppt.'); break; }
@@ -2605,7 +2742,7 @@ setInterval(() => { if (uid) renderIsland(); }, 1000);
 setInterval(() => { if (uid) loadSports(); }, 10*60e3);
 
 /* ---------- Dynamic Island: what's live right now ---------- */
-const ISL = { open: false };
+const ISL = { open: false, big: false, msg: null, key: '', swap: '', pkey: '', lp: false };
 function islandItems(){
   const mine = new Set((P?.bets || []).filter(b => b.st === 'open').map(b => b.src + ':' + b.mid));
   return allMatchesAll().map(m => ({ m, S: matchState(m) })).filter(({ m, S }) => S.st === 'live' && (m.src === 'oldb' || mine.has(keyOf(m))))
@@ -2615,36 +2752,97 @@ function islandRow(m, S, big){
   const n1 = m.kind === 'darts' ? lastName(m.t1) : m.s1, n2 = m.kind === 'darts' ? lastName(m.t2) : m.s2;
   return `<span class="idot"></span><span class="iteam">${esc(n1)}</span><b class="num">${S.sc ? S.sc[0] + ':' + S.sc[1] : '–:–'}</b><span class="iteam">${esc(n2)}</span>${S.label ? `<span class="imin num">${esc(S.label)}</span>` : ''}${big ? `<span class="ilg">${esc(m.lg)}</span>` : ''}`;
 }
+/* what the island shows, most important first: a new chat message, the slot machine running in the background, live matches */
+function islandMode(){
+  if (!P) return null;
+  if (ISL.msg && Date.now() < ISL.msg.until) return 'msg';
+  if ((S.busy || S.auto > 0 || Date.now() < (S.endAt || 0)) && !(game === 'slots' && tab === 'table')) return 'slots';
+  return islandItems().length ? 'live' : null;
+}
+const SLOT_STRIP = () => `<span class="istrip">${[...SLOT_SYMS, SLOT_SYMS[0]].map(x => `<i>${x}</i>`).join('')}</span>`;
+function islandSlotsHTML(big){
+  const center = S.reels.map(r => r[1]), spin = S.busy;
+  const reels = center.map((s, i) => `<span class="ireel${spin ? ' spin' : ''}${!spin && S.res && S.win[i] ? ' hit' : ''}">${spin ? SLOT_STRIP() : `<i>${SLOT_SYMS[s]}</i>`}</span>`).join('');
+  const auto = S.auto === Infinity ? `∞ · ${S.spun || 0}` : S.auto > 0 ? `noch ${S.auto}` : '';
+  const res = S.res?.jp ? `<b class="num iwin">+${fmt(S.res.jp)}</b>` : spin ? '<b class="num">…</b>' : S.res?.pay ? `<b class="num iwin">+${fmt(S.res.pay)}</b>` : '<b class="num">–</b>';
+  if (!big) return `<span class="islide islot" data-k="slot"><span class="ireels">${reels}</span>${res}${auto ? `<span class="imore">${auto}</span>` : ''}</span>`;
+  const msg = S.res?.jp ? `💥 JACKPOT! +${fmt(S.res.jp)} ℒ` : spin ? 'Die Walzen drehen …' : S.res?.pay ? `Gewonnen: ${fmt(S.res.pay)} ℒ` : S.res ? 'Leider nichts' : '';
+  return `<div class="ibig">
+    <div class="ibighead"><span>🎰 Automat</span><span class="muted small">${S.auto === Infinity ? `Auto ∞ · ${S.spun || 0} Drehs` : S.auto > 0 ? `Auto · noch ${S.auto}` : `Einsatz ${fmt(S.bet)} ℒ`}</span></div>
+    <div class="ireels big">${reels}</div>
+    <div class="ibigmsg${S.res?.pay ? ' win' : ''}">${esc(msg)}</div>
+    <div class="row" style="justify-content:center;gap:8px">${S.auto > 0 ? '<button class="btn sm" data-act="sautostop" data-keep="1">Auto stoppen</button>' : ''}<span class="muted small">Antippen: zum Automaten</span></div>
+  </div>`;
+}
 function renderIsland(){
   const el = $('island'), panel = $('islandpanel'); if (!el) return;
-  const items = P ? islandItems() : [];
-  const top = $('top');
-  const msg = ISL.msg && Date.now() < ISL.msg.until ? ISL.msg : null;
-  if (msg){
-    top.classList.add('has-island');
-    const h = `<span class="islide imsg" data-k="msg${msg.t}"><span class="iav">${avH(msg.av)}</span><span class="imtx"><b>${esc(msg.name)}</b> ${esc(msg.text)}</span></span>`;
-    if (el.innerHTML !== h){ el.innerHTML = h; el.querySelector('.islide').classList.add('in'); }
-    el.classList.add('msg'); el.hidden = false; panel.hidden = true; el.setAttribute('aria-label', `Neue Nachricht von ${msg.name}, antippen zum Öffnen`);
+  const top = $('top'), mode = islandMode();
+  if (!mode){
+    if (!el.hidden){ el.hidden = true; panel.hidden = true; ISL.open = ISL.big = false; ISL.key = ''; top.classList.remove('has-island'); }
     return;
   }
-  el.classList.remove('msg');
-  if (!items.length){ if (!el.hidden){ el.hidden = true; panel.hidden = true; ISL.open = false; top.classList.remove('has-island'); } return; }
-  top.classList.add('has-island');
-  const i = Math.floor(Date.now() / 4000) % items.length, { m, S } = items[i];
-  const html = `<span class="islide" data-k="${esc(keyOf(m))}">${islandRow(m, S)}</span>${items.length > 1 ? `<span class="imore">+${items.length - 1}</span>` : ''}`;
-  if (el.innerHTML !== html){ const swap = el.querySelector('.islide')?.dataset.k !== keyOf(m); el.innerHTML = html; if (swap) el.querySelector('.islide').classList.add('in'); }
-  el.hidden = false; el.setAttribute('aria-label', `${items.length} Live-${items.length === 1 ? 'Spiel' : 'Spiele'}`);
-  panel.hidden = !ISL.open;
-  if (ISL.open){
-    const ph = `<div class="iphead"><b>Live</b><span class="muted small">tippen für den Ticker</span></div>${items.map(({ m, S }) => `<button class="iprow" data-act="sopen" data-key="${esc(keyOf(m))}">${islandRow(m, S, true)}</button>`).join('')}`;
-    if (panel.innerHTML !== ph) panel.innerHTML = ph;
+  top.classList.add('has-island'); el.hidden = false;
+  el.classList.toggle('msg', mode === 'msg'); el.classList.toggle('slots', mode === 'slots');
+  let key, html, label, swapKey;
+  if (mode === 'msg'){
+    const m = ISL.msg; swapKey = 'msg' + m.t;
+    key = swapKey; label = `Neue Nachricht von ${m.name}, antippen zum Öffnen`;
+    html = `<span class="islide imsg"><span class="iav">${avH(m.av)}</span><span class="imtx"><b>${esc(m.name)}</b> ${esc(m.text)}</span></span>`;
+  } else if (mode === 'slots'){
+    swapKey = 'slots'; key = ['slots', S.busy, S.reels.map(r => r[1]).join(), S.res?.pay, S.res?.jp, S.auto, S.spun].join('|');
+    label = 'Automat läuft. Antippen: zum Automaten, lange drücken: vergrößern';
+    html = islandSlotsHTML(false);
+  } else {
+    const items = islandItems(), i = Math.floor(Date.now() / 4000) % items.length, { m, S: st } = items[i];
+    swapKey = keyOf(m); key = [keyOf(m), st.sc, st.label, items.length].join('|');
+    label = `${items.length} Live-${items.length === 1 ? 'Spiel' : 'Spiele'}`;
+    html = `<span class="islide">${islandRow(m, st)}</span>${items.length > 1 ? `<span class="imore">+${items.length - 1}</span>` : ''}`;
+  }
+  // compare keys, not innerHTML: the browser writes some characters back differently, which made the island re-animate (flicker)
+  if (ISL.key !== key){ const swap = ISL.swap !== swapKey; ISL.key = key; ISL.swap = swapKey; el.innerHTML = html; if (swap) el.querySelector('.islide')?.classList.add('in'); }
+  el.setAttribute('aria-label', label);
+  if (mode === 'slots' && ISL.big){
+    const ph = islandSlotsHTML(true), pk = 'big|' + key;
+    panel.hidden = false; panel.classList.add('isbig');
+    if (ISL.pkey !== pk){ ISL.pkey = pk; panel.innerHTML = ph; }
+    return;
+  }
+  panel.classList.remove('isbig');
+  if (mode !== 'slots') ISL.big = false;
+  panel.hidden = !(mode === 'live' && ISL.open);
+  if (mode === 'live' && ISL.open){
+    const items = islandItems();
+    const ph = `<div class="iphead"><b>Live</b><span class="muted small">tippen für den Ticker</span></div>${items.map(({ m, S: st }) => `<button class="iprow" data-act="sopen" data-key="${esc(keyOf(m))}">${islandRow(m, st, true)}</button>`).join('')}`;
+    const pk = 'live|' + items.map(({ m, S: st }) => keyOf(m) + st.sc + st.label).join();
+    if (ISL.pkey !== pk){ ISL.pkey = pk; panel.innerHTML = ph; }
   }
 }
+function openSlotsFromIsland(){ ISL.big = false; ISL.open = false; if (tab !== 'table') setTab('table'); if (game !== 'slots' && standUp('slots')) openGame('slots'); renderIsland(); }
+// long press makes the island bigger (like on the iPhone), a tap opens what it shows
+(() => {
+  let t = 0;
+  document.addEventListener('pointerdown', e => {
+    ISL.lp = false;
+    if (!e.target.closest('#island')) return;
+    clearTimeout(t);
+    t = setTimeout(() => { if (islandMode() === 'slots'){ ISL.lp = true; ISL.big = true; ISL.pkey = ''; navigator.vibrate?.(12); renderIsland(); } }, 420);
+  });
+  for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) document.addEventListener(ev, () => clearTimeout(t));
+  document.addEventListener('contextmenu', e => { if (e.target.closest('#island')) e.preventDefault(); });
+})();
 document.addEventListener('click', e => {
-  const isl = e.target.closest('#island');
-  if (isl && ISL.msg && Date.now() < ISL.msg.until){ const cid = ISL.msg.cid; ISL.msg = null; if (tab !== 'chat') setTab('chat'); openChat(cid); renderIsland(); return; }
-  if (isl){ const items = islandItems(); if (items.length === 1){ openMatch(keyOf(items[0].m)); } else { ISL.open = !ISL.open; renderIsland(); } return; }
-  if (ISL.open && !e.target.closest('#islandpanel')){ ISL.open = false; renderIsland(); }
+  const isl = e.target.closest('#island'), pan = e.target.closest('#islandpanel');
+  // the click that ends a long press can land next to the island when its content changed underneath the finger
+  if (ISL.lp){ ISL.lp = false; return; }
+  if (isl){
+    const mode = islandMode();
+    if (mode === 'msg'){ const cid = ISL.msg.cid; ISL.msg = null; ISL.key = ''; if (tab !== 'chat') setTab('chat'); openChat(cid); renderIsland(); return; }
+    if (mode === 'slots') return openSlotsFromIsland();
+    const items = islandItems(); if (items.length === 1){ openMatch(keyOf(items[0].m)); } else { ISL.open = !ISL.open; ISL.pkey = ''; renderIsland(); }
+    return;
+  }
+  if (pan && ISL.big){ if (!e.target.closest('[data-keep]')) openSlotsFromIsland(); return; }
+  if ((ISL.open || ISL.big) && !pan){ ISL.open = false; ISL.big = false; renderIsland(); }
 });
 function openMatch(key){
   ISL.open = false; SP.slip = null;
@@ -4192,7 +4390,7 @@ function startChats(){
     if (!first) for (const [id, c] of Object.entries(next)){
       const old = prev[id];
       if (c.last && c.last.u !== uid && (!old?.last || old.last.t !== c.last.t) && !(tab === 'chat' && CH.open === id)){
-        SFX.pop(); ISL.msg = { cid: id, name: c.group ? `${nameOf(c.last.u)} · ${chatName(c)}` : chatName(c), av: c.group ? avOf(c.last.u) : chatAv(c), text: c.last.k === 'e' ? avText(c.last.x) : c.last.x, t: c.last.t, until: Date.now() + 6000 }; ISL.open = false; renderIsland();
+        SFX.pop(); ISL.msg = { cid: id, name: c.group ? `${nameOf(c.last.u)} · ${chatName(c)}` : chatName(c), av: c.group ? avOf(c.last.u) : chatAv(c), text: c.last.k === 'e' ? avText(c.last.x) : c.last.x, t: c.last.t, until: Date.now() + 8000 }; ISL.open = false; renderIsland();
       }
       if (tab === 'chat' && CH.open === id) markRead(id);
     }
@@ -4206,13 +4404,14 @@ function openChat(id){
   }, e => console.warn(e));
   renderAll();
 }
-function closeChat(){ CH.unsubM && CH.unsubM(); CH.unsubM = null; CH.open = null; renderAll(); }
+function closeChat(){ CH.unsubM && CH.unsubM(); CH.unsubM = null; CH.open = null; CH.reply = null; renderAll(); }
 let lastChatMsg = 0;
 function chatSend(x, k, extra){
   const id = CH.open; if (!id || !x) return;
   if (Date.now() - lastChatMsg < 500) return; lastChatMsg = Date.now();
   x = x.slice(0, 500); const t = Date.now();
-  addDoc(collection(fs, 'chats', id, 'msgs'), { u: uid, x, k, t, ...(extra || {}) }).catch(handleWriteErr);
+  const re = CH.reply; if (re){ CH.reply = null; renderReplyBar(); }
+  addDoc(collection(fs, 'chats', id, 'msgs'), { u: uid, x, k, t, ...(re ? { re } : {}), ...(extra || {}) }).catch(handleWriteErr);
   updateDoc(doc(fs, 'chats', id), { last: { u: uid, x: x.slice(0, 80), k, t } }).catch(() => {});
 }
 function chatNewDM(friend){
@@ -4247,6 +4446,7 @@ function renderChatTab(){
       <div class="chathead" id="chhead"></div>
       <div class="chatmsgs" id="chmsgs" aria-live="polite"></div>
       <div class="emojis chatemo">${[...EMOJIS].map(e => `<button type="button" data-act="chemoji" data-e="${esc(e)}" aria-label="${esc(avText(e))} senden">${avH(e)}</button>`).join('')}</div>
+      <div class="replybar" id="chreply" hidden></div>
       <form class="chatform" id="chform" autocomplete="off"><label class="btn sm chpic" title="Bild senden" aria-label="Bild senden">📷<input type="file" accept="image/*" id="chfile" hidden></label><input id="chx" maxlength="500" placeholder="Nachricht …" aria-label="Nachricht"><button class="btn gold sm" type="submit">Senden</button></form>`
       : `<div class="chatempty"><div class="big">💬</div><p class="muted">Wähl links einen Chat oder starte einen neuen.</p></div>`}</section></div>`;
     $('chfile')?.addEventListener('change', e => { chatImage(e.target.files[0]); e.target.value = ''; });
@@ -4279,7 +4479,7 @@ function renderChatTab(){
     const head = `<button class="btn sm chback" data-act="chclose">←</button><span class="chav">${avH(chatAv(c))}</span><div class="chtx"><b>${esc(chatName(c))}</b><span class="muted small">${c.group ? c.members.map(m => m === uid ? 'du' : nameOf(m)).join(', ') : (isOnline(c.members.find(m => m !== uid)) ? 'online' : 'offline')}</span></div>
       ${c.group ? `<details class="chmore"><summary class="btn sm">⋯</summary><div class="chmenu">${add.map(f => `<button class="btn sm" data-act="chadd" data-id="${esc(f)}">+ ${esc(nameOf(f))}</button>`).join('')}<button class="btn sm" data-act="chleave">Gruppe verlassen</button></div></details>` : ''}`;
     const h = $('chhead'); if (h && h.innerHTML !== head && !h.querySelector('details[open]')) h.innerHTML = head;
-    renderChatMsgs();
+    renderChatMsgs(); renderReplyBar();
   }
 }
 function renderChatMsgs(){
@@ -4292,10 +4492,58 @@ function renderChatMsgs(){
     const okImg = m.k === 'img' && /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/=]+$/.test(m.img || '');
     const body = m.k === 'e' ? avH(m.x) : okImg ? `<img class="chimg" src="${m.img}" alt="Bild von ${esc(nameOf(m.u))}" data-act="chimgview">` : m.k === 'lo' ? loInviteBubble(m) : esc(m.x);
     const bar = CH.react === m.id ? `<span class="reactbar">${REACTS.map(e => `<button data-act="chreact" data-id="${esc(m.id)}" data-e="${e}" aria-label="mit ${e} reagieren">${e}</button>`).join('')}</span>` : '';
-    return `<div class="mrow${mine ? ' mine' : ''}"><div class="bub${m.k === 'e' ? ' emo' : ''}${okImg ? ' pic' : ''}" data-id="${esc(m.id || '')}">${showName ? `<span class="who">${avH(avOf(m.u))} ${esc(nameOf(m.u))}</span>` : ''}${body}<time>${timeShort(m.t)}</time>${bar}</div>${reactsHTML(m)}</div>`;
+    return `<div class="mrow${mine ? ' mine' : ''}"><div class="bub${m.k === 'e' ? ' emo' : ''}${okImg ? ' pic' : ''}" data-id="${esc(m.id || '')}">${showName ? `<span class="who">${avH(avOf(m.u))} ${esc(nameOf(m.u))}</span>` : ''}${quoteHTML(m)}${body}<time>${timeShort(m.t)}</time>${bar}</div>${reactsHTML(m)}</div>`;
   }).join('') : '<p class="muted small" style="text-align:center">Schreib die erste Nachricht.</p>';
   if (box.innerHTML !== html){ box.innerHTML = html; if (atBottom || box.dataset.first !== CH.open){ box.scrollTop = box.scrollHeight; box.dataset.first = CH.open; } }
 }
+
+
+/* ---------- v1.5.2: Antworten per Wischen nach rechts (wie bei WhatsApp) ---------- */
+const msgSnippet = m => m.k === 'img' ? '📷 Bild' : m.k === 'lo' ? '🎴 Loono-Einladung' : m.k === 'e' ? avText(m.x) : String(m.x || '').slice(0, 90);
+function setReply(m){
+  CH.reply = m ? { id: m.id, u: m.u, x: msgSnippet(m) } : null;
+  renderReplyBar();
+  if (m){ $('chx')?.focus(); navigator.vibrate?.(10); }
+}
+function renderReplyBar(){
+  const el = $('chreply'); if (!el) return;
+  const r = CH.reply;
+  el.hidden = !r;
+  const h = r ? `<span class="rqt"><b>${esc(r.u === uid ? 'Du' : nameOf(r.u))}</b><span>${esc(r.x)}</span></span><button type="button" class="btn sm" data-act="chreplyx" aria-label="Antwort abbrechen">✕</button>` : '';
+  if (el.innerHTML !== h) el.innerHTML = h;
+}
+const quoteHTML = m => m.re ? `<button type="button" class="quote" data-act="chquote" data-id="${esc(m.re.id)}"><b>${esc(m.re.u === uid ? 'Du' : nameOf(m.re.u))}</b><span>${esc(m.re.x)}</span></button>` : '';
+(() => {
+  let s = null;
+  document.addEventListener('pointerdown', e => {
+    const bub = e.target.closest?.('#chmsgs .bub[data-id]'); if (!bub || e.target.closest('button,a')) { s = null; return; }
+    s = { bub, x: e.clientX, y: e.clientY, on: false, dx: 0 };
+  });
+  document.addEventListener('pointermove', e => {
+    if (!s) return;
+    const dx = e.clientX - s.x, dy = e.clientY - s.y;
+    if (!s.on){ if (Math.abs(dy) > 12 && Math.abs(dy) > Math.abs(dx)) { s = null; return; } if (dx > 12 && dx > Math.abs(dy) * 1.4){ s.on = true; s.bub.classList.add('swiping'); } else return; }
+    s.dx = Math.max(0, Math.min(dx, 96));
+    s.bub.style.transform = `translateX(${s.dx}px)`; s.bub.style.setProperty('--sw', Math.min(1, s.dx / 64));
+    if (s.dx >= 64 && !s.buzz){ s.buzz = true; navigator.vibrate?.(8); }
+  });
+  const end = () => {
+    if (!s) return; const { bub, on, dx } = s; s = null; if (!on) return;
+    bub.classList.remove('swiping'); bub.classList.add('swipeback'); bub.style.transform = ''; bub.style.removeProperty('--sw');
+    setTimeout(() => bub.classList.remove('swipeback'), 260);
+    if (dx >= 64){ const m = CH.msgs.find(x => x.id === bub.dataset.id); if (m && m.k !== 's') setReply(m); }
+  };
+  document.addEventListener('pointerup', end); document.addEventListener('pointercancel', end);
+})();
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-act]'); if (!b) return;
+  if (b.dataset.act === 'chreplyx') setReply(null);
+  if (b.dataset.act === 'chquote'){
+    const t = document.querySelector(`#chmsgs .bub[data-id="${CSS.escape(b.dataset.id)}"]`);
+    if (t){ t.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' }); t.classList.remove('flash'); void t.offsetWidth; t.classList.add('flash'); }
+    else toast('Die Nachricht ist zu alt, um sie anzuzeigen.');
+  }
+});
 
 /* ---------- Coin Flip between friends ---------- */
 const FL = { a: {}, b: {}, pick: 'K', busy: false, seen: new Set(ls.get('flipSeen', [])) };
@@ -4996,13 +5244,21 @@ function tickTimers(){
 }
 function renderTabBadges(){
   const n = unreadChats().length, f = Object.values(flipAll()).filter(x => x.b === uid && x.st === 'open').length;
-  const set = (id, label, k) => { const b = $(id); const h = label + (k ? `<span class="tabbadge">${k}</span>` : ''); if (b.innerHTML !== h) b.innerHTML = h; };
+  const set = (id, label, k) => { const bd = $(id)?.querySelector('.tabbadge'); if (!bd) return; bd.hidden = !k; if (bd.textContent !== String(k || '')) bd.textContent = k || ''; };
   set('tab-chat', 'Chat', n); set('tab-account', 'Konto', f);
 }
+/** the glass capsule glides to the selected tab */
+function moveTabInd(){
+  const ind = $('tabind'), b = document.querySelector('nav.tabs button[aria-selected="true"]'); if (!ind || !b || !b.offsetWidth) return;
+  ind.style.width = b.offsetWidth + 'px'; ind.style.transform = `translateX(${b.offsetLeft}px)`; ind.classList.add('on');
+}
+addEventListener('resize', () => moveTabInd());
+new ResizeObserver(() => moveTabInd()).observe(document.getElementById('top'));
 function setTab(t){
   if (tab === 'chat' && t !== 'chat' && CH.open) closeChat();
   tab = t; shopConfirm = null;
   for (const b of document.querySelectorAll('nav.tabs button')) b.setAttribute('aria-selected', b.dataset.tab===t);
+  moveTabInd();
   for (const v of ['table','players','chat','bank','shop','account']) $('view-'+v).hidden = v!==t;
   if (t==='table') { lastTableHTML = ''; anim.prime = true; }
   renderAll();
