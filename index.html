@@ -1216,7 +1216,7 @@ import { initializeFirestore, doc, collection, query, where, orderBy, limit, onS
 
 /* ---------- constants ---------- */
 const START = 2000, MIN_BET = 100, VIP_MIN = 5000, MAX_BET = 50000, MAX_SEATS = 5;
-const TURN_MS = 30000, BET_MS = 15000, INS_MS = 12000, ONLINE_MS = 100000, DONE_MS = 5000;
+const TURN_MS = 30000, BET_MS = 10000, INS_MS = 12000, ONLINE_MS = 100000, DONE_MS = 5000, DONE_FAST = 1500;   // after DONE_FAST the next round starts as soon as everyone has bet again
 const CHIPS = [[50,'ch50','50'],[100,'ch100','100'],[500,'ch500','500'],[1000,'ch1k','1K'],[5000,'ch5k','5K'],[10000,'ch10k','10K'],[25000,'ch25k','25K']];
 const SUIT = {S:'♠',H:'♥',D:'♦',C:'♣'};
 const EMOJIS = ['😂','🔥','💀','😭','🤑','👏','🙏','😤','🍀','🫡','img:kippa'];
@@ -1981,11 +1981,20 @@ function canBet(amount){
   if (amount > P.balance) return 'Nicht genug Legats.';
   return null;
 }
+const chipControls = max => `
+      <div class="chips">${CHIPS.map(([v,cl,l])=>`<button class="chip ${cl}" data-act="chip" data-v="${v}" ${bet+v>max?'disabled':''} aria-label="${fmt(v)} hinzufügen">${l}</button>`).join('')}</div>
+      <div class="betline"><button class="btn sm" data-act="betclear">Löschen</button><span class="betval">${fmt(bet)}</span><button class="btn sm" data-act="betmax">Max</button></div>
+      <button class="btn gold" data-act="bet" ${bet<tableMin()||bet>max?'disabled':''}>Setzen</button>
+      ${autoSwitch()}
+      <p class="muted small">Einsatz ${fmt(tableMin())} – 50.000 Legats</p>`;
+let preChoose = null;   // round in which "Anderer Einsatz" was tapped on the result screen
+/** while the result is still shown ('done') the bet already counts for the next round */
+const betRound = () => T.phase === 'done' ? T.round + 1 : T.round;
 function placeBet(amount = bet){
-  if (!T || T.phase!=='betting') return false;
+  if (!T || (T.phase!=='betting' && T.phase!=='done')) return false;
   const err = canBet(amount); if (err){ toast(err); return false; }
   savePref('lastBet', amount); bet = amount;
-  seatWrite({ ready:true, round:T.round, bet:amount });
+  seatWrite({ ready:true, round:betRound(), bet:amount });
   SFX.chip();
   return true;
 }
@@ -2011,14 +2020,14 @@ let lastTurnKey = null, lastDoneKey = null;
 function afterTable(){
   if (!T || !P) return;
   // auto bet: repeat the last bet at the start of every round
-  if (auto && T.phase==='betting' && autoRound !== T.round && seats[uid]){
-    const s = seats[uid];
-    if (!(s.ready && s.round===T.round)){
-      autoRound = T.round;
+  if (auto && (T.phase==='betting' || (T.phase==='done' && T.history?.[T.round]?.[uid])) && autoRound !== betRound() && seats[uid]){
+    const s = seats[uid], br = betRound();
+    if (!(s.ready && s.round===br)){
+      autoRound = br;
       const amount = ls.get('lastBet', bet);
       const err = isBroke() ? 'Du bist pleite.' : canBet(amount);
       if (err){ auto = false; ls.set('autobet', false); toast('Auto-Einsatz gestoppt: ' + err); }
-      else { const r = T.round; setTimeout(() => { if (auto && T?.phase==='betting' && T.round===r) placeBet(amount); }, 700); }
+      else setTimeout(() => { if (auto && T && betRound()===br) placeBet(amount); }, 700);
     }
   }
   const tk = T.turn && T.turn.u===uid && T.phase==='playing' ? `${tid}-${T.round}-${T.turn.h}` : null;
@@ -2287,7 +2296,9 @@ function step(nt, now){
       settle(nt); nt.phase='done'; nt.doneAt=now; return true;
     }
     case 'done': {
-      if (now - (nt.doneAt||0) < DONE_MS) return false;
+      const present = seatList.filter(([u]) => presentSeat(u));
+      const allIn = present.length && present.every(([,s]) => s.ready && s.round === nt.round + 1 && s.bet >= min && s.bet <= MAX_BET);
+      if (now - (nt.doneAt||0) < (allIn ? DONE_FAST : DONE_MS)) return false;
       nt.phase='betting'; nt.round += 1; nt.hands={}; nt.dealer=[]; nt.order=[]; nt.turn=null; nt.reveal=false; nt.betUntil=null; nt.ins={}; nt.insDone={};
       return true;
     }
@@ -2359,9 +2370,19 @@ function animateCards(root){
 /* =====================================================================
    v1.1 – Casino home, Glücksrad, Roulette, Automat, Pferderennen, Sportwetten
    ===================================================================== */
-const APP_VERSION = '1.6.1';
+const APP_VERSION = '1.6.3';
 const CL_TITLES = { '1.5.12': 'Technische Verbesserungen' };
 const CHANGELOGS = {
+  '1.6.3': [
+    'Blackjack: Schon während das Ergebnis angezeigt wird, kannst du für die nächste Runde setzen („Nochmal“ oder „Anderer Einsatz“). Haben alle gesetzt, geht es nach gut 2 Sekunden weiter statt erst nach über 5',
+    'Blackjack: Der Auto-Einsatz setzt auch schon während des Ergebnisses',
+    'Blackjack: Wer nicht setzt, wird nur noch 10 statt 15 Sekunden abgewartet',
+  ],
+  '1.6.2': [
+    'Loono: Direkt nach „Loono!“ eine Karte antippen klappt jetzt. Vorher wurde der Tipp ignoriert, solange „Loono!“ noch unterwegs war',
+    'Loono: Deine gelegte Karte verschwindet sofort aus der Hand, auch bei langsamer Verbindung, statt erst Sekunden später',
+    'Loono: Hängt die Live-Verbindung, holt sich das Spiel den aktuellen Stand selbst',
+  ],
   '1.6.1': [
     'Loono: Karten antippen klappt jetzt zuverlässig. Vorher wurde die Hand manchmal genau beim Antippen neu aufgebaut und der Tipp ging verloren',
     'Loono: Die gelegte Karte hebt sich sofort an. Geht ein Zug nicht durch, sagt dir das Spiel, statt nichts zu tun',
@@ -4320,21 +4341,35 @@ function loBot(g){
 /* who runs the bots and the turn clock: the first human at the table who is online */
 const loHostId = g => g.seats.filter(s => !s.bot).map(s => s.id).find(id => isOnline(id)) || null;
 /** quiet = background work (bots, turn clock): it never blocks or hides the player's own taps */
-async function loTx(fn, quiet){
+async function loTx(fn, quiet, side){
   const id = LO.id; if (!id) return false;
-  const flag = quiet ? 'tickBusy' : 'busy';
+  const flag = side ? 'sideBusy' : quiet ? 'tickBusy' : 'busy';   // "Loono!" and "Erwischt!" never block laying a card
   LO[flag] = true;
   try {
-    return await runTransaction(fs, async tx => {
+    let out = null, read = null;
+    const r = await runTransaction(fs, async tx => {
+      out = null; read = null;
       const ref = doc(fs, 'loono', id), s = await tx.get(ref); if (!s.exists()) return false;
-      const g = s.data(); const r = fn(g); if (!r) return false;
-      tx.set(ref, g); return r;
+      read = s.data();
+      const g = structuredClone(read); const r = fn(g); if (!r) return false;
+      tx.set(ref, g); out = g; return r;
     }, { maxAttempts: 10 });   // with bots moving every second the table changes often: retry instead of giving up
+    // show the new table right away: the live update from Firebase takes a moment longer, and until then
+    // the old state (still "your turn", the card still in your hand) invited a second tap that then failed
+    if (out && LO.id === id) loApply(out);
+    else if (read && LO.id === id && (read.n || 0) > (LO.g?.n || 0)) loApply(read);   // the live update is lagging: take the fresh state we just read
+    if (!r && quiet) LO.tickHold = Date.now() + 1500;   // nothing to do: don't ask Firebase again every 400 ms
+    return r;
   } catch (e){ console.warn(e); if (!quotaHit(e) && !quiet) handleWriteErr(e); return false; }
   finally { LO[flag] = false; }
 }
+/** take a newer table state (own move or live update); an older one that arrives late is ignored */
+function loApply(g){
+  if (g && LO.g && g.round === LO.g.round && (g.n || 0) < (LO.g.n || 0)) return false;
+  const before = LO.g; LO.g = g; loChanged(before, g); renderAll(); return true;
+}
 async function loTick(){
-  const g = LO.g; if (!g || g.st !== 'play' || LO.tickBusy || !uid || !g.seats.some(s => s.id === uid)) return;
+  const g = LO.g; if (!g || g.st !== 'play' || LO.tickBusy || Date.now() < (LO.tickHold || 0) || !uid || !g.seats.some(s => s.id === uid)) return;
   const late = loHostId(g) === uid ? 0 : 6000, now = NOW(), cur = g.seats[g.turn];
   if (g.expose && now - g.expose.t > LO_CATCH + late){
     const victim = g.seats.find(s => s.id === g.expose.id), bot = g.seats.find(s => s.bot && s.id !== g.expose.id);
@@ -4436,7 +4471,7 @@ function loWatch(){
   if (id === LO.id) return;
   LO.unsub && LO.unsub(); LO.unsub = null; LO.id = id; LO.g = null; LO.ask = null; LO.animN = -1;
   if (!id){ renderAll(); return; }
-  LO.unsub = onSnapshot(doc(fs, 'loono', id), s => { const before = LO.g; LO.g = s.exists() ? s.data() : null; loChanged(before, LO.g); renderAll(); }, e => console.warn(e));
+  LO.unsub = onSnapshot(doc(fs, 'loono', id), s => { if (s.exists()) loApply(s.data()); else { LO.g = null; renderAll(); } }, e => console.warn(e));
 }
 function startLoono(){
   LO.unsubL = onSnapshot(query(collection(fs, 'loono'), where('st', '==', 'lobby')), s => { const o = {}; s.docs.forEach(d => o[d.id] = d.data()); LO.lobbies = o; renderAll(); }, e => console.warn(e));
@@ -4509,8 +4544,8 @@ const loDrawBtn = async () => { const n = LO.g?.n; if (!loMyTurn(LO.g) || LO.bus
   const ok = await loTx(x => x.n === n && x.seats[x.turn]?.id === uid ? (x.seats[x.turn].to = 0, loDrawAct(x, uid)) : false);
   if (!ok && LO.g?.st === 'play' && !loMyTurn(LO.g)) toast('Zu spät: Deine Zeit war abgelaufen.'); };
 const loKeepBtn = () => { const n = LO.g?.n; loTx(x => x.n === n && x.seats[x.turn]?.id === uid ? loKeep(x, uid) : false); };
-const loCallBtn = () => { SFX.pop(); loTx(x => loCall(x, uid)); };
-const loCatchBtn = () => { const t = LO.g?.expose?.t; loTx(x => x.expose && x.expose.t === t ? loCatch(x, uid) : false); };
+const loCallBtn = () => { SFX.pop(); loTx(x => loCall(x, uid), false, true); };
+const loCatchBtn = () => { const t = LO.g?.expose?.t; loTx(x => x.expose && x.expose.t === t ? loCatch(x, uid) : false, false, true); };
 
 /* ---------- screens ---------- */
 function loCard(c, cls = '', act = ''){
@@ -5875,12 +5910,7 @@ function renderTableView(){
     if (lim?.hit) controls = `<div class="note">${lim.hit==='win'?'Dein Gewinnziel ist erreicht':'Dein Stop-Loss ist erreicht'} (${sgn(lim.profit)} ℒ). Im Konto kannst du eine neue Session starten oder das Limit ändern.</div>`;
     else if (P.balance < tableMin()) controls = `<div class="note">An diesem Tisch ist der Mindesteinsatz ${fmt(tableMin())} Legats. Du hast nur ${fmt(P.balance)}.${P.euro > 0 ? ` Auf der Bank liegen ${fmt(P.euro)} €. <button class="btn sm gold" data-tab="bank" style="margin-left:6px">Zur Bank</button>` : ''}</div>`;
     else if (ready) controls = `<p>Dein Einsatz: <b class="num">${fmt(mySeat.bet)} ℒ</b>. Warte auf die anderen …</p><button class="btn sm" data-act="unbet">Einsatz zurückziehen</button>${autoSwitch()}${stuckHTML()}`;
-    else controls = `
-      <div class="chips">${CHIPS.map(([v,cl,l])=>`<button class="chip ${cl}" data-act="chip" data-v="${v}" ${bet+v>max?'disabled':''} aria-label="${fmt(v)} hinzufügen">${l}</button>`).join('')}</div>
-      <div class="betline"><button class="btn sm" data-act="betclear">Löschen</button><span class="betval">${fmt(bet)}</span><button class="btn sm" data-act="betmax">Max</button></div>
-      <button class="btn gold" data-act="bet" ${bet<tableMin()||bet>max?'disabled':''}>Setzen</button>
-      ${autoSwitch()}
-      <p class="muted small">Einsatz ${fmt(tableMin())} – 50.000 Legats</p>`;
+    else controls = chipControls(max);
   } else if (T.phase==='insurance' && T.hands?.[uid] && !T.insDone?.[uid]){
     const cost = Math.floor(T.hands[uid][0].bet/2);
     controls = `<p>Versicherung kostet <b class="num">${fmt(cost)} ℒ</b> und zahlt 2 zu 1, wenn der Dealer Blackjack hat.</p>
@@ -5898,8 +5928,13 @@ function renderTableView(){
       <button class="btn" data-act="split" ${dis} ${canSplit?'':'disabled'}>Teilen</button>
       ${canSurr ? `<button class="btn" data-act="surrender" ${dis}>Aufgeben</button>` : ''}</div>`;
   } else if (T.phase==='done' && T.history?.[T.round]?.[uid]){
-    const r = T.history[T.round][uid], net = r.pay - r.bet;
-    controls = `<p class="net" style="color:${net>0?'var(--win)':net<0?'var(--lose)':'var(--push)'}">${sgn(net)} ℒ</p>${autoSwitch()}`;
+    const r = T.history[T.round][uid], net = r.pay - r.bet, mySeat = seats[uid];
+    const pre = mySeat?.ready && mySeat.round === T.round + 1, again = ls.get('lastBet', bet), max = Math.min(MAX_BET, P?.balance||0);
+    const next = lim?.hit || isBroke() ? '' : pre
+      ? `<p class="muted small">Nächste Runde: <b class="num">${fmt(mySeat.bet)} ℒ</b> gesetzt</p><button class="btn sm" data-act="unbet">Zurückziehen</button>`
+      : preChoose === T.round ? chipControls(max)
+      : `<div class="row" style="justify-content:center;gap:8px"><button class="btn gold" data-act="betagain" ${again<tableMin()||again>max?'disabled':''}>Nochmal ${fmt(again)} ℒ</button><button class="btn" data-act="betnew">Anderer Einsatz</button></div>`;
+    controls = `<p class="net" style="color:${net>0?'var(--win)':net<0?'var(--lose)':'var(--push)'}">${sgn(net)} ℒ</p>${next}${pre || preChoose === T.round ? '' : autoSwitch()}`;
   } else if (T.hands?.[uid]) controls = autoSwitch();
   const leaveTxt = confirmLeave ? 'Wirklich gehen? Laufender Einsatz ist verloren' : 'Tisch verlassen';
   return `${backBar('Blackjack', (confirmLeave ? '<span class="small" style="color:var(--lose)">Hand läuft: nochmal „Casino“ tippen, um zu gehen</span>' : '<span class="muted small">„Casino“ verlässt den Tisch</span>'))}<div class="felt${vip?' vip':''}" style="${feltStyle(T.owner)}">
@@ -6263,6 +6298,8 @@ document.addEventListener('click', async e => {
     case 'betclear': bet = 0; renderAll(); break;
     case 'betmax': bet = Math.max(0, Math.min(MAX_BET, Math.floor(P.balance/50)*50)); SFX.chip(); renderAll(); break;
     case 'bet': if (confirmBig(bet, 'bj')) placeBet(bet); break;
+    case 'betagain': { const a = ls.get('lastBet', bet); if (confirmBig(a, 'bj')) placeBet(a); break; }
+    case 'betnew': preChoose = T?.round; renderAll(); break;
     case 'bjfix': b.disabled = true; forceHost(); break;
     case 'unbet': unBet(); if (auto){ auto=false; ls.set('autobet', false); toast('Auto-Einsatz aus'); } break;
     case 'hit': case 'stand': case 'double': case 'split': case 'surrender': act(a); break;
