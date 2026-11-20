@@ -803,9 +803,11 @@ nav.tabs button{position:relative}
 .btn.danger{background:#8f1f1a;border-color:#ff8a7a;color:#fff}
 .btn.hot{animation:crpulse .7s ease-in-out infinite alternate}
 .btn.loono{font-weight:800;letter-spacing:.04em}
-.lohand{display:flex;justify-content:center;padding:14px 10px 6px;overflow-x:auto;overflow-y:visible;scrollbar-width:thin}
-.lohand .lc{margin-left:-14px;transition:transform .15s}
-.lohand .lc:first-child{margin-left:0}
+.lohand{display:flex;justify-content:flex-start;padding:14px 10px 6px;overflow-x:auto;overflow-y:visible;scrollbar-width:thin}
+.lohand .lc{margin-left:-14px;transition:transform .15s,opacity .15s;flex:none}
+.lohand .lc:first-child{margin-left:auto}   /* centred, but with many cards the left ones stay reachable by scrolling */
+.lohand .lc:last-child{margin-right:auto}
+.lohand .lc.sending{transform:translateY(-26px)!important;opacity:.7}
 .lohand.myturn .lc.ok{transform:translateY(-10px);box-shadow:0 0 0 3px rgba(209,173,98,.7),0 6px 14px rgba(0,0,0,.5);cursor:pointer}
 .lohand.myturn .lc.ok:hover{transform:translateY(-16px)}
 .lohand.myturn .lc.no{filter:brightness(.55) saturate(.6)}
@@ -1464,11 +1466,29 @@ function flushSave(){
   SAVE.rev = rev; P.rev = rev; SAVE.last = Date.now();
   const out = { ...P, rev }, wid = ++SAVE.seq; SAVE.pending.set(wid, Date.now());
   slow(setDoc(doc(fs,'players',uid), out))
-    .then(() => { SAVE.pending.delete(wid); renderSaveWarn(); })
+    .then(() => { SAVE.pending.delete(wid); renderSaveWarn(); pubSync(); })
     .catch(e => { SAVE.pending.delete(wid); renderSaveWarn(); if (e?.code === 'permission-denied') resyncPlayer(); else handleWriteErr(e); });
 }
-addEventListener('pagehide', () => flushSave());
-document.addEventListener('visibilitychange', () => { if (document.hidden) flushSave(); });
+addEventListener('pagehide', () => { flushSave(); pubSync(true); });
+document.addEventListener('visibilitychange', () => { if (document.hidden){ flushSave(); pubSync(true); } });
+/* ---------- Sparmodus: what friends see is a small public copy (pub/{uid}) ----------
+   Every friend online reads a document again each time it changes. The full player document changes with every spin,
+   the public copy only when something friends need right away changes (table, Loono, game, name …), otherwise at most once a minute. */
+const PUB = { last: 0, sig: '', json: '', timer: 0 };
+const PUB_EVERY = 60000;
+const PUB_SKIP = ['rev', 'tasks', 'wch', 'claimed', 'fdone', 'prefs', 'mines', 'hilo', 'shift'];
+function pubOf(d){ const o = {}; for (const k in d) if (!PUB_SKIP.includes(k)) o[k] = d[k]; o.seen = Date.now(); return o; }
+const pubSig = d => JSON.stringify([d.name, d.avatar, d.code, d.friends, d.table, d.loono, d.playing, d.crash?.r, d.crash?.out]);
+function pubSync(now){
+  if (!P || !uid) return;
+  const sig = pubSig(P), urgent = sig !== PUB.sig, wait = PUB_EVERY - (Date.now() - PUB.last);
+  if (!urgent && !now && wait > 0){ if (!PUB.timer) PUB.timer = setTimeout(() => { PUB.timer = 0; pubSync(); }, wait); return; }
+  const out = pubOf(P), json = JSON.stringify({ ...out, seen: 0 });
+  if (!urgent && json === PUB.json && Date.now() - PUB.last < 40000) return;   // nothing new: the heartbeat keeps "online" fresh
+  clearTimeout(PUB.timer); PUB.timer = 0;
+  PUB.sig = sig; PUB.json = json; PUB.last = Date.now();
+  setDoc(doc(fs, 'pub', uid), out).catch(e => { PUB.sig = ''; quotaHit(e); console.warn(e); });
+}
 /* ---------- Firebase daily limit ---------- */
 const QUOTA = { hit: 0 };
 /** Firebase keeps retrying writes and live queries silently when the daily limit is used up. A tiny transaction reports it reliably. */
@@ -1646,10 +1666,10 @@ onAuthStateChanged(auth, u => {
 /* ---------- data ---------- */
 let intervals=[];
 /* ---------- players: load only me, my friends, people who added me, and who sits at my table or in my chats ---------- */
-const PL = { me: null, meMeta: null, meLoaded: false, rev: {}, ch: {}, key: '', unsubs: [], unsubMe: null, unsubRev: null, all: null, allAt: 0 };
+const PL = { me: null, meMeta: null, meLoaded: false, rev: {}, ch: {}, legacy: {}, key: '', unsubs: [], unsubMe: null, unsubRev: null, all: null, allAt: 0 };
 function startPlayers(){
   PL.unsubMe = onSnapshot(doc(fs, 'players', uid), s => { PL.me = s.exists() ? s.data() : null; PL.meMeta = s.metadata; PL.meLoaded = true; applyPlayers(); }, playersErr);
-  PL.unsubRev = onSnapshot(query(collection(fs, 'players'), where('friends', 'array-contains', uid)), s => { const o = {}; s.docs.forEach(d => o[d.id] = d.data()); PL.rev = o; applyPlayers(); }, playersErr);
+  PL.unsubRev = onSnapshot(query(collection(fs, 'pub'), where('friends', 'array-contains', uid)), s => { const o = {}; s.docs.forEach(d => o[d.id] = d.data()); PL.rev = o; applyPlayers(); }, playersErr);
 }
 function playersErr(e){ console.warn(e); if (quotaHit(e)) return; toast('Keine Verbindung zur Datenbank. Prüfe die Sicherheitsregeln.'); }
 function watchIds(){
@@ -1666,11 +1686,19 @@ function rewatch(){
   PL.unsubs.forEach(f => f()); PL.unsubs = []; PL.ch = {};
   for (let i = 0; i < ids.length; i += 30){
     const chunk = ids.slice(i, i + 30), k = 'c' + i;
-    PL.unsubs.push(onSnapshot(query(collection(fs, 'players'), where(documentId(), 'in', chunk)), s => { const o = {}; s.docs.forEach(d => o[d.id] = d.data()); PL.ch[k] = o; applyPlayers(); }, playersErr));
+    PL.unsubs.push(onSnapshot(query(collection(fs, 'pub'), where(documentId(), 'in', chunk)), s => { const o = {}; s.docs.forEach(d => o[d.id] = d.data()); PL.ch[k] = o;
+      if (!s.metadata.fromCache) for (const id of chunk) if (!o[id]) legacyPlayer(id);
+      applyPlayers(); }, playersErr));
   }
 }
+/** a friend who has not opened the new version yet has no public copy: read the full document once instead */
+async function legacyPlayer(id){
+  if (PL.legacy[id] !== undefined) return; PL.legacy[id] = null;
+  try { const d = await getDoc(doc(fs, 'players', id)); if (d.exists()){ PL.legacy[id] = d.data(); applyPlayers(); } } catch (e){ quotaHit(e); }
+}
 function applyPlayers(){
-  const next = { ...PL.rev }; for (const o of Object.values(PL.ch)) Object.assign(next, o);
+  const next = {}; for (const [id, d] of Object.entries(PL.legacy)) if (d) next[id] = d;
+  Object.assign(next, PL.rev); for (const o of Object.values(PL.ch)) Object.assign(next, o);
   if (PL.me) next[uid] = PL.me;
   players = next;
   const mine = PL.me, meta = PL.meMeta || {};
@@ -1685,29 +1713,33 @@ function applyPlayers(){
 }
 /** players by friend code (adding a friend, invite link): one small query instead of loading everybody */
 async function playerByCode(code){
-  const q = await getDocs(query(collection(fs, 'players'), where('code', '==', code)));
-  const d = q.docs.find(x => x.id !== uid); return d ? [d.id, d.data()] : null;
+  for (const c of ['pub', 'players']){   // players: friends who have not opened the new version yet
+    const q = await getDocs(query(collection(fs, c), where('code', '==', code)));
+    const d = q.docs.find(x => x.id !== uid); if (d) return [d.id, d.data()];
+  }
+  return null;
 }
 /** leaderboard "Alle": loaded once on demand, at most every 2 minutes */
 async function loadAllPlayers(){
   if (PL.loadingAll || (PL.all && Date.now() - PL.allAt < 120e3)) return;
   PL.loadingAll = true;
-  try { const q = await getDocs(collection(fs, 'players')); const o = {}; q.docs.forEach(d => o[d.id] = d.data()); PL.all = o; PL.allAt = Date.now(); renderAll(); }
+  try { const q = await getDocs(collection(fs, 'pub')); const o = {}; for (const [id, d] of Object.entries(PL.legacy)) if (d) o[id] = d; q.docs.forEach(d => o[d.id] = d.data()); PL.all = o; PL.allAt = Date.now(); renderAll(); }
   catch (e){ quotaHit(e); console.warn(e); }
   finally { PL.loadingAll = false; }
 }
 function startData(){
   startPlayers();
-  unsubG = onSnapshot(collection(fs,'gifts'), snap => {
-    const g = {}; snap.docs.forEach(d => g[d.id] = d.data()); gifts = g; claimGifts(); renderAll();
-  }, e => console.warn(e));
-  const beat = () => { if (P && document.visibilityState==='visible' && Date.now() - SAVE.last > 40000) updateDoc(doc(fs,'players',uid), { seen: Date.now() }).catch(()=>{}); };
+  const GQ = {}, gsnap = k => snap => { GQ[k] = {}; snap.docs.forEach(d => GQ[k][d.id] = d.data()); gifts = { ...GQ.debt, ...GQ.mine }; claimGifts(); renderAll(); };
+  const u1 = onSnapshot(query(collection(fs, 'gifts'), where('to', '==', uid)), gsnap('mine'), e => console.warn(e));
+  const u2 = onSnapshot(query(collection(fs, 'gifts'), where('kind', 'in', ['loan', 'repay'])), gsnap('debt'), e => console.warn(e));
+  unsubG = () => { u1(); u2(); };
+  const beat = () => { if (P && document.visibilityState==='visible' && Date.now() - PUB.last > 40000) pubSync(true); };
   document.addEventListener('visibilitychange', beat);
   startChats(); startFlips(); startDuels(); startJackpot(); startLoono();
   intervals = [setInterval(beat, 45000), setInterval(leaseLoop, 4000), setInterval(hostTick, 350), setInterval(tickTimers, 500), setInterval(renderAll, 30000)];
 }
 function stopAll(){
-  PL.unsubMe && PL.unsubMe(); PL.unsubRev && PL.unsubRev(); PL.unsubs.forEach(f => f()); PL.unsubs = []; PL.key = ''; PL.ch = {}; PL.me = null; PL.meLoaded = false;
+  PL.unsubMe && PL.unsubMe(); PL.unsubRev && PL.unsubRev(); PL.unsubs.forEach(f => f()); PL.unsubs = []; PL.key = ''; PL.ch = {}; PL.legacy = {}; PL.me = null; PL.meLoaded = false; PUB.sig = ''; clearTimeout(PUB.timer); PUB.timer = 0;
   unsubG && unsubG(); unsubG = null; closeTable();
   unsubChats && unsubChats(); unsubFA && unsubFA(); unsubFB && unsubFB(); CH.unsubM && CH.unsubM(); unsubChats = unsubFA = unsubFB = null;
   unsubDU && unsubDU(); unsubJP && unsubJP(); unsubDU = unsubJP = null;
@@ -1722,7 +1754,7 @@ async function createPlayer(){
   const d = norm({ name, code, balance: START, table: null, ledger: null, created: Date.now(), updated: Date.now(), seen: Date.now() });
   d.limits.base = d.balance; d.lowMark = d.balance;
   P = d; renderAll();
-  try { await slow(setDoc(doc(fs,'players',uid), d)); }
+  try { await slow(setDoc(doc(fs,'players',uid), d)); pubSync(true); }
   catch(e){ handleWriteErr(e); }
   refForExisting();   // an old invite link still makes you friends, just without a bonus
 }
@@ -2327,9 +2359,15 @@ function animateCards(root){
 /* =====================================================================
    v1.1 – Casino home, Glücksrad, Roulette, Automat, Pferderennen, Sportwetten
    ===================================================================== */
-const APP_VERSION = '1.6';
+const APP_VERSION = '1.6.1';
 const CL_TITLES = { '1.5.12': 'Technische Verbesserungen' };
 const CHANGELOGS = {
+  '1.6.1': [
+    'Loono: Karten antippen klappt jetzt zuverlässig. Vorher wurde die Hand manchmal genau beim Antippen neu aufgebaut und der Tipp ging verloren',
+    'Loono: Die gelegte Karte hebt sich sofort an. Geht ein Zug nicht durch, sagt dir das Spiel, statt nichts zu tun',
+    'Loono: Mit vielen Karten auf der Hand kommst du jetzt auch an die ganz linken heran',
+    'Sparmodus: Freunde laden nur noch eine kleine Kopie deines Spielstands, die sich selten ändert. Das spart einen Großteil des Firebase-Limits',
+  ],
   '1.6': [
     'Wochen-Herausforderungen: jede Woche drei große Ziele für alle, mit dicken Belohnungen',
     'Fünf statt drei Tagesaufgaben',
@@ -4187,7 +4225,7 @@ function loDraw(g, id, k){
 function loNext(g, steps = 1){
   if (g.seats.length === 2 && steps > 1) steps = 2;   // zu zweit: Aussetzen heißt nochmal dran
   g.turn = loStep(g, g.turn, steps); g.drew = null; g.n++;
-  g.dl = Date.now() + (g.seats[g.turn].bot ? 1100 + rnd(900) : LO_TURN);
+  g.dl = NOW() + (g.seats[g.turn].bot ? 1100 + rnd(900) : LO_TURN);
 }
 function loDeal(g){
   g.deck = loDeck(); g.hands = {};
@@ -4195,9 +4233,9 @@ function loDeal(g){
   let top = null;
   while (!top){ const c = g.deck.pop(); if (c[0] === 'x' || 'srd'.includes(loVal(c))) g.deck.unshift(c); else top = c; }
   Object.assign(g, { pile: [top], color: top[0], dir: 1, turn: rnd(g.seats.length), pend: 0, ptype: null, drew: null, called: {}, expose: null,
-    st: 'play', open: true, winner: null, round: (g.round || 0) + 1, n: (g.n || 0) + 1, ev: { a: 'start' }, pot: (g.stake || 0) * g.seats.length, started: Date.now() });
+    st: 'play', open: true, winner: null, round: (g.round || 0) + 1, n: (g.n || 0) + 1, ev: { a: 'start' }, pot: (g.stake || 0) * g.seats.length, started: NOW() });
   g.seats = g.seats.map(s => ({ ...s, to: 0 }));
-  g.dl = Date.now() + (g.seats[g.turn].bot ? 1800 : LO_TURN);
+  g.dl = NOW() + (g.seats[g.turn].bot ? 1800 : LO_TURN);
 }
 function loPlay(g, id, cards, color){
   const h = g.hands[id].slice();
@@ -4212,8 +4250,8 @@ function loPlay(g, id, cards, color){
   if (v === 'r'){ if (k % 2) g.dir *= -1; if (g.seats.length === 2) skip = k; }
   if (v === 'd' || v === 'f'){ g.pend = (g.pend || 0) + (v === 'd' ? 2 : 4) * k; g.ptype = v; }
   g.called ||= {};
-  g.expose = h.length === 1 && !g.called[id] ? { id, t: Date.now() } : null;
-  if (!h.length){ g.st = 'done'; g.open = false; g.winner = id; g.end = Date.now(); g.n++; g.ev = { n: g.n, id, a: 'play', c: cards, col: g.color }; return true; }
+  g.expose = h.length === 1 && !g.called[id] ? { id, t: NOW() } : null;
+  if (!h.length){ g.st = 'done'; g.open = false; g.winner = id; g.end = NOW(); g.n++; g.ev = { n: g.n, id, a: 'play', c: cards, col: g.color }; return true; }
   loNext(g, 1 + skip);
   g.ev = { n: g.n, id, a: 'play', c: cards, col: g.color };
   return true;
@@ -4224,7 +4262,7 @@ function loDrawAct(g, id){
   if (g.pend > 0){ const k = g.pend; loDraw(g, id, k); g.pend = 0; g.ptype = null; loNext(g, 1); g.ev = { n: g.n, id, a: 'take', k }; return true; }
   if (g.drew) return false;
   const [c] = loDraw(g, id, 1);
-  if (c && loCanPlay({ ...g, drew: c }, c)){ g.drew = c; g.n++; g.ev = { n: g.n, id, a: 'draw', k: 1 }; g.dl = Date.now() + (g.seats[g.turn].bot ? 900 : LO_TURN); return 'can'; }
+  if (c && loCanPlay({ ...g, drew: c }, c)){ g.drew = c; g.n++; g.ev = { n: g.n, id, a: 'draw', k: 1 }; g.dl = NOW() + (g.seats[g.turn].bot ? 900 : LO_TURN); return 'can'; }
   loNext(g, 1); g.ev = { n: g.n, id, a: 'draw', k: 1 };
   return true;
 }
@@ -4233,15 +4271,15 @@ function loCall(g, id){
   if ((g.hands[id] || []).length > 2) return false;
   g.called = { ...(g.called || {}), [id]: true };
   if (g.expose?.id === id) g.expose = null;
-  g.ev = { ...(g.ev || {}), call: id, ct: Date.now() };
+  g.ev = { ...(g.ev || {}), call: id, ct: NOW() };
   return true;
 }
 function loCatch(g, by){
   const v = g.expose?.id; if (!v || v === by) return false;
-  if (Date.now() - g.expose.t < LO_GRACE) return false;
+  if (NOW() - g.expose.t < LO_GRACE) return false;
   g.expose = null;
   if ((g.hands[v] || []).length !== 1) return false;
-  loDraw(g, v, 2); g.ev = { ...(g.ev || {}), caught: v, by, ct: Date.now() };
+  loDraw(g, v, 2); g.ev = { ...(g.ev || {}), caught: v, by, ct: NOW() };
   return true;
 }
 function loTimeout(g){
@@ -4281,21 +4319,23 @@ function loBot(g){
 }
 /* who runs the bots and the turn clock: the first human at the table who is online */
 const loHostId = g => g.seats.filter(s => !s.bot).map(s => s.id).find(id => isOnline(id)) || null;
+/** quiet = background work (bots, turn clock): it never blocks or hides the player's own taps */
 async function loTx(fn, quiet){
   const id = LO.id; if (!id) return false;
-  LO.busy = true;
+  const flag = quiet ? 'tickBusy' : 'busy';
+  LO[flag] = true;
   try {
     return await runTransaction(fs, async tx => {
       const ref = doc(fs, 'loono', id), s = await tx.get(ref); if (!s.exists()) return false;
       const g = s.data(); const r = fn(g); if (!r) return false;
       tx.set(ref, g); return r;
-    });
+    }, { maxAttempts: 10 });   // with bots moving every second the table changes often: retry instead of giving up
   } catch (e){ console.warn(e); if (!quotaHit(e) && !quiet) handleWriteErr(e); return false; }
-  finally { LO.busy = false; }
+  finally { LO[flag] = false; }
 }
 async function loTick(){
-  const g = LO.g; if (!g || g.st !== 'play' || LO.busy || !uid || !g.seats.some(s => s.id === uid)) return;
-  const late = loHostId(g) === uid ? 0 : 6000, now = Date.now(), cur = g.seats[g.turn];
+  const g = LO.g; if (!g || g.st !== 'play' || LO.tickBusy || !uid || !g.seats.some(s => s.id === uid)) return;
+  const late = loHostId(g) === uid ? 0 : 6000, now = NOW(), cur = g.seats[g.turn];
   if (g.expose && now - g.expose.t > LO_CATCH + late){
     const victim = g.seats.find(s => s.id === g.expose.id), bot = g.seats.find(s => s.bot && s.id !== g.expose.id);
     if (victim && !victim.bot && bot){ const t = g.expose.t; await loTx(x => x.expose && x.expose.t === t ? loCatch(x, bot.id) : false, true); return; }
@@ -4320,7 +4360,7 @@ async function loCreate(bots){
   if (P.loono) await loLeave(true);
   const seats = [loMySeat()];
   for (let i = 0; i < bots; i++) seats.push(loNewBot(seats));
-  const g = { host: uid, name: P.name, st: 'lobby', open: true, stake: LO.stake, rules: { ...LO.rules }, seats, members: [uid], created: Date.now(), round: 0, n: 0 };
+  const g = { host: uid, name: P.name, st: 'lobby', open: true, stake: LO.stake, rules: { ...LO.rules }, seats, members: [uid], created: NOW(), round: 0, n: 0 };
   if (bots) loDeal(g);
   const ref = doc(collection(fs, 'loono'));
   try { await setDoc(ref, g); loSetMine(ref.id); SFX.chip(); } catch (e){ handleWriteErr(e); }
@@ -4457,11 +4497,17 @@ function loTap(c){
   if (c[0] === 'x'){ LO.ask = { c, n: 1, step: 'color' }; renderAll(); return; }
   loDo([c]);
 }
-function loDo(cards, color){
+async function loDo(cards, color){
   LO.ask = null; const n = LO.g?.n;
-  loTx(x => { if (x.n !== n || x.seats[x.turn]?.id !== uid) return false; x.seats[x.turn].to = 0; return loPlay(x, uid, cards, color); });
+  LO.sending = cards[0]; renderAll();
+  const ok = await loTx(x => { if (x.n !== n || x.seats[x.turn]?.id !== uid) return false; x.seats[x.turn].to = 0; return loPlay(x, uid, cards, color); });
+  LO.sending = null;
+  if (!ok && LO.g?.st === 'play') toast(loMyTurn(LO.g) ? 'Die Karte ging gerade nicht durch. Tipp sie nochmal an.' : 'Zu spät: Deine Zeit war abgelaufen.');
+  renderAll();
 }
-const loDrawBtn = () => { const n = LO.g?.n; if (!loMyTurn(LO.g) || LO.busy) return; loTx(x => x.n === n && x.seats[x.turn]?.id === uid ? (x.seats[x.turn].to = 0, loDrawAct(x, uid)) : false); };
+const loDrawBtn = async () => { const n = LO.g?.n; if (!loMyTurn(LO.g) || LO.busy) return;
+  const ok = await loTx(x => x.n === n && x.seats[x.turn]?.id === uid ? (x.seats[x.turn].to = 0, loDrawAct(x, uid)) : false);
+  if (!ok && LO.g?.st === 'play' && !loMyTurn(LO.g)) toast('Zu spät: Deine Zeit war abgelaufen.'); };
 const loKeepBtn = () => { const n = LO.g?.n; loTx(x => x.n === n && x.seats[x.turn]?.id === uid ? loKeep(x, uid) : false); };
 const loCallBtn = () => { SFX.pop(); loTx(x => loCall(x, uid)); };
 const loCatchBtn = () => { const t = LO.g?.expose?.t; loTx(x => x.expose && x.expose.t === t ? loCatch(x, uid) : false); };
@@ -4557,7 +4603,7 @@ function loTableHTML(g){
   const prev = LO.prevHand.slice(), fresh = [];
   for (const c of mine){ const i = prev.indexOf(c); if (i >= 0) prev.splice(i, 1); else fresh.push(c); }
   const hand = mine.map((c, i) => { const f = isNew && fresh.includes(c) && LO.prevHand.length ? (fresh.splice(fresh.indexOf(c), 1), ' new') : '';
-    return loCard(c, `${myTurn ? (playable.has(c) ? ' ok' : ' no') : ''}${g.drew === c && myTurn ? ' drawn' : ''}${f}`, ` data-act="locard" data-c="${c}" aria-label="${esc(LO_NAMES[c[0]] || 'Schwarz')} ${esc(loSym(loVal(c)))}"`); }).join('');
+    return loCard(c, `${myTurn ? (playable.has(c) ? ' ok' : ' no') : ''}${g.drew === c && myTurn ? ' drawn' : ''}${LO.sending === c && myTurn ? ' sending' : ''}${f}`, ` data-act="locard" data-c="${c}" aria-label="${esc(LO_NAMES[c[0]] || 'Schwarz')} ${esc(loSym(loVal(c)))}"`); }).join('');
   let status;
   if (g.st === 'done') status = loEvText(g);
   else if (myTurn) status = g.pend > 0 ? `Du bist dran: ${g.rules?.stack ? 'leg eine +2 oder +4 drauf oder ' : ''}zieh ${g.pend} Karten` : g.drew ? 'Gezogene Karte legen oder behalten?' : '<b>Du bist dran</b>';
@@ -4567,7 +4613,7 @@ function loTableHTML(g){
   const acts = g.st !== 'play' ? '' : `
     ${myTurn ? (g.drew ? `<button class="btn" data-act="lokeep">Behalten</button>` : `<button class="btn${g.pend ? ' danger' : ''}" data-act="lodraw">${g.pend ? `${g.pend} Karten ziehen` : 'Karte ziehen'}</button>`) : ''}
     ${canCall ? `<button class="btn gold loono${meExposed || mine.length === 1 ? ' hot big' : ''}" data-act="locall">Loono!</button>` : ''}
-    ${other ? `<button class="btn danger hot" data-act="locatch" ${Date.now() - g.expose.t < LO_GRACE ? 'hidden' : ''}>Erwischt! ${esc(loName(g, g.expose.id))}</button>` : ''}`;
+    ${other ? `<button class="btn danger hot" data-act="locatch" ${NOW() - g.expose.t < LO_GRACE ? 'hidden' : ''}>Erwischt! ${esc(loName(g, g.expose.id))}</button>` : ''}`;
   let ask = '';
   if (LO.ask?.step === 'two') ask = `<div class="loask"><p>Du hast die Karte zweimal. Wie viele legst du?</p><div class="row"><button class="btn" data-act="loone">Eine</button><button class="btn gold" data-act="lotwo">Beide</button><button class="btn sm" data-act="lonoask">Abbrechen</button></div></div>`;
   if (LO.ask?.step === 'color') ask = `<div class="loask"><p>Welche Farbe wünschst du dir?</p><div class="locolors">${[...'rygb'].map(k => `<button class="lopick lc-${k}" data-act="locolor" data-v="${k}"><span class="lgem"></span>${LO_NAMES[k]}</button>`).join('')}</div><button class="btn sm" data-act="lonoask">Abbrechen</button></div>`;
@@ -4596,15 +4642,18 @@ function renderLoono(){
   if (!LO.id || !g || g.st === 'closed' || !g.seats?.some(s => s.id === uid)) html = loHomeHTML();
   else if (g.st === 'lobby') html = loLobbyHTML(g);
   else html = loTableHTML(g);
-  if (el.innerHTML !== html){ el.innerHTML = html; }
+  // the turn timer and the catch button change the DOM every moment, so compare with the last built html instead:
+  // otherwise every refresh rebuilt the hand and a tap that landed in that moment got lost
+  const key = html.replace(/ (drop|new)(?=[ "])/g, '');
+  if (key !== LO.htmlKey || !el.firstElementChild){ el.innerHTML = html; LO.htmlKey = key; }
   if (g && g.st !== 'lobby'){ LO.animN = g.n; LO.prevHand = (g.hands?.[uid] || []).slice(); }
   loTimer();
 }
 function loTimer(){
   const t = $('lotimer'), g = LO.g;
   const cb = document.querySelector('#g-loono [data-act="locatch"]');   // „Erwischt!“ only after the grace period
-  if (cb && g?.expose) cb.hidden = Date.now() - g.expose.t < LO_GRACE; if (!t || !g || g.st !== 'play'){ if (t) t.hidden = true; return; }
-  const cur = g.seats[g.turn], left = Math.max(0, g.dl - Date.now()), total = cur.bot ? 2000 : LO_TURN;
+  if (cb && g?.expose) cb.hidden = NOW() - g.expose.t < LO_GRACE; if (!t || !g || g.st !== 'play'){ if (t) t.hidden = true; return; }
+  const cur = g.seats[g.turn], left = Math.max(0, g.dl - NOW()), total = cur.bot ? 2000 : LO_TURN;
   t.hidden = false; t.classList.toggle('mine', cur.id === uid); t.classList.toggle('low', !cur.bot && left < 6000);
   t.firstElementChild.style.width = Math.min(100, left / total * 100).toFixed(1) + '%';
 }
