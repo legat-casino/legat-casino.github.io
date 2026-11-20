@@ -1588,7 +1588,9 @@ function toast(msg){ const el=$('toast'); el.textContent=msg; el.classList.remov
 
 /* ---------- helpers ---------- */
 function genCode(len, alpha='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'){ let s=''; for(let i=0;i<len;i++) s+=alpha[rnd(alpha.length)]; return s; }
-const pl = id => id===uid ? P : players[id] || PL.all?.[id];
+/** the newer of two copies of a player (public copy, full document, or an older load) */
+const fresher = (a, b) => !a ? b : !b ? a : ((b.updated || 0) >= (a.updated || 0) ? b : a);
+const pl = id => id===uid ? P : fresher(PL.all?.[id], players[id]);
 const nameOf = id => pl(id)?.name || 'Spieler';
 const avOf = id => pl(id)?.avatar || '🙂';
 const isOnline = id => id===uid || (players[id] && Date.now() - (players[id].seen||0) < ONLINE_MS);
@@ -1723,7 +1725,15 @@ async function playerByCode(code){
 async function loadAllPlayers(){
   if (PL.loadingAll || (PL.all && Date.now() - PL.allAt < 120e3)) return;
   PL.loadingAll = true;
-  try { const q = await getDocs(collection(fs, 'pub')); const o = {}; for (const [id, d] of Object.entries(PL.legacy)) if (d) o[id] = d; q.docs.forEach(d => o[d.id] = d.data()); PL.all = o; PL.allAt = Date.now(); renderAll(); }
+  try {
+    // players who have not opened 1.6.1 or newer only exist in players/: read those once per session (they don't change while they are away)
+    const [q, old] = await Promise.all([getDocs(collection(fs, 'pub')), PL.oldAll ? null : getDocs(collection(fs, 'players'))]);
+    if (old){ PL.oldAll = {}; old.docs.forEach(d => PL.oldAll[d.id] = d.data()); }
+    const o = {};
+    for (const src of [PL.oldAll, PL.legacy]) for (const [id, d] of Object.entries(src || {})) if (d) o[id] = fresher(o[id], d);
+    q.docs.forEach(d => o[d.id] = fresher(o[d.id], d.data()));
+    PL.all = o; PL.allAt = Date.now(); renderAll();
+  }
   catch (e){ quotaHit(e); console.warn(e); }
   finally { PL.loadingAll = false; }
 }
@@ -1739,7 +1749,7 @@ function startData(){
   intervals = [setInterval(beat, 45000), setInterval(leaseLoop, 4000), setInterval(hostTick, 350), setInterval(tickTimers, 500), setInterval(renderAll, 30000)];
 }
 function stopAll(){
-  PL.unsubMe && PL.unsubMe(); PL.unsubRev && PL.unsubRev(); PL.unsubs.forEach(f => f()); PL.unsubs = []; PL.key = ''; PL.ch = {}; PL.legacy = {}; PL.me = null; PL.meLoaded = false; PUB.sig = ''; clearTimeout(PUB.timer); PUB.timer = 0;
+  PL.unsubMe && PL.unsubMe(); PL.unsubRev && PL.unsubRev(); PL.unsubs.forEach(f => f()); PL.unsubs = []; PL.key = ''; PL.ch = {}; PL.legacy = {}; PL.all = null; PL.oldAll = null; PL.me = null; PL.meLoaded = false; PUB.sig = ''; clearTimeout(PUB.timer); PUB.timer = 0;
   unsubG && unsubG(); unsubG = null; closeTable();
   unsubChats && unsubChats(); unsubFA && unsubFA(); unsubFB && unsubFB(); CH.unsubM && CH.unsubM(); unsubChats = unsubFA = unsubFB = null;
   unsubDU && unsubDU(); unsubJP && unsubJP(); unsubDU = unsubJP = null;
@@ -2370,9 +2380,13 @@ function animateCards(root){
 /* =====================================================================
    v1.1 – Casino home, Glücksrad, Roulette, Automat, Pferderennen, Sportwetten
    ===================================================================== */
-const APP_VERSION = '1.6.3';
+const APP_VERSION = '1.6.4';
 const CL_TITLES = { '1.5.12': 'Technische Verbesserungen' };
 const CHANGELOGS = {
+  '1.6.4': [
+    'Rangliste „Alle“: Es fehlen keine Spieler mehr, die das Casino länger nicht geöffnet haben',
+    'Rangliste: Spieler mit gleichem Vermögen tauschen nicht mehr bei jeder Aktualisierung die Plätze',
+  ],
   '1.6.3': [
     'Blackjack: Schon während das Ergebnis angezeigt wird, kannst du für die nächste Runde setzen („Nochmal“ oder „Anderer Einsatz“). Haben alle gesetzt, geht es nach gut 2 Sekunden weiter statt erst nach über 5',
     'Blackjack: Der Auto-Einsatz setzt auch schon während des Ergebnisses',
@@ -5987,7 +6001,8 @@ function renderPlayers(){
   if (boardMode === 'all') loadAllPlayers();
   const ids = boardMode==='friends' ? [uid, ...friendIds()] : [...new Set([uid, ...Object.keys(PL.all || players)])];
   const val = p => boardScope==='week' ? (p.week?.id===wk ? p.week.net : 0) : wealth(p);
-  const rows = ids.map(id => [id, pl(id)]).filter(r=>r[1]).sort((a,b)=>val(b[1])-val(a[1]));
+  // equal values (e.g. everyone who still has the starting money) keep a fixed order instead of swapping on every update
+  const rows = ids.map(id => [id, pl(id)]).filter(r=>r[1]).sort((a,b)=>val(b[1])-val(a[1]) || String(a[1].name||'').localeCompare(String(b[1].name||''), 'de') || (a[0] < b[0] ? -1 : 1));
   const tr = rows.map(([id,p],i)=>{
     const s = p.stats||{}, w = p.week?.id===wk ? p.week : { net:0, hands:0, best:0 };
     const owed = owedBy(id, D), badges = Object.keys(p.ach||{}).length;
