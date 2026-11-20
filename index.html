@@ -296,6 +296,8 @@ table.board{width:100%;border-collapse:collapse;font-size:14px}
 .minisports{font-size:44px;display:flex;gap:18px}
 @media (max-width:760px){.tiles{grid-template-columns:1fr 1fr}.tile,.tile-bj,.tile-sports{grid-column:span 1}.tile .art{height:96px}.tinfo b{font-size:19px}}
 .ver{text-align:center;color:var(--muted);font-size:12px;margin-top:22px;font-family:var(--f-num)}
+.kp{display:flex;justify-content:center;margin:10px 0 calc(8px + env(safe-area-inset-bottom))}
+.kp svg{height:30px;width:auto;fill:var(--brass);opacity:.85}
 
 /* ---------- shared game chrome ---------- */
 .gamebar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
@@ -607,7 +609,34 @@ nav.tabs button{position:relative}
 .task.ready{border-color:var(--brass-dim);background:rgba(209,173,98,.08)}
 .task.got{opacity:.65}
 .task.got .tbar i{background:var(--win)}
+.task.slim{padding:6px 10px;font-size:13px}
+.progseg{align-self:flex-start}
+.progseg button{position:relative}
+.progseg .dot{position:absolute;top:4px;right:5px;width:7px;height:7px;border-radius:50%;background:var(--brass);box-shadow:0 0 6px var(--brass)}
 @media (max-width:760px){.progcard{grid-template-columns:1fr}}
+
+/* ---------- 1.6: große Gewinne ---------- */
+.cel{position:fixed;inset:0;z-index:90;display:grid;place-items:center;background:radial-gradient(60% 50% at 50% 45%,rgba(40,28,12,.55),rgba(8,6,4,.82));animation:celin .3s ease-out;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.cel.passive{pointer-events:none;background:radial-gradient(50% 40% at 50% 45%,rgba(40,28,12,.45),rgba(8,6,4,.35))}
+.cel.out{animation:celout .4s ease-in forwards}
+.cel canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.celrays{position:absolute;left:50%;top:45%;width:160vmax;height:160vmax;margin:-80vmax 0 0 -80vmax;background:repeating-conic-gradient(from 0deg,rgba(243,220,154,.13) 0 6deg,transparent 6deg 18deg);-webkit-mask:radial-gradient(circle,#000 0,transparent 55%);mask:radial-gradient(circle,#000 0,transparent 55%);animation:celspin 14s linear infinite;pointer-events:none}
+.cel-big .celrays{opacity:.6}
+.celbox{position:relative;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px;padding:0 16px;animation:celpop .6s cubic-bezier(.2,1.6,.4,1)}
+.celicons{font-size:clamp(44px,13vw,76px);display:flex;gap:6px;filter:drop-shadow(0 6px 18px rgba(243,220,154,.5))}
+.celicons span{display:inline-block;animation:celbounce .7s cubic-bezier(.2,1.8,.4,1) both}
+.celtitle{font-family:var(--f-display);font-size:clamp(34px,10vw,64px);font-weight:700;letter-spacing:.02em;background:linear-gradient(180deg,#fff3c4,#e8c36a 45%,#a8802e);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 3px 0 rgba(60,40,8,.9)) drop-shadow(0 0 22px rgba(243,220,154,.45));text-transform:uppercase;line-height:1.05}
+.cel-jackpot .celtitle{animation:celglow 1.1s ease-in-out infinite alternate}
+.celamt{font-size:clamp(30px,9vw,54px);font-weight:700;color:#fff3c4;text-shadow:0 2px 0 #5a3c0a,0 0 18px rgba(243,220,154,.6)}
+.celmult{font-size:18px;color:var(--brass);padding:2px 12px;border:1px solid var(--brass-dim);border-radius:999px;background:rgba(0,0,0,.35)}
+.celtap{margin-top:14px;opacity:.7}
+@keyframes celin{from{opacity:0}}
+@keyframes celout{to{opacity:0;transform:scale(1.04)}}
+@keyframes celpop{from{transform:scale(.3);opacity:0}}
+@keyframes celbounce{from{transform:translateY(-60px) scale(.4);opacity:0}}
+@keyframes celspin{to{transform:rotate(360deg)}}
+@keyframes celglow{to{filter:drop-shadow(0 3px 0 rgba(60,40,8,.9)) drop-shadow(0 0 40px rgba(255,230,150,.9))}}
+@media (prefers-reduced-motion:reduce){.celrays,.cel-jackpot .celtitle,.celicons span,.celbox{animation:none}}
 
 /* ---------- v1.4: neue Kacheln ---------- */
 .tile-crash .art{background:radial-gradient(110% 120% at 30% 100%,#3a1730,#120a1c 70%)}
@@ -1167,6 +1196,7 @@ body.isclosed{overflow:hidden}
   <section id="view-shop" hidden></section>
   <section id="view-account" hidden></section>
   <p class="ver" id="ver"></p>
+  <footer class="kp"><svg viewBox="6 6 238 128" role="img" aria-label="KP"><path d="M45.9 132.8L46.2 132.7L46.2 114.9C46.2 105.1 46.3 97.0 46.4 96.9C46.8 96.7 47.5 97.2 49.5 99.0C50.7 100.0 52.2 101.4 53.0 102.0C53.8 102.6 54.6 103.3 54.9 103.6C55.2 103.9 56.1 104.7 56.9 105.4C57.7 106.1 58.6 106.8 58.9 107.1C59.2 107.4 60.1 108.2 60.9 108.9C61.7 109.6 63.8 111.4 65.5 112.9C67.2 114.4 69.9 116.7 71.4 118.0C72.9 119.3 74.4 120.6 74.9 121.0C76.8 122.7 79.3 124.9 81.9 127.1C83.4 128.4 85.5 130.2 86.6 131.2L88.6 133.0L117.8 133.0L147.0 133.0L147.1 132.7C147.2 132.6 146.5 131.7 145.5 130.8C144.5 129.9 142.9 128.4 141.9 127.4C139.6 125.1 135.7 121.5 132.6 118.6C131.2 117.4 128.8 115.1 127.1 113.5C121.1 107.8 120.1 106.8 116.0 103.0C114.3 101.4 111.8 99.0 110.4 97.7C109.0 96.4 107.1 94.6 106.1 93.7C105.2 92.8 103.1 90.9 101.5 89.4C99.9 87.8 97.8 85.9 96.9 85.0C95.9 84.1 92.0 80.5 88.2 76.9C84.5 73.3 80.3 69.4 79.1 68.3C77.8 67.1 76.7 66.0 76.6 65.8L76.5 65.4L77.2 64.7C77.8 64.1 85.0 57.8 88.5 54.7C89.4 54.0 93.3 50.5 97.2 47.1C101.2 43.7 105.0 40.4 105.9 39.6C107.9 37.8 109.8 36.2 110.4 35.7C110.7 35.5 112.0 34.4 113.3 33.2C114.6 32.1 116.3 30.6 117.1 29.9C117.9 29.2 118.8 28.5 119.0 28.2C119.2 28.0 120.1 27.3 121.0 26.5C121.9 25.7 122.7 25.0 123.0 24.7C123.2 24.5 124.1 23.7 125.0 23.0C125.9 22.2 126.7 21.5 126.9 21.4C127.1 21.2 129.2 19.3 131.8 17.1C134.3 14.9 137.3 12.2 138.5 11.2C139.7 10.1 141.1 8.9 141.7 8.5C142.3 8.2 142.7 7.7 142.7 7.4L142.8 7.0L112.5 7.0L82.2 7.0L79.8 9.3C78.5 10.6 75.0 13.9 72.0 16.8C69.1 19.6 65.1 23.4 63.1 25.3C61.2 27.2 58.6 29.7 57.3 30.9C55.9 32.1 53.7 34.2 52.2 35.6C48.1 39.6 46.7 40.7 46.4 40.3C46.3 40.2 46.3 32.8 46.2 23.7L46.2 7.3L45.7 7.1C45.4 7.0 36.6 7.0 26.1 7.1L7.1 7.1L7.1 69.8C7.0 104.2 7.1 132.5 7.1 132.7L7.2 133.0L26.3 133.0C36.9 133.0 45.6 132.9 45.9 132.8ZM162.0 116.1C162.0 108.0 162.1 101.3 162.2 101.1L162.4 100.9L174.8 100.8L187.1 100.8L189.1 100.5C190.2 100.4 192.5 100.1 194.1 100.0C195.8 99.9 197.5 99.7 197.8 99.5C198.2 99.4 199.3 99.2 200.4 99.0C201.5 98.9 202.8 98.6 203.4 98.4C204.0 98.2 204.8 98.0 205.2 98.0C205.6 98.0 206.3 97.8 206.9 97.5C207.4 97.2 208.1 97.0 208.3 97.0C208.6 97.0 209.3 96.8 210.0 96.5C210.6 96.3 211.5 95.9 212.0 95.8C214.2 95.0 214.9 94.7 216.7 93.8C220.6 92.0 221.2 91.7 221.5 91.4C221.7 91.2 221.9 91.0 222.1 91.0C222.4 91.0 225.2 89.2 226.3 88.2C226.9 87.8 227.8 87.0 228.3 86.6C230.7 84.9 234.5 80.7 236.3 77.9C236.6 77.3 237.1 76.5 237.4 76.1C237.7 75.7 238.0 75.1 238.2 74.8C238.4 74.4 238.6 74.0 238.7 73.8C239.6 72.3 242.0 65.3 242.0 64.1C242.0 63.7 242.2 62.8 242.4 62.0L242.8 60.6L242.9 55.8L243.0 50.9L242.6 48.2C242.4 46.8 242.1 45.0 242.0 44.2C241.9 43.5 241.7 42.6 241.5 42.4C241.4 42.1 241.1 41.3 240.9 40.5C239.2 33.8 234.0 26.1 228.0 21.2C225.6 19.2 222.4 17.0 222.0 17.0C221.9 17.0 221.7 16.8 221.5 16.6C221.2 16.2 215.8 13.5 214.1 12.9C213.6 12.7 212.5 12.3 211.8 12.0C211.0 11.7 209.9 11.3 209.2 11.1C208.6 10.9 207.7 10.6 207.2 10.4C206.7 10.2 206.0 10.0 205.6 10.0C205.2 10.0 204.4 9.8 203.8 9.5C203.2 9.2 202.3 9.0 201.9 9.0C201.5 9.0 200.4 8.8 199.5 8.6C197.9 8.2 193.7 7.7 189.0 7.2C187.7 7.1 180.6 7.0 173.3 7.0L160.1 7.0L159.3 7.6C158.9 7.9 157.6 9.1 156.2 10.2C153.0 13.1 152.6 13.5 150.9 14.9C150.1 15.6 149.0 16.5 148.5 17.0C148.0 17.4 145.7 19.4 143.4 21.5C141.0 23.5 137.7 26.4 135.9 28.0C134.1 29.6 131.5 31.8 130.1 33.0C128.8 34.2 127.4 35.4 127.1 35.6C126.8 35.9 125.8 36.8 124.8 37.7C123.7 38.7 123.1 39.4 123.2 39.6C123.3 39.7 136.7 39.8 154.7 39.8C171.8 39.8 186.9 39.9 188.1 40.0C190.5 40.2 194.3 41.1 195.1 41.7C195.4 41.8 195.7 42.0 195.9 42.0C197.0 42.0 201.0 45.6 202.2 47.8C204.0 51.1 204.1 57.4 202.5 59.8C202.2 60.2 202.0 60.6 202.0 60.8C202.0 61.4 198.9 64.5 197.6 65.3C197.1 65.6 196.4 66.0 196.1 66.2C194.8 67.0 192.2 67.8 189.5 68.2L187.1 68.5L155.4 68.5L123.7 68.5L123.3 68.8L123.0 69.1L123.0 81.8L123.0 94.5L126.1 97.5C129.1 100.4 129.6 100.9 136.2 107.0C138.2 108.9 141.2 111.6 142.7 113.1C146.1 116.4 148.3 118.5 153.1 122.9C155.0 124.7 157.6 127.1 158.9 128.4C160.1 129.6 161.3 130.7 161.6 130.7L162.0 130.8L162.0 116.1Z"/></svg></footer>
 </main>
 <div id="islandpanel" class="islandpanel" hidden></div>
 <div id="modal" class="modal" hidden><div class="modal-card" id="modal-card" role="dialog" aria-modal="true"></div></div>
@@ -2297,35 +2327,20 @@ function animateCards(root){
 /* =====================================================================
    v1.1 – Casino home, Glücksrad, Roulette, Automat, Pferderennen, Sportwetten
    ===================================================================== */
-const APP_VERSION = '1.5.12';
+const APP_VERSION = '1.6';
+const CL_TITLES = { '1.5.12': 'Technische Verbesserungen' };
 const CHANGELOGS = {
-  '1.5.12': [
-    'Jedes Gerät prüft regelmäßig selbst, ob das Firebase-Tageslimit erreicht ist, und schließt dann, auch am PC',
+  '1.6': [
+    'Wochen-Herausforderungen: jede Woche drei große Ziele für alle, mit dicken Belohnungen',
+    'Fünf statt drei Tagesaufgaben',
+    'Große Gewinne werden gefeiert: Münzregen und Konfetti, zum Beispiel bei drei Diamanten am Automaten',
   ],
-  '1.5.12': [
-    'Auch eine offene Seite, auf der gerade nichts passiert, merkt jetzt, wenn das Tageslimit erreicht ist',
-  ],
-  '1.5.11': [
-    'Lädt nur noch deine Freunde statt aller Spieler: spart viel vom Firebase-Tageslimit',
-    'Das Casino merkt jetzt zuverlässig, wenn das Tageslimit erreicht ist, und schließt',
+  '1.5.12': [   // 1.5.6 bis 1.5.12 zusammengefasst, im Fenster als „Technische Verbesserungen“
+    'Blackjack bleibt nicht mehr bei „Warte auf die anderen …“ hängen. Hängt der Dealer, übernimmt ein anderer Spieler am Tisch, notfalls über „Dealer übernehmen“',
+    'Viel sparsamer mit dem kostenlosen Firebase-Tageslimit: Speichern wird gebündelt, es werden nur noch deine Freunde geladen, Jackpot und Loono-Lobbys verbrauchen weniger',
+    'Ist das Tageslimit erreicht, schließt das Casino auf allen Geräten sicher und zeigt, wann es wieder öffnet. So geht kein Spielstand verloren',
+    'Die Nachfrage bei großen Einsätzen kommt pro Spiel und Betrag nur noch einmal',
     'Der Einladungsbonus ist weg. Freunde fügst du über den Freundescode hinzu',
-  ],
-  '1.5.10': [
-    'Ist das Firebase-Tageslimit erreicht, schließt das Casino sicher und zeigt, wann es wieder öffnet. So geht kein Spielstand verloren',
-  ],
-  '1.5.9': [
-    'Das Spiel spart jetzt stark beim kostenlosen Firebase-Tageslimit: Speichern wird gebündelt, Jackpot und Loono-Lobbys verbrauchen viel weniger',
-    'Ist das Tageslimit erreicht, sagt das Spiel es jetzt klar, statt einfach zu hängen',
-  ],
-  '1.5.8': [
-    'Blackjack: Hängt der Tisch, erscheint „Dealer übernehmen“ und eine Diagnose',
-  ],
-  '1.5.7': [
-    'Blackjack: Der Tisch bleibt nicht mehr hängen („Warte auf die anderen …“). Hängt der Dealer, übernimmt automatisch ein anderer Spieler am Tisch',
-  ],
-  '1.5.6': [
-    'Blackjack: Die Nachfrage bei großen Einsätzen kommt pro Spiel und Betrag nur noch einmal, nicht jede Runde',
-    'Die Verbindung wird nur noch neu aufgebaut, wenn wirklich länger nichts gespeichert wurde',
   ],
   '1.5.5': [
     'Loono: Wer das Spiel verlässt, verlässt auch die Runde (in einer laufenden Runde nach einer Nachfrage, dann spielt ein Bot weiter)',
@@ -2439,7 +2454,8 @@ ACH.splice(ACH.length - 2, 0,
   ['pjack','💥','Topf geknackt','Den progressiven Jackpot am Automaten geknackt'],
   ['tipp','📋','Spieltagssieger','Einen Spieltag in der Tipprunde gewonnen'],
   ['duel','🤝','Ehrensache','Eine Wette gegen einen Freund gewonnen'],
-  ['tasks','✅','Fleißig','An einem Tag alle drei Tagesaufgaben geschafft'],
+  ['tasks','✅','Fleißig','An einem Tag alle fünf Tagesaufgaben geschafft'],
+  ['weekly','🏅','Wochenheld','Alle drei Wochen-Herausforderungen geschafft'],
   ['lvl10','🎖️','Aufsteiger','Level 10 erreicht'],
   ['loono','🎴','Loono!','Eine Runde Loono gewonnen'],
 );
@@ -2663,6 +2679,7 @@ async function rSpin(){
   await secs(5100);
   R.busy = false; R.res = { n, net: pay - total }; R.hist = [n, ...R.hist].slice(0, 14); ls.set('rhist', R.hist); R.bets = {};
   release(); if (pay > total) SFX.win(); else if (pay < total) SFX.lose(); else SFX.push();
+  if (game === 'roulette' && tab === 'table') bigWin(pay - total, pay / total, '🎯');
 }
 
 /* ---------- Automat ---------- */
@@ -2738,8 +2755,13 @@ async function slotSpin(){
   if (center.every(s => s===5)) SFX.bj(); else if (!slotHere()) {} else if (pay > S.bet) SFX.win(); else if (pay > 0) SFX.push();
   if (jp){
     S.busy = true; const amt = await jpWin(); S.busy = false;
-    if (amt){ S.res = { pay, jp: amt }; SFX.bj(); setTimeout(() => SFX.coins(), 600); renderAll(); return { pay, mult: 9999 }; }
+    if (amt){ S.res = { pay, jp: amt }; renderAll(); celebrate(amt + pay, 0, { tier: 'jackpot', title: 'Progressiver Jackpot!', icons: '💥' }); return { pay, mult: 9999 }; }
     renderAll();
+  }
+  if (slotHere() && pay > S.bet){
+    const same = center[0] === center[1] && center[1] === center[2] && center[0] >= 4;   // drei Diamanten oder drei Siebenen
+    if (same) celebrate(pay - S.bet, mult, { tier: center[0] === 5 ? 'jackpot' : 'mega', title: center[0] === 5 ? 'Drei Siebenen!' : 'Drei Diamanten!', icons: SLOT_SYMS[center[0]].repeat(3) });
+    else bigWin(pay - S.bet, mult);
   }
   return { pay, mult };
 }
@@ -2823,6 +2845,7 @@ async function horseRun(){
   });
   H.busy = false; H.res = { order, pay, stake: H.bet, pos: H.race.map(() => 1) };
   release(); won ? SFX.win() : SFX.lose();
+  if (won && game === 'horses' && tab === 'table') bigWin(pay - H.bet, pay / H.bet, '🏇');
 }
 
 /* ---------- Sportwetten ---------- */
@@ -3429,9 +3452,10 @@ function progress(d, key, stake, pay, x = {}){
   if (key === 'roulette' && pay > stake) taskBump(d, 'roulette_win', 1);
   if (key === 'hilo' && pay > 0) taskBump(d, 'hilo_cash', 1);
   if (key === 'crash' && pay >= 2 * stake) taskBump(d, 'crash_2x', 1);
+  const today = dayId(); weekOf(d); if (d.wch.day !== today){ d.wch.day = today; taskBump(d, 'days', 1); }
 }
 
-/* ---------- Tagesaufgaben: drei pro Tag, für jeden andere ---------- */
+/* ---------- Tagesaufgaben (fünf pro Tag, für jeden andere) und Wochen-Herausforderungen (drei pro Woche, für alle gleich) ---------- */
 const TASKS = [
   ['bj_n', n => `Spiel ${n} Hände Blackjack`, [5, 10, 15]],
   ['bj_win', n => `Gewinn ${n} Hände Blackjack`, [3, 5]],
@@ -3448,53 +3472,165 @@ const TASKS = [
   ['win_any', n => `Gewinn ${n}-mal, egal in welchem Spiel`, [10, 15]],
   ['tipp', n => `Gib ${n} Tipps in der Bundesliga-Tipprunde ab`, [3, 5]],
 ];
-const TASK_L = 750, TASK_XP = 100, TASK_ALL = 1500;
+const TASK_L = 750, TASK_XP = 100, TASK_ALL = 2000, TASK_N = 5;
+const WEEKLY = [
+  ['bj_n', n => `Spiel ${n} Hände Blackjack`, [40, 60]],
+  ['slots_n', n => `Dreh ${n}-mal am Automaten`, [150, 250]],
+  ['roulette_n', n => `Spiel ${n} Runden Roulette`, [30, 50]],
+  ['crash_n', n => `Spiel ${n} Runden Crash`, [30, 50]],
+  ['mines_safe', n => `Deck bei Mines ${n} sichere Felder auf`, [80, 120]],
+  ['horses_n', n => `Wette auf ${n} Pferderennen`, [15, 25]],
+  ['wager', n => `Setz diese Woche insgesamt ${fmt(n)} ℒ`, [100000, 200000]],
+  ['win_any', n => `Gewinn ${n}-mal, egal in welchem Spiel`, [50, 80]],
+  ['task_done', n => `Schaff ${n} Tagesaufgaben`, [15, 20]],
+  ['days', n => `Spiel an ${n} verschiedenen Tagen`, [4, 5]],
+  ['loono_win', n => `Gewinn ${n} Runden Loono`, [2, 3]],
+];
+const WEEK_L = 5000, WEEK_XP = 400, WEEK_ALL = 10000;
 const taskCache = {};
-function todayTasks(day = dayId()){
-  const key = uid + '|' + day; if (taskCache[key]) return taskCache[key];
-  const r = seeded('tasks-' + key), pool = TASKS.slice(), out = [];
-  while (out.length < 3){
+function pickTasks(list, seed, n){
+  const r = seeded(seed), pool = list.slice(), out = [];
+  while (out.length < n && pool.length){
     const t = pool.splice(Math.floor(r() * pool.length), 1)[0];
-    if (out.some(o => o.k.split('_')[0] === t[0].split('_')[0])) continue;   // not two tasks for the same game
+    if (out.some(o => o.k.split('_')[0] === t[0].split('_')[0])) continue;   // not two for the same game
     out.push({ k: t[0], n: t[2][Math.floor(r() * t[2].length)], txt: t[1] });
   }
-  return taskCache[key] = out;
+  return out;
 }
+function todayTasks(day = dayId()){
+  const key = uid + '|' + day;
+  return taskCache[key] ||= pickTasks(TASKS, 'tasks-' + key, TASK_N);   // the first three are the same as before 1.6
+}
+const weekTasks = (wk = weekId()) => taskCache['w|' + wk] ||= pickTasks(WEEKLY, 'week-' + wk, 3);
+function weekOf(d){ const wk = weekId(); if (!d.wch || d.wch.id !== wk) d.wch = { id: wk, p: {}, c: [], day: null }; return d.wch; }
 function taskBump(d, k, n){
   if (!(n > 0) || !uid) return;
   const day = dayId();
   if (!d.tasks || d.tasks.day !== day) d.tasks = { day, p: {}, c: [] };
-  if (!todayTasks(day).some(t => t.k === k)) return;
-  d.tasks.p[k] = (d.tasks.p[k] || 0) + n;
+  if (todayTasks(day).some(t => t.k === k)) d.tasks.p[k] = (d.tasks.p[k] || 0) + n;
+  if (weekTasks().some(t => t.k === k)){ const w = weekOf(d); w.p[k] = (w.p[k] || 0) + n; }
 }
 function taskClaim(k){
+  let all = false;
   const ok = withPlayer(d => {
     const t = todayTasks().find(x => x.k === k);
     if (!t || !d.tasks || d.tasks.day !== dayId() || d.tasks.c.includes(k) || (d.tasks.p[k] || 0) < t.n) return false;
-    d.tasks.c = [...d.tasks.c, k]; d.balance += TASK_L; gainXP(d, TASK_XP);
-    if (d.tasks.c.length === 3){ d.balance += TASK_ALL; grant(d, 'tasks'); }
+    d.tasks.c = [...d.tasks.c, k]; d.balance += TASK_L; gainXP(d, TASK_XP); taskBump(d, 'task_done', 1);
+    all = d.tasks.c.length === TASK_N; if (all){ d.balance += TASK_ALL; grant(d, 'tasks'); }
     return true;
   }, 'Tagesaufgabe');
-  if (ok){ SFX.coins(); toast(P.tasks.c.length === 3 ? `Alle drei geschafft: +${fmt(TASK_L + TASK_ALL)} ℒ` : `Aufgabe erledigt: +${fmt(TASK_L)} ℒ und ${TASK_XP} XP`); }
+  if (ok){ SFX.coins(); toast(all ? `Alle fünf geschafft: +${fmt(TASK_L + TASK_ALL)} ℒ` : `Aufgabe erledigt: +${fmt(TASK_L)} ℒ und ${TASK_XP} XP`); }
+}
+function weekClaim(k){
+  let all = false;
+  const ok = withPlayer(d => {
+    const t = weekTasks().find(x => x.k === k), w = weekOf(d);
+    if (!t || w.c.includes(k) || (w.p[k] || 0) < t.n) return false;
+    w.c = [...w.c, k]; d.balance += WEEK_L; gainXP(d, WEEK_XP);
+    all = w.c.length === 3; if (all){ d.balance += WEEK_ALL; grant(d, 'weekly'); }
+    return true;
+  }, 'Wochen-Herausforderung');
+  if (ok){ SFX.coins(); if (all) celebrate(WEEK_L + WEEK_ALL, 0, { title: 'Wochenheld', icons: '🏅' }); else toast(`Herausforderung geschafft: +${fmt(WEEK_L)} ℒ und ${WEEK_XP} XP`); }
+}
+let progTab = ls.get('progtab', 'day');
+function weekLeft(){
+  const n = new Date(), end = new Date(n); end.setHours(24, 0, 0, 0); end.setDate(end.getDate() + (7 - (n.getDay() || 7)));
+  const h = Math.round((end - n) / 36e5);
+  return h >= 48 ? `noch ${Math.floor(h / 24)} Tage` : h >= 24 ? 'noch 1 Tag' : `noch ${Math.max(1, h)} Std.`;
+}
+function taskRow(t, p, got, act, rew){
+  const v = Math.min(p, t.n), ready = !got && v >= t.n, big = t.n >= 10000;
+  return `<div class="task${got ? ' got' : ready ? ' ready' : ''}"><div class="tinf"><span>${esc(t.txt(t.n))}</span><div class="tbar"><i style="width:${(v / t.n * 100).toFixed(1)}%"></i></div></div>
+    ${got ? '<span class="pill good">✓</span>' : ready ? `<button class="btn gold sm" data-act="${act}" data-k="${t.k}">+${fmt(rew)} ℒ holen</button>` : `<span class="muted small num">${big ? fmt(v) + ' / ' + fmt(t.n) : v + ' / ' + t.n}</span>`}</div>`;
 }
 function progressCard(){
-  const lv = levelOf(P.xp || 0), ts = todayTasks(), tk = P.tasks?.day === dayId() ? P.tasks : { p: {}, c: [] };
-  const nx = lvlReward(lv.L + 1);
+  const lv = levelOf(P.xp || 0), nx = lvlReward(lv.L + 1);
+  const tk = P.tasks?.day === dayId() ? P.tasks : { p: {}, c: [] }, ts = todayTasks();
+  const wk = P.wch?.id === weekId() ? P.wch : { p: {}, c: [] }, ws = weekTasks();
+  const dayReady = ts.some(t => !tk.c.includes(t.k) && (tk.p[t.k] || 0) >= t.n), weekReady = ws.some(t => !wk.c.includes(t.k) && (wk.p[t.k] || 0) >= t.n);
+  const isWeek = progTab === 'week';
+  const seg = `<div class="seg progseg" role="tablist">
+      <button data-act="progtab" data-v="day" aria-pressed="${!isWeek}">Heute <span class="num">${tk.c.length}/${TASK_N}</span>${dayReady ? '<i class="dot"></i>' : ''}</button>
+      <button data-act="progtab" data-v="week" aria-pressed="${isWeek}">Woche <span class="num">${wk.c.length}/3</span>${weekReady ? '<i class="dot"></i>' : ''}</button></div>`;
+  let body;
+  if (!isWeek){
+    // finished tasks fold into one line so five tasks do not crowd the start page
+    const open = ts.filter(t => !tk.c.includes(t.k)), done = ts.length - open.length;
+    body = `${open.map(t => taskRow(t, tk.p[t.k] || 0, false, 'taskclaim', TASK_L)).join('')}
+      ${done ? `<div class="task got slim"><span>✓ ${done === TASK_N ? `Alle ${TASK_N} geschafft, morgen gibt es neue` : `${done} erledigt`}</span></div>` : ''}
+      <p class="muted small">Je ${fmt(TASK_L)} ℒ und ${TASK_XP} XP, alle fünf: +${fmt(TASK_ALL)} ℒ extra. Neue Aufgaben jeden Tag um Mitternacht.</p>`;
+  } else {
+    body = `${ws.map(t => taskRow(t, wk.p[t.k] || 0, wk.c.includes(t.k), 'weekclaim', WEEK_L)).join('')}
+      <p class="muted small">Für alle gleich, ${weekLeft()}. Je ${fmt(WEEK_L)} ℒ und ${WEEK_XP} XP, alle drei: +${fmt(WEEK_ALL)} ℒ extra. Neue Herausforderungen jeden Montag.</p>`;
+  }
   return `<section class="panel progcard">
     <div class="lvrow"><div class="lvbadge num" aria-label="Level ${lv.L}">${lv.L}</div>
       <div class="lvinfo"><div class="row" style="justify-content:space-between;gap:6px"><b>${esc(titleOf(lv.L))}</b><span class="muted small num">${fmt(lv.cur)} / ${fmt(lv.need)} XP</span></div>
         <div class="xpbar"><i style="width:${(lv.cur / lv.need * 100).toFixed(1)}%"></i></div>
         <span class="muted small">Level ${lv.L + 1}: +${fmt(nx.l)} ℒ${nx.e ? ` und ${fmt(nx.e)} €` : ''}${titleOf(lv.L + 1) !== titleOf(lv.L) ? ` · Titel „${esc(titleOf(lv.L + 1))}“` : ''}</span></div></div>
-    <div class="tasks">
-      <div class="row" style="justify-content:space-between"><h3>Tagesaufgaben</h3><span class="muted small">${tk.c.length} / 3 · alle drei: +${fmt(TASK_ALL)} ℒ extra</span></div>
-      ${ts.map(t => {
-        const p = Math.min(tk.p[t.k] || 0, t.n), got = tk.c.includes(t.k), ready = !got && p >= t.n;
-        return `<div class="task${got ? ' got' : ready ? ' ready' : ''}"><div class="tinf"><span>${esc(t.txt(t.n))}</span><div class="tbar"><i style="width:${(p / t.n * 100).toFixed(1)}%"></i></div></div>
-          ${got ? '<span class="pill good">✓ erledigt</span>' : ready ? `<button class="btn gold sm" data-act="taskclaim" data-k="${t.k}">+${fmt(TASK_L)} ℒ holen</button>` : `<span class="muted small num">${t.k === 'wager' ? fmt(p) + ' / ' + fmt(t.n) : p + ' / ' + t.n}</span>`}</div>`;
-      }).join('')}
-      <p class="muted small">Jede Aufgabe bringt ${fmt(TASK_L)} ℒ und ${TASK_XP} XP. Neue Aufgaben gibt es jeden Tag um Mitternacht. XP bekommst du für jeden Einsatz.</p>
-    </div>
+    <div class="tasks">${seg}${body}</div>
   </section>`;
+}
+
+/* ---------- Große Gewinne feiern (nur auf dem Gerät, kostet Firebase nichts) ---------- */
+const CEL = { el: null, raf: 0, end: 0 };
+/** net = won Legats, mult = payout multiple; opts.title / opts.icons / opts.tier override the automatic choice */
+function bigWin(net, mult, icons){
+  if (!(net >= 1000)) return;
+  if (mult >= 50) return celebrate(net, mult, { tier: 'mega', icons });
+  if (mult >= 10 || net >= 25000) return celebrate(net, mult, { tier: 'big', icons });
+}
+function celebrate(amount, mult, o = {}){
+  const tier = o.tier || 'mega', auto = typeof S !== 'undefined' && S.auto > 0;
+  const title = o.title || { big: 'Großer Gewinn', mega: 'Mega-Gewinn', jackpot: 'Jackpot!' }[tier];
+  celebrateEnd(true);
+  const el = document.createElement('div'); el.className = 'cel cel-' + tier + (auto ? ' passive' : ''); el.setAttribute('role', 'status');
+  el.innerHTML = `<div class="celrays"></div><canvas></canvas><div class="celbox">
+    ${o.icons ? `<div class="celicons">${[...o.icons].length > 3 ? o.icons : [...o.icons].map((c, i) => `<span style="animation-delay:${.08 + i * .12}s">${c}</span>`).join('')}</div>` : ''}
+    <div class="celtitle">${esc(title)}</div><div class="celamt num">+0 ℒ</div>${mult >= 2 ? `<div class="celmult num">×${fmt(Math.round(mult * 10) / 10)}</div>` : ''}
+    ${auto ? '' : '<div class="celtap muted small">Tippen zum Schließen</div>'}</div>`;
+  document.body.appendChild(el); CEL.el = el;
+  el.addEventListener('click', () => celebrateEnd());
+  const dur = reduceMotion ? 1600 : auto ? 2200 : tier === 'big' ? 3200 : 4600;
+  CEL.end = setTimeout(() => celebrateEnd(), dur);
+  buzz(tier === 'big' ? [30, 40, 30] : [40, 50, 40, 50, 80]); SFX.bj(); setTimeout(() => SFX.coins(), 350); if (tier !== 'big') setTimeout(() => SFX.coins(), 900);
+  // count the amount up
+  const amtEl = el.querySelector('.celamt'), t0 = performance.now(), cd = Math.min(dur * .55, 2000);
+  const count = now => { if (CEL.el !== el) return; const k = Math.min(1, (now - t0) / cd), e = 1 - Math.pow(1 - k, 3); amtEl.textContent = '+' + fmt(Math.round(amount * e)) + ' ℒ'; if (k < 1) requestAnimationFrame(count); };
+  requestAnimationFrame(count);
+  if (reduceMotion) return;
+  // coins and confetti on a canvas
+  const cv = el.querySelector('canvas'), cx = cv.getContext('2d'), dpr = Math.min(2, devicePixelRatio || 1);
+  const W = innerWidth, H = innerHeight; cv.width = W * dpr; cv.height = H * dpr; cx.scale(dpr, dpr);
+  const COLS = ['#f3dc9a', '#d1ad62', '#e8c36a', '#fff3c4', '#c0392b', '#2e86de', '#27ae60', '#9b59b6'];
+  const parts = [], n = { big: 70, mega: 140, jackpot: 200 }[tier] || 100;
+  const add = (x, y, burst) => { const coin = Math.random() < (tier === 'big' ? .6 : .45);
+    const a = burst ? Math.random() * Math.PI * 2 : Math.PI / 2, v = burst ? 4 + Math.random() * 9 : 1 + Math.random() * 2;
+    parts.push({ x, y, vx: Math.cos(a) * v * (burst ? 1 : .3) + (burst ? 0 : (Math.random() - .5) * 2), vy: burst ? Math.sin(a) * v - 6 : v, r: coin ? 7 + Math.random() * 6 : 4 + Math.random() * 4,
+      rot: Math.random() * 6, vr: (Math.random() - .5) * .3, flip: Math.random() * 6, coin, c: COLS[Math.floor(Math.random() * (coin ? 4 : COLS.length))] }); };
+  for (let i = 0; i < n; i++) add(W / 2, H * .45, true);
+  let rain = tier === 'big' ? 40 : 120;
+  const frame = () => {
+    if (CEL.el !== el) return;
+    cx.clearRect(0, 0, W, H);
+    if (rain > 0 && Math.random() < .8){ rain--; add(Math.random() * W, -20, false); }
+    for (const q of parts){
+      q.vy += .22; q.vx *= .99; q.x += q.vx; q.y += q.vy; q.rot += q.vr; q.flip += .15;
+      const sx = Math.abs(Math.cos(q.flip));
+      cx.save(); cx.translate(q.x, q.y); cx.rotate(q.rot);
+      if (q.coin){ cx.scale(Math.max(.15, sx), 1); cx.beginPath(); cx.arc(0, 0, q.r, 0, 7); const g = cx.createRadialGradient(-q.r * .3, -q.r * .3, 1, 0, 0, q.r); g.addColorStop(0, '#fff3c4'); g.addColorStop(.5, q.c); g.addColorStop(1, '#8f6c1f'); cx.fillStyle = g; cx.fill(); cx.strokeStyle = 'rgba(90,60,10,.6)'; cx.lineWidth = 1; cx.stroke(); }
+      else { cx.scale(1, Math.max(.2, sx)); cx.fillStyle = q.c; cx.fillRect(-q.r, -q.r / 2, q.r * 2, q.r); }
+      cx.restore();
+    }
+    for (let i = parts.length - 1; i >= 0; i--) if (parts[i].y > H + 40) parts.splice(i, 1);
+    CEL.raf = requestAnimationFrame(frame);
+  };
+  CEL.raf = requestAnimationFrame(frame);
+}
+function celebrateEnd(now){
+  const el = CEL.el; if (!el) return; CEL.el = null; clearTimeout(CEL.end); cancelAnimationFrame(CEL.raf);
+  if (now) return el.remove();
+  el.classList.add('out'); setTimeout(() => el.remove(), 400);
 }
 
 /* ---------- Progressiver Jackpot am Automaten (ein Topf für alle) ---------- */
@@ -3599,7 +3735,7 @@ function crashCash(at){
     d.balance += pay; d.crash = { ...d.crash, out: m, pay }; record(d, 'crash', c.bet, pay);
     if (m >= 10) grant(d, 'crash10'); return true;
   }, 'Crash');
-  if (game === 'crash' && tab === 'table') SFX.win();
+  if (game === 'crash' && tab === 'table'){ SFX.win(); bigWin(pay - c.bet, m, '🚀'); }
 }
 function crashSettle(){
   const c = P?.crash; if (!c || c.out != null) return;
@@ -3709,7 +3845,7 @@ function mnCash(){
   R_.over = true; R_.mult = minesMult(R_.n, R_.open.length); R_.pay = Math.floor(R_.stake * R_.mult);
   withPlayer(d => { d.balance += R_.pay; record(d, 'mines', R_.stake, R_.pay); taskBump(d, 'mines_safe', R_.open.length);
     if (R_.n >= 5 && R_.open.length >= 10) grant(d, 'mines'); d.mines = null; return true; }, 'Mines');
-  SFX.win(); renderAll();
+  SFX.win(); renderAll(); bigWin(R_.pay - R_.stake, R_.mult, '💎');
 }
 /** a game left in the middle (page closed) is lost, like Höher oder Tiefer */
 function checkAbortedMines(){ if (P?.mines && !(MN.run && !MN.run.over)) withPlayer(d => { record(d, 'mines', d.mines.stake, 0); d.mines = null; return true; }, 'Mines'); }
@@ -3985,6 +4121,8 @@ document.addEventListener('click', e => {
   const v = +b.dataset.v;
   switch (b.dataset.act){
     case 'taskclaim': taskClaim(b.dataset.k); break;
+    case 'weekclaim': weekClaim(b.dataset.k); break;
+    case 'progtab': progTab = b.dataset.v; ls.set('progtab', progTab); renderAll(); break;
     case 'crbet': CR.bet = v; CR.key = ''; renderAll(); break;
     case 'crauto': CR.auto = v; savePref('crashauto', v); CR.key = ''; renderAll(); break;
     case 'crgo': if (confirmBig(CR.bet, 'crash')) crashBet(); break;
@@ -4294,7 +4432,7 @@ function loBook(g){
     withPlayer(d => {
       if (!fdoneOnce(d, key + ':end')) return false;
       if (g.stake > 0){ if (won) d.balance += g.pot; record(d, 'loono', g.stake, won ? g.pot : 0); }
-      if (won) grant(d, 'loono');
+      if (won){ grant(d, 'loono'); taskBump(d, 'loono_win', 1); }
       return true;
     }, 'Loono');
   }
@@ -5931,7 +6069,7 @@ function renderModal(force){
 function newsHTML(){
   const vs = Object.keys(CHANGELOGS).filter(v => verNum(v) > verNum(seenBefore)).sort((a,b) => verNum(b) - verNum(a));
   return `<div class="stack"><div class="row" style="justify-content:space-between"><h2>Neu in Version ${APP_VERSION}</h2><button class="btn sm" data-act="closemodal">Schließen</button></div>
-    ${(vs.length ? vs : [APP_VERSION]).map(v => `${vs.length > 1 ? `<h3>Version ${v}</h3>` : ''}<ul class="news">${CHANGELOGS[v].map(x => `<li>${esc(x)}</li>`).join('')}</ul>`).join('')}
+    ${(vs.length ? vs : [APP_VERSION]).map(v => `${vs.length > 1 ? `<h3>${CL_TITLES[v] || 'Version ' + v}</h3>` : ''}<ul class="news">${CHANGELOGS[v].map(x => `<li>${esc(x)}</li>`).join('')}</ul>`).join('')}
     <button class="btn gold" data-act="closemodal">Los geht's</button></div>`;
 }
 function profileHTML(id){
