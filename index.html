@@ -2555,9 +2555,12 @@ function animateCards(root){
 /* =====================================================================
    v1.1 – Casino home, Glücksrad, Roulette, Automat, Pferderennen, Sportwetten
    ===================================================================== */
-const APP_VERSION = '1.7.1';
+const APP_VERSION = '1.7.2';
 const CL_TITLES = { '1.5.12': 'Technische Verbesserungen' };
 const CHANGELOGS = {
+  '1.7.2': [
+    'Beim Kisten-Öffnen verrät die Sammlungs-Zahl nicht mehr vorher, ob ein Item oder Legats drin sind',
+  ],
   '1.7.1': [
     'Laufende Auktionen erscheinen in der Dynamic Island: Höchstgebot und Restzeit. Lange drücken zeigt den Bieter, antippen öffnet die Auktion',
   ],
@@ -4059,7 +4062,7 @@ async function kOpen(id){
   const c = KCRATES.find(x => x.id === id), free = (P.crates?.[id] || 0) > 0;
   if (!free && P.balance < c.price) return toast(P.euro > 0 ? 'Nicht genug Legats. Heb auf der Bank etwas ab.' : 'Nicht genug Legats.');
   const win = kRoll(c), def = KITEM[win.k];
-  KS.busy = true;   // free crates won on the way are announced after the reveal
+  KS.busy = true; KS.pend = win.money ? null : win.id;   // free crates won on the way are announced after the reveal; the item stays hidden until then
   const ok = withPlayer(d => { WHY = c.n + (free ? ' (gratis)' : '');
     if (free){ if (!(d.crates?.[id] > 0)) return false; d.crates = { ...d.crates, [id]: d.crates[id] - 1 }; }
     else { if (d.balance < c.price) return false; d.balance -= c.price; }
@@ -4069,7 +4072,7 @@ async function kOpen(id){
     grant(d, 'kiste1'); if (def.r === 'gold') grant(d, 'mythisch'); if ((d.items || []).length >= 20) grant(d, 'sammler');
     return true;
   });
-  if (!ok){ KS.busy = false; return; }
+  if (!ok){ KS.busy = false; KS.pend = null; return; }
   if (win.money) hold = win.money;   // the header shows the win only after the reveal
   KS.busy = true; KS.last = id; renderAll();
   const box = $('kopen'), fast = KS.fast || reduceMotion;
@@ -4095,6 +4098,7 @@ async function kOpen(id){
 }
 const kCard = (it, extra = '') => { const d = KITEM[it.k]; return `<div class="kit r-${d.r}${extra}"><div class="ic">${d.ic}</div><div class="nm">${esc(d.n)}</div><div class="ty">${KRN[d.r]}</div></div>`; };
 function kReveal(win){
+  if (KS.pend){ KS.pend = null; renderAll(); }
   const d = KITEM[win.k], big = ['rot', 'gold'].includes(d.r), mid = d.r === 'pink', it = win.money ? null : P.items.find(x => x.id === win.id);
   const fan = n => n.forEach((f, i) => tone(f, .35, { type: 'triangle', vol: .07, at: i * .09 }));
   fan(big || mid ? [523, 659, 784, 1047, 1319] : [523, 659, 784]); if (big) setTimeout(() => fan([523, 659, 784, 1047, 1319]), 400);
@@ -4277,7 +4281,7 @@ function kSpark(k){ const c = kCurve(k).slice(-24 * 7).filter((v, i) => i % 4 ==
   return `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" aria-hidden="true"><polyline points="${c.map((v, i) => `${(i / (c.length - 1) * w).toFixed(1)},${(h - 2 - (v - mn) / (mx - mn || 1) * (h - 4)).toFixed(1)}`).join(' ')}" fill="none" stroke="${up ? '#79d8a2' : '#ec8a78'}" stroke-width="1.6"/></svg>`; }
 function renderKisten(){
   const el = $('kmain'); if (!el || !P) return;
-  const t = KS.tab, items = P.items || [], free = P.crates || {};
+  const t = KS.tab, items = (P.items || []).filter(x => x.id !== KS.pend), free = P.crates || {};
   const seg = `<div class="seg kseg" role="tablist">${[['kisten', 'Kisten'], ['samml', `Sammlung${items.length ? ' · ' + items.length : ''}`], ['markt', 'Markt']].map(([k, l]) => `<button data-act="ktab" data-v="${k}" aria-pressed="${t === k}">${l}</button>`).join('')}</div>`;
   let body = '';
   if (t === 'kisten'){
