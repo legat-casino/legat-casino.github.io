@@ -1073,6 +1073,10 @@ h3{font-size:12px;letter-spacing:.09em;font-weight:700}
 .icr b.fly{color:#fff}.icr b.win,.icrbig.win{color:var(--win)}.icr b.lose,.icrbig.lose{color:#ff6b5f}
 .icrbig{font-size:46px;color:#fff;line-height:1.1}
 .ilo b{color:var(--brass)}
+.iauc b{color:var(--brass);min-width:54px;text-align:right}
+#iauct.low{color:var(--lose)}
+#iaucb.bump,#iaucb2.bump{animation:ibump .45s cubic-bezier(.2,1.6,.4,1)}
+@keyframes ibump{40%{transform:scale(1.25);color:#fff3c4}}
 .island.out{animation:islout .22s ease-in both}
 @keyframes islout{to{transform:scale(.7);opacity:0}}
 
@@ -1117,9 +1121,170 @@ h3{font-size:12px;letter-spacing:.09em;font-weight:700}
 .closedinfo .btn{align-self:flex-start}
 body.isclosed{overflow:hidden}
 @media (prefers-reduced-motion:reduce){*{animation:none!important}}
+
+/* ---------- v1.7: Kisten, Sammlung, Markt, Auktionen ---------- */
+.r-blau{--rc:#4b8bf5}.r-lila{--rc:#9a5cf0}.r-pink{--rc:#e0479e}.r-rot{--rc:#eb4b3c}.r-gold{--rc:#f4c430}
+.tile-kisten{grid-column:span 6;flex-direction:row}
+.tile-kisten .art{height:auto;width:42%;min-height:120px;background:radial-gradient(110% 120% at 50% 20%,#5a4320,#1c140b);border-bottom:0;border-right:1px solid var(--line);display:grid;place-items:center}
+.tile-kisten .tinfo{justify-content:center}
+.tile-kisten .art{flex:none}
+.tile-kisten .kchest{transform:scale(.78)}
+@media (max-width:760px){.tile-kisten{grid-column:span 2}}
+.kchest{--c1:#7a5532;--c2:#4a321c;--band:#d1ad62;--gemc:#d1ad62;position:relative;width:120px;height:92px;margin:6px auto 4px;filter:drop-shadow(0 12px 16px rgba(0,0,0,.6))}
+.kchest .body{position:absolute;left:0;right:0;bottom:0;height:58px;border-radius:6px 6px 10px 10px;background:linear-gradient(180deg,var(--c1),var(--c2));box-shadow:inset 0 0 0 3px rgba(0,0,0,.25)}
+.kchest .lid{position:absolute;left:-3px;right:-3px;top:4px;height:38px;border-radius:40px 40px 6px 6px/26px 26px 6px 6px;background:linear-gradient(180deg,color-mix(in srgb,var(--c1) 80%,#fff),var(--c1));box-shadow:inset 0 0 0 3px rgba(0,0,0,.2);transform-origin:50% 100%;transition:transform .45s cubic-bezier(.3,1.6,.5,1)}
+.kchest .band{position:absolute;top:4px;bottom:0;width:12px;background:linear-gradient(90deg,#8f7643,var(--band),#8f7643);border-radius:3px}
+.kchest .band.l{left:18px}.kchest .band.r{right:18px}
+.kchest .lock{position:absolute;left:50%;top:34px;width:22px;height:26px;margin-left:-11px;border-radius:5px;background:linear-gradient(180deg,#f3dc9a,var(--band) 60%,#8f6c1f);box-shadow:0 2px 0 rgba(0,0,0,.4)}
+.kchest .lock::after{content:"";position:absolute;left:50%;top:9px;width:5px;height:8px;margin-left:-2.5px;border-radius:2px;background:#3a2a14}
+.kchest .gem{position:absolute;left:50%;top:13px;width:16px;height:16px;margin-left:-8px;transform:rotate(45deg);background:var(--gemc);box-shadow:0 0 12px var(--gemc);border-radius:2px}
+.kchest.samt{--c1:#6a2440;--c2:#38101f;--gemc:#e0479e}
+.kchest.tresor{--c1:#4a5260;--c2:#22262e;--band:#f4c430;--gemc:#f4c430}
+.kchest.shake{animation:kshake .5s ease-in-out 2}
+.kchest.open .lid{transform:translateY(-14px) rotate(-18deg)}
+@keyframes kshake{0%,100%{rotate:0deg}20%{rotate:-6deg}40%{rotate:6deg}60%{rotate:-4deg}80%{rotate:3deg}}
+.kseg{align-self:center}
+.kcrates{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media (max-width:640px){.kcrates{grid-template-columns:1fr}}
+.kcr{position:relative;border:1px solid var(--line);border-radius:18px;padding:14px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;background:radial-gradient(90% 70% at 50% 30%,rgba(209,173,98,.16),transparent 70%),rgba(0,0,0,.2)}
+.kcr-samt{background:radial-gradient(90% 70% at 50% 30%,rgba(224,71,158,.18),transparent 70%),rgba(0,0,0,.2)}
+.kcr-tresor{background:radial-gradient(90% 70% at 50% 30%,rgba(244,196,48,.18),transparent 70%),rgba(0,0,0,.2)}
+.kcr b{font:700 20px/1 var(--f-display)}
+.kprice{font-size:16px;color:var(--brass)}
+.kfree{position:absolute;top:10px;right:10px;background:var(--win);color:#0d2016;font:800 11px/1 var(--f-body);letter-spacing:.06em;text-transform:uppercase;border-radius:6px;padding:4px 7px}
+.kfast{display:flex;gap:8px;align-items:center;justify-content:center;color:var(--muted);font-size:13px}
+.kopenp{margin-bottom:12px}
+.kreelwrap{position:relative;height:178px;overflow:hidden;border-radius:14px;border:1px solid var(--line);background:linear-gradient(180deg,#0d0a08,#1a140f 50%,#0d0a08);-webkit-mask:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);mask:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
+.kreel{position:absolute;left:0;top:14px;display:flex;gap:8px;will-change:transform}
+.kmarker{position:absolute;left:50%;top:0;bottom:0;width:3px;margin-left:-1.5px;background:var(--brass);box-shadow:0 0 14px var(--brass);z-index:2}
+.kmarker::before,.kmarker::after{content:"";position:absolute;left:50%;margin-left:-9px;border:9px solid transparent}
+.kmarker::before{top:-2px;border-top-color:var(--brass)}.kmarker::after{bottom:-2px;border-bottom-color:var(--brass)}
+.kit{flex:none;width:118px;height:150px;border-radius:12px;background:linear-gradient(180deg,#2a221b,#17110d);border:1px solid rgba(255,255,255,.06);border-bottom:5px solid var(--rc);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:8px;text-align:center;position:relative;overflow:hidden;color:var(--ink)}
+.kit::before{content:"";position:absolute;inset:0;background:radial-gradient(80% 60% at 50% 40%,color-mix(in srgb,var(--rc) 35%,transparent),transparent 70%)}
+.kit .ic{position:relative;font-size:44px;line-height:1;filter:drop-shadow(0 4px 6px rgba(0,0,0,.5))}
+.kit .nm{position:relative;font:700 12.5px/1.2 var(--f-body)}
+.kit .ty,.kit .cond{position:relative;font:600 10.5px/1 var(--f-body);color:var(--muted);letter-spacing:.04em}
+.kit .ty{text-transform:uppercase}
+.kit .val{position:relative;font:600 12px/1 var(--f-num);color:var(--brass)}
+.kit .knr{position:absolute;top:6px;right:8px;font:600 10px/1 var(--f-num);color:var(--muted)}
+.kit .keq{position:absolute;top:5px;left:7px;font-size:11px}
+.kit.win{animation:kwin 1s ease-in-out infinite alternate}
+@keyframes kwin{to{box-shadow:0 0 0 3px var(--rc),0 0 30px var(--rc)}}
+.kinv{display:grid;grid-template-columns:repeat(auto-fill,minmax(108px,1fr));gap:8px;margin-top:8px}
+.kinv .kit{width:auto;height:148px;cursor:pointer}
+.kinv .kit .ic{font-size:36px}
+.kchip{display:inline-flex;align-items:center;font:700 12px/1 var(--f-body);padding:4px 8px;border-radius:999px;background:color-mix(in srgb,var(--rc) 22%,transparent);color:color-mix(in srgb,var(--rc) 60%,#fff);border:1px solid color-mix(in srgb,var(--rc) 50%,transparent)}
+.kodds{width:100%;border-collapse:collapse;font-size:13px}
+.kodds td{padding:5px 6px;border-top:1px solid rgba(255,255,255,.06)}
+.kodds td.r{text-align:right;font-family:var(--f-num);white-space:nowrap}
+.kmhead{margin:14px 8px 4px;font-family:var(--f-display);font-size:17px}
+.kmrow{display:grid;grid-template-columns:44px 1fr auto 90px;gap:10px;align-items:center;width:100%;padding:9px 8px;background:none;border:0;border-top:1px solid rgba(255,255,255,.06);border-radius:10px;text-align:left;color:var(--ink)}
+.kmrow:hover{background:rgba(255,255,255,.03)}
+.kmrow .ic{font-size:30px;text-align:center}
+.kmrow .p{font-size:14px;line-height:1.3;text-align:right}
+.kmrow svg{width:90px;height:30px}
+@media (max-width:480px){.kmrow{grid-template-columns:38px 1fr auto}.kmrow svg{display:none}}
+.kup{color:var(--win);font:600 12px/1 var(--f-num)}.kdown{color:var(--lose);font:600 12px/1 var(--f-num)}
+.kaucbar{display:flex;align-items:center;gap:12px;border-color:color-mix(in srgb,var(--rc) 50%,transparent)}
+.kaucbar .btn{margin-left:auto}
+.kbig3{font-size:34px}
+.kreveal{position:fixed;inset:0;z-index:95;display:grid;place-items:center;padding:20px;background:radial-gradient(60% 50% at 50% 45%,color-mix(in srgb,var(--rc) 30%,rgba(10,8,6,.7)),rgba(8,6,4,.93));animation:kfade .3s}
+.kreveal.out{opacity:0;transition:opacity .25s}
+.kreveal .kbox{position:relative;text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px;animation:kpop .55s cubic-bezier(.2,1.6,.4,1)}
+.krays{position:fixed;left:50%;top:45%;width:170vmax;height:170vmax;margin:-85vmax 0 0 -85vmax;background:repeating-conic-gradient(from 0deg,color-mix(in srgb,var(--rc) 22%,transparent) 0 6deg,transparent 6deg 18deg);-webkit-mask:radial-gradient(circle,#000,transparent 55%);mask:radial-gradient(circle,#000,transparent 55%);animation:kspin 16s linear infinite;pointer-events:none}
+.kreveal .kbig{font-size:96px;line-height:1;filter:drop-shadow(0 10px 24px color-mix(in srgb,var(--rc) 70%,transparent))}
+.kreveal .rn{font:800 12px/1 var(--f-body);letter-spacing:.2em;text-transform:uppercase;color:var(--rc)}
+.kreveal .tn{font:700 32px/1.1 var(--f-display)}
+.kreveal canvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none}
+@keyframes kfade{from{opacity:0}} @keyframes kpop{from{transform:scale(.4);opacity:0}} @keyframes kspin{to{transform:rotate(360deg)}}
+.ksheet{position:fixed;inset:0;z-index:92;display:grid;place-items:end center;background:rgba(0,0,0,.6);animation:kfade .2s}
+@media (min-width:700px){.ksheet{place-items:center}}
+.ksheet .kcard{width:min(560px,100%);max-height:92vh;overflow:auto;background:#1d1611;border:1px solid var(--line);border-radius:22px 22px 0 0;padding:18px 18px calc(18px + env(safe-area-inset-bottom));animation:kup .3s cubic-bezier(.2,1.2,.4,1)}
+@media (min-width:700px){.ksheet .kcard{border-radius:22px}}
+@keyframes kup{from{transform:translateY(40px);opacity:0}}
+.khd{display:flex;gap:14px;align-items:center}
+.kbig2{font-size:60px;line-height:1}
+.khd b{font:700 24px/1.1 var(--f-display)}
+.kkv{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:14px;margin:12px 0}
+.kkv>span:nth-child(odd){color:var(--muted)}
+.kchart{width:100%;height:150px;display:block;margin:6px 0}
+.kacts{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.kacts .btn{flex:1 1 140px}
+.kslider{width:100%}
+.kauc{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
+.kauc .clock{font-size:40px;line-height:1;color:var(--brass)}
+.kauc .clock.low{color:var(--lose);animation:kblink .5s steps(2) infinite}
+@keyframes kblink{50%{opacity:.4}}
+.kauc .bid{font-size:30px;font-weight:700}
+.kauc .who{font-size:14px;color:var(--muted);min-height:20px}
+.blog{width:100%;max-height:150px;overflow:auto;font-size:13px;border-top:1px solid rgba(255,255,255,.08);margin-top:6px}
+.blog div{display:flex;justify-content:space-between;padding:4px 2px;border-bottom:1px solid rgba(255,255,255,.04)}
+.blog div:first-child{font-weight:700}
+.hammer{font:700 26px/1.15 var(--f-display);color:var(--brass);animation:kpop .5s cubic-bezier(.2,1.6,.4,1);margin-top:8px}
+/* trailer */
+.trailer{position:fixed;inset:0;z-index:120;background:#07050a;display:grid;place-items:center}
+.trailer.out{opacity:0;transition:opacity .4s}
+.trstage{position:relative;width:100%;height:100%;overflow:hidden}
+.trstage .sc{position:absolute;inset:0;display:grid;place-items:center;text-align:center;opacity:0;transition:opacity .6s}
+.trstage .sc.on{opacity:1}
+.t-line{width:0;height:2px;background:linear-gradient(90deg,transparent,var(--brass),transparent);transition:width 1.2s cubic-bezier(.2,.8,.2,1)}
+.on .t-line{width:70%}
+.t-logo{font:700 clamp(34px,8vw,72px)/1 var(--f-display);letter-spacing:.04em;background:linear-gradient(100deg,#8f7643 20%,#fff3c4 45%,#d1ad62 55%,#8f7643 80%);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:tshine 2.4s linear infinite}
+@keyframes tshine{from{background-position:120% 0}to{background-position:-120% 0}}
+.t-up{font:800 clamp(13px,2.6vw,18px)/1 var(--f-body);letter-spacing:.4em;text-transform:uppercase;color:var(--muted);margin-top:14px}
+.t-ver{font:700 clamp(110px,30vw,260px)/1 var(--f-display);color:transparent;-webkit-text-stroke:2px var(--brass);transform:scale(.6);opacity:0;transition:all 1s cubic-bezier(.2,1.4,.4,1)}
+.on .t-ver{transform:scale(1);opacity:1;color:rgba(209,173,98,.12)}
+.t-crates{display:flex;gap:clamp(10px,4vw,40px);align-items:flex-end}
+@media (max-width:700px){.t-crates{zoom:.72}}
+.t-crates .kchest{opacity:0}
+.on .t-crates .kchest{animation:tdrop .8s cubic-bezier(.3,1.5,.5,1) forwards}
+.on .t-crates .kchest:nth-child(2){animation-delay:.25s}.on .t-crates .kchest:nth-child(3){animation-delay:.5s}
+.t-crates .kchest:nth-child(2){scale:1.3}
+@keyframes tdrop{from{opacity:1;transform:translateY(-120vh)}to{opacity:1;transform:translateY(0)}}
+.t-rays{position:absolute;left:50%;top:50%;width:170vmax;height:170vmax;margin:-85vmax 0 0 -85vmax;background:repeating-conic-gradient(from 0deg,rgba(243,220,154,.12) 0 6deg,transparent 6deg 18deg);-webkit-mask:radial-gradient(circle,#000,transparent 55%);mask:radial-gradient(circle,#000,transparent 55%);animation:kspin 18s linear infinite}
+.t-cap{position:absolute;left:0;right:0;bottom:12%;font:700 clamp(20px,4.6vw,38px)/1.15 var(--f-display);padding:0 18px}
+.t-cap small{display:block;font:600 clamp(12px,2.4vw,16px)/1.5 var(--f-body);color:var(--muted);margin-top:6px}
+.t-reel{position:relative;width:100%;height:170px;overflow:hidden;-webkit-mask:linear-gradient(90deg,transparent,#000 15%,#000 85%,transparent);mask:linear-gradient(90deg,transparent,#000 15%,#000 85%,transparent)}
+.t-reel .kreel{top:10px}
+.t-win{display:flex;flex-direction:column;align-items:center;gap:8px}
+.t-win .tbig{font-size:clamp(90px,24vw,160px);line-height:1;filter:drop-shadow(0 0 40px rgba(244,196,48,.7));animation:kpop .7s cubic-bezier(.2,1.6,.4,1)}
+.t-win .rn{font:800 13px/1 var(--f-body);letter-spacing:.24em;text-transform:uppercase;color:#f4c430}
+.t-win .tn{font:700 clamp(26px,6vw,46px)/1 var(--f-display)}
+.t-chart{position:absolute;left:8%;right:8%;top:10%;height:24%;opacity:.55}
+.t-chart path{stroke-dasharray:1200;stroke-dashoffset:1200}
+.on .t-chart path{animation:tdraw 2.4s ease-out forwards}
+@keyframes tdraw{to{stroke-dashoffset:0}}
+.t-feats{display:flex;flex-direction:column;gap:14px;align-items:center;padding:0 16px}
+.t-feats div{font:700 clamp(18px,4.4vw,30px)/1.2 var(--f-display);opacity:0;transform:translateY(20px);transition:all .6s}
+.on .t-feats div{opacity:1;transform:none}
+.on .t-feats div:nth-child(2){transition-delay:.5s}.on .t-feats div:nth-child(3){transition-delay:1s}
+.t-feats span{color:var(--brass)}
+.t-end h1{font:700 clamp(36px,9vw,80px)/1 var(--f-display);margin:0 0 10px;color:var(--brass)}
+.t-end p{margin:0 0 20px;color:var(--muted);font-size:clamp(14px,2.8vw,18px);padding:0 16px}
+.t-skip{position:absolute;top:calc(12px + env(safe-area-inset-top));right:12px;z-index:5;background:rgba(0,0,0,.45);border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:13px;font-weight:700;color:var(--ink)}
+.t-bar{position:absolute;left:0;bottom:0;height:3px;background:var(--brass);z-index:5;width:0}
+.t-start{position:absolute;inset:0;z-index:6;display:grid;place-items:center;background:radial-gradient(70% 50% at 50% 45%,#2a1d10,#07050a)}
+.trcv{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:4}
+@media (prefers-reduced-motion:reduce){.krays,.t-rays,.kchest.shake,.kit.win{animation:none}}
+
+/* ---------- v1.7: start animation ---------- */
+.intro{position:fixed;inset:0;z-index:200;display:grid;place-items:center;background:#0b0806;overflow:hidden;animation:introout .55s cubic-bezier(.6,0,.4,1) 2.6s forwards}
+.intro .coin{width:92px;height:92px;border-radius:50%;display:grid;place-items:center;font:700 54px/1 var(--f-display);color:#3a2a10;background:radial-gradient(circle at 35% 30%,#fff3c4,#e8c36a 40%,#a8802e 75%,#6b4f18);box-shadow:0 0 0 4px #8f6c1f inset,0 0 0 9px rgba(209,173,98,.25),0 12px 40px rgba(209,173,98,.35);animation:coinflip 1s cubic-bezier(.3,1.3,.5,1) both}
+.intro .word{position:absolute;top:calc(50% + 66px);left:0;right:0;text-align:center;font:700 30px/1 var(--f-display);color:var(--brass);letter-spacing:.06em}
+.intro .word i{display:inline-block;font-style:normal;opacity:0;transform:translateY(14px);animation:letter .45s cubic-bezier(.2,1.4,.4,1) forwards}
+.intro .sweep{position:absolute;inset:-40%;background:linear-gradient(105deg,transparent 42%,rgba(255,243,196,.22) 50%,transparent 58%);transform:translateX(-100%);animation:sweep 1s .9s ease-in-out forwards}
+.intro.out{animation:introout .55s cubic-bezier(.6,0,.4,1) forwards;pointer-events:none}
+@keyframes coinflip{0%{transform:scale(.2) rotateY(540deg);opacity:0}60%{opacity:1}100%{transform:scale(1) rotateY(0)}}
+@keyframes letter{to{opacity:1;transform:none}}
+@keyframes sweep{to{transform:translateX(100%)}}
+@keyframes introout{to{opacity:0;transform:scale(1.15);filter:blur(6px);visibility:hidden}}
+@media (prefers-reduced-motion:reduce){.intro{display:none}}
 </style>
 </head>
 <body>
+<div id="intro" class="intro" aria-hidden="true"><div class="sweep"></div><div class="coin"><span>L</span></div><div class="word"><i style="animation-delay:0.550s">L</i><i style="animation-delay:0.595s">e</i><i style="animation-delay:0.640s">g</i><i style="animation-delay:0.685s">a</i><i style="animation-delay:0.730s">t</i><i style="animation-delay:0.775s">&nbsp;</i><i style="animation-delay:0.820s">C</i><i style="animation-delay:0.865s">a</i><i style="animation-delay:0.910s">s</i><i style="animation-delay:0.955s">i</i><i style="animation-delay:1.000s">n</i><i style="animation-delay:1.045s">o</i></div></div>
+<script>(function(){var i=document.getElementById("intro");if(!i)return;function end(){if(!i.isConnected||i.classList.contains("out"))return;i.classList.add("out");setTimeout(function(){i.remove()},560)}i.addEventListener("click",end);setTimeout(end,1800)})();</script>
 <header class="top" id="top" hidden>
   <div class="top-in">
     <div class="logo"><span class="full">Legat <span>Casino</span></span><span class="mono" aria-hidden="true">L<span>C</span></span></div>
@@ -1183,6 +1348,7 @@ body.isclosed{overflow:hidden}
     <div id="g-mines" hidden></div>
     <div id="g-tipp" hidden></div>
     <div id="g-loono" hidden></div>
+    <div id="g-kisten" hidden><div id="kopen" class="panel kopenp" hidden></div><div id="kmain"></div></div>
     <div id="chat" class="panel chat" hidden>
       <div class="emojis" id="emojis"></div>
       <div class="chatlog" id="chatlog" aria-live="polite"></div>
@@ -1421,7 +1587,7 @@ function norm(d){
   d.bets ||= [];
   if (d.euro == null) d.euro = START_EURO; d.bank ||= { last:null, got:0 };
   d.claimed ||= []; d.giftedTotal ||= 0; if (d.lowMark == null) d.lowMark = d.balance;
-  d.fdone ||= [];
+  d.fdone ||= []; d.items ||= []; d.crates ||= {}; d.eq ||= {};
   if (!d.log) d.log = [{ t: Date.now(), b: 0, e: 0, r: 'start', B: d.balance, E: d.euro ?? START_EURO }];
   if (!d.week || d.week.id !== weekId()) d.week = { id: weekId(), net:0, hands:0, best:0 };
   return d;
@@ -1432,8 +1598,8 @@ let WHY = null;
 function withPlayer(fn, why){
   if (!P) return false;
   const d = norm(structuredClone(P));
-  newBadges = []; WHY = null; WHY_EXTRA = ''; lvlUps.length = 0;
-  if (!fn(d)) return false;
+  newBadges = []; WHY = null; WHY_EXTRA = ''; lvlUps.length = 0; const giftN = KS.gift.length;
+  if (!fn(d)){ KS.gift.length = giftN; return false; }
   const reason = (WHY || why || '?') + WHY_EXTRA; WHY = null; WHY_EXTRA = '';
   const db_ = d.balance - P.balance, de_ = d.euro - (P.euro ?? START_EURO);
   if (db_ || de_) d.log = [...d.log, { t: Date.now(), b: db_, e: de_, r: reason, B: d.balance, E: d.euro }].slice(-150);
@@ -1444,6 +1610,7 @@ function withPlayer(fn, why){
   P = d; renderAll();
   queueSave();
   if (newBadges.length){ const b = newBadges; newBadges = []; b.forEach((k,i) => badgeLater(k, 400 + i*2200)); }
+  if (KS.gift.length && !KS.busy) kGiftToast();
   if (lvlUps.length){ const ups = lvlUps.splice(0); ups.forEach((L,i) => levelLater(L, 900 + i*2600)); }
   return true;
 }
@@ -1476,7 +1643,7 @@ document.addEventListener('visibilitychange', () => { if (document.hidden){ flus
    the public copy only when something friends need right away changes (table, Loono, game, name …), otherwise at most once a minute. */
 const PUB = { last: 0, sig: '', json: '', timer: 0 };
 const PUB_EVERY = 60000;
-const PUB_SKIP = ['rev', 'tasks', 'wch', 'claimed', 'fdone', 'prefs', 'mines', 'hilo', 'shift'];
+const PUB_SKIP = ['rev', 'tasks', 'wch', 'claimed', 'fdone', 'prefs', 'mines', 'hilo', 'shift', 'auc'];
 function pubOf(d){ const o = {}; for (const k in d) if (!PUB_SKIP.includes(k)) o[k] = d[k]; o.seen = Date.now(); return o; }
 const pubSig = d => JSON.stringify([d.name, d.avatar, d.code, d.friends, d.table, d.loono, d.playing, d.crash?.r, d.crash?.out]);
 function pubSync(now){
@@ -1618,7 +1785,7 @@ const brokeDoc = d => d && d.balance + euroOf(d) < MIN_BET && !ledgerOpen(d);
 const needBank = () => P && P.balance < MIN_BET && !inRound() && !brokeDoc(P);
 const isBroke = () => brokeDoc(P);
 const tableMin = () => T?.min || MIN_BET;
-function grant(d, key){ if (!d.ach[key]){ d.ach[key] = Date.now(); newBadges.push(key); } }
+function grant(d, key){ if (!d.ach[key]){ d.ach[key] = Date.now(); newBadges.push(key); kGive(d, 'messing'); } }   // every new achievement: a free Messing-Kiste
 function checkBalanceBadges(d){
   const w = d.balance + d.euro;
   if (w >= 10000) grant(d,'k10');
@@ -1628,7 +1795,8 @@ function checkBalanceBadges(d){
 }
 function feltStyle(ownerId){
   const s = pl(ownerId)?.sel || { felt:'green', back:'red' };
-  const f = SHOP.felt.find(x=>x[0]===s.felt) || SHOP.felt[0], b = SHOP.back.find(x=>x[0]===s.back) || SHOP.back[0];
+  const iF = String(s.felt).startsWith('i:') && KFELT[s.felt.slice(2)], iB = String(s.back).startsWith('i:') && KBACK[s.back.slice(2)];   // items from crates
+  const f = iF ? [0, 0, 0, ...iF] : SHOP.felt.find(x=>x[0]===s.felt) || SHOP.felt[0], b = iB ? [0, 0, 0, ...iB] : SHOP.back.find(x=>x[0]===s.back) || SHOP.back[0];
   return `--f1:${f[3]};--f2:${f[4]};--f3:${f[5]};--b1:${b[3]};--b2:${b[4]}`;
 }
 /** debts[debtor][creditor] = amount still owed */
@@ -1781,7 +1949,14 @@ let loggedOnce = false;
 function afterLogin(){
   if (loggedOnce) return; loggedOnce = true;
   const seen = ls.get('seenVersion', null);
-  if (seen !== APP_VERSION){ seenBefore = seen; ls.set('seenVersion', APP_VERSION); if (P.created && Date.now() - P.created > 60e3) openModal('news'); }
+  if (seen !== APP_VERSION){ seenBefore = seen; ls.set('seenVersion', APP_VERSION);
+    if (P.created && Date.now() - P.created > 60e3){
+      // first start since the crate update: the trailer first (once per device), then the news
+      if (verNum(seen) < verNum('1.7') && !ls.get('trailer17', false)){ ls.set('trailer17', true); const go = () => $('intro') ? setTimeout(go, 300) : trailerOpen(() => openModal('news')); go(); }
+      else openModal('news');
+    }
+  }
+  if (!P.k17) withPlayer(d => { if (d.k17) return false; d.k17 = 1; kGive(d, 'messing'); return true; }, 'Kisten-Update');   // a free crate for everyone
   setPlaying(game);
   applyPrefs(); loWatch();
   checkAbortedShift(); checkAbortedHilo(); checkAbortedMines(); crashSettle(); syncClock();
@@ -2380,9 +2555,20 @@ function animateCards(root){
 /* =====================================================================
    v1.1 – Casino home, Glücksrad, Roulette, Automat, Pferderennen, Sportwetten
    ===================================================================== */
-const APP_VERSION = '1.6.4';
+const APP_VERSION = '1.7.1';
 const CL_TITLES = { '1.5.12': 'Technische Verbesserungen' };
 const CHANGELOGS = {
+  '1.7.1': [
+    'Laufende Auktionen erscheinen in der Dynamic Island: Höchstgebot und Restzeit. Lange drücken zeigt den Bieter, antippen öffnet die Auktion',
+  ],
+  '1.7': [
+    'Kisten: Messing, Samt und Tresor. Drin sind Items oder Geldsäcke bis 2,5 Mio. ℒ, mit Öffnungs-Animation und offenen Chancen',
+    'Items haben eine Seltenheit, einen Zustand und eine Nummer. Avatare, Tische, Kartenrücken und Namensfarben kannst du ausrüsten',
+    'Markt: Jedes Item hat einen Kurs, der sich jede Stunde ändert. Sofort verkaufen oder gezielt kaufen',
+    'Auktionen: Versteigere Items an Sammler, mit Countdown und Bietergefecht',
+    'Gratis-Kisten für Tagesaufgaben, Erfolge, Wochen-Herausforderungen und Level. Zum Start bekommt jeder eine Messing-Kiste',
+    'Neue Startanimation beim Öffnen des Casinos',
+  ],
   '1.6.4': [
     'Rangliste „Alle“: Es fehlen keine Spieler mehr, die das Casino länger nicht geöffnet haben',
     'Rangliste: Spieler mit gleichem Vermögen tauschen nicht mehr bei jeder Aktualisierung die Plätze',
@@ -2512,7 +2698,7 @@ const verNum = v => (v||'0').split('.').map(Number).reduce((a,x,i) => a + x * Ma
 let seenBefore = null;
 let game = null;            // null = Casino-Startseite, 'bj', 'roulette', 'slots', 'horses', 'sports'
 let hold = 0;               // Gewinn, der erst nach der Animation im Kontostand erscheint
-const GAME_NAMES = { bj:'Blackjack', roulette:'Roulette', slots:'Automat', horses:'Pferderennen', sports:'Sportwette', wheel:'Glücksrad', hilo:'Höher oder Tiefer', coinflip:'Coin Flip', crash:'Crash', mines:'Mines', tipp:'Tipprunde', duel:'Freundeswette', loono:'Loono' };
+const GAME_NAMES = { bj:'Blackjack', roulette:'Roulette', slots:'Automat', horses:'Pferderennen', sports:'Sportwette', wheel:'Glücksrad', hilo:'Höher oder Tiefer', coinflip:'Coin Flip', crash:'Crash', mines:'Mines', tipp:'Tipprunde', duel:'Freundeswette', loono:'Loono', kisten:'Kisten' };
 ACH.splice(ACH.length - 2, 0,
   ['r_num','🎯','Volltreffer','Beim Roulette eine einzelne Zahl getroffen'],
   ['jackpot','7️⃣','Jackpot','Am Automaten drei Siebenen gedreht'],
@@ -2531,6 +2717,10 @@ ACH.splice(ACH.length - 2, 0,
   ['weekly','🏅','Wochenheld','Alle drei Wochen-Herausforderungen geschafft'],
   ['lvl10','🎖️','Aufsteiger','Level 10 erreicht'],
   ['loono','🎴','Loono!','Eine Runde Loono gewonnen'],
+  ['kiste1','🗝️','Aufgeschlossen','Deine erste Kiste geöffnet'],
+  ['sammler','🗃️','Sammler','20 Items gleichzeitig in der Sammlung'],
+  ['auktion','🔨','Zum Ersten …','Ein Item versteigert'],
+  ['mythisch','🌟','Mythisch!','Ein mythisches Item aus einer Kiste gezogen'],
 );
 const pick = arr => arr[rnd(arr.length)];
 const secs = ms => new Promise(r => setTimeout(r, ms));
@@ -3206,6 +3396,7 @@ function islandMode(){
   if (!P) return null;
   if (ISL.msg && Date.now() < ISL.msg.until) return 'msg';
   if (islandCrash()) return 'crash';
+  if (P.auc && !KS.aucOpen) return 'auc';   // a running auction, unless its window is open anyway
   if ((S.busy || S.auto > 0 || Date.now() < (S.endAt || 0)) && !islandHere('slots')) return 'slots';
   return islandItems().length ? 'live' : null;
 }
@@ -3222,6 +3413,17 @@ function islandSlotsHTML(big){
     <div class="ireels big">${reels}</div>
     <div class="ibigmsg${S.res?.pay ? ' win' : ''}">${esc(msg)}</div>
     <div class="row" style="justify-content:center;gap:8px">${S.auto > 0 ? '<button class="btn sm" data-act="sautostop" data-keep="1">Auto stoppen</button>' : ''}<span class="muted small">Antippen: zum Automaten</span></div>
+  </div>`;
+}
+/** the auction in the island: item, highest bid, time left; long press: bigger with the bidder */
+function islandAucHTML(big){
+  const a = P.auc, d = KITEM[a.it.k];
+  if (!big) return `<span class="islide iauc"><span class="iav">🔨</span><span class="iav">${d.ic}</span><b class="num" id="iaucb">–</b><span class="imore num" id="iauct"></span></span>`;
+  return `<div class="ibig">
+    <div class="ibighead"><span>🔨 Auktion</span><span class="muted small num" id="iauct2"></span></div>
+    <div style="text-align:center"><div style="font-size:44px;line-height:1">${d.ic}</div><b>${esc(d.n)}</b><div class="muted small">${kCond(a.it.w)[1]} · Nr. ${a.it.nr}</div></div>
+    <b class="num icrbig" id="iaucb2">–</b><span class="muted small" id="iaucw">Noch kein Gebot</span>
+    <span class="muted small">Antippen: zur Auktion</span>
   </div>`;
 }
 function islandCrashHTML(big){
@@ -3242,7 +3444,7 @@ function islandAskHTML(m, big){
     <div class="row" style="justify-content:center"><button class="btn gold" data-act="${yes}" data-id="${esc(m.id)}" data-keep="1" data-close="1">Annehmen</button><button class="btn" data-act="${no}" data-id="${esc(m.id)}" data-keep="1" data-close="1">Ablehnen</button></div>
   </div>`;
 }
-const ISL_BIG = new Set(['slots', 'crash', 'ask']);
+const ISL_BIG = new Set(['slots', 'crash', 'ask', 'auc']);
 function renderIsland(){
   const el = $('island'), panel = $('islandpanel'); if (!el) return;
   const top = $('top'), mode = islandMode();
@@ -3257,7 +3459,7 @@ function renderIsland(){
   el.classList.remove('out');
   top.classList.add('has-island'); el.hidden = false;
   const ask = mode === 'msg' && ISL.msg.kind !== 'chat';
-  for (const k of ['msg', 'slots', 'crash', 'loono']) el.classList.toggle(k, mode === k);
+  for (const k of ['msg', 'slots', 'crash', 'loono', 'auc']) el.classList.toggle(k, mode === k);
   let key, html, label, swapKey;
   if (mode === 'msg'){
     const m = ISL.msg; swapKey = key = 'msg' + m.t;
@@ -3267,6 +3469,10 @@ function renderIsland(){
     swapKey = key = 'loono' + LO.g.n;
     label = 'Loono: Du bist dran. Antippen zum Spielen';
     html = `<span class="islide ilo"><span class="iav">🎴</span><b>Du bist dran</b><span class="imore num" id="ilot"></span></span>`;
+  } else if (mode === 'auc'){
+    swapKey = key = 'auc' + P.auc.t0;
+    label = `Auktion läuft: ${KITEM[P.auc.it.k].n}. Antippen: zur Auktion, lange drücken: vergrößern`;
+    html = islandAucHTML(false);
   } else if (mode === 'crash'){
     const r = islandCrash(); swapKey = 'crash'; key = 'crash' + r.id;
     label = 'Crash läuft. Antippen: zu Crash, lange drücken: Auszahlen';
@@ -3288,7 +3494,7 @@ function renderIsland(){
   if (ISL.big && ISL_BIG.has(bigMode)){
     const pk = 'big|' + (mode === 'crash' ? key : key);
     panel.hidden = false; panel.classList.add('isbig');
-    if (ISL.pkey !== pk){ ISL.pkey = pk; panel.innerHTML = mode === 'slots' ? islandSlotsHTML(true) : mode === 'crash' ? islandCrashHTML(true) : islandAskHTML(ISL.msg, true); }
+    if (ISL.pkey !== pk){ ISL.pkey = pk; panel.innerHTML = mode === 'slots' ? islandSlotsHTML(true) : mode === 'crash' ? islandCrashHTML(true) : mode === 'auc' ? islandAucHTML(true) : islandAskHTML(ISL.msg, true); }
   } else {
     panel.classList.remove('isbig'); ISL.big = false;
     panel.hidden = !(mode === 'live' && ISL.open);
@@ -3298,7 +3504,7 @@ function renderIsland(){
       if (ISL.pkey !== pk){ ISL.pkey = pk; panel.innerHTML = `<div class="iphead"><b>Live</b><span class="muted small">tippen für den Ticker</span></div>${items.map(({ m, S: st }) => `<button class="iprow" data-act="sopen" data-key="${esc(keyOf(m))}">${islandRow(m, st, true)}</button>`).join('')}`; }
     }
   }
-  if ((mode === 'crash' || mode === 'loono') && !ISL.raf) ISL.raf = requestAnimationFrame(islandFrame);
+  if ((mode === 'crash' || mode === 'loono' || mode === 'auc') && !ISL.raf) ISL.raf = requestAnimationFrame(islandFrame);
 }
 /** live numbers inside the island (Crash multiplier, Loono turn clock) */
 function islandFrame(){
@@ -3318,7 +3524,14 @@ function islandFrame(){
     if (btn){ const can = c.out == null && t >= r.fly && t < r.boom; btn.disabled = !can; btn.textContent = can ? `Auszahlen · ${fmt(Math.floor(c.bet * crMult(r, t)))} ℒ` : c.out > 0 ? `Ausgezahlt bei ${crFmt(c.out)}` : t < r.fly ? 'Gleich geht’s los' : 'Vorbei'; }
   }
   if (mode === 'loono'){ const e = $('ilot'), g = LO.g; if (e && g) e.textContent = Math.max(0, Math.ceil((g.dl - Date.now()) / 1000)) + ' s'; }
-  if (mode === 'crash' || mode === 'loono') ISL.raf = requestAnimationFrame(islandFrame);
+  if (mode === 'auc' && P?.auc){
+    const a = P.auc, t = NOW() - a.t0, left = Math.max(0, Math.ceil((a.end - NOW()) / 1000)), tl = `${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')}`;
+    let n = 0; while (n < a.bids.length && a.bids[n].t <= t) n++;
+    const bid = n ? fmt(a.bids[n - 1].p) : '–', who = n ? `${KBIDDERS[a.bids[n - 1].b][1]} ${KBIDDERS[a.bids[n - 1].b][0]}` : 'Noch kein Gebot';
+    for (const [id, v] of [['iaucb', bid], ['iaucb2', bid === '–' ? '–' : bid + ' ℒ'], ['iauct', tl], ['iauct2', 'noch ' + tl], ['iaucw', who]]){ const e = $(id); if (e && e.textContent !== v){ e.textContent = v; if (id.startsWith('iaucb') && ISL.aucN !== n){ e.classList.remove('bump'); void e.offsetWidth; e.classList.add('bump'); } } }
+    ISL.aucN = n; const e = $('iauct'); if (e) e.classList.toggle('low', left <= 10);
+  }
+  if (mode === 'crash' || mode === 'loono' || mode === 'auc') ISL.raf = requestAnimationFrame(islandFrame);
 }
 function goTo(t, g){ ISL.big = false; ISL.open = false; if (tab !== t) setTab(t); if (g && game !== g && standUp(g)) openGame(g); renderIsland(); }
 const openSlotsFromIsland = () => goTo('table', 'slots');
@@ -3344,6 +3557,7 @@ document.addEventListener('click', e => {
     const mode = islandMode();
     if (mode === 'msg'){ const m = ISL.msg; ISL.msg = null; ISL.key = ''; if (m.kind === 'chat'){ goTo('chat'); openChat(m.cid); } else if (m.kind === 'flip') goTo('account'); else { SP.view = 'mine'; SP.detail = null; goTo('table', 'sports'); } return; }
     if (mode === 'loono') return goTo('table', 'loono');
+    if (mode === 'auc'){ goTo('table', 'kisten'); KS.tab = 'samml'; renderAll(); return kAucView(); }
     if (mode === 'crash') return goTo('table', 'crash');
     if (mode === 'slots') return openSlotsFromIsland();
     const items = islandItems(); if (items.length === 1){ openMatch(keyOf(items[0].m)); } else { ISL.open = !ISL.open; ISL.pkey = ''; renderIsland(); }
@@ -3352,7 +3566,7 @@ document.addEventListener('click', e => {
   if (pan && ISL.big){
     const k = e.target.closest('[data-keep]');
     if (k){ if (k.dataset.close){ ISL.msg = null; ISL.big = false; ISL.key = ''; setTimeout(renderIsland, 50); } return; }
-    const mode = islandMode(); if (mode === 'crash') goTo('table', 'crash'); else if (mode === 'msg'){ const m = ISL.msg; ISL.msg = null; if (m.kind === 'flip') goTo('account'); else { SP.view = 'mine'; goTo('table', 'sports'); } } else openSlotsFromIsland();
+    const mode = islandMode(); if (mode === 'auc'){ goTo('table', 'kisten'); KS.tab = 'samml'; renderAll(); kAucView(); } else if (mode === 'crash') goTo('table', 'crash'); else if (mode === 'msg'){ const m = ISL.msg; ISL.msg = null; if (m.kind === 'flip') goTo('account'); else { SP.view = 'mine'; goTo('table', 'sports'); } } else openSlotsFromIsland();
     return;
   }
   if ((ISL.open || ISL.big) && !pan){ ISL.open = false; ISL.big = false; renderIsland(); }
@@ -3504,6 +3718,7 @@ function gainXP(d, n){
     const r = lvlReward(L); d.balance += r.l; d.euro = (d.euro ?? START_EURO) + r.e;
     lvlUps.push(L); WHY_EXTRA = ' + Level ' + L;
     if (L >= 10) grant(d, 'lvl10');
+    if (L % 5 === 0) kGive(d, L % 25 === 0 ? 'tresor' : 'samt');   // free crates for levels
   }
 }
 function levelLater(L, ms){
@@ -3589,7 +3804,7 @@ function taskClaim(k){
     const t = todayTasks().find(x => x.k === k);
     if (!t || !d.tasks || d.tasks.day !== dayId() || d.tasks.c.includes(k) || (d.tasks.p[k] || 0) < t.n) return false;
     d.tasks.c = [...d.tasks.c, k]; d.balance += TASK_L; gainXP(d, TASK_XP); taskBump(d, 'task_done', 1);
-    all = d.tasks.c.length === TASK_N; if (all){ d.balance += TASK_ALL; grant(d, 'tasks'); }
+    all = d.tasks.c.length === TASK_N; if (all){ d.balance += TASK_ALL; grant(d, 'tasks'); kGive(d, 'messing'); }
     return true;
   }, 'Tagesaufgabe');
   if (ok){ SFX.coins(); toast(all ? `Alle fünf geschafft: +${fmt(TASK_L + TASK_ALL)} ℒ` : `Aufgabe erledigt: +${fmt(TASK_L)} ℒ und ${TASK_XP} XP`); }
@@ -3600,7 +3815,7 @@ function weekClaim(k){
     const t = weekTasks().find(x => x.k === k), w = weekOf(d);
     if (!t || w.c.includes(k) || (w.p[k] || 0) < t.n) return false;
     w.c = [...w.c, k]; d.balance += WEEK_L; gainXP(d, WEEK_XP);
-    all = w.c.length === 3; if (all){ d.balance += WEEK_ALL; grant(d, 'weekly'); }
+    all = w.c.length === 3; if (all){ d.balance += WEEK_ALL; grant(d, 'weekly'); kGive(d, 'samt'); }
     return true;
   }, 'Wochen-Herausforderung');
   if (ok){ SFX.coins(); if (all) celebrate(WEEK_L + WEEK_ALL, 0, { title: 'Wochenheld', icons: '🏅' }); else toast(`Herausforderung geschafft: +${fmt(WEEK_L)} ℒ und ${WEEK_XP} XP`); }
@@ -3631,10 +3846,10 @@ function progressCard(){
     const open = ts.filter(t => !tk.c.includes(t.k)), done = ts.length - open.length;
     body = `${open.map(t => taskRow(t, tk.p[t.k] || 0, false, 'taskclaim', TASK_L)).join('')}
       ${done ? `<div class="task got slim"><span>✓ ${done === TASK_N ? `Alle ${TASK_N} geschafft, morgen gibt es neue` : `${done} erledigt`}</span></div>` : ''}
-      <p class="muted small">Je ${fmt(TASK_L)} ℒ und ${TASK_XP} XP, alle fünf: +${fmt(TASK_ALL)} ℒ extra. Neue Aufgaben jeden Tag um Mitternacht.</p>`;
+      <p class="muted small">Je ${fmt(TASK_L)} ℒ und ${TASK_XP} XP, alle fünf: +${fmt(TASK_ALL)} ℒ und eine Messing-Kiste. Neue Aufgaben jeden Tag um Mitternacht.</p>`;
   } else {
     body = `${ws.map(t => taskRow(t, wk.p[t.k] || 0, wk.c.includes(t.k), 'weekclaim', WEEK_L)).join('')}
-      <p class="muted small">Für alle gleich, ${weekLeft()}. Je ${fmt(WEEK_L)} ℒ und ${WEEK_XP} XP, alle drei: +${fmt(WEEK_ALL)} ℒ extra. Neue Herausforderungen jeden Montag.</p>`;
+      <p class="muted small">Für alle gleich, ${weekLeft()}. Je ${fmt(WEEK_L)} ℒ und ${WEEK_XP} XP, alle drei: +${fmt(WEEK_ALL)} ℒ und eine Samt-Kiste. Neue Herausforderungen jeden Montag.</p>`;
   }
   return `<section class="panel progcard">
     <div class="lvrow"><div class="lvbadge num" aria-label="Level ${lv.L}">${lv.L}</div>
@@ -3704,6 +3919,470 @@ function celebrateEnd(now){
   const el = CEL.el; if (!el) return; CEL.el = null; clearTimeout(CEL.end); cancelAnimationFrame(CEL.raf);
   if (now) return el.remove();
   el.classList.add('out'); setTimeout(() => el.remove(), 400);
+}
+
+/* =====================================================================
+   v1.7 – Kisten, Sammlung, Markt und Auktionen
+   Everything runs on the device: a crate, a sale or an auction is one normal save of the player document.
+   The market prices are computed from the clock, the same on every device, without Firebase.
+   ===================================================================== */
+const KRAR = [
+  { k: 'blau', n: 'Gewöhnlich', w: 7920 },
+  { k: 'lila', n: 'Selten', w: 1600 },
+  { k: 'pink', n: 'Episch', w: 390 },
+  { k: 'rot', n: 'Legendär', w: 72 },
+  { k: 'gold', n: 'Mythisch', w: 18 },
+];
+const KRN = Object.fromEntries(KRAR.map(r => [r.k, r.n]));
+const KTYPE = { av: 'Avatar', felt: 'Tisch', back: 'Kartenrücken', name: 'Namensfarbe', deko: 'Sammlerstück', L: 'Legats' };
+const KCRATES = [
+  { id: 'messing', n: 'Messing-Kiste', price: 1000, cls: '' },
+  { id: 'samt', n: 'Samt-Kiste', price: 5000, cls: ' samt' },
+  { id: 'tresor', n: 'Tresor', price: 25000, cls: ' tresor' },
+];
+// [key, crate, rarity, icon, name, type, base value]; type L = bag of Legats (paid out at once, no market price)
+const KITEMS = [
+  ['schnecke', 'messing', 'blau', '🐌', 'Schnecke', 'av', 380], ['kupfer', 'messing', 'blau', '🟫', 'Kupfer-Rücken', 'back', 420], ['wuerfel', 'messing', 'blau', '🎲', 'Glückswürfel', 'deko', 400],
+  ['klee', 'messing', 'blau', '☘️', 'Kleeblatt', 'av', 450], ['moos', 'messing', 'blau', '🌿', 'Moos-Tisch', 'felt', 450],
+  ['flamingo', 'messing', 'lila', '🦩', 'Flamingo', 'av', 1600], ['mitternacht', 'messing', 'lila', '🌌', 'Mitternachts-Tisch', 'felt', 1800], ['silber', 'messing', 'lila', '🥈', 'Silberpokal', 'deko', 1700],
+  ['drache', 'messing', 'pink', '🐲', 'Drache', 'av', 5200], ['rose', 'messing', 'pink', '🌸', 'Name in Rosé', 'name', 4800],
+  ['lava', 'messing', 'rot', '🌋', 'Lava-Tisch', 'felt', 15000],
+  ['goldkrone', 'messing', 'gold', '👑', 'Goldkrone', 'av', 60000],
+  ['igel', 'samt', 'blau', '🦔', 'Igel', 'av', 1900], ['samtback', 'samt', 'blau', '🟪', 'Samt-Rücken', 'back', 2100], ['faecher', 'samt', 'blau', '🪭', 'Fächer', 'deko', 2000],
+  ['kaktus', 'samt', 'blau', '🌵', 'Kaktus', 'av', 2100], ['pflaume', 'samt', 'blau', '🍇', 'Pflaumen-Tisch', 'felt', 2400],
+  ['pfau', 'samt', 'lila', '🦚', 'Pfau', 'av', 8000], ['bordeauxk', 'samt', 'lila', '🍷', 'Weinroter Tisch', 'felt', 9000], ['maske', 'samt', 'lila', '🎭', 'Theatermaske', 'deko', 8500],
+  ['einhorn', 'samt', 'pink', '🦄', 'Einhorn', 'av', 26000], ['violett', 'samt', 'pink', '💜', 'Name in Violett', 'name', 24000],
+  ['rosen', 'samt', 'rot', '🌹', 'Rosen-Tisch', 'felt', 75000],
+  ['zylinder', 'samt', 'gold', '🎩', 'Zylinder des Barons', 'av', 300000],
+  ['loewe', 'tresor', 'blau', '🦁', 'Löwe', 'av', 9500], ['onyxback', 'tresor', 'blau', '⬛', 'Onyx-Rücken', 'back', 10500], ['uhr', 'tresor', 'blau', '⌚', 'Taschenuhr', 'deko', 10000],
+  ['tiger', 'tresor', 'blau', '🐯', 'Tiger', 'av', 10000], ['marmor', 'tresor', 'blau', '🤍', 'Marmor-Tisch', 'felt', 12000],
+  ['wolf', 'tresor', 'lila', '🐺', 'Wolf', 'av', 40000], ['onyx', 'tresor', 'lila', '🖤', 'Onyx-Tisch', 'felt', 45000], ['barren', 'tresor', 'lila', '🥇', 'Goldbarren', 'deko', 42500],
+  ['adler', 'tresor', 'pink', '🦅', 'Adler', 'av', 125000], ['goldname', 'tresor', 'pink', '✨', 'Name in Gold', 'name', 125000],
+  ['feuer', 'tresor', 'rot', '🔥', 'Feuer-Tisch', 'felt', 375000],
+  ['diamantkrone', 'tresor', 'gold', '💠', 'Diamant-Krone', 'av', 1250000],
+].map(([k, c, r, ic, n, t, base]) => ({ k, c, r, ic, n, t, base }));
+// bags of Legats: about a third of all draws
+const KMONEY = { messing: { blau: [200, 300, 500], lila: [1200, 1800], pink: [5000], rot: [15000], gold: [100000] } };
+for (const [c, f] of [['samt', 5], ['tresor', 25]]) KMONEY[c] = Object.fromEntries(Object.entries(KMONEY.messing).map(([r, a]) => [r, a.map(v => v * f)]));
+const KBAG = { blau: '🪙', lila: '💰', pink: '💰', rot: '💸', gold: '🏆' };
+for (const [c, rs] of Object.entries(KMONEY)) for (const [r, a] of Object.entries(rs)) a.forEach((v, i) => KITEMS.push({ k: `m_${c}_${r}_${i}`, c, r, ic: KBAG[r], n: fmt(v) + ' ℒ', t: 'L', base: v }));
+const KITEM = Object.fromEntries(KITEMS.map(x => [x.k, x]));
+// what an equipped item looks like: table felts, card backs, name colours
+const KFELT = { moos: ['#4a6b2f', '#33501f', '#1f3313'], mitternacht: ['#22306a', '#151f48', '#0b112b'], lava: ['#9a3214', '#661f0a', '#3d1205'], pflaume: ['#5e2c63', '#401d44', '#28112b'],
+  bordeauxk: ['#7d2140', '#55152b', '#350c1a'], rosen: ['#9a1f45', '#69142e', '#410b1c'], marmor: ['#8c8c88', '#62625e', '#3d3d3a'], onyx: ['#2c2c33', '#1a1a1f', '#0d0d10'], feuer: ['#c4511c', '#8a3410', '#521e08'] };
+const KBACK = { kupfer: ['#a0603a', '#7a4428'], samtback: ['#6a2a6e', '#4e1c52'], onyxback: ['#1c1c1c', '#7a6224'] };
+const KNCOL = { rose: '#f5a3c7', violett: '#c9a3ff', goldname: '#f4c430' };
+// condition: wear 0..1; better condition = more valuable. Low numbers are wanted by collectors.
+const KCOND = [[.05, 'Fabrikneu', 1.6], [.20, 'Wie neu', 1.25], [.65, 'Gebraucht', 1], [.90, 'Abgenutzt', .8], [1, 'Ramponiert', .65]];
+const kCond = w => KCOND.find(c => w < c[0]) || KCOND[KCOND.length - 1];
+const kNr = nr => nr <= 9 ? 2 : nr <= 99 ? 1.3 : 1;
+const K_RTP = .98, K_SELL = .03, K_BUY = .05, K_AUC = .05, K_AUC_MS = window.__aucMs || 120000;
+const K_CN = KCOND.reduce((s, c, i) => s + (c[0] - (i ? KCOND[i - 1][0] : 0)) * c[2], 0) * (9 * 2 + 90 * 1.3 + 9900) / 9999;   // average condition × number bonus
+{ // scale the items of every crate so that the average draw (bags included) is worth K_RTP × price
+  const condAvg = K_CN, nrAvg = 1;
+  for (const c of KCRATES){
+    let money = 0, items = 0;
+    for (const r of KRAR){ const l = KITEMS.filter(i => i.c === c.id && i.r === r.k), p = r.w / 10000 / l.length;
+      for (const i of l) if (i.t === 'L') money += p * i.base; else items += p * i.base * condAvg * nrAvg; }
+    const f = (K_RTP * c.price - money) / items;
+    for (const i of KITEMS) if (i.c === c.id && i.t !== 'L') i.base = Math.round(i.base * f);
+  }
+}
+
+/* ---------- market prices: one calm random walk per item, the same on every device ---------- */
+function khash(str){ let h = 2166136261; for (let i = 0; i < str.length; i++){ h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } h ^= h >>> 13; h = Math.imul(h, 0x5bd1e995); h ^= h >>> 15; return (h >>> 0) / 4294967296; }
+const kgauss = (k, h) => { const u = Math.max(1e-9, khash(k + ':' + h)), v = khash(k + '|' + h); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); };
+const KCURVE = {};
+/** market factor of an item for every hour of the last 14 days; it always drifts back to 1 */
+function kCurve(k){
+  const hNow = Math.floor(NOW() / 3600e3);
+  if (KCURVE[k]?.h === hNow) return KCURVE[k].v;
+  const vol = { blau: .006, lila: .008, pink: .01, rot: .012, gold: .015 }[KITEM[k].r], half = vol * vol / (1 - .995 * .995) / 2, out = [];
+  let x = 0;
+  for (let h = hNow - 24 * 35; h <= hNow; h++){ x = .995 * x + vol * kgauss(k, h); if (h > hNow - 24 * 14) out.push(Math.exp(x - half)); }
+  KCURVE[k] = { h: hNow, v: out }; return out;
+}
+const kMkt = k => { const c = kCurve(k); return c[c.length - 1]; };
+const kChange = k => { const c = kCurve(k); return c[c.length - 1] / c[c.length - 25] - 1; };
+const kValue = it => KITEM[it.k].base * kMkt(it.k) * kCond(it.w)[2] * kNr(it.nr);
+const kSellPrice = it => Math.round(kValue(it) * (1 - K_SELL));
+const kBuyPrice = k => Math.round(KITEM[k].base * kMkt(k) * (1 + K_BUY));
+const kCrateEV = c => KRAR.reduce((s, r) => { const l = KITEMS.filter(i => i.c === c.id && i.r === r.k); return s + r.w / 10000 * l.reduce((a, i) => a + (i.t === 'L' ? i.base : i.base * kMkt(i.k) * K_CN), 0) / l.length; }, 0);
+const kCollection = p => (p?.items || []).reduce((s, it) => s + (KITEM[it.k] ? kValue(it) : 0), 0);
+
+function kMake(def, w = Math.random(), nr = 1 + rnd(9999)){ return { k: def.k, w: Math.round(w * 1e4) / 1e4, nr, id: Date.now().toString(36) + rnd(1e6).toString(36) }; }
+function kRoll(c){
+  let x = rnd(10000), r = KRAR[0];
+  for (const q of KRAR){ if (x < q.w){ r = q; break; } x -= q.w; }
+  const list = KITEMS.filter(i => i.c === c.id && i.r === r.k), def = list[rnd(list.length)];
+  return def.t === 'L' ? { k: def.k, money: def.base } : kMake(def);
+}
+
+/* ---------- free crates: tasks, achievements, weekly challenges, levels ---------- */
+const kGive = (d, id, n = 1) => { d.crates = { ...(d.crates || {}), [id]: ((d.crates || {})[id] || 0) + n }; KS.gift.push(id); };
+const kFree = () => Object.values(P?.crates || {}).reduce((a, b) => a + b, 0);
+const KS = { tab: 'kisten', busy: false, fast: ls.get('kfast', false), last: null, gift: [], key: '', sheet: null };
+function kGiftToast(){ if (!KS.gift.length) return; const g = KS.gift.splice(0); const n = g.length, c = KCRATES.find(x => x.id === g[g.length - 1]);
+  setTimeout(() => { toast(`🎁 ${n > 1 ? n + ' Gratis-Kisten' : c.n + ' geschenkt'}! Im Casino unter „Kisten“`); notify('🎁', n > 1 ? `${n} Gratis-Kisten bekommen` : `${c.n} bekommen`, { tab: 'table', game: 'kisten' }); }, 2600); }
+
+/* ---------- equip ---------- */
+function kEquipped(it){ const d = KITEM[it.k];
+  return d.t === 'av' ? P.avatar === d.ic && P.eq?.av === it.id : d.t === 'felt' ? P.sel?.felt === 'i:' + it.k && P.eq?.felt === it.id
+    : d.t === 'back' ? P.sel?.back === 'i:' + it.k && P.eq?.back === it.id : d.t === 'name' ? P.eq?.name === it.id && !!P.ncol : false; }
+function kUnequip(d, id){
+  const e = d.eq || {};
+  if (e.av === id){ if (d.avatar === KITEM[(d.items.find(x => x.id === id) || {}).k]?.ic) d.avatar = '🙂'; delete e.av; }
+  if (e.felt === id){ d.sel = { ...d.sel, felt: 'green' }; delete e.felt; }
+  if (e.back === id){ d.sel = { ...d.sel, back: 'red' }; delete e.back; }
+  if (e.name === id){ d.ncol = null; delete e.name; }
+  d.eq = { ...e };
+}
+function kEquip(id){
+  const it = P.items.find(x => x.id === id); if (!it) return; const def = KITEM[it.k], on = kEquipped(it);
+  withPlayer(d => {
+    d.eq ||= {};
+    if (on) kUnequip(d, id);
+    else if (def.t === 'av'){ d.avatar = def.ic; d.eq = { ...d.eq, av: id }; }
+    else if (def.t === 'felt'){ d.sel = { ...d.sel, felt: 'i:' + it.k }; d.eq = { ...d.eq, felt: id }; }
+    else if (def.t === 'back'){ d.sel = { ...d.sel, back: 'i:' + it.k }; d.eq = { ...d.eq, back: id }; }
+    else if (def.t === 'name'){ d.ncol = KNCOL[it.k]; d.eq = { ...d.eq, name: id }; }
+    return true;
+  });
+  tone(1200, .08, { type: 'triangle', vol: .06 }); toast(on ? `${def.n} abgelegt` : `${def.n} ausgerüstet`);
+}
+const nameStyle = id => { const c = pl(id)?.ncol; return c ? ` style="color:${esc(c)}"` : ''; };
+
+/* ---------- open a crate ---------- */
+async function kOpen(id){
+  if (KS.busy || !P) return;
+  if (unsavedMs() > 12000) return toast('Dein Spielstand wird gerade nicht gespeichert. Warte, bis die Verbindung wieder da ist.');
+  const c = KCRATES.find(x => x.id === id), free = (P.crates?.[id] || 0) > 0;
+  if (!free && P.balance < c.price) return toast(P.euro > 0 ? 'Nicht genug Legats. Heb auf der Bank etwas ab.' : 'Nicht genug Legats.');
+  const win = kRoll(c), def = KITEM[win.k];
+  KS.busy = true;   // free crates won on the way are announced after the reveal
+  const ok = withPlayer(d => { WHY = c.n + (free ? ' (gratis)' : '');
+    if (free){ if (!(d.crates?.[id] > 0)) return false; d.crates = { ...d.crates, [id]: d.crates[id] - 1 }; }
+    else { if (d.balance < c.price) return false; d.balance -= c.price; }
+    if (win.money){ d.balance += win.money; WHY += ': ' + def.n; }
+    else { d.items = [...(d.items || []), win].slice(-400); WHY += ': ' + def.n; }
+    d.kst = { n: (d.kst?.n || 0) + 1, best: Math.max(d.kst?.best || 0, win.money || kValue(win)) };
+    grant(d, 'kiste1'); if (def.r === 'gold') grant(d, 'mythisch'); if ((d.items || []).length >= 20) grant(d, 'sammler');
+    return true;
+  });
+  if (!ok){ KS.busy = false; return; }
+  if (win.money) hold = win.money;   // the header shows the win only after the reveal
+  KS.busy = true; KS.last = id; renderAll();
+  const box = $('kopen'), fast = KS.fast || reduceMotion;
+  const chest = document.querySelector(`#g-kisten [data-kchest="${id}"]`);
+  if (!fast && chest){ chest.classList.add('shake'); tone(220, .2, { type: 'triangle', vol: .08 }); await secs(900); chest.classList.add('open'); noise(.45, { vol: .2, freq: 900 }); }
+  // the strip: 55 random draws, the real one at 46
+  const strip = Array.from({ length: 55 }, () => kRoll(c)); strip[46] = win;
+  box.hidden = false;
+  box.innerHTML = `<div class="kreelwrap"><div class="kmarker"></div><div class="kreel">${strip.map((it, i) => kCard(it, i === 46 ? ' target' : '')).join('')}</div></div>`;
+  box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  const reel = box.querySelector('.kreel'); void reel.offsetWidth;
+  const W = 126, wrapW = reel.parentElement.clientWidth, dist = 46 * W + 59 - wrapW / 2 + (Math.random() - .5) * 96, dur = fast ? 1.2 : 6.2;
+  reel.style.transition = `transform ${dur}s cubic-bezier(.08,.62,.1,1)`; reel.style.transform = `translateX(${-dist}px)`;
+  let lastI = -1; const t0 = performance.now();
+  await new Promise(res => { const f = () => { if (!reel.isConnected) return res();
+    const m = new DOMMatrix(getComputedStyle(reel).transform).m41, i = Math.floor((-m + wrapW / 2) / W);
+    if (i !== lastI){ lastI = i; tone(1400 + Math.random() * 300, .03, { type: 'square', vol: .025 }); }
+    if (performance.now() - t0 < dur * 1000 + 60) requestAnimationFrame(f); else res(); }; requestAnimationFrame(f); });
+  reel.querySelector('.target')?.classList.add('win');
+  await secs(fast ? 150 : 450);
+  chest?.classList.remove('shake', 'open');
+  kReveal(win);
+}
+const kCard = (it, extra = '') => { const d = KITEM[it.k]; return `<div class="kit r-${d.r}${extra}"><div class="ic">${d.ic}</div><div class="nm">${esc(d.n)}</div><div class="ty">${KRN[d.r]}</div></div>`; };
+function kReveal(win){
+  const d = KITEM[win.k], big = ['rot', 'gold'].includes(d.r), mid = d.r === 'pink', it = win.money ? null : P.items.find(x => x.id === win.id);
+  const fan = n => n.forEach((f, i) => tone(f, .35, { type: 'triangle', vol: .07, at: i * .09 }));
+  fan(big || mid ? [523, 659, 784, 1047, 1319] : [523, 659, 784]); if (big) setTimeout(() => fan([523, 659, 784, 1047, 1319]), 400);
+  buzz(big ? [40, 50, 40, 50, 80] : [20]);
+  const el = document.createElement('div'); el.className = 'kreveal r-' + d.r;
+  const c = it ? kCond(it.w) : null;
+  el.innerHTML = `<div class="krays"></div>${big || mid ? '<canvas></canvas>' : ''}<div class="kbox">
+    <div class="rn">${KRN[d.r]}</div><div class="kbig">${d.ic}</div><div class="tn">${esc(d.n)}</div>
+    ${it ? `<div class="muted">${KTYPE[d.t]} · ${c[1]} · Nr. ${it.nr}${kNr(it.nr) > 1 ? ' <b style="color:var(--brass)">(seltene Nummer!)</b>' : ''}</div>
+      <div class="num" style="color:var(--brass);font-size:20px">Wert heute: ${fmt(kValue(it))} ℒ</div>` : '<div class="muted">sofort gutgeschrieben</div>'}
+    <div class="row" style="justify-content:center">${it ? `<button class="btn gold" data-kx>In die Sammlung</button>${d.t !== 'deko' ? `<button class="btn" data-kxeq="${it.id}">Ausrüsten</button>` : ''}<button class="btn" data-kxsell="${it.id}">Verkaufen: ${fmt(kSellPrice(it))} ℒ</button>` : '<button class="btn gold" data-kx>Weiter</button>'}</div></div>`;
+  document.body.appendChild(el);
+  if (big || mid) kConfetti(el.querySelector('canvas'), d.r === 'gold' ? 220 : big ? 150 : 80);
+  const done = () => { el.classList.add('out'); setTimeout(() => el.remove(), 250); KS.busy = false; release(); kGiftToast(); };
+  el.addEventListener('click', e => {
+    if (e.target.closest('[data-kx]')) done();
+    const q = e.target.closest('[data-kxeq]'); if (q){ kEquip(q.dataset.kxeq); done(); }
+    const s = e.target.closest('[data-kxsell]'); if (s){ kSell(s.dataset.kxsell); done(); }
+  });
+}
+function kConfetti(cv, n){
+  const cx = cv.getContext('2d'), dpr = Math.min(2, devicePixelRatio || 1), W = innerWidth, H = innerHeight;
+  cv.width = W * dpr; cv.height = H * dpr; cx.scale(dpr, dpr);
+  const C = ['#f3dc9a', '#d1ad62', '#e8c36a', '#fff3c4', '#eb4b3c', '#4b8bf5', '#9a5cf0', '#e0479e'], Q = [];
+  const add = (x, y, burst) => { const a = burst ? Math.random() * Math.PI * 2 : Math.PI / 2, v = burst ? 4 + Math.random() * 9 : 1 + Math.random() * 2, coin = Math.random() < .45;
+    Q.push({ x, y, vx: burst ? Math.cos(a) * v : (Math.random() - .5) * 2, vy: burst ? Math.sin(a) * v - 6 : v, r: coin ? 7 + Math.random() * 6 : 4 + Math.random() * 4, rot: Math.random() * 6, vr: (Math.random() - .5) * .3, fl: Math.random() * 6, coin, c: C[rnd(coin ? 4 : C.length)] }); };
+  for (let i = 0; i < n; i++) add(W / 2, H * .45, true);
+  let rain = 80;
+  const f = () => { if (!cv.isConnected) return; cx.clearRect(0, 0, W, H);
+    if (rain-- > 0) add(Math.random() * W, -20, false);
+    for (const q of Q){ q.vy += .22; q.vx *= .99; q.x += q.vx; q.y += q.vy; q.rot += q.vr; q.fl += .15; const s = Math.abs(Math.cos(q.fl));
+      cx.save(); cx.translate(q.x, q.y); cx.rotate(q.rot);
+      if (q.coin){ cx.scale(Math.max(.15, s), 1); cx.beginPath(); cx.arc(0, 0, q.r, 0, 7); const g = cx.createRadialGradient(-q.r * .3, -q.r * .3, 1, 0, 0, q.r); g.addColorStop(0, '#fff3c4'); g.addColorStop(.5, q.c); g.addColorStop(1, '#8f6c1f'); cx.fillStyle = g; cx.fill(); }
+      else { cx.scale(1, Math.max(.2, s)); cx.fillStyle = q.c; cx.fillRect(-q.r, -q.r / 2, q.r * 2, q.r); }
+      cx.restore(); }
+    for (let i = Q.length - 1; i >= 0; i--) if (Q[i].y > H + 40) Q.splice(i, 1);
+    if (Q.length) requestAnimationFrame(f); };
+  requestAnimationFrame(f);
+}
+
+/* ---------- sell, buy ---------- */
+function kSell(id){
+  const it = P.items.find(x => x.id === id); if (!it) return;
+  const v = kSellPrice(it), n = KITEM[it.k].n;
+  if (withPlayer(d => { WHY = 'Item verkauft: ' + n; const i = (d.items || []).findIndex(x => x.id === id); if (i < 0) return false; kUnequip(d, id); d.items = d.items.filter(x => x.id !== id); d.balance += v; return true; })){
+    SFX.coins(); toast(`${n} verkauft: +${fmt(v)} ℒ`);
+  }
+}
+function kBuy(k){
+  const p = kBuyPrice(k), def = KITEM[k];
+  if (unsavedMs() > 12000) return toast('Dein Spielstand wird gerade nicht gespeichert. Warte, bis die Verbindung wieder da ist.');
+  if (P.balance < p) return toast('Nicht genug Legats.');
+  const it = kMake(def, .2 + Math.random() * .45);
+  if (withPlayer(d => { WHY = 'Item gekauft: ' + def.n; if (d.balance < p) return false; d.balance -= p; d.items = [...(d.items || []), it].slice(-400); if (d.items.length >= 20) grant(d, 'sammler'); return true; })){
+    SFX.coins(); toast(`${def.n} gekauft (Nr. ${it.nr})`); kGiftToast();
+  }
+}
+
+/* ---------- auction against computer collectors ----------
+   The collectors' limits and every bid are drawn at the start and saved, so leaving or reloading changes nothing. */
+const KBIDDERS = [['Graf Zahlreich', '🧐'], ['Tante Erna', '👵'], ['Sammler-Sigi', '🤓'], ['Baronin von Bling', '💅'], ['Onkel Dagobert', '🦆'], ['Kunsthändler Klaus', '🧑‍🎨'], ['Lady Luck', '🍀'], ['Der Scheich', '🕌']];
+function kAucStart(id, minPct){
+  const it = P.items.find(x => x.id === id); if (!it || P.auc) return;
+  const v = kValue(it), min = Math.max(100, Math.round(v * minPct / 100));
+  const pool = KBIDDERS.map((_, i) => i).sort(() => Math.random() - .5).slice(0, 3 + rnd(4));
+  const lims = pool.map(() => v * Math.exp(-.05 + .2 * kgauss('a' + Math.random(), 0)));
+  const steps = []; let price = 0, lead = -1;
+  const inc = p => Math.max(Math.round(v * .02), Math.round(p * .04));
+  for (let g = 0; g < 200; g++){
+    const next = lead >= 0 ? price + inc(price) : min;
+    const cand = pool.map((b, i) => i).filter(i => i !== lead && lims[i] >= next); if (!cand.length) break;
+    lead = cand[rnd(cand.length)]; price = next; steps.push({ b: pool[lead], p: price });
+  }
+  // spread the bids over the time, with a burst near the end
+  // Firestore can't store lists inside lists, so every bid is an object { b: bidder, p: price, t: ms after the start }
+  const bids = steps.map((s, i) => { const f = i / Math.max(1, steps.length - 1); return { ...s, t: Math.round(f < .7 ? 3000 + f / .7 * K_AUC_MS * .65 : K_AUC_MS * .7 + (f - .7) / .3 * K_AUC_MS * .27) }; });
+  const t0 = NOW();
+  if (!withPlayer(d => { const i = (d.items || []).findIndex(x => x.id === id); if (i < 0 || d.auc) return false; kUnequip(d, id); d.items = d.items.filter(x => x.id !== id); d.auc = { it, min, t0, end: t0 + K_AUC_MS, bids }; return true; })) return;
+  SFX.chip(); kAucView();
+}
+/** finish the auction once its time is up: pay out or give the item back */
+function kAucSettle(){
+  const a = P?.auc; if (!a || NOW() < a.end || KS.settling) return;
+  KS.settling = true;
+  const sold = a.bids.length > 0, price = sold ? a.bids[a.bids.length - 1].p : 0, net = Math.round(price * (1 - K_AUC)), n = KITEM[a.it.k]?.n || 'Item';
+  const ok = withPlayer(d => { if (!d.auc || d.auc.t0 !== a.t0) return false; WHY = sold ? 'Auktion: ' + n : 'Auktion ohne Gebot: ' + n;
+    if (sold){ d.balance += net; grant(d, 'auktion'); } else d.items = [...(d.items || []), a.it].slice(-400);
+    d.auc = null; return true; });
+  KS.settling = false;
+  if (ok && !KS.aucOpen){ const tx = sold ? `${n} versteigert für ${fmt(price)} ℒ (+${fmt(net)} ℒ)` : `${n}: kein Gebot, das Item ist zurück`; toast('🔨 ' + tx); notify('🔨', tx, { tab: 'table', game: 'kisten' }); if (sold) SFX.coins(); }
+  if (ok) kGiftToast();
+}
+setInterval(() => { if (P?.auc) kAucSettle(); if (KS.aucOpen) kAucTick(); }, 250);
+function kAucView(){
+  const a = P?.auc; if (!a) return;
+  const d = KITEM[a.it.k];
+  KS.aucOpen = { t0: a.t0, a, shown: -1, done: false }; ISL.big = false; renderIsland();
+  kSheet(`<div class="kauc r-${d.r}"><div style="font-size:54px">${d.ic}</div><b style="font:700 22px/1 var(--f-display)">${esc(d.n)}</b><span class="muted small">${kCond(a.it.w)[1]} · Nr. ${a.it.nr} · Mindestgebot ${fmt(a.min)} ℒ</span>
+    <div class="clock num" id="kaclock">2:00</div><div class="muted small">Höchstgebot</div><div class="bid num" id="kabid">–</div><div class="who" id="kawho">Warte auf Gebote …</div>
+    <div class="blog" id="kalog"></div><div id="kaend"></div>
+    <div id="kahint"><p class="muted small">Du kannst das Fenster schließen. Die Auktion läuft weiter und oben in der Dynamic Island mit.</p><button class="btn sm" data-ksx>Schließen</button></div></div>`, () => { KS.aucOpen = null; setTimeout(renderIsland, 0); });
+  kAucTick();
+}
+function kAucTick(){
+  const o = KS.aucOpen; if (!o || !$('kaclock')) return;
+  const a = o.a, t = NOW() - a.t0, left = Math.max(0, a.end - NOW());
+  const cl = $('kaclock'); cl.textContent = (s => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`)(Math.ceil(left / 1000));
+  cl.classList.toggle('low', left < 10000);
+  let n = 0; while (n < a.bids.length && a.bids[n].t <= t) n++;
+  if (n !== o.shown){
+    if (n > 0){ const { b, p } = a.bids[n - 1]; $('kabid').textContent = fmt(p) + ' ℒ'; $('kawho').textContent = `${KBIDDERS[b][1]} ${KBIDDERS[b][0]}`; }
+    $('kalog').innerHTML = a.bids.slice(0, n).reverse().map(({ b, p }) => `<div><span>${KBIDDERS[b][1]} ${esc(KBIDDERS[b][0])}</span><span class="num">${fmt(p)} ℒ</span></div>`).join('');
+    if (o.shown >= 0 && n > o.shown) tone(700 + Math.min(600, n * 25), .07, { type: 'triangle', vol: .06 });
+    o.shown = n;
+  }
+  if (left <= 0 && !o.done){
+    o.done = true; kAucSettle();
+    const sold = a.bids.length > 0, price = sold ? a.bids[a.bids.length - 1].p : 0, v = kValue(a.it), end = $('kaend'); $('kahint').hidden = true;
+    if (sold){ const { b } = a.bids[a.bids.length - 1]; tone(523, .4, { type: 'triangle', vol: .07 }); tone(784, .5, { type: 'triangle', vol: .07, at: .12 }); setTimeout(() => SFX.coins(), 300);
+      end.innerHTML = `<div class="hammer">Zum Ersten, zum Zweiten … verkauft!</div><p>an ${KBIDDERS[b][1]} ${esc(KBIDDERS[b][0])} für <b class="num">${fmt(price)} ℒ</b><br><span class="muted small">Du bekommst ${fmt(price * (1 - K_AUC))} ℒ (5 % Gebühr) · ${price >= v ? `<span style="color:var(--win)">${Math.round((price / v - 1) * 100)} % über dem Marktwert</span>` : `<span style="color:var(--lose)">${Math.round((1 - price / v) * 100)} % unter dem Marktwert</span>`}</span></p>`; }
+    else { tone(200, .4, { vol: .1 }); end.innerHTML = `<div class="hammer" style="color:var(--muted)">Kein Gebot</div><p class="muted">Niemand wollte mindestens ${fmt(a.min)} ℒ zahlen. Das Item ist zurück in deiner Sammlung.</p>`; }
+    end.insertAdjacentHTML('beforeend', '<div class="row" style="justify-content:center"><button class="btn gold" data-ksx>Fertig</button></div>');
+  }
+}
+
+/* ---------- sheets (item, market item, auction setup) ---------- */
+function kSheet(html, onClose){
+  $('ksheet')?.remove();
+  const el = document.createElement('div'); el.className = 'ksheet'; el.id = 'ksheet'; el.innerHTML = `<div class="kcard">${html}</div>`;
+  el._close = onClose;
+  el.addEventListener('click', e => { if (e.target === el || e.target.closest('[data-ksx]')) kSheetClose(); });
+  document.body.appendChild(el);
+}
+function kSheetClose(){ const el = $('ksheet'); if (!el) return; el._close?.(); el.remove(); }
+function kChart(k){
+  const c = kCurve(k).filter((v, i, a) => (a.length - 1 - i) % 3 === 0), W = 520, H = 150, mn = Math.min(...c), mx = Math.max(...c), base = KITEM[k].base;
+  const y = v => (H - 14 - (v - mn) / (mx - mn || 1) * (H - 28)).toFixed(1);
+  const pts = c.map((v, i) => `${(i / (c.length - 1) * W).toFixed(1)},${y(v)}`).join(' '), up = c[c.length - 1] >= c[0], col = up ? '#79d8a2' : '#ec8a78';
+  return `<svg class="kchart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><defs><linearGradient id="kg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${col}" stop-opacity=".25"/><stop offset="1" stop-color="${col}" stop-opacity="0"/></linearGradient></defs>
+    <polygon points="0,${H} ${pts} ${W},${H}" fill="url(#kg)"/><polyline points="${pts}" fill="none" stroke="${col}" stroke-width="2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+    <text x="4" y="12" fill="#a3b7ab" font-size="11">${fmt(base * mx)} ℒ</text><text x="4" y="${H - 2}" fill="#a3b7ab" font-size="11">${fmt(base * mn)} ℒ</text><text x="${W / 2}" y="${H - 2}" fill="#a3b7ab" font-size="11" text-anchor="middle">vor 7 Tagen</text><text x="${W - 4}" y="${H - 2}" fill="#a3b7ab" font-size="11" text-anchor="end">jetzt</text></svg>`;
+}
+const kTrend = k => { const ch = kChange(k); return `<span class="${ch >= 0 ? 'kup' : 'kdown'}">${ch >= 0 ? '▲' : '▼'} ${(Math.abs(ch) * 100).toFixed(1).replace('.', ',')} %</span>`; };
+function kItemSheet(id){
+  const it = P.items.find(x => x.id === id); if (!it) return;
+  const d = KITEM[it.k], c = kCond(it.w), v = kValue(it), on = kEquipped(it);
+  kSheet(`<div class="khd r-${d.r}"><div class="kbig2">${d.ic}</div><div><span class="kchip">${KRN[d.r]}</span><br><b>${esc(d.n)}</b><div class="muted small">${KTYPE[d.t]} aus der ${KCRATES.find(x => x.id === d.c).n}</div></div></div>
+    <div class="kkv"><span>Zustand</span><span>${c[1]} <span class="muted small">(Abnutzung ${(it.w * 100).toFixed(1).replace('.', ',')} %${c[2] !== 1 ? `, ${c[2] > 1 ? '+' : '−'}${Math.round(Math.abs(c[2] - 1) * 100)} % Wert` : ''})</span></span>
+      <span>Nummer</span><span>Nr. ${it.nr}${kNr(it.nr) > 1 ? ` <span class="muted small">(seltene Nummer, +${Math.round((kNr(it.nr) - 1) * 100)} % Wert)</span>` : ''}</span>
+      <span>Wert heute</span><span class="num" style="color:var(--brass)">${fmt(v)} ℒ ${kTrend(it.k)}</span></div>
+    ${kChart(it.k)}
+    <div class="kacts">${d.t !== 'deko' ? `<button class="btn" data-act="keq" data-id="${it.id}">${on ? 'Ablegen' : 'Ausrüsten'}</button>` : ''}<button class="btn" data-act="ksell" data-id="${it.id}">Verkaufen: ${fmt(kSellPrice(it))} ℒ</button><button class="btn gold" data-act="kaucset" data-id="${it.id}" ${P.auc ? 'disabled' : ''}>Versteigern</button></div>
+    <p class="muted small">${P.auc ? 'Es läuft schon eine Auktion. Du kannst nur ein Item gleichzeitig versteigern. ' : ''}Verkaufen: sofort zum Marktkurs, 3 % Gebühr. Versteigern: 2 Minuten lang bieten Sammler, das kann mehr oder weniger bringen, 5 % Gebühr.${d.t !== 'deko' ? ' Ausgerüstet sehen deine Freunde es am Tisch und in der Rangliste.' : ''}</p>
+    <div class="kacts"><button class="btn sm" data-ksx>Schließen</button></div>`);
+}
+function kMarketSheet(k){
+  const d = KITEM[k], own = (P.items || []).filter(x => x.k === k), m = d.base * kMkt(k), p = kBuyPrice(k);
+  kSheet(`<div class="khd r-${d.r}"><div class="kbig2">${d.ic}</div><div><span class="kchip">${KRN[d.r]}</span><br><b>${esc(d.n)}</b><div class="muted small">${KTYPE[d.t]} · ${kTrend(k)} in 24 h</div></div></div>
+    ${kChart(k)}
+    <table class="kodds">${KCOND.map(c => `<tr><td>${c[1]}</td><td class="r">${fmt(m * c[2])} ℒ</td></tr>`).join('')}</table>
+    <div class="kacts"><button class="btn gold" data-act="kbuy" data-k="${k}" ${P.balance < p ? 'disabled' : ''}>Kaufen (Gebraucht): ${fmt(p)} ℒ</button></div>
+    <p class="muted small">Du bekommst ein Item im Zustand „Gebraucht“ mit zufälliger Nummer. 5 % Aufschlag.</p>
+    ${own.length ? `<h3 style="margin-top:12px">Deine (${own.length})</h3><div class="kinv">${own.map(kInvCard).join('')}</div>` : ''}
+    <div class="kacts"><button class="btn sm" data-ksx>Schließen</button></div>`);
+}
+function kAucSetup(id){
+  const it = P.items.find(x => x.id === id); if (!it) return; const d = KITEM[it.k], v = kValue(it);
+  kSheet(`<div class="khd r-${d.r}"><div class="kbig2">${d.ic}</div><div><b>${esc(d.n)} versteigern</b><div class="muted small">Wert heute ${fmt(v)} ℒ</div></div></div>
+    <p style="margin:14px 0 6px">Mindestgebot: <b class="num" id="kminv">${fmt(v * .7)} ℒ</b></p>
+    <input class="kslider" type="range" id="kminr" min="30" max="130" value="70" aria-label="Mindestgebot in Prozent vom Wert">
+    <p class="muted small">Niedriges Mindestgebot: Es wird fast sicher verkauft. Hohes Mindestgebot: Vielleicht bietet niemand so viel, dann bekommst du das Item zurück.</p>
+    <div class="kacts"><button class="btn" data-ksx>Abbrechen</button><button class="btn gold" data-act="kaucgo" data-id="${id}">Auktion starten (2 Min.)</button></div>`);
+  $('kminr').oninput = e => { $('kminv').textContent = fmt(v * e.target.value / 100) + ' ℒ'; };
+}
+
+/* ---------- the screen ---------- */
+const kInvCard = it => { const d = KITEM[it.k]; if (!d) return ''; const c = kCond(it.w); return `<button class="kit r-${d.r}" data-act="kitem" data-id="${it.id}"><span class="knr">Nr. ${it.nr}</span>${kEquipped(it) ? '<span class="keq" title="ausgerüstet">✅</span>' : ''}<div class="ic">${d.ic}</div><div class="nm">${esc(d.n)}</div><div class="cond">${c[1]}</div><div class="val">${fmt(kValue(it))} ℒ</div></button>`; };
+const kChest = (c, attr = '') => `<div class="kchest${c.cls}"${attr}><div class="body"></div><div class="band l"></div><div class="band r"></div><div class="lid"></div><div class="gem"></div><div class="lock"></div></div>`;
+function kSpark(k){ const c = kCurve(k).slice(-24 * 7).filter((v, i) => i % 4 === 0), w = 90, h = 30, mn = Math.min(...c), mx = Math.max(...c), up = c[c.length - 1] >= c[0];
+  return `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" aria-hidden="true"><polyline points="${c.map((v, i) => `${(i / (c.length - 1) * w).toFixed(1)},${(h - 2 - (v - mn) / (mx - mn || 1) * (h - 4)).toFixed(1)}`).join(' ')}" fill="none" stroke="${up ? '#79d8a2' : '#ec8a78'}" stroke-width="1.6"/></svg>`; }
+function renderKisten(){
+  const el = $('kmain'); if (!el || !P) return;
+  const t = KS.tab, items = P.items || [], free = P.crates || {};
+  const seg = `<div class="seg kseg" role="tablist">${[['kisten', 'Kisten'], ['samml', `Sammlung${items.length ? ' · ' + items.length : ''}`], ['markt', 'Markt']].map(([k, l]) => `<button data-act="ktab" data-v="${k}" aria-pressed="${t === k}">${l}</button>`).join('')}</div>`;
+  let body = '';
+  if (t === 'kisten'){
+    body = `<div class="kcrates">${KCRATES.map(c => { const n = free[c.id] || 0, top = KITEMS.filter(i => i.c === c.id && i.r === 'gold');
+      return `<div class="kcr kcr-${c.id}">${n ? `<span class="kfree">${n}× gratis</span>` : ''}${kChest(c, ` data-kchest="${c.id}"`)}
+        <b>${c.n}</b><span class="kprice num">${n ? 'Gratis' : fmt(c.price) + ' ℒ'}</span><span class="muted small">Top: ${top.map(i => i.ic).join(' ')} bis ${fmt(Math.max(...top.map(i => i.base)))} ℒ</span>
+        <div class="row" style="justify-content:center"><button class="btn gold" data-act="kopen" data-v="${c.id}" ${KS.busy || (!n && P.balance < c.price) ? 'disabled' : ''}>Öffnen</button><button class="btn sm" data-act="kodds" data-v="${c.id}">Inhalt</button></div></div>`; }).join('')}</div>
+      <label class="kfast"><input type="checkbox" data-act="kfast" ${KS.fast ? 'checked' : ''}> Schnell öffnen (ohne lange Animation)</label>
+      ${KS.odds ? kOddsHTML(KCRATES.find(c => c.id === KS.odds)) : ''}
+      <div class="panel"><h3>Gratis-Kisten</h3><table class="kodds"><tr><td>Alle 5 Tagesaufgaben geschafft</td><td class="r">Messing</td></tr><tr><td>Jeder neue Erfolg</td><td class="r">Messing</td></tr><tr><td>Alle 3 Wochen-Herausforderungen</td><td class="r">Samt</td></tr><tr><td>Alle 5 Level</td><td class="r">Samt</td></tr><tr><td>Level 25, 50, 75 …</td><td class="r">Tresor</td></tr></table></div>`;
+  } else if (t === 'samml'){
+    const sum = kCollection(P), a = P.auc;
+    body = `${a ? `<div class="panel kaucbar r-${KITEM[a.it.k].r}"><span class="kbig3">${KITEM[a.it.k].ic}</span><span><b>Auktion läuft: ${esc(KITEM[a.it.k].n)}</b><br><span class="muted small">noch ${Math.max(0, Math.ceil((a.end - NOW()) / 1000))} s</span></span><button class="btn gold sm" data-act="kaucview">Ansehen</button></div>` : ''}
+      <div class="panel"><div class="row" style="justify-content:space-between;align-items:baseline"><h3>Deine Sammlung</h3><span class="muted small">${items.length ? `${items.length} Items · Wert <b class="num" style="color:var(--brass)">${fmt(sum)} ℒ</b>` : ''}</span></div>
+      ${items.length ? `<p class="muted small">Tippe ein Item an: ausrüsten, verkaufen oder versteigern.</p><div class="kinv">${items.slice().sort((x, y) => kValue(y) - kValue(x)).map(kInvCard).join('')}</div>` : '<p class="muted">Noch leer. Öffne eine Kiste.</p>'}</div>`;
+  } else {
+    body = `<div class="panel"><p class="muted small" style="margin:0">Die Kurse ändern sich jede Stunde und sind für alle gleich. Preise für Zustand „Gebraucht“. Antippen für Kursverlauf und Kaufen.</p>
+      ${KCRATES.map(c => `<div class="kmhead"><b>${c.n}</b></div>` + KITEMS.filter(i => i.c === c.id && i.t !== 'L').slice().reverse().map(i => { const own = items.filter(x => x.k === i.k).length;
+        return `<button class="kmrow r-${i.r}" data-act="kmk" data-k="${i.k}"><span class="ic">${i.ic}</span><span class="tl"><b>${esc(i.n)}</b>${own ? ` <span class="muted small">· ${own}×</span>` : ''}<br><span class="kchip">${KRN[i.r]}</span></span><span class="p num">${fmt(i.base * kMkt(i.k))} ℒ<br>${kTrend(i.k)}</span>${kSpark(i.k)}</button>`; }).join('')).join('')}</div>`;
+  }
+  const html = `${backBar('Kisten')}<div class="stack">${seg}${body}</div>`;
+  // only rebuild when something changed: the opening animation lives in #kopen and is never touched here
+  if (html !== KS.key){ KS.key = html; el.innerHTML = html; }
+}
+function kOddsHTML(c){
+  return `<div class="panel"><div class="row" style="justify-content:space-between"><h3>Inhalt: ${c.n}</h3><button class="btn sm" data-act="kodds" data-v="">Schließen</button></div><table class="kodds">${KRAR.map(r => `<tr class="r-${r.k}"><td><span class="kchip">${r.n}</span></td><td>${KITEMS.filter(i => i.c === c.id && i.r === r.k).map(i => i.ic + ' ' + esc(i.n)).join(', ')}</td><td class="r">${(r.w / 100).toLocaleString('de-DE')} %</td></tr>`).join('')}
+    <tr><td colspan="2" class="muted">Durchschnittlicher Wert zum heutigen Kurs</td><td class="r">${fmt(kCrateEV(c))} ℒ</td></tr></table>
+    <p class="muted small">Etwa ein Drittel sind Geldsäcke, die sofort gutgeschrieben werden. Der Wert eines Items hängt vom Marktkurs, vom Zustand (Fabrikneu +60 % bis Ramponiert −35 %) und von der Nummer ab (einstellig ×2, zweistellig +30 %).</p></div>`;
+}
+function kisTileExtra(){ const n = kFree(); return n ? `<span class="pill good">🎁 ${n} gratis</span>` : P?.auc ? '<span class="pill">🔨 Auktion läuft</span>' : ''; }
+
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-act]'); if (!b || b.disabled) return;
+  switch (b.dataset.act){
+    case 'ktab': KS.tab = b.dataset.v; $('kopen').hidden = true; renderAll(); break;
+    case 'kopen': ac(); kOpen(b.dataset.v); break;
+    case 'kodds': KS.odds = b.dataset.v || null; renderAll(); break;
+    case 'kfast': KS.fast = b.checked; ls.set('kfast', KS.fast); break;
+    case 'kitem': kItemSheet(b.dataset.id); break;
+    case 'kmk': kMarketSheet(b.dataset.k); break;
+    case 'keq': kEquip(b.dataset.id); kItemSheet(b.dataset.id); break;
+    case 'ksell': kSell(b.dataset.id); kSheetClose(); break;
+    case 'kaucset': kAucSetup(b.dataset.id); break;
+    case 'kaucgo': ac(); kAucStart(b.dataset.id, +$('kminr').value); break;
+    case 'kaucview': kAucView(); break;
+    case 'kbuy': kBuy(b.dataset.k); kMarketSheet(b.dataset.k); break;
+  }
+});
+
+/* ---------- 1.7 trailer: once, at the first start after the update (only on this device, costs nothing) ---------- */
+const TR = { timers: [], el: null, then: null };
+function trailerOpen(then){
+  if (TR.el) return; TR.then = then || null;
+  const chest = (cls, id = '') => `<div class="kchest${cls}"${id}><div class="body"></div><div class="band l"></div><div class="band r"></div><div class="lid"></div><div class="gem"></div><div class="lock"></div></div>`;
+  const el = document.createElement('div'); el.className = 'trailer'; el.id = 'trailer';
+  el.innerHTML = `<div class="trstage">
+    <div class="sc" data-s="0"><div style="display:flex;flex-direction:column;align-items:center;gap:16px;width:100%"><div class="t-line"></div><div class="t-logo">Legat Casino</div><div class="t-up">präsentiert</div><div class="t-line"></div></div></div>
+    <div class="sc" data-s="1"><div><div class="t-ver">1.7</div></div><div class="t-cap">Das Kisten-Update</div></div>
+    <div class="sc" data-s="2"><div class="t-rays"></div><div class="t-crates">${chest('')}${chest(' tresor', ' id="trchest"')}${chest(' samt')}</div><div class="t-cap">Drei Kisten<small>Messing · Samt · Tresor</small></div></div>
+    <div class="sc" data-s="3"><div class="t-reel"><div class="kmarker"></div><div class="kreel" id="trreel"></div></div><div class="t-cap">Dreh. Zitter. Hoff.</div></div>
+    <div class="sc" data-s="4"><div class="t-rays"></div><div class="t-win"><div class="rn">Mythisch</div><div class="tbig">👑</div><div class="tn">Goldkrone</div></div></div>
+    <div class="sc" data-s="5"><svg class="t-chart" viewBox="0 0 400 120" preserveAspectRatio="none"><path d="M0 100 L40 92 L70 96 L110 80 L140 86 L180 64 L210 70 L250 48 L280 56 L320 30 L350 38 L400 8" fill="none" stroke="#79d8a2" stroke-width="4" stroke-linejoin="round"/></svg><div class="t-feats"><div>Seltene <span>Items</span> mit Zustand &amp; Nummer</div><div>Ein <span>Markt</span> mit echten Kursen</div><div><span>Auktionen</span> und Geldsäcke bis 2,5 Mio. ℒ</div></div></div>
+    <div class="sc t-end" data-s="6"><div><h1>Kisten sind da</h1><p>Eine Messing-Kiste wartet schon gratis auf dich.</p><button class="btn gold" data-tr="go">Zur Kiste</button><div style="margin-top:12px"><button class="btn sm" data-tr="close">Später</button></div></div></div>
+    <canvas class="trcv"></canvas>
+    <button class="t-skip" data-tr="skip" hidden>Überspringen</button>
+    <div class="t-bar"></div>
+    <div class="t-start"><div style="text-align:center;padding:20px"><p class="t-up" style="margin:0 0 10px">Neu in Version 1.7</p><div class="t-logo" style="font-size:clamp(34px,9vw,60px)">Kisten</div><p class="muted" style="margin:10px 0 20px">Ein kurzer Trailer, etwa 17 Sekunden</p><button class="btn gold" data-tr="play">▶ Trailer ansehen</button><div style="margin-top:12px"><button class="btn sm" data-tr="close">Überspringen</button></div></div></div>
+  </div>`;
+  document.body.appendChild(el); TR.el = el; trShow(0);
+  el.addEventListener('click', e => { const b = e.target.closest('[data-tr]'); if (!b) return;
+    const a = b.dataset.tr; if (a === 'play'){ ac(); trPlay(); } else if (a === 'skip'){ trStop(); trShow(6); el.querySelector('[data-tr="skip"]').hidden = true; }
+    else if (a === 'go'){ trClose(true); } else if (a === 'close') trClose(false); });
+}
+function trShow(i){ TR.el?.querySelectorAll('.sc').forEach(s => s.classList.toggle('on', +s.dataset.s === i)); }
+function trStop(){ TR.timers.forEach(clearTimeout); TR.timers = []; }
+function trClose(go){
+  trStop(); const el = TR.el; if (!el) return; TR.el = null;
+  el.classList.add('out'); setTimeout(() => el.remove(), 400);
+  if (go){ setTab('table'); if (standUp('kisten')) openGame('kisten'); KS.tab = 'kisten'; }
+  else TR.then?.();
+}
+function trPlay(){
+  const el = TR.el, at = (ms, f) => TR.timers.push(setTimeout(f, ms)); trStop();
+  const bar = el.querySelector('.t-bar'); bar.style.transition = 'none'; bar.style.width = '0'; void bar.offsetWidth; bar.style.transition = 'width 17000ms linear'; bar.style.width = '100%';
+  el.querySelector('.t-start').hidden = true; el.querySelector('[data-tr="skip"]').hidden = false;
+  for (const [t, i] of [[0, 0], [2600, 1], [5000, 2], [8200, 3], [11600, 4], [13600, 5], [16600, 6]]) at(t, () => trShow(i));
+  const fan = () => [523, 659, 784, 1047, 1319].forEach((f, i) => tone(f, .35, { type: 'triangle', vol: .07, at: i * .09 }));
+  at(300, () => tone(196, 1.6, { vol: .06 }));
+  at(2600, () => { tone(98, 1.2, { vol: .2 }); tone(392, .8, { type: 'triangle', vol: .05, at: .05 }); });
+  at(5000, () => tone(90, .3, { vol: .25 })); at(5250, () => tone(70, .35, { vol: .3 })); at(5500, () => tone(90, .3, { vol: .25 }));
+  at(6800, () => { el.querySelector('#trchest')?.classList.add('shake'); tone(220, .2, { type: 'triangle', vol: .08 }); });
+  at(7700, () => { el.querySelector('#trchest')?.classList.add('open'); noise(.45, { vol: .2, freq: 900 }); });
+  at(8200, () => {
+    const c = KCRATES[2], items = Array.from({ length: 40 }, () => kRoll(c));
+    items[33] = kMake(KITEM.goldkrone, .02, 7); items[31] = kMake(KITEM.feuer); items[35] = kMake(KITEM.feuer);
+    const reel = el.querySelector('#trreel'); reel.innerHTML = items.map((it, i) => kCard(it, i === 33 ? ' target' : '')).join(''); void reel.offsetWidth;
+    const W = 126, ww = reel.parentElement.clientWidth; reel.style.transition = 'transform 3.1s cubic-bezier(.08,.62,.1,1)'; reel.style.transform = `translateX(${-(33 * W + 59 - ww / 2 + 22)}px)`;
+    let li = -1; const t0 = performance.now();
+    const f = () => { if (!reel.isConnected) return; const m = new DOMMatrix(getComputedStyle(reel).transform).m41, i = Math.floor((-m + ww / 2) / W); if (i !== li){ li = i; tone(1400 + Math.random() * 300, .03, { type: 'square', vol: .025 }); } if (performance.now() - t0 < 3150) requestAnimationFrame(f); else reel.querySelector('.target')?.classList.add('win'); };
+    requestAnimationFrame(f);
+  });
+  at(11600, () => { fan(); setTimeout(fan, 400); kConfetti(el.querySelector('.trcv'), 200); });
+  at(13600, () => [0, 500, 1000].forEach(d => setTimeout(() => tone(660, .12, { type: 'triangle', vol: .06 }), d)));
+  at(16600, () => { tone(523, .5, { type: 'triangle', vol: .06 }); tone(784, .7, { type: 'triangle', vol: .06, at: .1 }); });
+  at(17000, () => { const s = el.querySelector('[data-tr="skip"]'); if (s) s.hidden = true; });
 }
 
 /* ---------- Progressiver Jackpot am Automaten (ein Topf für alle) ---------- */
@@ -4847,6 +5526,12 @@ const TUTS = {
     [tvis(tbox('Loono!', ' gold')), '„Loono!“ rufen', 'Hast du nur noch zwei Karten, tipp auf <b>Loono!</b>. Vergisst du es und jemand tippt „Erwischt!“, ziehst du 2 Strafkarten. Für jeden Zug hast du 20 Sekunden.'],
     [tvis('<span class="tutemo">🤖</span><span class="tutemo">🦊</span>'), 'Mitspieler', 'Eröffne eine Runde und füg Bots hinzu oder lade Freunde im Chat ein. Mit Einsatz zahlt jeder gleich viel in den Topf, der Sieger bekommt alles.'],
   ]},
+  kisten: { t: 'Kisten', steps: [
+    [() => tvis(kChest(KCRATES[0]), kChest(KCRATES[2])), 'Kisten öffnen', 'Drei Kisten: Messing, Samt und Tresor. In jeder steckt ein <b>Item</b> oder ein <b>Geldsack</b>, der sofort gutgeschrieben wird. Die Chancen stehen unter „Inhalt“.'],
+    [tvis(tbox('Gewöhnlich'), tbox('Selten'), tbox('Mythisch', ' gold')), 'Items', 'Jedes Item hat eine Seltenheit, einen <b>Zustand</b> (Fabrikneu bis Ramponiert) und eine <b>Nummer</b>. Besserer Zustand und kleine Nummern sind mehr wert. Avatare, Tische, Kartenrücken und Namensfarben kannst du ausrüsten.'],
+    [tvis('<span class="tutemo">📈</span><span class="tutemo">🔨</span>'), 'Markt und Auktion', 'Der <b>Markt</b> hat Kurse, die sich jede Stunde ändern. Du kannst sofort verkaufen oder kaufen. In der <b>Auktion</b> bieten 2 Minuten lang Sammler, das kann mehr oder weniger bringen.'],
+    [tvis('<span class="tutemo">🎁</span>'), 'Gratis-Kisten', 'Alle 5 Tagesaufgaben und jeder neue Erfolg: Messing-Kiste. Alle Wochen-Herausforderungen und alle 5 Level: Samt-Kiste. Level 25, 50, 75 …: Tresor.'],
+  ]},
   crash: { t: 'Crash', steps: [
     [tvis('<span class="tutemo">🚀</span>', tbox('1,00× → 2,47×')), 'Die Rakete', 'Nach dem Start steigt der Multiplikator immer weiter, bis die Rakete explodiert. Wann das passiert, weiß vorher niemand.'],
     [tvis(tbox('8 s zum Setzen')), 'Setzen', 'Vor jeder Runde hast du 8 Sekunden, um deinen Einsatz zu setzen. Alle Freunde fliegen in derselben Runde mit.'],
@@ -5710,7 +6395,8 @@ function renderHome(){
     <div class="tiles">
       ${tile('bj', 'Blackjack', 'Mit Freunden am Tisch, bis zu 5 Spieler', `<div class="minicards"><div class="mc">A<i>♠</i></div><div class="mc red">K<i>♥</i></div></div>`, atTables ? `<span class="pill good">${atTables} ${atTables===1?'Freund':'Freunde'} am Tisch</span>` : tid ? '<span class="pill good">Du sitzt am Tisch</span>' : '')}
       ${tile('sports', 'Sportwetten', 'Bundesliga · Champions League · Darts', `<div class="minisports"><span>⚽</span><span>🎯</span></div>`, duIncoming() ? `<span class="pill good">🤝 ${duIncoming()} ${duIncoming() === 1 ? 'Herausforderung' : 'Herausforderungen'}</span>` : next ? `<span class="small muted">Nächstes: ${esc(next.t1)} – ${esc(next.t2)}, ${timeLabel(next.t)}</span>` : '<span class="small muted">Plus fiktive Turniere alle 15 Minuten</span>')}
-      ${tile('loono', 'Loono<span class="newtag">Neu</span>', 'Kartenspiel mit Freunden und Bots, 2 bis 8 Spieler, mit oder ohne Einsatz', `<div class="miniloono">${['r7','gs','yd','xf'].map(c => loCard(c)).join('')}</div>`, loTileExtra())}
+      ${tile('kisten', 'Kisten<span class="newtag">Neu</span>', 'Öffnen, sammeln, handeln: Items mit Zustand und Nummer, Markt und Auktionen', kChest(KCRATES[2]), kisTileExtra())}
+      ${tile('loono', 'Loono', 'Kartenspiel mit Freunden und Bots, 2 bis 8 Spieler, mit oder ohne Einsatz', `<div class="miniloono">${['r7','gs','yd','xf'].map(c => loCard(c)).join('')}</div>`, loTileExtra())}
       ${tile('crash', 'Crash', 'Zahl aus, bevor die Rakete explodiert', `<div class="minicrash"><svg viewBox="0 0 120 70" aria-hidden="true"><path d="M5 65 Q70 62 105 12" fill="none" stroke="#ff5a4f" stroke-width="4" stroke-linecap="round"/></svg><span>🚀</span><b class="num">2,47×</b></div>`, crashFriends())}
       ${tile('mines', 'Mines', 'Diamanten finden, Minen meiden', `<div class="minimines">${[...'💎💎💣💎💎💣💎💎💎'].map(x => `<i>${x}</i>`).join('')}</div>`)}
       ${tile('tipp', 'Tipprunde', 'Bundesliga-Ergebnisse tippen gegen Freunde', `<div class="minitipp"><b class="num">2:1</b><small>dein Tipp</small></div>`, tippExtra())}
@@ -5765,7 +6451,7 @@ function openGame(g){
   window.scrollTo(0, 0); renderAll();
 }
 function renderCasino(){
-  const views = { home: game===null, tv: game==='bj', 'g-roulette': game==='roulette', 'g-slots': game==='slots', 'g-horses': game==='horses', 'g-sports': game==='sports', 'g-hilo': game==='hilo', 'g-crash': game==='crash', 'g-mines': game==='mines', 'g-tipp': game==='tipp', 'g-loono': game==='loono' };
+  const views = { home: game===null, tv: game==='bj', 'g-roulette': game==='roulette', 'g-slots': game==='slots', 'g-horses': game==='horses', 'g-sports': game==='sports', 'g-hilo': game==='hilo', 'g-crash': game==='crash', 'g-mines': game==='mines', 'g-tipp': game==='tipp', 'g-loono': game==='loono', 'g-kisten': game==='kisten' };
   for (const [id, show] of Object.entries(views)) $(id).hidden = !show;
   $('chat').hidden = !(game==='bj' && tid && T);
   const typing = el => { const a=document.activeElement; return a && (a.tagName==='INPUT' || a.tagName==='SELECT') && a.type!=='checkbox' && el.contains(a); };
@@ -5780,6 +6466,7 @@ function renderCasino(){
   else if (game==='mines') renderMines();
   else if (game==='tipp') renderTipp();
   else if (game==='loono') renderLoono();
+  else if (game==='kisten') renderKisten();
 }
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-act]'); if (!b || b.disabled) return;
@@ -6010,7 +6697,7 @@ function renderPlayers(){
       ? `<td class="r num" style="color:${w.net>=0?'var(--win)':'var(--lose)'}"><b>${sgn(w.net)}</b></td><td class="r num">${w.hands}</td><td class="r num">${sgn(w.best)}</td>`
       : `<td class="r num"><b style="color:var(--brass)">${fmt(wealth(p))}</b></td><td class="r num">${fmt(p.balance)}</td><td class="r num">${fmt(euroOf(p))}</td><td class="r num">${s.hands||0}</td><td class="r num">${s.wins||0} / ${s.losses||0} / ${s.pushes||0}</td>`;
     return `<tr class="${id===uid?'me':''}" data-act="profile" data-id="${esc(id)}"><td class="rank">${i+1}</td>
-      <td><span class="dot${isOnline(id)?' on':''}"></span><span class="av">${avH(p.avatar||'🙂')}</span><b>${esc(p.name)}</b> ${lvlPill(p)}${suspicious(p) ? ' <span class="pill warn" title="Kontostand passt nicht zum Kontobuch">⚠️</span>' : ''}${id===uid?' <span class="muted">(du)</span>':''}${p.table && isOnline(id)?` <span class="pill">am Tisch</span>`:''}</td>
+      <td><span class="dot${isOnline(id)?' on':''}"></span><span class="av">${avH(p.avatar||'🙂')}</span><b${nameStyle(id)}>${esc(p.name)}</b> ${lvlPill(p)}${suspicious(p) ? ' <span class="pill warn" title="Kontostand passt nicht zum Kontobuch">⚠️</span>' : ''}${id===uid?' <span class="muted">(du)</span>':''}${p.table && isOnline(id)?` <span class="pill">am Tisch</span>`:''}</td>
       ${main}
       <td class="r num">${s.bankrupts ? `<span class="pill bad">${s.bankrupts}× pleite</span>` : '0'}</td>
       <td class="r num">${owed ? `<span class="pill bad">${fmt(owed)}</span>` : '–'}</td>
@@ -6176,8 +6863,9 @@ function profileHTML(id){
   const me = id===uid, friend = isFriend(id), wk = weekId(), w = p.week?.id===wk ? p.week : { net:0, hands:0 };
   const D = debts(), theyOweMe = D[id]?.[uid] || 0, iOwe = D[uid]?.[id] || 0;
   return `<div class="stack">
-    <div class="row" style="justify-content:space-between"><div class="prof-head"><div class="prof-av">${avH(p.avatar||'🙂')}</div><div><h2>${esc(p.name)}</h2>
+    <div class="row" style="justify-content:space-between"><div class="prof-head"><div class="prof-av">${avH(p.avatar||'🙂')}</div><div><h2${nameStyle(id)}>${esc(p.name)}</h2>
       <p class="small" style="margin:0 0 2px"><span class="lvl">Lv ${levelOf(p.xp || 0).L}</span> <b style="color:var(--brass)">${esc(titleOf(levelOf(p.xp || 0).L))}</b> <span class="muted">· ${fmt(p.xp || 0)} XP</span></p>
+      ${(p.items||[]).length ? `<p class="small" style="margin:0 0 2px">🗃️ Sammlung: ${p.items.length} Items · <b class="num" style="color:var(--brass)">${fmt(kCollection(p))} ℒ</b></p>` : ''}
       <p class="muted small"><span class="dot${isOnline(id)?' on':''}"></span>${isOnline(id)?'Online':'Offline'}${me?' · das bist du':friend?' · Freund':''}</p></div></div>
       <button class="btn sm" data-act="closemodal">Schließen</button></div>
     ${statsHTML(p)}
