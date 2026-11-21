@@ -78,6 +78,7 @@ p{margin:0}
 .code{font-family:var(--f-num);font-size:22px;letter-spacing:.14em;color:var(--brass)}
 .note{border-left:3px solid var(--brass);padding:8px 12px;background:rgba(209,173,98,.08);border-radius:0 8px 8px 0}
 .note.bad{border-color:var(--lose);background:rgba(236,138,120,.08)}
+.banwall{position:fixed;inset:0;z-index:9999;background:rgba(10,8,6,.92);display:grid;place-items:center;padding:16px}.banwall .panel{max-width:420px;text-align:center}
 .toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--rail);padding:10px 16px;border-radius:999px;font-weight:700;z-index:30;max-width:calc(100% - 32px);text-align:center;pointer-events:none}
 .switch{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:14px;cursor:pointer;user-select:none;flex-wrap:wrap;justify-content:center}
 .switch input{appearance:none;-webkit-appearance:none;width:38px;height:22px;border-radius:999px;background:#3b332b;position:relative;margin:0;cursor:pointer;transition:background .2s;flex:none}
@@ -1415,6 +1416,7 @@ const ACH = [
   ['broke1','💸','Erste Pleite','Zum ersten Mal pleite gegangen', true],
   ['broke5','🪦','Stammgast beim Bestatter','Fünfmal pleite gegangen', true],
 ];
+const DAY_CAP = 500000;   // the rules let wealth rise by at most this much per day (server time); above it waits in d.owed
 const START_EURO = 2000, BANK_FEE = 0.05, INT_RATE = 0.01, INT_MAX = 500;
 const fmt = n => Math.round(n).toLocaleString('de-DE');
 const sgn = n => (n>0?'+':n<0?'−':'') + fmt(Math.abs(n));
@@ -1597,6 +1599,7 @@ let newBadges = [];
 let WHY = null;
 function withPlayer(fn, why){
   if (!P) return false;
+  if (P.ban){ renderAll(); return false; }
   const d = norm(structuredClone(P));
   newBadges = []; WHY = null; WHY_EXTRA = ''; lvlUps.length = 0; const giftN = KS.gift.length;
   if (!fn(d)){ KS.gift.length = giftN; return false; }
@@ -1615,7 +1618,27 @@ function withPlayer(fn, why){
   return true;
 }
 /* ---------- saving: never play on while nothing reaches the server ---------- */
-const SAVE = { seq: 0, pending: new Map(), cycled: 0, resyncing: false, dirty: false, timer: 0, rev: null, last: 0 };
+const SAVE = { seq: 0, pending: new Map(), cycled: 0, resyncing: false, dirty: false, timer: 0, rev: null, last: 0, base: null, ack: null };
+/* ---------- daily limit (1.7.3): the server checks it, the device keeps to it ----------
+   SAVE.base = the document as the server has it before the next write, SAVE.ack = the last confirmed save */
+function dayGuard(){
+  const b = SAVE.base; if (!b || !P) return;
+  const day = Math.floor((NOW() - 120e3) / 864e5);   // two minutes behind: never ahead of the server's day
+  const nd = b.db == null ? day : Math.max(b.db, day);
+  const d0 = (b.db == null || nd !== b.db) ? wealth(b) : b.d0;
+  P.db = nd; P.d0 = d0;
+  const room = d0 + DAY_CAP - wealth(P), owed = P.owed || 0;
+  const mv = room < 0 ? room : Math.min(owed, room);
+  if (!mv) return;
+  let mb = mv, me = 0;
+  if (P.balance + mb < 0){ me = P.balance + mb; mb = -P.balance; }
+  P.balance += mb; P.euro = euroOf(P) + me; P.owed = Math.max(0, owed - mv);
+  if (mv < 0 && hold > 0) hold = Math.max(0, hold + mv);   // a win still hidden behind an animation: only the part that is paid now
+  P.log = [...(P.log || []), { t: Date.now(), b: mb, e: me, r: mv < 0 ? 'Tageslimit: Rest kommt später' : 'Tageslimit: Auszahlung', B: P.balance, E: P.euro }].slice(-150);
+  const msg = mv < 0 ? `Tageslimit erreicht: ${fmt(-mv)} ℒ sind nicht verloren, sie kommen ab morgen automatisch dazu. Details in der Bank.` : `${fmt(mv)} ℒ aus dem Tageslimit gutgeschrieben${P.owed ? `, noch ${fmt(P.owed)} ℒ ausstehend` : ''}.`;
+  const say = () => (hold || KS.busy) ? setTimeout(say, 500) : (toast(msg), notify('⏳', msg, { tab: 'bank' })); setTimeout(say, 300);
+  renderAll();
+}
 const SAVE_DELAY = window.__saveDelay ?? 1500;
 /** changes are collected for a moment and written together: saves Firebase's daily quota (every write is read again by every friend online) */
 function queueSave(){
@@ -1629,11 +1652,13 @@ function flushSave(){
   clearTimeout(SAVE.timer); SAVE.timer = 0;
   if (!SAVE.dirty || !P || !uid) return;
   SAVE.dirty = false;
+  if (P.ban) return;
+  dayGuard();
   const rev = (SAVE.rev ?? P.rev ?? 0) + 1;   // the server only takes the next number: an outdated device can't overwrite newer progress
   SAVE.rev = rev; P.rev = rev; SAVE.last = Date.now();
-  const out = { ...P, rev }, wid = ++SAVE.seq; SAVE.pending.set(wid, Date.now());
+  const out = { ...P, rev }, wid = ++SAVE.seq; SAVE.pending.set(wid, Date.now()); SAVE.base = out;
   slow(setDoc(doc(fs,'players',uid), out))
-    .then(() => { SAVE.pending.delete(wid); renderSaveWarn(); pubSync(); })
+    .then(() => { SAVE.pending.delete(wid); if (!SAVE.ack || (out.rev || 0) >= (SAVE.ack.rev || 0)) SAVE.ack = out; renderSaveWarn(); pubSync(); })
     .catch(e => { SAVE.pending.delete(wid); renderSaveWarn(); if (e?.code === 'permission-denied') resyncPlayer(); else handleWriteErr(e); });
 }
 addEventListener('pagehide', () => { flushSave(); pubSync(true); });
@@ -1644,10 +1669,12 @@ document.addEventListener('visibilitychange', () => { if (document.hidden){ flus
 const PUB = { last: 0, sig: '', json: '', timer: 0 };
 const PUB_EVERY = 60000;
 const PUB_SKIP = ['rev', 'tasks', 'wch', 'claimed', 'fdone', 'prefs', 'mines', 'hilo', 'shift', 'auc'];
-function pubOf(d){ const o = {}; for (const k in d) if (!PUB_SKIP.includes(k)) o[k] = d[k]; o.seen = Date.now(); return o; }
+function pubOf(d){ const o = {}; for (const k in d) if (!PUB_SKIP.includes(k)) o[k] = d[k]; o.seen = Date.now();
+  const a = SAVE.ack; if (a) for (const k of ['balance', 'euro', 'log', 'owed', 'db', 'd0']) if (a[k] !== undefined) o[k] = a[k]; else delete o[k];   // the rules only take what the server already has
+  delete o.ban; return o; }
 const pubSig = d => JSON.stringify([d.name, d.avatar, d.code, d.friends, d.table, d.loono, d.playing, d.crash?.r, d.crash?.out]);
 function pubSync(now){
-  if (!P || !uid) return;
+  if (!P || !uid || P.ban) return;
   const sig = pubSig(P), urgent = sig !== PUB.sig, wait = PUB_EVERY - (Date.now() - PUB.last);
   if (!urgent && !now && wait > 0){ if (!PUB.timer) PUB.timer = setTimeout(() => { PUB.timer = 0; pubSync(); }, wait); return; }
   const out = pubOf(P), json = JSON.stringify({ ...out, seen: 0 });
@@ -1732,7 +1759,7 @@ async function resyncPlayer(){
   if (SAVE.resyncing) return; SAVE.resyncing = true;
   try {
     const s = await getDocFromServer(doc(fs, 'players', uid));
-    if (s.exists()){ P = norm(structuredClone(s.data())); SAVE.rev = P.rev || 0; SAVE.dirty = false; HL.run = null; MN.run = null; renderAll();
+    if (s.exists()){ SAVE.base = SAVE.ack = s.data(); P = norm(structuredClone(s.data())); SAVE.rev = P.rev || 0; SAVE.dirty = false; HL.run = null; MN.run = null; renderAll();
       toast('Dein Spielstand wurde auf einem anderen Gerät oder Tab geändert. Hier ist jetzt der aktuelle Stand geladen.'); }
   } catch (e){ console.warn(e); toast('Speichern abgelehnt. Bitte lade die Seite neu.'); }
   finally { setTimeout(() => { SAVE.resyncing = false; }, 3000); }
@@ -1837,7 +1864,9 @@ onAuthStateChanged(auth, u => {
 let intervals=[];
 /* ---------- players: load only me, my friends, people who added me, and who sits at my table or in my chats ---------- */
 const PL = { me: null, meMeta: null, meLoaded: false, rev: {}, ch: {}, legacy: {}, key: '', unsubs: [], unsubMe: null, unsubRev: null, all: null, allAt: 0 };
+let ADMIN = false;
 function startPlayers(){
+  getDoc(doc(fs, 'meta', 'admin')).then(() => { ADMIN = true; renderAll(); }).catch(() => {});   // only the owner of the casino may read it
   PL.unsubMe = onSnapshot(doc(fs, 'players', uid), s => { PL.me = s.exists() ? s.data() : null; PL.meMeta = s.metadata; PL.meLoaded = true; applyPlayers(); }, playersErr);
   PL.unsubRev = onSnapshot(query(collection(fs, 'pub'), where('friends', 'array-contains', uid)), s => { const o = {}; s.docs.forEach(d => o[d.id] = d.data()); PL.rev = o; applyPlayers(); }, playersErr);
 }
@@ -1874,6 +1903,7 @@ function applyPlayers(){
   const mine = PL.me, meta = PL.meMeta || {};
   if (PL.meLoaded){
     const newer = !P || ((mine?.rev || 0) !== (P.rev || 0) ? (mine?.rev || 0) > (P.rev || 0) : (mine?.updated || 0) >= (P.updated || 0));
+    if (mine && !meta.hasPendingWrites && !SAVE.pending.size){ SAVE.base = mine; if (!SAVE.ack || (mine.rev || 0) >= (SAVE.ack.rev || 0)) SAVE.ack = mine; }
     if (mine && !meta.hasPendingWrites && !SAVE.pending.size && !SAVE.dirty && newer){ P = norm(structuredClone(mine)); SAVE.rev = P.rev || 0; }
     if (!meta.fromCache && !mine && !P) createPlayer();
     else if (!meta.fromCache && mine){ refForExisting(); accrueInterest(); afterLogin(); }
@@ -1931,8 +1961,8 @@ async function createPlayer(){
   const code = genCode(6);   // 32^6 possible codes: a clash is practically impossible
   const d = norm({ name, code, balance: START, table: null, ledger: null, created: Date.now(), updated: Date.now(), seen: Date.now() });
   d.limits.base = d.balance; d.lowMark = d.balance;
-  P = d; renderAll();
-  try { await slow(setDoc(doc(fs,'players',uid), d)); pubSync(true); }
+  P = d; SAVE.base = d; renderAll();
+  try { await slow(setDoc(doc(fs,'players',uid), d)); SAVE.ack = d; pubSync(true); }
   catch(e){ handleWriteErr(e); }
   refForExisting();   // an old invite link still makes you friends, just without a bonus
 }
@@ -2008,6 +2038,7 @@ function renderBank(){
   const next = Math.min(INT_MAX, Math.floor(P.euro * INT_RATE));
   const quick = f => `<div class="row">${[[.25,'25 %'],[.5,'50 %'],[1,'Alles']].map(([q,l]) => `<button class="btn sm" data-act="bq" data-f="${f}" data-q="${q}">${l}</button>`).join('')}</div>`;
   const html = `<div class="stack">
+    ${P.owed > 0 ? `<div class="note"><b>⏳ ${fmt(P.owed)} ℒ stehen noch aus.</b> Pro Tag darf dein Vermögen um höchstens ${fmt(DAY_CAP)} ℒ wachsen (Schutz gegen Schummeln). Was du darüber gewonnen hast, ist nicht verloren: Es wird dir ab morgen automatisch gutgeschrieben, sobald du spielst, jeden Tag bis zu ${fmt(DAY_CAP)} ℒ.</div>` : ''}
     <div class="panel stack"><h2>Bank</h2>
       <p class="muted">Euro auf der Bank sind sicher: Am Tisch kannst du nur Legats verlieren. Beides ist Spielgeld und lässt sich weder kaufen noch auszahlen.</p>
       <div class="statgrid">
@@ -2555,9 +2586,14 @@ function animateCards(root){
 /* =====================================================================
    v1.1 – Casino home, Glücksrad, Roulette, Automat, Pferderennen, Sportwetten
    ===================================================================== */
-const APP_VERSION = '1.7.2';
+const APP_VERSION = '1.7.3';
 const CL_TITLES = { '1.5.12': 'Technische Verbesserungen' };
 const CHANGELOGS = {
+  '1.7.3': [
+    'Mehr Schutz gegen Schummeln: Dein Vermögen darf pro Tag um höchstens 500.000 ℒ wachsen, das prüft Firebase selbst. Gewinnst du mehr, geht nichts verloren: Der Rest steht als „ausstehend“ oben unter deinem Kontostand und in der Bank und wird dir ab dem nächsten Tag automatisch gutgeschrieben',
+    'Die Rangliste kann keinen höheren Kontostand mehr zeigen, als wirklich gespeichert ist',
+    'Manipulierte Konten können zurückgesetzt oder gesperrt werden',
+  ],
   '1.7.2': [
     'Beim Kisten-Öffnen verrät die Sammlungs-Zahl nicht mehr vorher, ob ein Item oder Legats drin sind',
   ],
@@ -4108,7 +4144,7 @@ function kReveal(win){
   el.innerHTML = `<div class="krays"></div>${big || mid ? '<canvas></canvas>' : ''}<div class="kbox">
     <div class="rn">${KRN[d.r]}</div><div class="kbig">${d.ic}</div><div class="tn">${esc(d.n)}</div>
     ${it ? `<div class="muted">${KTYPE[d.t]} · ${c[1]} · Nr. ${it.nr}${kNr(it.nr) > 1 ? ' <b style="color:var(--brass)">(seltene Nummer!)</b>' : ''}</div>
-      <div class="num" style="color:var(--brass);font-size:20px">Wert heute: ${fmt(kValue(it))} ℒ</div>` : '<div class="muted">sofort gutgeschrieben</div>'}
+      <div class="num" style="color:var(--brass);font-size:20px">Wert heute: ${fmt(kValue(it))} ℒ</div>` : P.owed > 0 ? `<div class="muted">gutgeschrieben · wegen des Tageslimits kommen ${fmt(P.owed)} ℒ ab morgen dazu</div>` : '<div class="muted">sofort gutgeschrieben</div>'}
     <div class="row" style="justify-content:center">${it ? `<button class="btn gold" data-kx>In die Sammlung</button>${d.t !== 'deko' ? `<button class="btn" data-kxeq="${it.id}">Ausrüsten</button>` : ''}<button class="btn" data-kxsell="${it.id}">Verkaufen: ${fmt(kSellPrice(it))} ℒ</button>` : '<button class="btn gold" data-kx>Weiter</button>'}</div></div>`;
   document.body.appendChild(el);
   if (big || mid) kConfetti(el.querySelector('canvas'), d.r === 'gold' ? 220 : big ? 150 : 80);
@@ -6522,7 +6558,7 @@ function renderTop(){
   renderIsland();
   $('ver').textContent = `Legat Casino · Version ${APP_VERSION}`;
   { const h = P ? `${avH(P.avatar)} ${esc(P.name)}` : 'Konto'; if ($('pname').innerHTML !== h) $('pname').innerHTML = h; }
-  $('peur').textContent = P ? `Bank ${fmt(P.euro)} €` : '';
+  $('peur').textContent = P ? `Bank ${fmt(P.euro)} €${P.owed > 0 ? ` · ⏳ +${fmt(P.owed)} ℒ` : ''}` : '';
   renderBell();
   const el = $('daily');
   if (el.innerHTML) el.innerHTML = '';   // the daily bonus is now the Glücksrad on the casino home
@@ -6693,7 +6729,7 @@ function renderPlayers(){
   const ids = boardMode==='friends' ? [uid, ...friendIds()] : [...new Set([uid, ...Object.keys(PL.all || players)])];
   const val = p => boardScope==='week' ? (p.week?.id===wk ? p.week.net : 0) : wealth(p);
   // equal values (e.g. everyone who still has the starting money) keep a fixed order instead of swapping on every update
-  const rows = ids.map(id => [id, pl(id)]).filter(r=>r[1]).sort((a,b)=>val(b[1])-val(a[1]) || String(a[1].name||'').localeCompare(String(b[1].name||''), 'de') || (a[0] < b[0] ? -1 : 1));
+  const rows = ids.map(id => [id, pl(id)]).filter(r=>r[1] && (!r[1].ban || ADMIN || r[0]===uid)).sort((a,b)=>val(b[1])-val(a[1]) || String(a[1].name||'').localeCompare(String(b[1].name||''), 'de') || (a[0] < b[0] ? -1 : 1));
   const tr = rows.map(([id,p],i)=>{
     const s = p.stats||{}, w = p.week?.id===wk ? p.week : { net:0, hands:0, best:0 };
     const owed = owedBy(id, D), badges = Object.keys(p.ach||{}).length;
@@ -6701,7 +6737,7 @@ function renderPlayers(){
       ? `<td class="r num" style="color:${w.net>=0?'var(--win)':'var(--lose)'}"><b>${sgn(w.net)}</b></td><td class="r num">${w.hands}</td><td class="r num">${sgn(w.best)}</td>`
       : `<td class="r num"><b style="color:var(--brass)">${fmt(wealth(p))}</b></td><td class="r num">${fmt(p.balance)}</td><td class="r num">${fmt(euroOf(p))}</td><td class="r num">${s.hands||0}</td><td class="r num">${s.wins||0} / ${s.losses||0} / ${s.pushes||0}</td>`;
     return `<tr class="${id===uid?'me':''}" data-act="profile" data-id="${esc(id)}"><td class="rank">${i+1}</td>
-      <td><span class="dot${isOnline(id)?' on':''}"></span><span class="av">${avH(p.avatar||'🙂')}</span><b${nameStyle(id)}>${esc(p.name)}</b> ${lvlPill(p)}${suspicious(p) ? ' <span class="pill warn" title="Kontostand passt nicht zum Kontobuch">⚠️</span>' : ''}${id===uid?' <span class="muted">(du)</span>':''}${p.table && isOnline(id)?` <span class="pill">am Tisch</span>`:''}</td>
+      <td><span class="dot${isOnline(id)?' on':''}"></span><span class="av">${avH(p.avatar||'🙂')}</span><b${nameStyle(id)}>${esc(p.name)}</b> ${lvlPill(p)}${suspicious(p) ? ' <span class="pill warn" title="Kontostand passt nicht zum Kontobuch">⚠️</span>' : ''}${p.ban ? ' <span class="pill bad">🚫 gesperrt</span>' : ''}${id===uid?' <span class="muted">(du)</span>':''}${p.table && isOnline(id)?` <span class="pill">am Tisch</span>`:''}</td>
       ${main}
       <td class="r num">${s.bankrupts ? `<span class="pill bad">${s.bankrupts}× pleite</span>` : '0'}</td>
       <td class="r num">${owed ? `<span class="pill bad">${fmt(owed)}</span>` : '–'}</td>
@@ -6877,6 +6913,9 @@ function profileHTML(id){
     ${chartHTML(p.hist)}
     ${gameStatsHTML(p)}
     ${suspicious(p) ? '<div class="note bad"><b>⚠️ Kontostand passt nicht zum Kontobuch.</b> Das Guthaben wurde vermutlich am Spiel vorbei geändert.</div>' : ''}
+    ${p.ban ? '<div class="note bad"><b>🚫 Dieses Konto ist gesperrt.</b></div>' : ''}
+    ${ADMIN && !me ? `<div class="panel stack"><h3>Admin</h3><p class="muted small">Nur du siehst das. Zurücksetzen: ${fmt(START)} ℒ und ${fmt(START_EURO)} €, Items, Kisten und Kontobuch werden geleert.</p>
+      <div class="row"><button class="btn" data-act="adreset" data-id="${esc(id)}">Konto zurücksetzen</button><button class="btn" data-act="adban" data-id="${esc(id)}">${p.ban ? 'Entsperren' : 'Sperren'}</button></div></div>` : ''}
     <h3>Erfolge · ${Object.keys(p.ach||{}).length} von ${ACH.length}</h3>${badgesHTML(p.ach, false)}
     <details class="panel"><summary><b>Kontobuch</b> <span class="muted small">· letzte Änderungen an Legats und Euro</span></summary><div style="margin-top:10px">${logHTML(p)}</div></details>
     ${!me && friend ? `<div class="panel stack"><h3>Legats schicken</h3>
@@ -6918,10 +6957,40 @@ function fairHTML(){
 }
 
 let rq = false;
+/* ---------- 1.7.3: locked accounts and the owner's tools ---------- */
+function banWall(){
+  const w = $('banwall');
+  if (!P?.ban){ w?.remove(); return; }
+  if (w) return;
+  const el = document.createElement('div'); el.id = 'banwall'; el.className = 'banwall';
+  el.innerHTML = '<div class="panel stack"><h2>🚫 Konto gesperrt</h2><p>Dein Spielstand wurde am Spiel vorbei verändert. Melde dich beim Betreiber des Casinos, damit er dein Konto wieder freischaltet.</p></div>';
+  document.body.appendChild(el);
+}
+async function adminAct(id, kind){
+  if (!ADMIN || id === uid) return;
+  const p = pl(id), n = p?.name || 'Spieler';
+  if (!confirm(kind === 'reset' ? `${n} wirklich auf ${fmt(START)} ℒ und ${fmt(START_EURO)} € zurücksetzen?` : p?.ban ? `${n} entsperren?` : `${n} sperren? Das Konto kann dann nichts mehr speichern.`)) return;
+  try {
+    const res = await runTransaction(fs, async tx => {
+      const ref = doc(fs, 'players', id), s = await tx.get(ref); if (!s.exists()) throw new Error('Spieler nicht gefunden');
+      const d = s.data(), now = Date.now(), ch = { rev: (d.rev || 0) + 1, updated: Math.max(now, (d.updated || 0) + 1) }, pub = {};
+      if (kind === 'reset'){
+        Object.assign(ch, { balance: START, euro: START_EURO, items: [], crates: {}, eq: {}, owed: 0, auc: null, db: null, d0: null,
+          log: [{ t: now, b: 0, e: 0, r: 'start', B: START, E: START_EURO }], limits: { win: null, loss: null, base: START }, lowMark: START });
+        Object.assign(pub, { balance: START, euro: START_EURO, items: [], log: ch.log, owed: 0 });
+      } else { ch.ban = !d.ban; pub.ban = ch.ban; }
+      tx.update(ref, ch); tx.set(doc(fs, 'pub', id), pub, { merge: true });
+      return ch;
+    });
+    PL.all = null; PL.oldAll = null; if (PL.legacy[id]) PL.legacy[id] = null;
+    toast(kind === 'reset' ? `${n} wurde zurückgesetzt.` : res.ban ? `${n} ist gesperrt.` : `${n} ist wieder freigeschaltet.`);
+    closeModal(); renderAll();
+  } catch (e){ console.warn(e); toast('Hat nicht geklappt: ' + (e?.code === 'permission-denied' ? 'keine Berechtigung. Sind die neuen Regeln in Firebase eingetragen?' : e?.message || e)); }
+}
 function renderAll(){
   if (rq || !uid) return; if (PL.meLoaded) rewatch(); if (P && (P.loono || null) !== LO.id) loWatch(); rq = true;
   requestAnimationFrame(() => {
-    rq=false; renderTop();
+    rq=false; renderTop(); banWall();
     const typing = el => { const a=document.activeElement; return a && (a.tagName==='INPUT' || a.tagName==='SELECT') && a.type!=='checkbox' && el.contains(a); };
     if (tab==='table') renderCasino();
     if (tab==='players' && !typing($('view-players'))) renderPlayers();
@@ -7015,6 +7084,8 @@ document.addEventListener('click', async e => {
     case 'emoji': sendMsg(b.dataset.e, 'e'); break;
     case 'fair': openModal('fair'); break;
     case 'profile': openModal('profile', b.dataset.id); break;
+    case 'adreset': adminAct(b.dataset.id, 'reset'); break;
+    case 'adban': adminAct(b.dataset.id, 'ban'); break;
     case 'closemodal': closeModal(); break;
     case 'revive': if (isBroke() && Date.now() >= reviveAt()){ Object.assign(DISH, { phase:'intro', collected:false }); openModal('dish'); } break;
     case 'dishstart': dishStart(); break;
