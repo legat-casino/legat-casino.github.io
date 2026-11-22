@@ -1114,6 +1114,8 @@ h3{font-size:12px;letter-spacing:.09em;font-weight:700}
 .stuckbox .diag{margin-top:4px;line-height:1.5;word-break:break-word;color:var(--ink);opacity:.85}
 .closed{position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:24px;background:radial-gradient(120% 80% at 50% 0%,#2a1d14,#120d0a 70%);overflow:auto}
 .closedcard{max-width:460px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:12px;animation:gin .4s ease both}
+body.hasbanner{padding-bottom:64px}
+.admbanner{position:fixed;left:50%;bottom:12px;transform:translateX(-50%);z-index:90;max-width:calc(100% - 32px);padding:8px 14px;border-radius:999px;border:1px solid var(--brass);background:rgba(20,16,12,.95);color:var(--brass);font:inherit;font-size:13px;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.5)}
 .closedsign{font-size:64px;filter:grayscale(.6) drop-shadow(0 10px 20px rgba(0,0,0,.5))}
 .closed h1{font-family:var(--f-display);font-size:clamp(28px,7vw,40px);line-height:1.1;margin:0}
 .closedwhen{font-size:18px;margin:0}
@@ -1314,11 +1316,12 @@ body.isclosed{overflow:hidden}
       <p class="closedwhen">Wir öffnen wieder um <b id="closedat">9:00</b> Uhr</p>
       <p class="muted num" id="closedin"></p>
       <button class="btn gold" type="button" id="closedmore">Mehr Infos</button>
+      <div class="row" style="justify-content:center;margin-top:8px"><button class="btn sm" type="button" id="closedpeek" hidden>Trotzdem rein (nur du)</button><button class="btn sm" type="button" id="closedadmin" hidden>Casino für alle öffnen</button></div>
       <div class="closedinfo" id="closedinfo" hidden>
-        <p>Legat Casino speichert alles bei <b>Firebase</b>, einem kostenlosen Dienst von Google. Der kostenlose Tarif erlaubt pro Tag eine bestimmte Anzahl an Lese- und Speichervorgängen (50.000 Lesen, 20.000 Speichern). Heute ist dieses Tageslimit aufgebraucht.</p>
-        <p>Ohne Speichern könnten Gewinne, Einsätze und Spielstände verloren gehen. Damit das nicht passiert, macht das Casino zu, bis das Limit zurückgesetzt wird. Das passiert jeden Tag um Mitternacht kalifornischer Zeit, bei uns also um <b id="closedat2">9:00</b> Uhr.</p>
+        <p id="closedp1">Legat Casino speichert alles bei <b>Firebase</b>, einem kostenlosen Dienst von Google. Der kostenlose Tarif erlaubt pro Tag eine bestimmte Anzahl an Lese- und Speichervorgängen (50.000 Lesen, 20.000 Speichern). Heute ist dieses Tageslimit aufgebraucht.</p>
+        <p id="closedp2">Ohne Speichern könnten Gewinne, Einsätze und Spielstände verloren gehen. Damit das nicht passiert, macht das Casino zu, bis das Limit zurückgesetzt wird. Das passiert jeden Tag um Mitternacht kalifornischer Zeit, bei uns also um <b id="closedat2">9:00</b> Uhr.</p>
         <p>Dein Spielstand ist sicher: Alles, was vor dem Schließen gespeichert wurde, ist noch da. Nur die allerletzte Aktion kurz vor dem Schließen kann fehlen.</p>
-        <p class="muted small">Zur Öffnungszeit lädt sich die Seite von selbst neu.</p>
+        <p class="muted small" id="closedp4">Zur Öffnungszeit lädt sich die Seite von selbst neu.</p>
         <button class="btn sm" type="button" id="closedretry">Trotzdem nochmal versuchen</button>
       </div>
     </div>
@@ -1713,16 +1716,32 @@ function quotaReset(now = Date.now()){
   return now - into + 864e5 - (now % 1000);
 }
 /** the free daily limit is used up: nothing can be saved safely any more, so the casino closes until it resets */
-function closeCasino(until){
+const FOREVER = 4102444800000;   // admin closings: until the admin opens again
+const CLOSED_TXT = {
+  kosten: { sign: '🎰', h: 'Legat Casino hat gerade geschlossen', p1: 'Heute war im Casino ungewöhnlich viel los, mehr als unsere Server-Kasse an einem Tag verkraften soll. Damit keine hohen Kosten entstehen, macht das Casino zur Sicherheit bis morgen früh zu.', p2: 'Um <b id="closedat2"></b> Uhr öffnet es automatisch wieder.' },
+  admin: { sign: '🔒', h: 'Legat Casino hat gerade geschlossen', when: 'Wir öffnen bald wieder', p1: 'Das Casino wurde vom Betreiber vorübergehend geschlossen.', p2: 'Sobald es wieder offen ist, lädt sich die Seite von selbst neu.' },
+  wartung: { sign: '🛠️', h: 'Wartungsarbeiten', when: 'Wir sind bald wieder für dich da', p1: 'Gerade wird am Casino gearbeitet, zum Beispiel an einem Update. Damit dabei nichts schiefgeht, ist das Casino kurz geschlossen.', p2: 'Sobald die Arbeiten fertig sind, lädt sich die Seite von selbst neu.' },
+};
+const CLOSED0 = {};
+const CL = { peek: false, kind: null };
+function closeCasino(until, kind = 'limit'){
   until = until || quotaReset();
-  ls.set('closedUntil', until);
-  try { S.auto = 0; } catch {}
+  ls.set('closedUntil', until); ls.set('closedKind', kind); CL.kind = kind;
   const el = $('closed'); if (!el) return;
-  const at = new Date(until).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
-  $('closedat').textContent = at; $('closedat2').textContent = at;
+  if (!CLOSED0.p1) Object.assign(CLOSED0, { sign: el.querySelector('.closedsign').textContent, h: $('closedh').textContent, when: el.querySelector('.closedwhen').innerHTML, p1: $('closedp1').innerHTML, p2: $('closedp2').innerHTML });
+  const T = CLOSED_TXT[kind] || {}, open = until < FOREVER;
+  el.querySelector('.closedsign').textContent = T.sign || CLOSED0.sign; $('closedh').textContent = T.h || CLOSED0.h;
+  el.querySelector('.closedwhen').innerHTML = T.when ? esc(T.when) : CLOSED0.when;
+  $('closedp1').innerHTML = T.p1 || CLOSED0.p1; $('closedp2').innerHTML = T.p2 || CLOSED0.p2; $('closedp4').hidden = !open;
+  $('closedretry').hidden = kind !== 'limit';
+  $('closedadmin').hidden = !ADMIN; $('closedpeek').hidden = !ADMIN;
+  try { S.auto = 0; } catch {}
+  if (open){ const at = new Date(until).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }); if ($('closedat')) $('closedat').textContent = at; if ($('closedat2')) $('closedat2').textContent = at; }
+  if (CL.peek){ adminBanner(); return; }   // the admin is looking around inside
   el.hidden = false; document.body.classList.add('isclosed');
   clearInterval(QUOTA.timer);
   const tick = () => {
+    if (!open){ $('closedin').textContent = ''; return; }
     const left = until - Date.now();
     if (left <= 0){ ls.set('closedUntil', 0); location.reload(); return; }
     const h = Math.floor(left / 3600e3), m = Math.floor(left % 3600e3 / 60e3);
@@ -1730,9 +1749,24 @@ function closeCasino(until){
   };
   tick(); QUOTA.timer = setInterval(tick, 20000);
 }
+/** the admin goes in although the casino is closed for everyone else */
+function adminPeek(){
+  if (!ADMIN) return; CL.peek = true;
+  $('closed').hidden = true; document.body.classList.remove('isclosed'); clearInterval(QUOTA.timer);
+  adminBanner(); renderAll();
+}
+function adminBanner(){
+  let b = $('admbanner'); const show = ADMIN && CL.peek && ls.get('closedUntil', 0) > Date.now();
+  document.body.classList.toggle('hasbanner', show);
+  if (!show){ b?.remove(); return; }
+  if (!b){ b = document.createElement('button'); b.id = 'admbanner'; b.className = 'admbanner'; b.addEventListener('click', () => { setTab('account'); renderAll(); }); document.body.appendChild(b); }
+  b.textContent = `${CL.kind === 'wartung' ? '🛠️ Wartung' : '🔒 Geschlossen'}: Spieler sehen gerade den Schließ-Bildschirm. Öffnen unter Konto`;
+}
 $('closedmore')?.addEventListener('click', () => { const i = $('closedinfo'); i.hidden = !i.hidden; $('closedmore').textContent = i.hidden ? 'Mehr Infos' : 'Weniger Infos'; });
 $('closedretry')?.addEventListener('click', () => { ls.set('closedUntil', 0); location.reload(); });
-setTimeout(() => { const cu = ls.get('closedUntil', 0); if (cu && Date.now() < cu) closeCasino(cu); }, 0);   // still closed after a reload
+setTimeout(() => { const cu = ls.get('closedUntil', 0); if (cu && Date.now() < cu) closeCasino(cu, ls.get('closedKind', 'limit')); }, 0);   // still closed after a reload
+$('closedadmin')?.addEventListener('click', () => adminCasino('open'));
+$('closedpeek')?.addEventListener('click', adminPeek);
 const unsavedMs = () => { let o = Infinity; for (const t of SAVE.pending.values()) o = Math.min(o, t); return o === Infinity ? 0 : Date.now() - o; };
 function renderSaveWarn(){
   const el = $('savewarn'); if (!el) return;
@@ -1866,7 +1900,14 @@ let intervals=[];
 const PL = { me: null, meMeta: null, meLoaded: false, rev: {}, ch: {}, legacy: {}, key: '', unsubs: [], unsubMe: null, unsubRev: null, all: null, allAt: 0 };
 let ADMIN = false;
 function startPlayers(){
-  getDoc(doc(fs, 'meta', 'admin')).then(() => { ADMIN = true; renderAll(); }).catch(() => {});   // only the owner of the casino may read it
+  getDoc(doc(fs, 'meta', 'admin')).then(() => { ADMIN = true; if ($('closedadmin')){ $('closedadmin').hidden = false; $('closedpeek').hidden = false; } renderAll(); }).catch(() => {});   // only the owner of the casino may read it
+  // emergency closing by the cost guard on the server (or by the admin): until the next morning
+  onSnapshot(doc(fs, 'meta', 'closed'), s => { const c = s.data(); SRV.closed = c || null;
+    const kind = ['admin', 'wartung'].includes(c?.why) ? c.why : 'kosten';
+    if (c?.until > NOW()) closeCasino(c.until >= FOREVER ? FOREVER : c.until - clockOff, kind);
+    else if (['kosten', 'admin', 'wartung'].includes(ls.get('closedKind', '')) && ls.get('closedUntil', 0) > Date.now()){ ls.set('closedUntil', 0); if (CL.peek){ CL.peek = false; adminBanner(); toast('Das Casino ist wieder für alle offen.'); } else location.reload(); }
+    if (tab === 'account') renderAll();
+  }, e => console.warn(e));
   PL.unsubMe = onSnapshot(doc(fs, 'players', uid), s => { PL.me = s.exists() ? s.data() : null; PL.meMeta = s.metadata; PL.meLoaded = true; applyPlayers(); }, playersErr);
   PL.unsubRev = onSnapshot(query(collection(fs, 'pub'), where('friends', 'array-contains', uid)), s => { const o = {}; s.docs.forEach(d => o[d.id] = d.data()); PL.rev = o; applyPlayers(); }, playersErr);
 }
@@ -2586,9 +2627,14 @@ function animateCards(root){
 /* =====================================================================
    v1.1 – Casino home, Glücksrad, Roulette, Automat, Pferderennen, Sportwetten
    ===================================================================== */
-const APP_VERSION = '1.7.3';
+const APP_VERSION = '1.7.4';
 const CL_TITLES = { '1.5.12': 'Technische Verbesserungen' };
 const CHANGELOGS = {
+  '1.7.4': [
+    'Vorbereitung für die Server-Kasse: Das Casino ist jetzt mit einem eigenen Server verbunden. Für dich ändert sich beim Spielen noch nichts',
+    'Neuer Schutz: Wird es an einem Tag zu teuer, schließt das Casino automatisch bis zum nächsten Morgen um 7 Uhr',
+    'Bei Wartungsarbeiten zeigt das Casino jetzt einen eigenen Hinweis und öffnet von selbst wieder, sobald alles fertig ist',
+  ],
   '1.7.3': [
     'Mehr Schutz gegen Schummeln: Dein Vermögen darf pro Tag um höchstens 500.000 ℒ wachsen, das prüft Firebase selbst. Gewinnst du mehr, geht nichts verloren: Der Rest steht als „ausstehend“ oben unter deinem Kontostand und in der Bank und wird dir ab dem nächsten Tag automatisch gutgeschrieben',
     'Die Rangliste kann keinen höheren Kontostand mehr zeigen, als wirklich gespeichert ist',
@@ -6811,6 +6857,39 @@ function renderShop(){
   if (el.innerHTML !== html) el.innerHTML = html;
 }
 let shopConfirm = null;
+/* ---------- 2.0 step 0: server connection (Cloud Functions in Frankfurt) ---------- */
+const SRV = { fn: null, closed: null, ping: '', kosten: null };
+async function srvCall(name, data = {}){
+  if (!SRV.fn){ const m = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js'); SRV.fn = { m, f: m.getFunctions(app, 'europe-west3') }; }
+  return (await SRV.fn.m.httpsCallable(SRV.fn.f, name)(data)).data;
+}
+async function adminPing(){
+  SRV.ping = '⏳ Teste …'; renderAll(); const t0 = performance.now();
+  try { const r = await srvCall('ping'); SRV.ping = r?.ok ? `✅ Server verbunden (${Math.round(performance.now() - t0)} ms)` : '❌ Unerwartete Antwort'; }
+  catch (e){ console.warn(e); SRV.ping = '❌ Keine Verbindung: ' + (e?.code === 'functions/not-found' ? 'Funktion noch nicht hochgeladen' : e?.message || e); }
+  try { SRV.kosten = (await getDoc(doc(fs, 'meta', 'kosten'))).data() || null; } catch {}
+  renderAll();
+}
+/** the next 7:00 in the morning (local time) */
+async function adminCasino(mode){
+  if (!ADMIN) return;
+  if (mode !== 'open' && !confirm(mode === 'wartung' ? 'Casino wegen Wartungsarbeiten für alle schließen? Es bleibt zu, bis du es wieder öffnest.' : 'Casino für alle schließen? Es bleibt zu, bis du es wieder öffnest.')) return;
+  if (mode !== 'open') CL.peek = true;   // set before the write: the listener fires at once
+  try { await setDoc(doc(fs, 'meta', 'closed'), mode === 'open' ? { until: 0, why: 'open', at: Date.now() } : { until: FOREVER, why: mode, at: Date.now() });
+    if (mode === 'open'){ ls.set('closedUntil', 0); CL.peek = false; adminBanner(); $('closed').hidden = true; document.body.classList.remove('isclosed'); clearInterval(QUOTA.timer); toast('Das Casino ist wieder für alle offen.'); renderAll(); }
+    else { CL.peek = true; toast(mode === 'wartung' ? 'Wartungsmodus an. Du kannst weiter rein.' : 'Casino geschlossen. Du kannst weiter rein.'); } }
+  catch (e){ console.warn(e); if (mode !== 'open'){ CL.peek = false; adminBanner(); } toast('Hat nicht geklappt: ' + (e?.code === 'permission-denied' ? 'Sind die neuen Regeln in Firebase eingetragen?' : e?.message || e)); }
+}
+function adminServerHTML(){
+  if (!ADMIN) return '';
+  const k = SRV.kosten, c = SRV.closed, open = !(c?.until > NOW());
+  return `<div class="panel stack"><h3>Admin · Server</h3>
+    <div class="row"><button class="btn" data-act="adping">Server testen</button>${SRV.ping ? `<span>${esc(SRV.ping)}</span>` : ''}</div>
+    ${k ? `<p class="muted small">Kosten laut Google: heute ${(k.today || 0).toLocaleString('de-DE', { style: 'currency', currency: k.cur || 'EUR' })} (erlaubt ${(k.allow || 0).toLocaleString('de-DE', { style: 'currency', currency: k.cur || 'EUR' })}), diesen Monat ${(k.last || 0).toLocaleString('de-DE', { style: 'currency', currency: k.cur || 'EUR' })} · Stand ${new Date(k.at).toLocaleString('de-DE', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}</p>` : ''}
+    <p>Casino: <b>${open ? '🟢 offen' : c.why === 'wartung' ? '🛠️ geschlossen wegen Wartungsarbeiten' : c.why === 'admin' ? '🔒 geschlossen' : `🔒 geschlossen vom Kostenwächter bis ${new Date(c.until).toLocaleString('de-DE', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}`}</b></p>
+    <div class="row">${open ? '<button class="btn" data-act="adclose" data-v="admin">🔒 Schließen</button><button class="btn" data-act="adclose" data-v="wartung">🛠️ Schließen wegen Wartungsarbeiten</button>' : '<button class="btn gold" data-act="adopen">🟢 Casino öffnen</button>'}</div>
+    <p class="muted small">Geschlossen bleibt es, bis du wieder öffnest. Du selbst kommst trotzdem rein: Auf dem Schließ-Bildschirm auf „Trotzdem rein (nur du)“ tippen.</p></div>`;
+}
 function renderAccount(){
   const el = $('view-account');
   if (!P){ el.innerHTML = `<div class="panel"><p class="muted">Lädt …</p></div>`; return; }
@@ -6823,6 +6902,7 @@ function renderAccount(){
     <div class="panel stack"><div class="row" style="justify-content:space-between"><h2>${avH(P.avatar)} ${esc(P.name)}</h2><button class="btn sm" data-act="logout">Abmelden</button></div>
       <p class="muted small">Angemeldet als ${esc(authUser?.email||'')} · Version ${APP_VERSION}</p><div id="acc-stats"></div></div>
     ${settingsHTML()}
+    ${adminServerHTML()}
     <div class="panel stack"><h3>Verlauf</h3>${chartHTML(P.hist)}${hist ? `<div class="hist">${hist}</div>` : ''}</div>
     ${Object.keys(P.games||{}).length ? `<div class="panel stack"><h3>Andere Spiele</h3><div class="statgrid">${Object.entries(P.games).map(([k,g]) => `<div class="stat"><small>${GAME_NAMES[k]||k}</small><b style="color:${g.net>=0?'var(--win)':'var(--lose)'}">${sgn(g.net)}</b><span class="muted small"> · ${g.n}×</span></div>`).join('')}</div></div>` : ''}
     <div class="panel stack"><h3>Erfolge · ${Object.keys(P.ach).length} von ${ACH.length}</h3>${badgesHTML(P.ach, true)}</div>
@@ -7085,6 +7165,9 @@ document.addEventListener('click', async e => {
     case 'fair': openModal('fair'); break;
     case 'profile': openModal('profile', b.dataset.id); break;
     case 'adreset': adminAct(b.dataset.id, 'reset'); break;
+    case 'adping': adminPing(); break;
+    case 'adclose': adminCasino(b.dataset.v); break;
+    case 'adopen': adminCasino('open'); break;
     case 'adban': adminAct(b.dataset.id, 'ban'); break;
     case 'closemodal': closeModal(); break;
     case 'revive': if (isBroke() && Date.now() >= reviveAt()){ Object.assign(DISH, { phase:'intro', collected:false }); openModal('dish'); } break;
