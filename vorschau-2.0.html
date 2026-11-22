@@ -1115,6 +1115,9 @@ h3{font-size:12px;letter-spacing:.09em;font-weight:700}
 .closed{position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:24px;background:radial-gradient(120% 80% at 50% 0%,#2a1d14,#120d0a 70%);overflow:auto}
 .closedcard{max-width:460px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:12px;animation:gin .4s ease both}
 body.hasbanner{padding-bottom:64px}
+.mcell.wait{animation:kwait .45s ease-in-out infinite alternate;border-color:var(--brass)}
+.hlcard.wait{animation:kwait .45s ease-in-out infinite alternate}
+@keyframes kwait{from{transform:scale(1);filter:brightness(1)}to{transform:scale(.94);filter:brightness(1.35)}}
 .admbanner{position:fixed;left:50%;bottom:12px;transform:translateX(-50%);z-index:90;max-width:calc(100% - 32px);padding:8px 14px;border-radius:999px;border:1px solid var(--brass);background:rgba(20,16,12,.95);color:var(--brass);font:inherit;font-size:13px;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.5)}
 .closedsign{font-size:64px;filter:grayscale(.6) drop-shadow(0 10px 20px rgba(0,0,0,.5))}
 .closed h1{font-family:var(--f-display);font-size:clamp(28px,7vw,40px);line-height:1.1;margin:0}
@@ -2632,8 +2635,9 @@ const APP_VERSION = '2.0';
 const CL_TITLES = { '1.5.12': 'Technische Verbesserungen' };
 const CHANGELOGS = {
   '2.0': [
-    'Server-Kasse: Automat, Roulette, Pferderennen, Glücksrad, Crash, Mines und Höher oder Tiefer werden jetzt auf unserem eigenen Server ausgespielt und gebucht. Schummeln über die Konsole bringt hier nichts mehr',
+    'Server-Kasse: Automat, Roulette, Pferderennen, Glücksrad, Crash, Mines, Höher oder Tiefer und die Kisten werden jetzt auf unserem eigenen Server ausgespielt und gebucht. Schummeln über die Konsole bringt hier nichts mehr',
     'Crash: Die Explosionspunkte kennt nur noch der Server, sie stehen weiterhin vor dem Start fest und sind für alle gleich',
+    'Kisten, Markt und Auktionen laufen über die Server-Kasse. Deine Sammlung wird dabei sicher auf dem Server gespeichert',
     'Auto-Spin am Automaten läuft in Paketen von bis zu 10 Drehs. Stoppst du mitten im Paket, werden die restlichen Drehs sofort angezeigt',
     'Das Tageslimit für alles, was noch auf dem Handy gerechnet wird, sinkt auf 100.000 ℒ. Gewinne über die Server-Kasse zählen nicht mit',
   ],
@@ -4229,9 +4233,17 @@ async function kOpen(id){
   if (unsavedMs() > 12000) return toast('Dein Spielstand wird gerade nicht gespeichert. Warte, bis die Verbindung wieder da ist.');
   const c = KCRATES.find(x => x.id === id), free = (P.crates?.[id] || 0) > 0;
   if (!free && P.balance < c.price) return toast(P.euro > 0 ? 'Nicht genug Legats. Heb auf der Bank etwas ab.' : 'Nicht genug Legats.');
-  const win = kRoll(c), def = KITEM[win.k];
+  let win, def, ok;
+  if (KASSE_ON){   // the server opens the crate and books it
+    KS.busy = true; renderAll();
+    let r; try { r = await kasse('kopen', { id, free }); } catch (e){ KS.busy = false; renderAll(); return toast(e.message); }
+    win = r.win; def = KITEM[win.k]; KS.pend = win.money ? null : win.id;
+    ok = withPlayer(d => { d.kst = { n: (d.kst?.n || 0) + 1, best: Math.max(d.kst?.best || 0, r.value) };
+      grant(d, 'kiste1'); if (def.r === 'gold') grant(d, 'mythisch'); if ((d.items || []).length >= 20) grant(d, 'sammler'); return true; }, 'Kiste') || true;
+  } else {
+  win = kRoll(c); def = KITEM[win.k];
   KS.busy = true; KS.pend = win.money ? null : win.id;   // free crates won on the way are announced after the reveal; the item stays hidden until then
-  const ok = withPlayer(d => { WHY = c.n + (free ? ' (gratis)' : '');
+  ok = withPlayer(d => { WHY = c.n + (free ? ' (gratis)' : '');
     if (free){ if (!(d.crates?.[id] > 0)) return false; d.crates = { ...d.crates, [id]: d.crates[id] - 1 }; }
     else { if (d.balance < c.price) return false; d.balance -= c.price; }
     if (win.money){ d.balance += win.money; WHY += ': ' + def.n; }
@@ -4240,6 +4252,7 @@ async function kOpen(id){
     grant(d, 'kiste1'); if (def.r === 'gold') grant(d, 'mythisch'); if ((d.items || []).length >= 20) grant(d, 'sammler');
     return true;
   });
+  }
   if (!ok){ KS.busy = false; KS.pend = null; return; }
   if (win.money) hold = win.money;   // the header shows the win only after the reveal
   KS.busy = true; KS.last = id; renderAll();
@@ -4308,15 +4321,27 @@ function kConfetti(cv, n){
 }
 
 /* ---------- sell, buy ---------- */
-function kSell(id){
+async function kSell(id){
   const it = P.items.find(x => x.id === id); if (!it) return;
+  if (KASSE_ON){
+    const n = KITEM[it.k].n; let r;
+    try { r = await kasse('ksell', { id }); } catch (e){ return toast(e.message); }
+    withPlayer(d => { kUnequip(d, id); return true; });
+    SFX.coins(); toast(`${n} verkauft: +${fmt(r.price)} ℒ`); return;
+  }
   const v = kSellPrice(it), n = KITEM[it.k].n;
   if (withPlayer(d => { WHY = 'Item verkauft: ' + n; const i = (d.items || []).findIndex(x => x.id === id); if (i < 0) return false; kUnequip(d, id); d.items = d.items.filter(x => x.id !== id); d.balance += v; return true; })){
     SFX.coins(); toast(`${n} verkauft: +${fmt(v)} ℒ`);
   }
 }
-function kBuy(k){
+async function kBuy(k){
   const p = kBuyPrice(k), def = KITEM[k];
+  if (KASSE_ON){
+    if (P.balance < p) return toast('Nicht genug Legats.');
+    let r; try { r = await kasse('kbuy', { k }); } catch (e){ return toast(e.message); }
+    withPlayer(d => { if ((d.items || []).length >= 20) grant(d, 'sammler'); return true; });
+    SFX.coins(); toast(`${def.n} gekauft (Nr. ${r.it.nr}) für ${fmt(r.price)} ℒ`); kGiftToast(); if ($('ksheet')) kMarketSheet(k); return;
+  }
   if (unsavedMs() > 12000) return toast('Dein Spielstand wird gerade nicht gespeichert. Warte, bis die Verbindung wieder da ist.');
   if (P.balance < p) return toast('Nicht genug Legats.');
   const it = kMake(def, .2 + Math.random() * .45);
@@ -4328,8 +4353,13 @@ function kBuy(k){
 /* ---------- auction against computer collectors ----------
    The collectors' limits and every bid are drawn at the start and saved, so leaving or reloading changes nothing. */
 const KBIDDERS = [['Graf Zahlreich', '🧐'], ['Tante Erna', '👵'], ['Sammler-Sigi', '🤓'], ['Baronin von Bling', '💅'], ['Onkel Dagobert', '🦆'], ['Kunsthändler Klaus', '🧑‍🎨'], ['Lady Luck', '🍀'], ['Der Scheich', '🕌']];
-function kAucStart(id, minPct){
+async function kAucStart(id, minPct){
   const it = P.items.find(x => x.id === id); if (!it || P.auc) return;
+  if (KASSE_ON){
+    try { await kasse('kauc', { id, minPct: Math.round(minPct) }); } catch (e){ return toast(e.message); }
+    withPlayer(d => { kUnequip(d, id); return true; });
+    SFX.chip(); kAucView(); return;
+  }
   const v = kValue(it), min = Math.max(100, Math.round(v * minPct / 100));
   const pool = KBIDDERS.map((_, i) => i).sort(() => Math.random() - .5).slice(0, 3 + rnd(4));
   const lims = pool.map(() => v * Math.exp(-.05 + .2 * kgauss('a' + Math.random(), 0)));
@@ -4350,6 +4380,12 @@ function kAucStart(id, minPct){
 /** finish the auction once its time is up: pay out or give the item back */
 function kAucSettle(){
   const a = P?.auc; if (!a || NOW() < a.end || KS.settling) return;
+  if (KASSE_ON){   // the server pays out or gives the item back
+    if (Date.now() - (KS.settleTry || 0) < 4000 || SRV.busy) return;
+    KS.settleTry = Date.now(); KS.settling = true;
+    kasse('kaucend').catch(e => console.warn(e)).finally(() => { KS.settling = false; });
+    return;
+  }
   KS.settling = true;
   const sold = a.bids.length > 0, price = sold ? a.bids[a.bids.length - 1].p : 0, net = Math.round(price * (1 - K_AUC)), n = KITEM[a.it.k]?.n || 'Item';
   const ok = withPlayer(d => { if (!d.auc || d.auc.t0 !== a.t0) return false; WHY = sold ? 'Auktion: ' + n : 'Auktion ohne Gebot: ' + n;
@@ -4827,7 +4863,8 @@ async function mnStartK(){
 async function mnPickK(i){
   const R_ = MN.run; if (!R_ || R_.over || R_.open.includes(i) || MN.busy) return;
   MN.busy = true; let r;
-  try { r = await kasse('mnpick', { i }); } catch (e){ MN.busy = false; renderAll(); return toast(e.message); }
+  document.querySelector(`[data-act="mnpick"][data-i="${i}"]`)?.classList.add('wait'); tone(520, .03, { type: 'triangle', vol: .05 });   // react at once, the server answers in a moment
+  try { r = await kasse('mnpick', { i }); } catch (e){ MN.busy = false; document.querySelectorAll('.wait').forEach(x => x.classList.remove('wait')); renderAll(); return toast(e.message); }
   MN.busy = false;
   if (r.mine){
     R_.mines = new Set(r.mines); R_.over = true; R_.lost = true; R_.boom = i; SFX.bust();
@@ -4866,7 +4903,8 @@ async function hlGuessK(dir){
   const R_ = HL.run; if (!R_ || R_.over || HL.busy) return;
   const cur = R_.cards[R_.cards.length - 1]; if (!hlFactor(cur.r, dir)) return;
   HL.busy = true; let r;
-  try { r = await kasse('hlguess', { dir }); } catch (e){ HL.busy = false; renderAll(); return toast(e.message); }
+  document.querySelector('#g-hilo .hlcard')?.classList.add('wait'); document.querySelectorAll('[data-act="hlhi"],[data-act="hllo"]').forEach(x => x.disabled = true); SFX.card();
+  try { r = await kasse('hlguess', { dir }); } catch (e){ HL.busy = false; document.querySelectorAll('.wait').forEach(x => x.classList.remove('wait')); renderHilo(); renderAll(); return toast(e.message); }
   HL.busy = false; R_.cards.push(r.card);
   if (r.tie){ HL.msg = 'Gleich! Kein Verlust, rate nochmal.'; renderAll(); return; }
   if (r.lost){
@@ -7118,6 +7156,10 @@ async function kasse(a, p = {}){
     const r = await srvCall('kasse', { a, ...p, rev: P.rev || 0 });
     applySrv(r.doc);
     if (r.settled){ const x = r.settled; withPlayer(d => { record(d, 'crash', x.bet, x.pay); if (x.out >= 10) grant(d, 'crash10'); return true; }, 'Crash'); }
+    if (r.auc){ const x = r.auc, n = KITEM[x.k]?.n || 'Item';
+      if (x.sold) withPlayer(d => { grant(d, 'auktion'); return true; });
+      if (!KS.aucOpen){ const tx = x.sold ? `${n} versteigert für ${fmt(x.price)} ℒ (+${fmt(x.net)} ℒ)` : `${n}: kein Gebot, das Item ist zurück`; toast('🔨 ' + tx); notify('🔨', tx, { tab: 'table', game: 'kisten' }); if (x.sold) SFX.coins(); }
+      kGiftToast(); }
     return r.out;
   } catch (e){
     console.warn(e);
