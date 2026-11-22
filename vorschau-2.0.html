@@ -2632,7 +2632,8 @@ const APP_VERSION = '2.0';
 const CL_TITLES = { '1.5.12': 'Technische Verbesserungen' };
 const CHANGELOGS = {
   '2.0': [
-    'Server-Kasse: Automat, Roulette, Pferderennen und Glücksrad werden jetzt auf unserem eigenen Server ausgespielt und gebucht. Schummeln über die Konsole bringt hier nichts mehr',
+    'Server-Kasse: Automat, Roulette, Pferderennen, Glücksrad, Crash, Mines und Höher oder Tiefer werden jetzt auf unserem eigenen Server ausgespielt und gebucht. Schummeln über die Konsole bringt hier nichts mehr',
+    'Crash: Die Explosionspunkte kennt nur noch der Server, sie stehen weiterhin vor dem Start fest und sind für alle gleich',
     'Auto-Spin am Automaten läuft in Paketen von bis zu 10 Drehs. Stoppst du mitten im Paket, werden die restlichen Drehs sofort angezeigt',
     'Das Tageslimit für alles, was noch auf dem Handy gerechnet wird, sinkt auf 100.000 ℒ. Gewinne über die Server-Kasse zählen nicht mit',
   ],
@@ -3174,7 +3175,7 @@ async function slotAuto(n){
         } else {   // stopped: these spins were already played, show them at once
           const rest = spins.slice(i); let net = 0;
           for (const x of rest){ slotBook(x); net += x.pay - S.pk.bet + (x.jp || 0); S.reels = x.reels; }
-          toast(`Die restlichen ${rest.length} Drehs dieses Pakets waren schon gespielt: ${sgn(net)} ℒ`); break out;
+          toast(`Auto-Spin gestoppt. ${rest.length} ${rest.length === 1 ? 'Dreh war' : 'Drehs waren'} schon gestartet und ${rest.length === 1 ? 'wurde' : 'wurden'} direkt ausgewertet: ${sgn(net)} ℒ`); break out;
         }
       }
       if (spins.length < want){ toast('Nicht genug Legats für den nächsten Dreh. Auto-Spin gestoppt.'); break; }
@@ -3201,8 +3202,8 @@ const raceOf = r => r.h.map((h, i) => ({ n: h.n, p: h.p, odds: h.odds, c: SILKS[
 function newRace(){
   if (KASSE_ON){   // the server sets up the race (names, chances, odds)
     H.res = null; H.pickI = null;
-    const r = P?.hrace;
-    if (r){ H.race = raceOf(r); H.raceId = r.id; return; }
+    const r = H.next;
+    if (r){ H.race = raceOf(r); H.raceId = r.id; H.next = null; return; }
     H.race = null;
     if (!H.loading && P){ H.loading = true; kasse('hnew').then(o => { H.race = raceOf(o.race); H.raceId = o.race.id; }).catch(e => toast(e.message)).finally(() => { H.loading = false; renderAll(); }); }
     return;
@@ -3243,7 +3244,7 @@ async function horseRun(){
   let order = [], won, pay; const h = H.race[H.pickI];
   if (KASSE_ON){
     H.busy = true; renderAll();
-    try { ({ order, pay } = await kasse('horses', { id: H.raceId, pick: H.pickI, bet: H.bet })); }
+    try { let nx; ({ order, pay, next: nx } = await kasse('horses', { id: H.raceId, pick: H.pickI, bet: H.bet })); H.next = nx; }
     catch (e){ H.busy = false; toast(e.message); newRace(); renderAll(); return; }
     won = order[0] === H.pickI; hold = pay;
     withPlayer(d => { record(d, 'horses', H.bet, pay); if (won && h.odds >= 8) grant(d,'horse8'); return true; }, 'Pferderennen');
@@ -4628,15 +4629,17 @@ function crashHour(h){
 }
 const crMult = (r, t) => Math.min(r.cp, Math.floor(Math.exp(CR_RATE * Math.max(0, t - r.fly)) * 100) / 100);
 const crFmt = m => m.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '×';
-function crashRound(id){ const [h, i] = String(id).split('-').map(Number); return crashHour(h)[i]; }
+function crashRound(id){ if (KASSE_ON) return CR.known[id] || null; const [h, i] = String(id).split('-').map(Number); return crashHour(h)[i]; }
 function crashAt(t = NOW()){
+  if (KASSE_ON) return crashAtK(t);
   const h = Math.floor(t / 3600e3), r = crashHour(h).find(x => t >= x.start && t < x.end);
   if (!r) return { phase: 'idle', next: (h + 1) * 3600e3, t };
   const phase = t < r.fly ? 'bet' : t < r.boom ? 'fly' : 'boom';
   return { phase, r, t, m: phase === 'fly' ? crMult(r, t) : phase === 'boom' ? r.cp : 1 };
 }
-function crashHistory(n){ const t = NOW(), h = Math.floor(t / 3600e3); return [...crashHour(h - 1), ...crashHour(h)].filter(r => r.boom <= t).slice(-n).reverse(); }
+function crashHistory(n){ if (KASSE_ON) return (CR.hist || []).slice(0, n); const t = NOW(), h = Math.floor(t / 3600e3); return [...crashHour(h - 1), ...crashHour(h)].filter(r => r.boom <= t).slice(-n).reverse(); }
 function crashBet(){
+  if (KASSE_ON) return crashBetK();
   const s = crashAt(); if (s.phase !== 'bet') return toast('Warte auf die nächste Runde.');
   if (P.crash && P.crash.r === s.r.id) return;
   if (P.crash && P.crash.out == null) crashSettle();
@@ -4647,6 +4650,7 @@ function crashBet(){
 }
 /** cash out now, or at the auto multiplier (also works later, when the app was closed) */
 function crashCash(at){
+  if (KASSE_ON) return crashCashK();
   const c = P?.crash; if (!c || c.out != null) return;
   const r = crashRound(c.r), t = NOW(); if (!r || t < r.fly) return;
   let m = at;
@@ -4661,6 +4665,7 @@ function crashCash(at){
   if (game === 'crash' && tab === 'table'){ SFX.win(); bigWin(pay - c.bet, m, '🚀'); }
 }
 function crashSettle(){
+  if (KASSE_ON) return crashSettleK();
   const c = P?.crash; if (!c || c.out != null) return;
   const r = crashRound(c.r); if (!r) return;
   const t = NOW();
@@ -4679,12 +4684,13 @@ function renderCrash(){
   if (P?.crash && P.crash.out == null) crashSettle();
   const mine = P?.crash && s.r && P.crash.r === s.r.id ? P.crash : null;
   const ps = crashPlayers(s);
-  const key = [s.phase, s.r?.id, mine ? mine.out : '-', CR.bet, CR.auto, ps.map(([id, c]) => id + c.out).join(), P ? P.balance - hold : 0].join('|');
+  const key = [s.phase, s.r?.id, mine ? mine.out : '-', CR.bet, CR.auto, CR.busy, ps.map(([id, c]) => id + c.out).join(), P ? P.balance - hold : 0].join('|');
   if (el.innerHTML && key === CR.key) return crashFrame(s);
   CR.key = key;
   const hist = crashHistory(14).map(r => `<span class="crh ${r.cp < 2 ? 'lo' : r.cp >= 10 ? 'hi' : 'mid'}">${crFmt(r.cp)}</span>`).join('');
   let btn;
-  if (s.phase === 'bet') btn = mine ? `<button class="btn gold spinbtn" disabled>Gesetzt: ${fmt(mine.bet)} ℒ${mine.auto ? ` · Auto bei ${crFmt(mine.auto)}` : ''}</button>`
+  if (s.phase === 'bet' && CR.busy && !mine) btn = `<button class="btn gold spinbtn" disabled>Wird gesetzt …</button>`;
+  else if (s.phase === 'bet') btn = mine ? `<button class="btn gold spinbtn" disabled>Gesetzt: ${fmt(mine.bet)} ℒ${mine.auto ? ` · Auto bei ${crFmt(mine.auto)}` : ''}</button>`
     : `<button class="btn gold spinbtn" data-act="crgo">Setzen · ${fmt(CR.bet)} ℒ</button>`;
   else if (s.phase === 'fly' && mine && mine.out == null) btn = `<button class="btn gold spinbtn crcash" data-act="crcash" id="crbtn">Auszahlen</button>`;
   else if (mine && mine.out > 0) btn = `<button class="btn spinbtn" disabled>Ausgezahlt bei ${crFmt(mine.out)} · +${fmt(mine.pay)} ℒ</button>`;
@@ -4744,6 +4750,7 @@ const MN = { stake: ls.get('minesstake', 500), n: ls.get('minesn', 3), run: null
 const MN_EDGE = 0.97, MN_MAX = 1000;
 const minesMult = (n, k) => { let m = MN_EDGE; for (let i = 0; i < k; i++) m *= (25 - i) / (25 - n - i); return Math.min(MN_MAX, Math.floor(m * 100) / 100); };
 function mnStart(){
+  if (KASSE_ON) return mnStartK();
   if (MN.run && !MN.run.over) return;
   const err = betError(MN.stake); if (err) return toast(err);
   const stake = MN.stake, n = MN.n;
@@ -4753,6 +4760,7 @@ function mnStart(){
   savePref('minesstake', stake); savePref('minesn', n); SFX.chip(); renderAll();
 }
 function mnPick(i){
+  if (KASSE_ON) return mnPickK(i);
   const R_ = MN.run; if (!R_ || R_.over || R_.open.includes(i)) return;
   if (R_.mines.has(i)){
     R_.over = true; R_.lost = true; R_.boom = i; SFX.bust();
@@ -4764,6 +4772,7 @@ function mnPick(i){
   renderAll();
 }
 function mnCash(){
+  if (KASSE_ON) return mnCashK();
   const R_ = MN.run; if (!R_ || R_.over || !R_.open.length) return;
   R_.over = true; R_.mult = minesMult(R_.n, R_.open.length); R_.pay = Math.floor(R_.stake * R_.mult);
   withPlayer(d => { d.balance += R_.pay; record(d, 'mines', R_.stake, R_.pay); taskBump(d, 'mines_safe', R_.open.length);
@@ -4771,7 +4780,7 @@ function mnCash(){
   SFX.win(); renderAll(); bigWin(R_.pay - R_.stake, R_.mult, '💎');
 }
 /** a game left in the middle (page closed) is lost, like Höher oder Tiefer */
-function checkAbortedMines(){ if (P?.mines && !(MN.run && !MN.run.over)) withPlayer(d => { record(d, 'mines', d.mines.stake, 0); d.mines = null; return true; }, 'Mines'); }
+function checkAbortedMines(){ if (KASSE_ON) return; if (P?.mines && !(MN.run && !MN.run.over)) withPlayer(d => { record(d, 'mines', d.mines.stake, 0); d.mines = null; return true; }, 'Mines'); }
 function renderMines(){
   const el = $('g-mines'), R_ = MN.run, playing = R_ && !R_.over, k = R_ ? R_.open.length : 0, n = R_ ? R_.n : MN.n;
   const cells = Array.from({ length: 25 }, (_, i) => {
@@ -4797,10 +4806,149 @@ function renderMines(){
       : `${chipPicker(MN.stake, 'mnstake')}
         <div class="row autorow"><span class="muted small">Minen</span><div class="seg">${[1, 3, 5, 10, 24].map(x => `<button data-act="mnn" data-v="${x}" aria-pressed="${MN.n === x}">${x}</button>`).join('')}</div></div>
         <button class="btn gold spinbtn" data-act="mnstart">${R_ ? 'Neue Runde' : 'Spielen'} · ${fmt(MN.stake)} ℒ</button>`}
-      <p class="muted small" style="max-width:54ch">Unter ${n} der 25 Felder liegen Minen. Jeder Diamant erhöht den Multiplikator, je mehr Minen, desto schneller. Zahl aus, wann du willst. Eine Mine kostet den Einsatz. Die Minen liegen schon beim Start fest. Ab ${multFmt(MN_MAX)} wird automatisch ausgezahlt.</p>
+      <p class="muted small" style="max-width:54ch">Unter ${n} der 25 Felder liegen Minen. Jeder Diamant erhöht den Multiplikator, je mehr Minen, desto schneller. Zahl aus, wann du willst. Eine Mine kostet den Einsatz. Jedes Feld hat genau die Chance, als lägen die Minen schon beim Start fest. Ab ${multFmt(MN_MAX)} wird automatisch ausgezahlt.</p>
     </div>
   </div>`;
   if (el.innerHTML !== html) el.innerHTML = html;
+}
+
+/* ---------- 2.0b: Mines, Höher oder Tiefer and Crash via the server ---------- */
+async function mnStartK(){
+  if ((MN.run && !MN.run.over) || MN.busy) return;
+  const err = betError(MN.stake); if (err) return toast(err);
+  const stake = MN.stake, n = MN.n;
+  MN.busy = true; renderAll(); let r;
+  try { r = await kasse('mnstart', { stake, n }); } catch (e){ MN.busy = false; renderAll(); return toast(e.message); }
+  MN.busy = false;
+  if (r.forfeit) withPlayer(d => { record(d, 'mines', r.forfeit, 0); return true; }, 'Mines');
+  MN.id++; MN.run = { stake, n, mines: new Set(), open: [], over: false, lost: false, boom: -1 };
+  savePref('minesstake', stake); savePref('minesn', n); SFX.chip(); renderAll();
+}
+async function mnPickK(i){
+  const R_ = MN.run; if (!R_ || R_.over || R_.open.includes(i) || MN.busy) return;
+  MN.busy = true; let r;
+  try { r = await kasse('mnpick', { i }); } catch (e){ MN.busy = false; renderAll(); return toast(e.message); }
+  MN.busy = false;
+  if (r.mine){
+    R_.mines = new Set(r.mines); R_.over = true; R_.lost = true; R_.boom = i; SFX.bust();
+    withPlayer(d => { record(d, 'mines', R_.stake, 0); taskBump(d, 'mines_safe', R_.open.length); return true; }, 'Mines');
+    renderAll(); return;
+  }
+  R_.open = r.open; tone(660 + R_.open.length * 35, .09, { type: 'triangle', vol: .08 });
+  if (r.cash) return mnCashDone(r);
+  renderAll();
+}
+async function mnCashK(){
+  const R_ = MN.run; if (!R_ || R_.over || !R_.open.length || MN.busy) return;
+  MN.busy = true; let r;
+  try { r = await kasse('mncash'); } catch (e){ MN.busy = false; renderAll(); return toast(e.message); }
+  MN.busy = false; mnCashDone(r);
+}
+function mnCashDone(r){
+  const R_ = MN.run; R_.over = true; R_.mult = r.mult; R_.pay = r.pay; R_.mines = new Set(r.mines);
+  withPlayer(d => { record(d, 'mines', R_.stake, R_.pay); taskBump(d, 'mines_safe', R_.open.length);
+    if (R_.n >= 5 && R_.open.length >= 10) grant(d, 'mines'); return true; }, 'Mines');
+  SFX.win(); renderAll(); bigWin(R_.pay - R_.stake, R_.mult, '💎');
+}
+
+async function hlStartK(){
+  if ((HL.run && !HL.run.over) || HL.busy) return;
+  const err = betError(HL.stake); if (err) return toast(err);
+  const stake = HL.stake;
+  HL.busy = true; renderAll(); let r;
+  try { r = await kasse('hlstart', { stake }); } catch (e){ HL.busy = false; renderAll(); return toast(e.message); }
+  HL.busy = false;
+  if (r.forfeit) withPlayer(d => { record(d, 'hilo', r.forfeit, 0); return true; }, 'Höher oder Tiefer');
+  savePref('hilostake', stake);
+  HL.id++; HL.run = { stake, cards: [r.card], mult: 1, n: 0, over: false }; HL.msg = ''; SFX.chip(); renderAll();
+}
+async function hlGuessK(dir){
+  const R_ = HL.run; if (!R_ || R_.over || HL.busy) return;
+  const cur = R_.cards[R_.cards.length - 1]; if (!hlFactor(cur.r, dir)) return;
+  HL.busy = true; let r;
+  try { r = await kasse('hlguess', { dir }); } catch (e){ HL.busy = false; renderAll(); return toast(e.message); }
+  HL.busy = false; R_.cards.push(r.card);
+  if (r.tie){ HL.msg = 'Gleich! Kein Verlust, rate nochmal.'; renderAll(); return; }
+  if (r.lost){
+    R_.over = true; R_.lost = true; HL.msg = `Leider ${dir === 'hi' ? 'tiefer' : 'höher'}. ${fmt(R_.stake)} ℒ verloren.`;
+    withPlayer(d => { record(d, 'hilo', R_.stake, 0); return true; }, 'Höher oder Tiefer');
+    setTimeout(() => SFX.lose(), 450); renderAll(); return;
+  }
+  R_.mult = r.mult; R_.n = r.n; HL.msg = '';
+  if (r.cash){ renderAll(); setTimeout(() => hlCashDone(r), 700); return; }
+  setTimeout(() => SFX.push(), 450); renderAll();
+}
+async function hlCashK(){
+  const R_ = HL.run; if (!R_ || R_.over || R_.n < 1 || HL.busy) return;
+  HL.busy = true; let r;
+  try { r = await kasse('hlcash'); } catch (e){ HL.busy = false; renderAll(); return toast(e.message); }
+  HL.busy = false; hlCashDone(r);
+}
+function hlCashDone(r){
+  const R_ = HL.run; R_.over = true; R_.mult = r.mult;
+  withPlayer(d => { record(d, 'hilo', R_.stake, r.pay); if (R_.n >= 10) grant(d, 'hilo10'); return true; }, 'Höher oder Tiefer');
+  HL.msg = `Ausgezahlt: ${fmt(r.pay)} ℒ (${multFmt(r.mult)})`; SFX.win(); renderAll();
+}
+
+/* Crash: the rounds come from the server; the crash point only once the rocket has crashed.
+   While the rocket flies, the app asks about once a second (this costs no database reads). */
+Object.assign(CR, { known: {}, cur: null, hist: [], at: 0, fetching: false, busy: false, settleAt: {} });
+const crPub = r => r && { ...r, boom: r.boom ?? Infinity, end: r.end ?? Infinity, cp: r.cp ?? Infinity };
+function crashAtK(t){
+  const r = CR.cur;
+  if (!r) return { phase: 'idle', next: t + 1000, t };
+  if (t < r.start) return { phase: 'idle', next: r.start, t };
+  const phase = t < r.fly ? 'bet' : t < r.boom ? 'fly' : 'boom';
+  return { phase, r, t, m: phase === 'fly' ? crMult(r, t) : phase === 'boom' ? r.cp : 1 };
+}
+async function crashFetch(){
+  CR.fetching = true; const t0 = Date.now();
+  try {
+    const x = await srvCall('crash'), t1 = Date.now();
+    if (t1 - t0 < 1500) clockOff = x.now - (t0 + t1) / 2;   // the server's clock is the one that counts
+    CR.at = Date.now(); CR.hist = x.hist || [];
+    const r = crPub(x.r); if (r){ CR.known[r.id] = r; CR.cur = r; }
+    for (const h of CR.hist){ const k = CR.known[h.id]; if (k && k.cp === Infinity){ CR.known[h.id] = null; } }
+    const ks = Object.keys(CR.known); if (ks.length > 30) delete CR.known[ks[0]];
+    CR.key = '';
+  } catch (e){ console.warn(e); CR.at = Date.now(); }
+  finally { CR.fetching = false; }
+}
+function crashTick(){
+  if (!P || CR.fetching || document.hidden) return;
+  const watching = game === 'crash' && tab === 'table', mine = P.crash && P.crash.out == null;
+  if (!watching && !mine && ISL.mode !== 'crash') return;
+  const t = NOW(), r = CR.cur, since = Date.now() - CR.at;
+  const go = !r || since > 30000 || t >= r.end || (t >= r.start && t < r.start + 50 && since > 2000)
+    || (t >= r.fly && r.boom === Infinity && since > 800);
+  if (go) crashFetch();
+}
+function crashBetK(){
+  const s = crashAt(); if (s.phase !== 'bet') return toast('Warte auf die nächste Runde.');
+  if ((P.crash && P.crash.r === s.r.id) || CR.busy) return;
+  const err = betError(CR.bet); if (err) return toast(err);
+  if (s.r.fly - NOW() < 400) return toast('Zu spät, die Rakete startet.');
+  const stake = CR.bet, auto = CR.auto || null;
+  CR.busy = true; CR.key = ''; renderAll();
+  kasse('crbet', { r: s.r.id, bet: stake, auto }).then(() => { savePref('crashbet', stake); SFX.chip(); })
+    .catch(e => toast(e.message)).finally(() => { CR.busy = false; CR.key = ''; renderAll(); });
+}
+function crashCashK(){
+  const c = P?.crash; if (!c || c.out != null || CR.busy) return;
+  CR.busy = true; const b = $('crbtn'); if (b) b.disabled = true;
+  kasse('crcash', { r: c.r }).then(o => { if (game === 'crash' && tab === 'table'){ SFX.win(); bigWin(o.pay - c.bet, o.out, '🚀'); } })
+    .catch(e => toast(e.message)).finally(() => { CR.busy = false; CR.key = ''; renderAll(); });
+}
+/** the server decides a waiting bet (crashed, or auto cash-out reached); asked once the app sees it is due */
+function crashSettleK(){
+  const c = P?.crash; if (!c || c.out != null || CR.busy || SRV.busy) return;
+  const r = CR.known[c.r], t = NOW();
+  const due = !r ? CR.cur && CR.cur.id !== c.r   // a bet from a round the app does not know (any more): let the server decide
+    : t >= r.boom || (c.auto && t >= r.fly + Math.log(c.auto) / CR_RATE);
+  if (!due) return;
+  const tries = CR.settleAt[c.r] || [0, 0]; if (Date.now() - tries[0] < 4000 || tries[1] >= 4) return;
+  CR.settleAt[c.r] = [Date.now(), tries[1] + 1];
+  CR.busy = true; kasse('crsettle').catch(e => console.warn(e)).finally(() => { CR.busy = false; CR.key = ''; renderAll(); });
 }
 
 /* ---------- Bundesliga-Tipprunde ---------- */
@@ -5067,7 +5215,7 @@ document.addEventListener('click', e => {
   }
 });
 // Crash auto cash-out and settlement keep running in every view
-setInterval(() => { if (P?.crash && P.crash.out == null) crashSettle(); }, 250);
+setInterval(() => { if (KASSE_ON) crashTick(); if (P?.crash && P.crash.out == null) crashSettle(); }, 250);
 setInterval(() => { if (!uid || !P) return; duelsChanged(); tpPrize(); }, 60e3);
 
 
@@ -5712,7 +5860,7 @@ const TUTS = {
   mines: { t: 'Mines', steps: [
     [tvis('<div class="minimines">' + [...'💎💎💣💎💎💣💎💎💎'].map(x => `<i>${x}</i>`).join('') + '</div>'), 'Das Feld', 'Unter 25 Feldern liegen Diamanten und Minen. Du wählst vorher, wie viele Minen es sind: 1, 3, 5, 10 oder 24.'],
     [tvis('<span class="tutemo">💎</span>', tbox('×1,13 → ×1,29')), 'Aufdecken', 'Jeder Diamant erhöht deinen Multiplikator. Je mehr Minen im Feld, desto schneller steigt er.'],
-    [tvis(tbox('Auszahlen', ' gold'), '<span class="tutemo">💣</span>'), 'Aufhören oder weiter?', 'Du kannst nach jedem Diamanten auszahlen. Triffst du eine Mine, ist der Einsatz weg. Die Minen liegen schon beim Start fest.'],
+    [tvis(tbox('Auszahlen', ' gold'), '<span class="tutemo">💣</span>'), 'Aufhören oder weiter?', 'Du kannst nach jedem Diamanten auszahlen. Triffst du eine Mine, ist der Einsatz weg. Jedes Feld hat genau die Chance, als lägen die Minen schon beim Start fest.'],
   ]},
   tipp: { t: 'Tipprunde', steps: [
     [tvis(tbox('2 : 1', ' gold')), 'Ergebnisse tippen', 'Tipp für jedes Bundesliga-Spiel das genaue Ergebnis, mit + und −. Bis zum Anpfiff kannst du ändern.'],
@@ -6155,6 +6303,7 @@ const hlCard = () => ({ r: 2 + rnd(13), s: 'SHDC'[rnd(4)] });
 const hlCode = c => '23456789TJQKA'[c.r - 2] + c.s;
 const multFmt = m => '×' + m.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 function hlStart(){
+  if (KASSE_ON) return hlStartK();
   if (HL.run && !HL.run.over) return;
   const err = betError(HL.stake); if (err) return toast(err);
   const stake = HL.stake;
@@ -6163,6 +6312,7 @@ function hlStart(){
   HL.id++; HL.run = { stake, cards: [hlCard()], mult: 1, n: 0, over: false }; HL.msg = ''; SFX.chip(); renderAll();
 }
 function hlGuess(dir){
+  if (KASSE_ON) return hlGuessK(dir);
   const R_ = HL.run; if (!R_ || R_.over) return;
   const cur = R_.cards[R_.cards.length - 1], f = hlFactor(cur.r, dir); if (!f) return;
   const next = hlCard(); R_.cards.push(next);
@@ -6179,13 +6329,14 @@ function hlGuess(dir){
   renderAll();
 }
 function hlCash(){
+  if (KASSE_ON) return hlCashK();
   const R_ = HL.run; if (!R_ || R_.over || R_.n < 1) return;
   R_.over = true; const pay = Math.floor(R_.stake * R_.mult);
   withPlayer(d => { d.balance += pay; record(d, 'hilo', R_.stake, pay); d.hilo = null; if (R_.n >= 10) grant(d, 'hilo10'); return true; }, 'Höher oder Tiefer');
   HL.msg = `Ausgezahlt: ${fmt(pay)} ℒ (${multFmt(R_.mult)})`; SFX.win(); renderAll();
 }
 /** a game left in the middle (page closed) is lost */
-function checkAbortedHilo(){ if (P?.hilo && !(HL.run && !HL.run.over)) withPlayer(d => { record(d, 'hilo', d.hilo.stake, 0); d.hilo = null; return true; }, 'Höher oder Tiefer'); }
+function checkAbortedHilo(){ if (KASSE_ON) return; if (P?.hilo && !(HL.run && !HL.run.over)) withPlayer(d => { record(d, 'hilo', d.hilo.stake, 0); d.hilo = null; return true; }, 'Höher oder Tiefer'); }
 function renderHilo(){
   const el = $('g-hilo'), R_ = HL.run;
   const cards = R_ ? R_.cards : [];
@@ -6965,7 +7116,9 @@ async function kasse(a, p = {}){
   SRV.busy = true;
   try {
     const r = await srvCall('kasse', { a, ...p, rev: P.rev || 0 });
-    applySrv(r.doc); return r.out;
+    applySrv(r.doc);
+    if (r.settled){ const x = r.settled; withPlayer(d => { record(d, 'crash', x.bet, x.pay); if (x.out >= 10) grant(d, 'crash10'); return true; }, 'Crash'); }
+    return r.out;
   } catch (e){
     console.warn(e);
     if (e?.code === 'functions/aborted'){ resyncPlayer(); throw new Error('Dein Spielstand wurde gerade neu geladen. Bitte nochmal.'); }
@@ -6974,6 +7127,7 @@ async function kasse(a, p = {}){
   } finally { SRV.busy = false; if (SAVE.dirty) queueSave(); }
 }
 function applySrv(doc){
+  if (!doc || !Object.keys(doc).length) return;   // nothing in the player document changed (e.g. a safe field in Mines)
   P = { ...P, ...doc }; SAVE.rev = doc.rev;
   SAVE.base = { ...(SAVE.base || P), ...doc }; SAVE.ack = { ...(SAVE.ack || P), ...doc };
   renderAll(); pubSync();
