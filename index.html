@@ -2123,8 +2123,25 @@ function bankInfo(){
 document.addEventListener('input', e => { if (e.target.id==='bdep') bankInfo(); });
 
 /* ---------- gifts & loans ---------- */
+const CLAIM = { busy: new Set() };
+/** 2.1a: incoming money is booked by the server, one transfer after the other */
+async function claimGiftsK(){
+  for (const [id, g] of Object.entries(gifts)){
+    if (g.to !== uid || g.claimed || CLAIM.busy.has(id) || CLAIM.busy.size) continue;
+    CLAIM.busy.add(id); let r;
+    try { r = await kasse('claim', { id }); } catch (e){ console.warn(e); setTimeout(() => CLAIM.busy.delete(id), 5000); return; }
+    CLAIM.busy.delete(id); gifts[id] = { ...g, claimed: true };
+    if (r.amount){
+      SFX.coins();
+      if (g.kind==='comp'){ const tx = `Gutschrift vom Casino: +${fmt(r.amount)} ℒ${r.why ? ' (' + r.why + ')' : ''}`; toast('🎁 ' + tx); notify('🎁', tx, { tab: 'account' }); }
+      else if (g.kind==='ref') toast(`${nameOf(g.from)} ist über deinen Link beigetreten: +${fmt(r.amount)} ℒ`); else
+      toast(g.kind==='loan' ? `${nameOf(g.from)} leiht dir ${fmt(r.amount)} ℒ` : g.kind==='repay' ? `${nameOf(g.from)} zahlt dir ${fmt(r.amount)} ℒ zurück` : `${nameOf(g.from)} schenkt dir ${fmt(r.amount)} ℒ`);
+    }
+  }
+}
 function claimGifts(){
   if (!P) return;
+  if (KASSE_ON){ if (!SRV.busy) claimGiftsK(); else setTimeout(claimGifts, 800); return; }
   for (const [id, g] of Object.entries(gifts)){
     if (g.to !== uid || g.claimed) continue;
     const did = withPlayer(d => { WHY = ({gift:'Geschenk erhalten',loan:'Geliehen bekommen',repay:'Rückzahlung erhalten',ref:'Einladungsbonus'})[g.kind] || 'Geschenk erhalten'; if (d.claimed.includes(id)) return false; d.balance += g.amount; d.claimed = [...d.claimed, id].slice(-300); return true; });
@@ -2141,6 +2158,15 @@ function sendGift(to, amount, kind){
   if (!(amount >= 100)) return toast('Mindestens 100 Legats.');
   if (inRound()) return toast('Warte, bis deine Runde vorbei ist.');
   if (amount > P.balance) return toast('So viele Legats hast du nicht.');
+  if (KASSE_ON){
+    if (ledgerOpen(P)) return toast('Warte, bis deine Runde vorbei ist.');
+    kasse('gift', { to, amount, kind }).then(() => {
+      if (kind === 'gift') withPlayer(d => { d.giftedTotal += amount; if (d.giftedTotal >= 10000) grant(d, 'generous'); return true; });
+      SFX.coins();
+      toast(kind==='loan' ? `Du leihst ${nameOf(to)} ${fmt(amount)} ℒ` : kind==='repay' ? `Du zahlst ${nameOf(to)} ${fmt(amount)} ℒ zurück` : `Du schenkst ${nameOf(to)} ${fmt(amount)} ℒ`);
+    }).catch(e => toast(e.message));
+    return;
+  }
   const ref = doc(collection(fs,'gifts'));
   const ok = withPlayer(d => { WHY = ({gift:'Geschenk',loan:'Verliehen',repay:'Schulden zurückgezahlt'})[kind] || 'Geschenk';
     if (d.balance < amount || ledgerOpen(d)) return false;
@@ -2631,9 +2657,16 @@ function animateCards(root){
 /* =====================================================================
    v1.1 – Casino home, Glücksrad, Roulette, Automat, Pferderennen, Sportwetten
    ===================================================================== */
-const APP_VERSION = '2.0';
+const APP_VERSION = '2.0.2';
 const CL_TITLES = { '1.5.12': 'Technische Verbesserungen' };
 const CHANGELOGS = {
+  '2.0.2': [
+    'Crash: Der Auszahlen-Knopf reagiert jetzt sofort beim Drücken, auch mit Trackpad und Maus. Vorher konnte ein Klick verloren gehen',
+  ],
+  '2.0.1': [
+    'Schenken, Leihen und Zurückzahlen laufen jetzt über die Server-Kasse',
+    'Automat und Roulette brauchen pro Dreh einen Datenbank-Zugriff weniger',
+  ],
   '2.0': [
     'Server-Kasse: Automat, Roulette, Pferderennen, Glücksrad, Crash, Mines, Höher oder Tiefer und die Kisten werden jetzt auf unserem eigenen Server ausgespielt und gebucht. Schummeln über die Konsole bringt hier nichts mehr',
     'Crash: Die Explosionspunkte kennt nur noch der Server, sie stehen weiterhin vor dem Start fest und sind für alle gleich',
@@ -4948,7 +4981,8 @@ async function crashFetch(){
     const r = crPub(x.r); if (r){ CR.known[r.id] = r; CR.cur = r; }
     for (const h of CR.hist){ const k = CR.known[h.id]; if (k && k.cp === Infinity){ CR.known[h.id] = null; } }
     const ks = Object.keys(CR.known); if (ks.length > 30) delete CR.known[ks[0]];
-    CR.key = '';
+    // redraw only when something new came in: redrawing replaces the cash-out button, and a click in between would get lost
+    const sig = [CR.cur?.id, CR.cur?.boom, CR.hist[0]?.id].join('|'); if (sig !== CR.sig){ CR.sig = sig; CR.key = ''; }
   } catch (e){ console.warn(e); CR.at = Date.now(); }
   finally { CR.fetching = false; }
 }
@@ -5235,7 +5269,7 @@ document.addEventListener('click', e => {
     case 'crbet': CR.bet = v; CR.key = ''; renderAll(); break;
     case 'crauto': CR.auto = v; savePref('crashauto', v); CR.key = ''; renderAll(); break;
     case 'crgo': if (confirmBig(CR.bet, 'crash')) crashBet(); break;
-    case 'crcash': crashCash(); break;
+    case 'crcash': if (Date.now() - (CR.pdown || 0) > 800) crashCash(); break;   // keyboard; mouse, trackpad and finger already cashed out on pointerdown
     case 'mnstake': MN.stake = v; renderAll(); break;
     case 'mnn': MN.n = v; renderAll(); break;
     case 'mnstart': if (confirmBig(MN.stake, 'mines')) mnStart(); break;
@@ -5253,6 +5287,11 @@ document.addEventListener('click', e => {
   }
 });
 // Crash auto cash-out and settlement keep running in every view
+/* the cash-out button reacts when it is pressed, not when it is let go: with a trackpad or mouse there is a moment in between */
+document.addEventListener('pointerdown', e => {
+  const b = e.target.closest('[data-act="crcash"]'); if (!b || b.disabled || e.button > 0) return;
+  e.preventDefault(); CR.pdown = Date.now(); crashCash();
+});
 setInterval(() => { if (KASSE_ON) crashTick(); if (P?.crash && P.crash.out == null) crashSettle(); }, 250);
 setInterval(() => { if (!uid || !P) return; duelsChanged(); tpPrize(); }, 60e3);
 
@@ -7305,6 +7344,10 @@ function profileHTML(id){
     ${gameStatsHTML(p)}
     ${suspicious(p) ? '<div class="note bad"><b>⚠️ Kontostand passt nicht zum Kontobuch.</b> Das Guthaben wurde vermutlich am Spiel vorbei geändert.</div>' : ''}
     ${p.ban ? '<div class="note bad"><b>🚫 Dieses Konto ist gesperrt.</b></div>' : ''}
+    ${ADMIN ? `<div class="panel stack"><h3>Admin · Gutschrift</h3><p class="muted small">Zum Beispiel nach einem Fehler. Kommt beim Spieler an, sobald er online ist, und steht als „Gutschrift vom Casino“ im Kontobuch.</p>
+      <div class="row"><div class="field" style="flex:0 1 130px"><label for="admamt">Legats</label><input id="admamt" type="number" min="1" step="100" inputmode="numeric" placeholder="z. B. 5000"></div>
+      <div class="field" style="flex:1 1 160px"><label for="admwhy">Grund</label><input id="admwhy" maxlength="80" placeholder="z. B. Crash-Fehler"></div></div>
+      <button class="btn" data-act="adcomp" data-id="${esc(id)}">Gutschreiben</button></div>` : ''}
     ${ADMIN && !me ? `<div class="panel stack"><h3>Admin</h3><p class="muted small">Nur du siehst das. Zurücksetzen: ${fmt(START)} ℒ und ${fmt(START_EURO)} €, Items, Kisten und Kontobuch werden geleert.</p>
       <div class="row"><button class="btn" data-act="adreset" data-id="${esc(id)}">Konto zurücksetzen</button><button class="btn" data-act="adban" data-id="${esc(id)}">${p.ban ? 'Entsperren' : 'Sperren'}</button></div></div>` : ''}
     <h3>Erfolge · ${Object.keys(p.ach||{}).length} von ${ACH.length}</h3>${badgesHTML(p.ach, false)}
@@ -7356,6 +7399,14 @@ function banWall(){
   const el = document.createElement('div'); el.id = 'banwall'; el.className = 'banwall';
   el.innerHTML = '<div class="panel stack"><h2>🚫 Konto gesperrt</h2><p>Dein Spielstand wurde am Spiel vorbei verändert. Melde dich beim Betreiber des Casinos, damit er dein Konto wieder freischaltet.</p></div>';
   document.body.appendChild(el);
+}
+async function adminComp(id){
+  const amount = Math.floor(+$('admamt')?.value || 0), why = ($('admwhy')?.value || '').trim();
+  if (!(amount >= 1)) return toast('Betrag eingeben.');
+  const n = pl(id)?.name || 'Spieler';
+  if (!confirm(`${fmt(amount)} ℒ an ${n} gutschreiben?`)) return;
+  try { await kasse('comp', { to: id, amount, why }); toast(`${fmt(amount)} ℒ für ${n} sind unterwegs.`); closeModal(); }
+  catch (e){ toast(e.message); }
 }
 async function adminAct(id, kind){
   if (!ADMIN || id === uid) return;
@@ -7476,6 +7527,7 @@ document.addEventListener('click', async e => {
     case 'fair': openModal('fair'); break;
     case 'profile': openModal('profile', b.dataset.id); break;
     case 'adreset': adminAct(b.dataset.id, 'reset'); break;
+    case 'adcomp': adminComp(b.dataset.id); break;
     case 'adping': adminPing(); break;
     case 'adclose': adminCasino(b.dataset.v); break;
     case 'adopen': adminCasino('open'); break;
