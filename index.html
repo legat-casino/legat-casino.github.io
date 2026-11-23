@@ -1118,6 +1118,7 @@ body.hasbanner{padding-bottom:64px}
 .mcell.wait{animation:kwait .45s ease-in-out infinite alternate;border-color:var(--brass)}
 .hlcard.wait{animation:kwait .45s ease-in-out infinite alternate}
 @keyframes kwait{from{transform:scale(1);filter:brightness(1)}to{transform:scale(.94);filter:brightness(1.35)}}
+.sitenote{border:1px solid rgba(236,138,120,.6);background:rgba(236,138,120,.12);color:#f3a596;border-radius:12px;padding:10px 14px;font-weight:600;line-height:1.4;white-space:pre-line}
 .admbanner{position:fixed;left:50%;bottom:12px;transform:translateX(-50%);z-index:90;max-width:calc(100% - 32px);padding:8px 14px;border-radius:999px;border:1px solid var(--brass);background:rgba(20,16,12,.95);color:var(--brass);font:inherit;font-size:13px;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.5)}
 .closedsign{font-size:64px;filter:grayscale(.6) drop-shadow(0 10px 20px rgba(0,0,0,.5))}
 .closed h1{font-family:var(--f-display);font-size:clamp(28px,7vw,40px);line-height:1.1;margin:0}
@@ -1904,7 +1905,10 @@ let intervals=[];
 const PL = { me: null, meMeta: null, meLoaded: false, rev: {}, ch: {}, legacy: {}, key: '', unsubs: [], unsubMe: null, unsubRev: null, all: null, allAt: 0 };
 let ADMIN = false;
 function startPlayers(){
+  setTimeout(srvWarm, 1500);
   getDoc(doc(fs, 'meta', 'admin')).then(() => { ADMIN = true; if ($('closedadmin')){ $('closedadmin').hidden = false; $('closedpeek').hidden = false; } renderAll(); }).catch(() => {});   // only the owner of the casino may read it
+  // a notice on the start page (set by the admin)
+  onSnapshot(doc(fs, 'meta', 'notice'), s => { SRV.notice = s.data() || null; renderAll(); }, e => console.warn(e));
   // emergency closing by the cost guard on the server (or by the admin): until the next morning
   onSnapshot(doc(fs, 'meta', 'closed'), s => { const c = s.data(); SRV.closed = c || null;
     const kind = ['admin', 'wartung'].includes(c?.why) ? c.why : 'kosten';
@@ -2657,9 +2661,14 @@ function animateCards(root){
 /* =====================================================================
    v1.1 – Casino home, Glücksrad, Roulette, Automat, Pferderennen, Sportwetten
    ===================================================================== */
-const APP_VERSION = '2.0.2';
+const APP_VERSION = '2.0.3';
 const CL_TITLES = { '1.5.12': 'Technische Verbesserungen' };
 const CHANGELOGS = {
+  '2.0.3': [
+    'Wichtige Hinweise erscheinen jetzt rot oben auf der Startseite',
+    'Jackpot, Coin Flip und Freundeswetten laufen jetzt über die Server-Kasse. Das Ergebnis einer Freundeswette holt sich der Server selbst',
+    'Die erste Kiste nach dem Öffnen des Casinos geht jetzt genauso schnell wie alle anderen',
+  ],
   '2.0.2': [
     'Crash: Der Auszahlen-Knopf reagiert jetzt sofort beim Drücken, auch mit Trackpad und Maus. Vorher konnte ein Klick verloren gehen',
   ],
@@ -4634,13 +4643,14 @@ let unsubJP = null;
 function startJackpot(){
   const ref = doc(fs, 'meta', 'jackpot');
   unsubJP = onSnapshot(ref, s => {
-    if (!s.exists()){ setDoc(ref, { pot: JP_SEED }).catch(() => {}); return; }
+    if (!s.exists()){ if (!KASSE_ON) setDoc(ref, { pot: JP_SEED }).catch(() => {}); return; }
     const d = s.data(), lt = tsMs(d.last?.t);
     if (!JP.first && d.last && lt && lt !== tsMs(JP.last?.t) && d.last.uid !== uid){ SFX.bj(); toast(`💥 ${d.last.name} hat den Jackpot geknackt: ${fmt(d.last.amt)} ℒ!`); notify('💥', `${d.last.name} hat den Jackpot geknackt: ${fmt(d.last.amt)} ℒ`, { tab: 'table', game: 'slots' }); }
     JP.pot = d.pot + (JP.acc || 0); JP.last = d.last || null; JP.first = false; renderAll();
   }, e => console.warn(e));
 }
 function jpFeed(stake){
+  if (KASSE_ON) return;   // the server fills the pot (2.0.3)
   const add = Math.max(1, Math.round(stake * JP_SHARE));
   JP.pot = (JP.pot ?? JP_SEED) + add; JP.acc = (JP.acc || 0) + add;
   if (!JP.t) JP.t = setTimeout(jpFlush, 30000);
@@ -5167,6 +5177,7 @@ function duelsChanged(before = DU.all){
   const now = Date.now();
   for (const [id, du] of Object.entries(DU.all)){
     const other = du.a === uid ? du.b : du.a;
+    if (KASSE_ON){ duelK(id, du, other, now, before); continue; }
     if (!DU.first && du.b === uid && du.st === 'open' && !before[id]){ SFX.pop(); const tx = `will wetten: ${du.t1} – ${du.t2}, ${fmt(du.stake)} ℒ`; islandNotice({ kind: 'duel', id, name: nameOf(du.a), icon: '🤝', text: tx }); notify('🤝', `${nameOf(du.a)} ${tx}`, { tab: 'table', game: 'sports', view: 'mine' }); }
     // the challenger gets the stake back: declined, withdrawn or not accepted before kick-off
     if (du.a === uid && !du.refA && (du.st === 'declined' || du.st === 'cancelled' || (du.st === 'open' && now > du.ko))){
@@ -5189,6 +5200,25 @@ function duelsChanged(before = DU.all){
   }
   DU.first = false;
 }
+/** 2.0.3: the server settles (result from OpenLigaDB) and pays; the app asks when something could be due */
+function duelK(id, du, other, now, before){
+  if (!DU.first && du.b === uid && du.st === 'open' && !before[id]){ SFX.pop(); const tx = `will wetten: ${du.t1} – ${du.t2}, ${fmt(du.stake)} ℒ`; islandNotice({ kind: 'duel', id, name: nameOf(du.a), icon: '🤝', text: tx }); notify('🤝', `${nameOf(du.a)} ${tx}`, { tab: 'table', game: 'sports', view: 'mine' }); }
+  const mine = du.a === uid ? 'paidA' : 'paidB';
+  const due = (du.st === 'accepted' && now > du.ko + 90 * 60e3)
+    || (du.st === 'done' && du.winner === uid && !du.paidW)
+    || (du.st === 'void' && !du[mine])
+    || (du.a === uid && !du.paidA && !du.refA && (du.st === 'declined' || du.st === 'cancelled' || (du.st === 'open' && now > du.ko)));
+  DU.try ||= {};
+  const wait = du.st === 'accepted' ? 10 * 60e3 : 8000;   // an unfinished match: ask again in ten minutes
+  if (due && now - (DU.try[id] || 0) > wait){ DU.try[id] = now; kasse('duelpay', { id }).then(r => { if (r.amount && r.st !== 'done') SFX.coins(); }).catch(e => console.warn(e)); }
+  if (du.st === 'done'){
+    const won = du.winner === uid;
+    if (withPlayer(d => { if (!fdoneOnce(d, 'du:' + id + ':book')) return false; if (won) grant(d, 'duel'); record(d, 'duel', du.stake, won ? du.stake * 2 : 0); return true; }, 'Freundeswette')){
+      const tx = `${du.t1} – ${du.t2} ${du.score ? du.score[0] + ':' + du.score[1] : ''}: Wette gegen ${nameOf(other)} ${won ? `gewonnen, +${fmt(du.stake * 2)} ℒ` : 'verloren'}`;
+      won ? SFX.win() : SFX.lose(); toast('🤝 ' + tx); notify('🤝', tx, { tab: 'table', game: 'sports', view: 'mine' });
+    }
+  }
+}
 async function duelCreate(key){
   const m = findMatch(key); if (!m || m.src !== 'oldb') return;
   const b = $('dufriend')?.value, stake = Math.floor(+($('dustake')?.value || 0));
@@ -5199,6 +5229,12 @@ async function duelCreate(key){
   if (Date.now() > m.t - 60e3) return toast('Das Spiel fängt gleich an.');
   if (Object.values(DU.all).filter(x => x.a === uid && x.st === 'open').length >= 10) return toast('Höchstens 10 offene Herausforderungen.');
   const pick = DU.pick in m.odds ? DU.pick : '1';
+  if (KASSE_ON){
+    try { await kasse('duelnew', { b, stake, pick, mid: m.id, kind: m.kind, lsc: m.sc_, season: m.season, lg: m.lg, t1: m.t1, t2: m.t2, odds: m.odds[pick] });
+      if ($('dustake')) $('dustake').value = ''; SFX.chip(); toast(`Herausforderung an ${nameOf(b)} geschickt`); }
+    catch (e){ toast(e.message); }
+    return;
+  }
   const ref = doc(collection(fs, 'duels'));
   if (!withPlayer(d => { if (d.balance < stake) return false; d.balance -= stake; return true; }, 'Freundeswette Einsatz')) return;
   try {
@@ -5208,6 +5244,10 @@ async function duelCreate(key){
   } catch (e){ handleWriteErr(e); withPlayer(d => { d.balance += stake; return true; }, 'Freundeswette zurück'); }
 }
 async function duelAnswer(id, yes){
+  if (KASSE_ON && yes){
+    try { await kasse('duelaccept', { id }); SFX.chip(); toast('Wette steht. Abgerechnet wird nach dem Spiel.'); } catch (e){ toast(e.message); }
+    return;
+  }
   const ref = doc(fs, 'duels', id);
   try {
     const du = await runTransaction(fs, async tx => {
@@ -6641,7 +6681,8 @@ function flipsChanged(before){
     // I challenged, the other accepted: throw the coin with my secret
     if (f.a === uid && f.st === 'accepted' && !f.secretA) revealFlip(id, f);
     // my stake comes back when declined or withdrawn
-    if (f.a === uid && (f.st === 'declined' || f.st === 'cancelled') && f.stake > 0 && !f.refA)
+    if (KASSE_ON){ if (f.a === uid && (f.st === 'declined' || f.st === 'cancelled') && f.stake > 0 && !f.paidA && !f.refA) flipPay(id); }
+    else if (f.a === uid && (f.st === 'declined' || f.st === 'cancelled') && f.stake > 0 && !f.refA)
       if (withPlayer(d => { const k = id + ':ref'; if (d.fdone?.includes(k)) return false; d.fdone = [...(d.fdone || []), k].slice(-200); d.balance += f.stake; return true; }, 'Coin Flip zurück'))
         updateDoc(doc(fs, 'flips', id), { refA: true }).catch(() => {});
     // the challenger never threw the coin: after 24 h the pot goes to the other player
@@ -6650,7 +6691,12 @@ function flipsChanged(before){
     // finished: book it once, show the coin once
     if (f.st === 'done' && (f.a === uid || f.b === uid)){
       const won = f.winner === uid;
-      if (f.stake > 0) withPlayer(d => { const k = id + ':book'; if (d.fdone?.includes(k)) return false; d.fdone = [...(d.fdone || []), k].slice(-200);
+      if (KASSE_ON){   // the server pays the pot; here only statistics and the achievement
+        if (won && f.stake > 0 && !f.paidW) flipPay(id);
+        withPlayer(d => { const k = id + ':book'; if (d.fdone?.includes(k)) return false; d.fdone = [...(d.fdone || []), k].slice(-200);
+          if (won) grant(d, 'flip'); if (f.stake > 0) record(d, 'coinflip', f.stake, won ? f.stake * 2 : 0); return true; }, 'Coin Flip');
+      }
+      else if (f.stake > 0) withPlayer(d => { const k = id + ':book'; if (d.fdone?.includes(k)) return false; d.fdone = [...(d.fdone || []), k].slice(-200);
         if (won){ d.balance += f.stake * 2; grant(d, 'flip'); } record(d, 'coinflip', f.stake, won ? f.stake * 2 : 0); return true; }, 'Coin Flip');
       else if (won) withPlayer(d => { if (d.ach.flip) return false; grant(d, 'flip'); return true; });
       if (!FL.seen.has(id) && !flipsFirst){ FL.seen.add(id); ls.set('flipSeen', [...FL.seen].slice(-100)); showFlip(id); }
@@ -6658,6 +6704,11 @@ function flipsChanged(before){
     }
   }
   if (flipsFirst){ ls.set('flipSeen', [...FL.seen].slice(-100)); flipsFirst = false; }
+}
+/** the server pays what is due (pot or stake back); asked at most every few seconds per flip */
+function flipPay(id){
+  FL.pay ||= {}; if (Date.now() - (FL.pay[id] || 0) < 8000) return; FL.pay[id] = Date.now();
+  kasse('flippay', { id }).then(r => { if (r.amount) SFX.coins(); }).catch(e => console.warn(e));
 }
 async function revealFlip(id, f){
   if (FL.busy) return; FL.busy = true;
@@ -6672,6 +6723,16 @@ async function flipChallenge(){
   if (!b) return toast('Wähl einen Freund aus.');
   if (stake > 0){ if (stake < 50) return toast('Einsatz: 0 (ohne Einsatz) oder ab 50 Legats.'); if (stake > MAX_BET) return toast('Höchstens 50.000 Legats.'); if (stake > P.balance) return toast('So viele Legats hast du nicht.'); }
   if (Object.values(FL.a).filter(f => f.st === 'open').length >= 5) return toast('Höchstens 5 offene Herausforderungen.');
+  if (KASSE_ON){   // the server takes the stake and creates the challenge; the secret stays with me
+    const secret = randHex();
+    try {
+      const r = await kasse('flipnew', { b, stake, pick: FL.pick, hashA: sha256(secret) });
+      await setDoc(doc(fs, 'flipsecrets', r.id), { a: uid, s: secret }).catch(() => setDoc(doc(fs, 'flipsecrets', r.id), { a: uid, s: secret }));
+      if ($('flstake')) $('flstake').value = '';
+      toast(`Herausforderung an ${nameOf(b)} geschickt`);
+    } catch (e){ toast(e.message); }
+    return;
+  }
   const ref = doc(collection(fs, 'flips')), secret = randHex();
   if (stake > 0 && !withPlayer(d => { if (d.balance < stake) return false; d.balance -= stake; return true; }, 'Coin Flip Einsatz')) return;
   try {
@@ -6682,6 +6743,10 @@ async function flipChallenge(){
   } catch (e){ handleWriteErr(e); }
 }
 async function flipAnswer(id, yes){
+  if (KASSE_ON && yes){
+    try { await kasse('flipaccept', { id }); toast('Angenommen, die Münze fliegt …'); } catch (e){ toast(e.message); }
+    return;
+  }
   const ref = doc(fs, 'flips', id);
   try {
     const ok = await runTransaction(fs, async tx => {
@@ -6781,6 +6846,7 @@ function renderHome(){
   const hour = new Date().getHours(), greet = hour < 11 ? 'Guten Morgen' : hour < 18 ? 'Hallo' : 'Guten Abend';
   const tile = (g, title, sub, art, extra='') => `<button class="tile tile-${g}" data-act="game" data-g="${g}"><div class="art" aria-hidden="true">${art}</div><div class="tinfo"><b>${title}</b><span>${sub}</span>${extra}</div></button>`;
   const html = `<div class="stack">
+    ${SRV.notice?.text ? `<div class="sitenote" role="status">📢 ${esc(SRV.notice.text)}</div>` : ''}
     <section class="hero">
       <div><p class="eyebrow">${greet}, ${esc(P?.name || '')}</p><h1>Legat <span>Casino</span></h1></div>
       <div class="wallet"><div><small>Legats</small><b class="num">${fmt(P ? P.balance - hold : 0)} ℒ</b></div><div><small>Bank</small><b class="num">${fmt(P?.euro || 0)} €</b></div></div>
@@ -6853,7 +6919,7 @@ function renderCasino(){
   const views = { home: game===null, tv: game==='bj', 'g-roulette': game==='roulette', 'g-slots': game==='slots', 'g-horses': game==='horses', 'g-sports': game==='sports', 'g-hilo': game==='hilo', 'g-crash': game==='crash', 'g-mines': game==='mines', 'g-tipp': game==='tipp', 'g-loono': game==='loono', 'g-kisten': game==='kisten' };
   for (const [id, show] of Object.entries(views)) $(id).hidden = !show;
   $('chat').hidden = !(game==='bj' && tid && T);
-  const typing = el => { const a=document.activeElement; return a && (a.tagName==='INPUT' || a.tagName==='SELECT') && a.type!=='checkbox' && el.contains(a); };
+  const typing = el => { const a=document.activeElement; return a && (a.tagName==='INPUT' || a.tagName==='SELECT' || a.tagName==='TEXTAREA') && a.type!=='checkbox' && el.contains(a); };
   if (game===null) renderHome();
   else if (game==='bj'){ if (!typing($('tv'))) renderTable(); }
   else if (game==='roulette') renderRoulette();
@@ -7173,11 +7239,18 @@ let shopConfirm = null;
 /* ---------- 2.0 step 0: server connection (Cloud Functions in Frankfurt) ---------- */
 const SRV = { fn: null, closed: null, ping: '', kosten: null };
 async function srvCall(name, data = {}){
-  if (!SRV.fn){ const m = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js'); SRV.fn = { m, f: m.getFunctions(app, 'europe-west3') }; }
+  if (!SRV.fn){ SRV.fnLoad ||= import('https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js'); const m = await SRV.fnLoad; SRV.fn ||= { m, f: m.getFunctions(app, 'europe-west3') }; }
   return (await SRV.fn.m.httpsCallable(SRV.fn.f, name)(data)).data;
 }
 /* ---------- 2.0: Server-Kasse. The server draws, books and saves; the app only shows it ---------- */
 const KASSE_ON = true;   // false = everything is played on the device again, as in 1.7 (the way back)
+/** wake the Server-Kasse early (after login and when coming back), so the first crate or spin doesn't wait for a cold start. No database involved */
+function srvWarm(){
+  if (!KASSE_ON || !uid || Date.now() - (SRV.warmed || 0) < 4 * 60e3) return;
+  SRV.warmed = Date.now(); srvCall('kasse', { a: 'warm' }).catch(() => { SRV.warmed = 0; });
+}
+document.addEventListener('visibilitychange', () => { if (!document.hidden) srvWarm(); });
+setInterval(() => { if (!document.hidden && P) srvWarm(); }, 60e3);
 async function saveIdle(ms = 10000){
   flushSave(); const t0 = Date.now();
   while (SAVE.dirty || SAVE.pending.size){
@@ -7221,6 +7294,14 @@ async function adminPing(){
   renderAll();
 }
 /** the next 7:00 in the morning (local time) */
+const NOTICE_DEFAULT = 'Zurzeit wird viel am Casino gearbeitet. Sollte euch ein Fehler auffallen, schickt ihn mir (Jan) bitte über die Chat-Funktion, am besten mit Screenshot.';
+async function adminNotice(on){
+  if (!ADMIN) return;
+  const text = on ? ($('adnote')?.value || '').trim().slice(0, 400) : '';
+  if (on && !text) return toast('Text eingeben.');
+  try { await setDoc(doc(fs, 'meta', 'notice'), { text, at: Date.now() }); toast(on ? 'Hinweis ist jetzt auf der Startseite.' : 'Hinweis entfernt.'); }
+  catch (e){ console.warn(e); toast('Hat nicht geklappt: ' + (e?.code === 'permission-denied' ? 'Sind die neuen Regeln in Firebase eingetragen?' : e?.message || e)); }
+}
 async function adminCasino(mode){
   if (!ADMIN) return;
   if (mode !== 'open' && !confirm(mode === 'wartung' ? 'Casino wegen Wartungsarbeiten für alle schließen? Es bleibt zu, bis du es wieder öffnest.' : 'Casino für alle schließen? Es bleibt zu, bis du es wieder öffnest.')) return;
@@ -7238,7 +7319,11 @@ function adminServerHTML(){
     ${k ? `<p class="muted small">Kosten laut Google: heute ${(k.today || 0).toLocaleString('de-DE', { style: 'currency', currency: k.cur || 'EUR' })} (erlaubt ${(k.allow || 0).toLocaleString('de-DE', { style: 'currency', currency: k.cur || 'EUR' })}), diesen Monat ${(k.last || 0).toLocaleString('de-DE', { style: 'currency', currency: k.cur || 'EUR' })} · Stand ${new Date(k.at).toLocaleString('de-DE', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}</p>` : ''}
     <p>Casino: <b>${open ? '🟢 offen' : c.why === 'wartung' ? '🛠️ geschlossen wegen Wartungsarbeiten' : c.why === 'admin' ? '🔒 geschlossen' : `🔒 geschlossen vom Kostenwächter bis ${new Date(c.until).toLocaleString('de-DE', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}`}</b></p>
     <div class="row">${open ? '<button class="btn" data-act="adclose" data-v="admin">🔒 Schließen</button><button class="btn" data-act="adclose" data-v="wartung">🛠️ Schließen wegen Wartungsarbeiten</button>' : '<button class="btn gold" data-act="adopen">🟢 Casino öffnen</button>'}</div>
-    <p class="muted small">Geschlossen bleibt es, bis du wieder öffnest. Du selbst kommst trotzdem rein: Auf dem Schließ-Bildschirm auf „Trotzdem rein (nur du)“ tippen.</p></div>`;
+    <p class="muted small">Geschlossen bleibt es, bis du wieder öffnest. Du selbst kommst trotzdem rein: Auf dem Schließ-Bildschirm auf „Trotzdem rein (nur du)“ tippen.</p></div>
+    <div class="panel stack"><h3>Admin · Hinweis auf der Startseite</h3>
+    <p class="muted small">${SRV.notice?.text ? 'Gerade sichtbar für alle.' : 'Gerade ist kein Hinweis zu sehen.'} Er erscheint rot oben auf der Startseite.</p>
+    <div class="field"><label for="adnote">Text</label><textarea id="adnote" rows="3" maxlength="400" style="width:100%;resize:vertical">${esc(SRV.notice?.text || NOTICE_DEFAULT)}</textarea></div>
+    <div class="row"><button class="btn gold" data-act="adnote">Anzeigen</button>${SRV.notice?.text ? '<button class="btn" data-act="adnoteoff">Entfernen</button>' : ''}</div></div>`;
 }
 function renderAccount(){
   const el = $('view-account');
@@ -7433,7 +7518,7 @@ function renderAll(){
   if (rq || !uid) return; if (PL.meLoaded) rewatch(); if (P && (P.loono || null) !== LO.id) loWatch(); rq = true;
   requestAnimationFrame(() => {
     rq=false; renderTop(); banWall();
-    const typing = el => { const a=document.activeElement; return a && (a.tagName==='INPUT' || a.tagName==='SELECT') && a.type!=='checkbox' && el.contains(a); };
+    const typing = el => { const a=document.activeElement; return a && (a.tagName==='INPUT' || a.tagName==='SELECT' || a.tagName==='TEXTAREA') && a.type!=='checkbox' && el.contains(a); };
     if (tab==='table') renderCasino();
     if (tab==='players' && !typing($('view-players'))) renderPlayers();
     if (tab==='bank' && !typing($('view-bank'))) renderBank();
@@ -7531,6 +7616,8 @@ document.addEventListener('click', async e => {
     case 'adping': adminPing(); break;
     case 'adclose': adminCasino(b.dataset.v); break;
     case 'adopen': adminCasino('open'); break;
+    case 'adnote': adminNotice(true); break;
+    case 'adnoteoff': adminNotice(false); break;
     case 'adban': adminAct(b.dataset.id, 'ban'); break;
     case 'closemodal': closeModal(); break;
     case 'revive': if (isBroke() && Date.now() >= reviveAt()){ Object.assign(DISH, { phase:'intro', collected:false }); openModal('dish'); } break;
