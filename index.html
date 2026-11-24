@@ -1663,6 +1663,8 @@ function flushSave(){
   if (P.ban) return;
   dayGuard();
   const rev = (SAVE.rev ?? P.rev ?? 0) + 1;   // the server only takes the next number: an outdated device can't overwrite newer progress
+  // the server already has this number or a newer one (another device or window saved): don't save the outdated state, load the real one
+  if (PL.meMeta && !PL.meMeta.fromCache && !PL.meMeta.hasPendingWrites && (PL.me?.rev || 0) >= rev){ SAVE.dirty = false; resyncPlayer(); return; }
   SAVE.rev = rev; P.rev = rev; SAVE.last = Date.now();
   const out = { ...P, rev }, wid = ++SAVE.seq; SAVE.pending.set(wid, Date.now()); SAVE.base = out;
   slow(setDoc(doc(fs,'players',uid), out))
@@ -1787,12 +1789,21 @@ function reconnect(){
 }
 setInterval(() => { if (unsavedMs() > 25000) reconnect(); renderSaveWarn(); }, 1000);
 let hiddenAt = 0;
+/* back after a long break (the iPad keeps old windows frozen for days): always start fresh with the state from the server
+   and the newest version. A save still waiting from before the break can't go through anyway (the server has moved on). */
+const freshStart = why => { console.warn('Neustart nach Pause:', why); try { sessionStorage.setItem('freshStart', why); } catch {}
+  try { disableNetwork(fs); } catch {}   // a save still waiting from before the break must not go out any more
+  location.reload(); };
 document.addEventListener('visibilitychange', () => {
   if (document.hidden){ hiddenAt = Date.now(); return; }
-  // back after a long break (iPad keeps old windows for days): start fresh with the current state and the newest version
-  if (hiddenAt && Date.now() - hiddenAt > 10 * 60e3 && !SAVE.pending.size){ location.reload(); return; }
+  if (hiddenAt && Date.now() - hiddenAt > 10 * 60e3) return freshStart('hidden');
   if (SAVE.pending.size) reconnect();
 });
+// Safari brings a page back from its memory ("back/forward cache") without loading it again
+addEventListener('pageshow', e => { if (e.persisted) freshStart('pageshow'); });
+// a frozen page notices only by the clock jumping: no tick for more than 10 minutes
+let lastTick = Date.now();
+setInterval(() => { const n = Date.now(); if (n - lastTick > 10 * 60e3) return freshStart('frozen'); lastTick = n; }, 5000);
 /** a save was refused (another device or an old tab got there first): load the real state from the server */
 async function resyncPlayer(){
   if (SAVE.resyncing) return; SAVE.resyncing = true;
@@ -1954,6 +1965,8 @@ function applyPlayers(){
     const newer = !P || ((mine?.rev || 0) !== (P.rev || 0) ? (mine?.rev || 0) > (P.rev || 0) : (mine?.updated || 0) >= (P.updated || 0));
     if (mine && !meta.hasPendingWrites && !SAVE.pending.size){ SAVE.base = mine; if (!SAVE.ack || (mine.rev || 0) >= (SAVE.ack.rev || 0)) SAVE.ack = mine; }
     if (mine && !meta.hasPendingWrites && !SAVE.pending.size && !SAVE.dirty && newer){ P = norm(structuredClone(mine)); SAVE.rev = P.rev || 0; }
+    // the server is two or more steps ahead while this page still waits to save: this page is outdated, load the real state
+    else if (mine && !meta.fromCache && P && (mine.rev || 0) > (P.rev || 0) + 1 && !SRV.busy) resyncPlayer();
     if (!meta.fromCache && !mine && !P) createPlayer();
     else if (!meta.fromCache && mine){ refForExisting(); accrueInterest(); afterLogin(); }
   }
@@ -2661,9 +2674,19 @@ function animateCards(root){
 /* =====================================================================
    v1.1 – Casino home, Glücksrad, Roulette, Automat, Pferderennen, Sportwetten
    ===================================================================== */
-const APP_VERSION = '2.0.3';
+const APP_VERSION = '2.0.6';
 const CL_TITLES = { '1.5.12': 'Technische Verbesserungen' };
 const CHANGELOGS = {
+  '2.0.6': [
+    'Ein alter Tab kann deinen Spielstand nicht mehr zurücksetzen, auch nicht beim Betreiber-Konto',
+  ],
+  '2.0.5': [
+    'Wer das Casino nach einer längeren Pause wieder öffnet (zum Beispiel ein alter Tab auf dem iPad), bekommt jetzt immer sofort den aktuellen Spielstand',
+  ],
+  '2.0.4': [
+    'Sportwetten laufen jetzt über die Server-Kasse. Die Quote echter Spiele und das Endergebnis prüft der Server selbst',
+    'Die Ergebnisse der Legat-Liga und der Legat Darts Open sind jetzt geheim, bis sie im Spiel passieren. Vorher konnte man sie mit etwas Aufwand vorher ausrechnen',
+  ],
   '2.0.3': [
     'Wichtige Hinweise erscheinen jetzt rot oben auf der Startseite',
     'Jackpot, Coin Flip und Freundeswetten laufen jetzt über die Server-Kasse. Das Ergebnis einer Freundeswette holt sich der Server selbst',
@@ -3421,6 +3444,7 @@ function fictMatches(slot){
 }
 /** the full result, known from kick-off; shown bit by bit while the match is "live" */
 function fictResult(m){
+  if (KASSE_ON) return FICT.ev[m.id]?.ev || [];   // 2.0.4: the results are secret; the server tells what has already happened
   const r = seeded('result-' + m.id), ev = [];
   if (m.kind==='fb'){
     const g1 = poisson(m.l1, r), g2 = poisson(m.l2, r);
@@ -3440,7 +3464,41 @@ function fictScore(m, now=Date.now()){
 }
 function fictById(id){ const slot = +id.split('-')[1]; return fictMatches(slot).find(m => m.id===id); }
 const outcome = (sc, kind) => sc[0] > sc[1] ? '1' : sc[0] < sc[1] ? '2' : (kind==='darts' ? null : 'X');
+/* ---------- 2.0.4: fictional results from the server, bets booked by the server ---------- */
+const FICT = { ev: {}, at: 0, busy: false };
+async function fictFetch(){
+  FICT.busy = true;
+  try { const x = await srvCall('sport'); for (const [id, v] of Object.entries(x.ev || {})) FICT.ev[id] = v;
+    const ids = Object.keys(FICT.ev); if (ids.length > 60) ids.slice(0, ids.length - 60).forEach(id => { FICT.ev[id] = undefined; });
+    renderAll(); }
+  catch (e){ console.warn(e); }
+  finally { FICT.at = Date.now(); FICT.busy = false; }
+}
+/** while a fictional match is live (or just over) and someone looks at it: ask the server every few seconds */
+function fictTick(){
+  if (!KASSE_ON || !P || document.hidden || FICT.busy) return;
+  const now = Date.now(), slot = Math.floor(now / SLOT_MS), into = now - slot * SLOT_MS;
+  const live = into < LIVE_MS + 60e3, watching = tab === 'table' && (game === 'sports' || game === null);
+  const myLive = (P.bets || []).some(b => b.st === 'open' && b.src === 'fict' && now >= b.ko && now < b.ko + LIVE_MS + 60e3);
+  if (!(watching || myLive)) return;
+  const wait = live ? 7000 : 120e3;
+  if (now - FICT.at > wait) fictFetch();
+}
+setInterval(fictTick, 2000);
+const SPB = { at: 0, busy: false };
+function settleBetsK(){
+  const open = (P?.bets || []).filter(b => b.st === 'open'); if (!open.length || SPB.busy || SRV.busy) return;
+  const now = Date.now(), fictDue = open.some(b => b.src === 'fict' && now >= b.ko + LIVE_MS + 1500), realDue = open.some(b => b.src !== 'fict' && now >= b.ko + 100 * 60e3);
+  if (!(fictDue || realDue) || now - SPB.at < (fictDue ? 6000 : 5 * 60e3)) return;
+  SPB.busy = true; SPB.at = now;
+  kasse('ssettle').then(r => {
+    const done = r.done || []; let won = 0;
+    if (done.length) withPlayer(d => { for (const x of done){ if (x.st !== 'void') record(d, 'sports', x.stake, x.pay); if (x.st === 'won'){ won += x.pay - x.stake; if (x.odds >= 3) grant(d, 'sport3'); } } return true; }, 'Sportwette');
+    if (won > 0){ SFX.coins(); toast(`Sportwette gewonnen: +${fmt(won)} ℒ`); }
+  }).catch(e => console.warn(e)).finally(() => { SPB.busy = false; });
+}
 function settleBets(){
+  if (KASSE_ON) return settleBetsK();
   if (!P?.bets?.some(b => b.st==='open')) return;
   const now = Date.now(), done = [];
   for (const b of P.bets){
@@ -3483,6 +3541,15 @@ function placeBet2(){
   const err = betError(SP.stake); if (err) return toast(err);
   if (Date.now() > s.m.t - 30e3) { SP.slip = null; renderAll(); return toast('Das Spiel hat schon angefangen.'); }
   if ((P.bets||[]).filter(b => b.st==='open').length >= 30) return toast('Höchstens 30 offene Wetten gleichzeitig.');
+  if (KASSE_ON){
+    if (SP.placing) return; SP.placing = true; const m = s.m;
+    kasse('sbet', { src: m.src, mid: m.id, pick: s.pick, stake: SP.stake, sc: m.sc_ || null, season: m.season || null, lg: m.lg, odds: m.odds[s.pick] }).then(r => {
+      withPlayer(d => { taskBump(d, 'sports_bet', 1); return true; });
+      savePref('sportstake', SP.stake); SP.slip = null; SFX.chip();
+      toast(`Wette platziert: ${fmt(r.bet.stake)} ℒ, möglicher Gewinn ${fmt(Math.floor(r.bet.stake * r.bet.odds))} ℒ`); renderAll();
+    }).catch(e => toast(e.message)).finally(() => { SP.placing = false; });
+    return;
+  }
   const m = s.m, bet = { id: Date.now().toString(36) + rnd(1e6).toString(36), src:m.src, sc:m.sc_ || null, season:m.season || null, mid:m.id, kind:m.kind, lg:m.lg, t1:m.t1, t2:m.t2, ko:m.t, pick:s.pick, odds:m.odds[s.pick], stake:SP.stake, st:'open', at:Date.now() };
   const ok = withPlayer(d => { WHY = 'Sportwette Einsatz'; if (d.balance < SP.stake) return false; d.balance -= SP.stake; d.bets = [...(d.bets||[]), bet]; taskBump(d, 'sports_bet', 1); return true; });
   if (ok){ savePref('sportstake', SP.stake); SP.slip = null; SFX.chip(); toast(`Wette platziert: ${fmt(bet.stake)} ℒ, möglicher Gewinn ${fmt(Math.floor(bet.stake*bet.odds))} ℒ`); renderAll(); }
