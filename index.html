@@ -1273,6 +1273,27 @@ body.isclosed{overflow:hidden}
 .t-bar{position:absolute;left:0;bottom:0;height:3px;background:var(--brass);z-index:5;width:0}
 .t-start{position:absolute;inset:0;z-index:6;display:grid;place-items:center;background:radial-gradient(70% 50% at 50% 45%,#2a1d10,#07050a)}
 .trcv{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:4}
+/* 2.1 trailer: the Bonuslink */
+.t-link{display:flex;align-items:center;gap:12px;padding:14px 22px;border-radius:999px;border:1px solid rgba(209,173,98,.55);background:rgba(209,173,98,.08);box-shadow:0 0 50px rgba(209,173,98,.25);font:700 clamp(15px,3.6vw,26px)/1 var(--f-body);color:#f3dc9a;transform:scale(.7);opacity:0;transition:all .9s cubic-bezier(.2,1.4,.4,1);max-width:92vw;white-space:nowrap;overflow:hidden}
+.on .t-link{transform:scale(1);opacity:1}
+.t-link i{font-style:normal;font-size:1.4em}
+.t-link b{color:#fff;letter-spacing:.06em}
+.t-join{display:flex;flex-direction:column;align-items:center;gap:18px}
+.t-friend{display:flex;align-items:center;gap:10px;padding:8px 16px 8px 8px;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid var(--line);font:700 clamp(14px,3vw,20px)/1 var(--f-body);opacity:0;transform:translateX(-40px);transition:all .6s cubic-bezier(.2,1.2,.4,1)}
+.on .t-friend{opacity:1;transform:none}
+.t-friend span{display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:#1d1520;font-size:22px}
+.t-join .kchest{opacity:0}
+.on .t-join .kchest{animation:tdrop .8s cubic-bezier(.3,1.5,.5,1) .5s forwards}
+.t-join.big .kchest{scale:1.35}
+.t-three{display:flex;gap:clamp(8px,3vw,26px);align-items:flex-end}
+@media (max-width:700px){.t-join .kchest,.t-three{zoom:.8}}
+.t-three .kchest{opacity:0;scale:.8}
+.on .t-three .kchest{animation:tdrop .7s cubic-bezier(.3,1.5,.5,1) forwards}
+.on .t-three .kchest:nth-child(2){animation-delay:.3s}.on .t-three .kchest:nth-child(3){animation-delay:.6s}.on .t-three .kchest:nth-child(4){animation-delay:.9s}
+.t-gift{display:flex;flex-direction:column;align-items:center;gap:14px}
+.t-gift .t-pair{display:flex;gap:16px}
+.t-gift .t-pair .kchest{opacity:0}
+.on .t-gift .t-pair .kchest{animation:tdrop .8s cubic-bezier(.3,1.5,.5,1) forwards}.on .t-gift .t-pair .kchest:nth-child(2){animation-delay:.25s}
 @media (prefers-reduced-motion:reduce){.krays,.t-rays,.kchest.shake,.kit.win{animation:none}}
 
 /* ---------- v1.7: start animation ---------- */
@@ -1610,11 +1631,17 @@ function withPlayer(fn, why){
   const d = norm(structuredClone(P));
   newBadges = []; WHY = null; WHY_EXTRA = ''; lvlUps.length = 0; const giftN = KS.gift.length;
   if (!fn(d)){ KS.gift.length = giftN; return false; }
+  if (KASSE_ON){   // 2.3: money and progress come only from the server; whatever an old code path changed there is put back
+    const hit = LOCKED_F.filter(k => JSON.stringify(d[k]) !== JSON.stringify(P[k]));
+    if (hit.length){ const n0 = norm(structuredClone(P)), real = hit.filter(k => JSON.stringify(d[k]) !== JSON.stringify(n0[k]));
+      if (real.length) console.warn('Nur der Server darf ändern:', real.join(', '), '(' + (WHY || why || '?') + ')');
+      for (const k of hit){ if (P[k] === undefined) delete d[k]; else d[k] = structuredClone(P[k]); } }
+  }
   const reason = (WHY || why || '?') + WHY_EXTRA; WHY = null; WHY_EXTRA = '';
   const db_ = d.balance - P.balance, de_ = d.euro - (P.euro ?? START_EURO);
   if (db_ || de_) d.log = [...d.log, { t: Date.now(), b: db_, e: de_, r: reason, B: d.balance, E: d.euro }].slice(-150);
-  checkBalanceBadges(d);
-  if (brokeDoc(d)){ if (!d.brokeAt) d.brokeAt = Date.now(); } else if (d.brokeAt) d.brokeAt = null;
+  if (!KASSE_ON){ checkBalanceBadges(d);
+    if (brokeDoc(d)){ if (!d.brokeAt) d.brokeAt = Date.now(); } else if (d.brokeAt) d.brokeAt = null; }
   d.updated = Math.max(Date.now(), (P.updated||0) + 1); d.seen = Date.now();
   d.rev = P.rev;
   P = d; renderAll();
@@ -1629,6 +1656,7 @@ const SAVE = { seq: 0, pending: new Map(), cycled: 0, resyncing: false, dirty: f
 /* ---------- daily limit (1.7.3): the server checks it, the device keeps to it ----------
    SAVE.base = the document as the server has it before the next write, SAVE.ack = the last confirmed save */
 function dayGuard(){
+  if (KASSE_ON) return;   // 2.1: the phone books no money any more
   const b = SAVE.base; if (!b || !P) return;
   const day = Math.floor((NOW() - 120e3) / 864e5);   // two minutes behind: never ahead of the server's day
   const nd = b.db == null ? day : Math.max(b.db, day);
@@ -1666,8 +1694,16 @@ function flushSave(){
   // the server already has this number or a newer one (another device or window saved): don't save the outdated state, load the real one
   if (PL.meMeta && !PL.meMeta.fromCache && !PL.meMeta.hasPendingWrites && (PL.me?.rev || 0) >= rev){ SAVE.dirty = false; resyncPlayer(); return; }
   SAVE.rev = rev; P.rev = rev; SAVE.last = Date.now();
-  const out = { ...P, rev }, wid = ++SAVE.seq; SAVE.pending.set(wid, Date.now()); SAVE.base = out;
-  slow(setDoc(doc(fs,'players',uid), out))
+  const out = { ...P, rev }, wid = ++SAVE.seq; SAVE.pending.set(wid, Date.now());
+  let write;
+  if (KASSE_ON && SAVE.base){
+    const b = SAVE.base, upd = { rev, updated: P.updated || Date.now(), seen: P.seen || Date.now() };
+    for (const k of Object.keys(P)) if (!LOCKED_F.includes(k) && !(k in upd) && JSON.stringify(P[k]) !== JSON.stringify(b[k])) upd[k] = P[k] === undefined ? null : P[k];
+    for (const k of LOCKED_F) out[k] = b[k];   // what the server has, not what the phone shows
+    write = updateDoc(doc(fs,'players',uid), upd);
+  } else write = setDoc(doc(fs,'players',uid), out);
+  SAVE.base = out;
+  slow(write)
     .then(() => { SAVE.pending.delete(wid); if (!SAVE.ack || (out.rev || 0) >= (SAVE.ack.rev || 0)) SAVE.ack = out; renderSaveWarn(); pubSync(); })
     .catch(e => { SAVE.pending.delete(wid); renderSaveWarn(); if (e?.code === 'permission-denied') resyncPlayer(); else handleWriteErr(e); });
 }
@@ -1684,7 +1720,7 @@ function pubOf(d){ const o = {}; for (const k in d) if (!PUB_SKIP.includes(k)) o
   delete o.ban; return o; }
 const pubSig = d => JSON.stringify([d.name, d.avatar, d.code, d.friends, d.table, d.loono, d.playing, d.crash?.r, d.crash?.out]);
 function pubSync(now){
-  if (!P || !uid || P.ban) return;
+  if (!P || !uid || P.ban || !SAVE.ack) return;   // a new account: only once it is really saved (the rules compare with it)
   const sig = pubSig(P), urgent = sig !== PUB.sig, wait = PUB_EVERY - (Date.now() - PUB.last);
   if (!urgent && !now && wait > 0){ if (!PUB.timer) PUB.timer = setTimeout(() => { PUB.timer = 0; pubSync(); }, wait); return; }
   const out = pubOf(P), json = JSON.stringify({ ...out, seen: 0 });
@@ -1853,7 +1889,9 @@ function limitState(){
   if (L.loss && -profit >= L.loss) return {hit:'loss', profit};
   return {hit:null, profit};
 }
-const ledgerOpen = d => !!(d?.ledger && !d.ledger.settled);
+const ledgerOpen = d => KASSE_ON ? !!(T && tid && (T.esc?.[uid] || (T.hands?.[uid] && T.phase !== 'done' && T.phase !== 'betting'))) : !!(d?.ledger && !d.ledger.settled);
+/** what someone has bet for a round (from the table, which only the server writes) */
+const escOf = (u, round) => KASSE_ON ? (T?.esc?.[u]?.round === round ? T.esc[u].amt : 0) : (seats[u]?.ready && seats[u].round === round ? seats[u].bet : 0);
 const inRound = () => ledgerOpen(P);
 const euroOf = p => p?.euro ?? START_EURO;
 const wealth = p => (p?.balance || 0) + euroOf(p);
@@ -1862,7 +1900,7 @@ const brokeDoc = d => d && d.balance + euroOf(d) < MIN_BET && !ledgerOpen(d);
 const needBank = () => P && P.balance < MIN_BET && !inRound() && !brokeDoc(P);
 const isBroke = () => brokeDoc(P);
 const tableMin = () => T?.min || MIN_BET;
-function grant(d, key){ if (!d.ach[key]){ d.ach[key] = Date.now(); newBadges.push(key); kGive(d, 'messing'); } }   // every new achievement: a free Messing-Kiste
+function grant(d, key){ if (KASSE_ON) return; if (!d.ach[key]){ d.ach[key] = Date.now(); newBadges.push(key); kGive(d, 'messing'); } }   // every new achievement: a free Messing-Kiste
 function checkBalanceBadges(d){
   const w = d.balance + d.euro;
   if (w >= 10000) grant(d,'k10');
@@ -2018,15 +2056,22 @@ function stopAll(){
 }
 async function createPlayer(){
   if (P) return;
+  // came with a Bonuslink: find the one who invited (before the account exists, so it can be noted at once)
+  let refUid = null; const refCode = ls.get('ref', null);
+  if (KASSE_ON && refCode){ try { const hit = await playerByCode(refCode); if (hit && hit[0] !== uid) refUid = hit[0]; } catch {} }
+  if (P) return;
   let name = (authUser?.displayName || '').split(' ')[0] || 'Spieler';
   name = name.slice(0,20);
   const code = genCode(6);   // 32^6 possible codes: a clash is practically impossible
-  const d = norm({ name, code, balance: START, table: null, ledger: null, created: Date.now(), updated: Date.now(), seen: Date.now() });
+  const d = norm({ name, code, balance: START, table: null, ledger: null, created: Date.now(), updated: Date.now(), seen: Date.now(), ...(KASSE_ON ? { k17: 1 } : {}) });
   d.limits.base = d.balance; d.lowMark = d.balance;
+  if (refUid){ d.ref = refUid; d.friends = [refUid]; }
   P = d; SAVE.base = d; renderAll();
   try { await slow(setDoc(doc(fs,'players',uid), d)); SAVE.ack = d; pubSync(true); }
   catch(e){ handleWriteErr(e); }
-  refForExisting();   // an old invite link still makes you friends, just without a bonus
+  if (refUid){ ls.set('ref', null);
+    kasse('refjoin').then(r => { if (r.crates){ toast(`Willkommen! Über den Bonuslink bekommst du ${r.crates} Messing-Kisten geschenkt.`); } }).catch(e => console.warn(e));
+  } else refForExisting();   // an invite link for an existing player still makes you friends
 }
 /** an existing player who opens someone's invite link simply becomes their friend */
 function refForExisting(){
@@ -2040,11 +2085,14 @@ function refForExisting(){
 let loggedOnce = false;
 function afterLogin(){
   if (loggedOnce) return; loggedOnce = true;
+  // a Blackjack round from last time that was not paid out yet (left the table, closed the app)
+  if (KASSE_ON && P?.bjOpen?.tid) setTimeout(() => { if (P?.bjOpen?.tid && P.bjOpen.tid !== tid) kasse('bjclaim', { tid: P.bjOpen.tid }).catch(e => console.warn(e)); }, 2500);
   const seen = ls.get('seenVersion', null);
   if (seen !== APP_VERSION){ seenBefore = seen; ls.set('seenVersion', APP_VERSION);
     if (P.created && Date.now() - P.created > 60e3){
       // first start since the crate update: the trailer first (once per device), then the news
-      if (verNum(seen) < verNum('1.7') && !ls.get('trailer17', false)){ ls.set('trailer17', true); const go = () => $('intro') ? setTimeout(go, 300) : trailerOpen(() => openModal('news')); go(); }
+      if (KASSE_ON && verNum(seen) < verNum('2.1') && !ls.get('trailer21', false)){ ls.set('trailer21', true); const go = () => $('intro') ? setTimeout(go, 300) : trailer21Open(() => openModal('news')); go(); }
+      else if (verNum(seen) < verNum('1.7') && !ls.get('trailer17', false)){ ls.set('trailer17', true); const go = () => $('intro') ? setTimeout(go, 300) : trailerOpen(() => openModal('news')); go(); }
       else openModal('news');
     }
   }
@@ -2057,6 +2105,11 @@ function afterLogin(){
 setInterval(() => { if (uid && P?.bets?.some(b => b.st==='open' && b.src==='oldb') && Date.now() - SP.lastLoad > 5*60e3) loadSports(); }, 60e3);
 /* ---------- bank: euros are safe from the table ---------- */
 function accrueInterest(){
+  if (KASSE_ON){
+    if (!P || P.bank?.last === dayId() || SRV.zins === dayId()) return; SRV.zins = dayId();
+    kasse('zinsen').then(r => { if (r.got){ SFX.coins(); toast(`Zinsen von der Bank: +${fmt(r.got)} €`); } }).catch(e => { SRV.zins = null; console.warn(e); });
+    return;
+  }
   if (!P) return; const today = dayId(); let got = 0;
   withPlayer(d => { WHY = 'Zinsen';
     if (d.bank.last === today) return false;
@@ -2068,6 +2121,19 @@ function accrueInterest(){
 }
 function bankMove(kind, v){
   v = Math.floor(v);
+  if (KASSE_ON){
+    if (kind === 'deposit'){
+      if (!(v >= 100)) { toast('Mindestens 100 Legats einzahlen.'); return false; }
+      if (inRound()) { toast('Einzahlen geht erst, wenn deine Runde vorbei ist.'); return false; }
+      if (v > P.balance) { toast('So viele Legats hast du nicht.'); return false; }
+      kasse('bankin', { v }).then(r => { SFX.coins(); toast(`${fmt(r.euro)} € eingezahlt (Gebühr ${fmt(r.fee)})`); }).catch(e => toast(e.message));
+    } else {
+      if (!(v >= 50)) { toast('Mindestens 50 € abheben.'); return false; }
+      if (v > P.euro) { toast('So viel liegt nicht auf der Bank.'); return false; }
+      kasse('bankout', { v }).then(() => { SFX.chip(); toast(`${fmt(v)} Legats abgehoben`); }).catch(e => toast(e.message));
+    }
+    return true;
+  }
   if (kind==='deposit'){
     if (!(v >= 100)) return toast('Mindestens 100 Legats einzahlen.');
     if (inRound()) return toast('Einzahlen geht erst, wenn deine Runde vorbei ist.');
@@ -2100,7 +2166,7 @@ function renderBank(){
   const next = Math.min(INT_MAX, Math.floor(P.euro * INT_RATE));
   const quick = f => `<div class="row">${[[.25,'25 %'],[.5,'50 %'],[1,'Alles']].map(([q,l]) => `<button class="btn sm" data-act="bq" data-f="${f}" data-q="${q}">${l}</button>`).join('')}</div>`;
   const html = `<div class="stack">
-    ${P.owed > 0 ? `<div class="note"><b>⏳ ${fmt(P.owed)} ℒ stehen noch aus.</b> Pro Tag darf dein Vermögen um höchstens ${fmt(DAY_CAP)} ℒ wachsen (Schutz gegen Schummeln). Was du darüber gewonnen hast, ist nicht verloren: Es wird dir ab morgen automatisch gutgeschrieben, sobald du spielst, jeden Tag bis zu ${fmt(DAY_CAP)} ℒ.</div>` : ''}
+    ${P.owed > 0 ? `<div class="note"><b>⏳ ${fmt(P.owed)} ℒ stehen noch aus.</b> ${KASSE_ON ? `Das ist noch aus dem alten Tageslimit. Der Server zahlt es dir automatisch aus, sobald du spielst, jeden Tag bis zu ${fmt(DAY_CAP)} ℒ.` : `Pro Tag darf dein Vermögen um höchstens ${fmt(DAY_CAP)} ℒ wachsen (Schutz gegen Schummeln). Was du darüber gewonnen hast, ist nicht verloren: Es wird dir ab morgen automatisch gutgeschrieben, sobald du spielst, jeden Tag bis zu ${fmt(DAY_CAP)} ℒ.`}</div>` : ''}
     <div class="panel stack"><h2>Bank</h2>
       <p class="muted">Euro auf der Bank sind sicher: Am Tisch kannst du nur Legats verlieren. Beides ist Spielgeld und lässt sich weder kaufen noch auszahlen.</p>
       <div class="statgrid">
@@ -2148,9 +2214,10 @@ async function claimGiftsK(){
     CLAIM.busy.add(id); let r;
     try { r = await kasse('claim', { id }); } catch (e){ console.warn(e); setTimeout(() => CLAIM.busy.delete(id), 5000); return; }
     CLAIM.busy.delete(id); gifts[id] = { ...g, claimed: true };
-    if (r.amount){
-      SFX.coins();
-      if (g.kind==='comp'){ const tx = `Gutschrift vom Casino: +${fmt(r.amount)} ℒ${r.why ? ' (' + r.why + ')' : ''}`; toast('🎁 ' + tx); notify('🎁', tx, { tab: 'account' }); }
+    if (r.amount || r.crate){
+      if (r.amount) SFX.coins();
+      if (g.kind==='refcrate' && r.crate){ const c = KCRATES.find(x => x.id === r.crate); const tx = `${r.name || nameOf(g.from)} ist über deinen Bonuslink beigetreten: 🎁 ${c ? c.n : 'Kiste'}`; SFX.coins(); toast(tx); notify('🎁', tx, { tab: 'table', game: 'kisten' }); }
+      else if (g.kind==='comp'){ const tx = `Gutschrift vom Casino: +${fmt(r.amount)} ℒ${r.why ? ' (' + r.why + ')' : ''}`; toast('🎁 ' + tx); notify('🎁', tx, { tab: 'account' }); }
       else if (g.kind==='ref') toast(`${nameOf(g.from)} ist über deinen Link beigetreten: +${fmt(r.amount)} ℒ`); else
       toast(g.kind==='loan' ? `${nameOf(g.from)} leiht dir ${fmt(r.amount)} ℒ` : g.kind==='repay' ? `${nameOf(g.from)} zahlt dir ${fmt(r.amount)} ℒ zurück` : `${nameOf(g.from)} schenkt dir ${fmt(r.amount)} ℒ`);
     }
@@ -2178,7 +2245,6 @@ function sendGift(to, amount, kind){
   if (KASSE_ON){
     if (ledgerOpen(P)) return toast('Warte, bis deine Runde vorbei ist.');
     kasse('gift', { to, amount, kind }).then(() => {
-      if (kind === 'gift') withPlayer(d => { d.giftedTotal += amount; if (d.giftedTotal >= 10000) grant(d, 'generous'); return true; });
       SFX.coins();
       toast(kind==='loan' ? `Du leihst ${nameOf(to)} ${fmt(amount)} ℒ` : kind==='repay' ? `Du zahlst ${nameOf(to)} ${fmt(amount)} ℒ zurück` : `Du schenkst ${nameOf(to)} ${fmt(amount)} ℒ`);
     }).catch(e => toast(e.message));
@@ -2232,6 +2298,7 @@ function closeTable(){
 }
 async function createTable(vip){
   if (vip && P.balance < VIP_MIN) return toast(`Für einen VIP-Tisch brauchst du mindestens ${fmt(VIP_MIN)} Legats.`);
+  if (KASSE_ON){ try { const r = await kasse('bjcreate', { vip: !!vip }); sitAt(r.tid); } catch (e){ toast(e.message); } return; }
   let id;
   for (let i=0;i<5;i++){ id = genCode(5); const s = await getDoc(doc(fs,'tables',id)); if (!s.exists()) break; }
   const t = { name: (P?.name||'Spieler')+'s Tisch', owner: uid, min: vip ? VIP_MIN : MIN_BET, phase:'betting', round:1, shoe:[], dealer:[], hands:{}, order:[],
@@ -2260,6 +2327,7 @@ function leaveTable(){
   const mid = T && T.hands && T.hands[uid] && T.phase!=='betting' && T.phase!=='done';
   if (mid && !confirmLeave){ confirmLeave = true; renderAll(); return; }
   confirmLeave = false; leaving = true;
+  if (KASSE_ON && tid){ const t0 = tid; kasse('bjclaim', { tid: t0, leave: true }).catch(e => console.warn(e)); }
   seatWrite(null,'delete');
   withPlayer(d => {
     d.table = null;
@@ -2296,18 +2364,28 @@ let preChoose = null;   // round in which "Anderer Einsatz" was tapped on the re
 const betRound = () => T.phase === 'done' ? T.round + 1 : T.round;
 function placeBet(amount = bet){
   if (!T || (T.phase!=='betting' && T.phase!=='done')) return false;
-  const err = canBet(amount); if (err){ toast(err); return false; }
+  const kept = KASSE_ON ? escOf(uid, betRound()) : 0;   // a bet already at the table counts as available when it is changed
+  const err = kept && amount >= tableMin() && amount <= MAX_BET && amount <= P.balance + kept ? null : canBet(amount); if (err){ toast(err); return false; }
   savePref('lastBet', amount); bet = amount;
+  if (KASSE_ON){
+    if (BJ.busy) return false; BJ.busy = true;
+    kasse('bjbet', { tid, bet: amount }).then(r => { seatWrite({ ready:true, round:r.round, bet:amount }); SFX.chip(); })
+      .catch(e => toast(e.message)).finally(() => { BJ.busy = false; renderAll(); });
+    return true;
+  }
   seatWrite({ ready:true, round:betRound(), bet:amount });
   SFX.chip();
   return true;
 }
-function unBet(){ seatWrite({ ready:false }); }
+function unBet(){
+  if (KASSE_ON){ kasse('bjunbet', { tid }).then(() => seatWrite({ ready:false })).catch(e => toast(e.message)); return; }
+  seatWrite({ ready:false }); }
 function act(type){
   if (!T || T.phase!=='playing' || !T.turn || T.turn.u!==uid || pendingAct) return;
   const H = T.hands[uid][T.turn.h];
   if ((type==='double' || type==='split') && P.balance < H.bet) return toast('Nicht genug Legats für '+(type==='double'?'Verdoppeln':'Teilen')+'.');
   pendingAct = true; renderAll();
+  if (KASSE_ON){ kasse('bjact', { tid, type, h: T.turn.h, round: T.round }).catch(e => toast(e.message)).finally(() => { pendingAct = false; renderAll(); }); return; }
   seatWrite({ act: { type, h:T.turn.h, round:T.round, seq:Date.now() } });
   setTimeout(()=>{ if(pendingAct){ pendingAct=false; renderAll(); } }, 4000);
 }
@@ -2316,6 +2394,7 @@ function insure(yes){
   const cost = Math.floor(T.hands[uid][0].bet/2);
   if (yes && P.balance < cost) return toast('Nicht genug Legats für die Versicherung.');
   pendingAct = true; renderAll();
+  if (KASSE_ON){ kasse('bjins', { tid, yes: !!yes }).catch(e => toast(e.message)).finally(() => { pendingAct = false; renderAll(); }); return; }
   seatWrite({ act: { type: yes ? 'insure' : 'noinsure', h:-1, round:T.round, seq:Date.now() } });
   setTimeout(()=>{ if(pendingAct){ pendingAct=false; renderAll(); } }, 4000);
 }
@@ -2326,7 +2405,7 @@ function afterTable(){
   // auto bet: repeat the last bet at the start of every round
   if (auto && (T.phase==='betting' || (T.phase==='done' && T.history?.[T.round]?.[uid])) && autoRound !== betRound() && seats[uid]){
     const s = seats[uid], br = betRound();
-    if (!(s.ready && s.round===br)){
+    if (!escOf(uid, br)){
       autoRound = br;
       const amount = ls.get('lastBet', bet);
       const err = isBroke() ? 'Du bist pleite.' : canBet(amount);
@@ -2374,7 +2453,29 @@ function applyResult(d, r, ctx){
     if (hs.some(H => H.bet >= 50000 && !H.dbl)) grant(d,'high');
   }
 }
+const BJ = { busy: false, claimAt: 0, tickAt: 0, ticking: false };
+function bjClaim(force){
+  if (!P || !T || !tid || Date.now() - BJ.claimAt < 2500) return;
+  const mine = Object.entries(T.history || {}).some(([rd, h]) => h[uid] && !T.paid?.[rd]?.[uid]);
+  const stale = T.esc?.[uid] && T.esc[uid].round < T.round;
+  if (!mine && !stale && !force) return;
+  BJ.claimAt = Date.now();
+  kasse('bjclaim', { tid }).catch(e => console.warn(e));
+}
+/** the phones at the table move it on: when a time limit is over or the dealer's next card is due */
+function bjTick(){
+  if (!KASSE_ON || !T || !tid || document.hidden || BJ.ticking) return;
+  const now = NOW(), ph = T.phase;
+  const allIn = ph === 'done' && Object.keys(seats).length && Object.keys(seats).every(u => T.esc?.[u]?.round === T.round + 1);
+  const due = (ph === 'betting' && T.betUntil && now >= T.betUntil) || (ph === 'insurance' && now >= T.insUntil)
+    || (ph === 'playing' && T.turn?.until && now >= T.turn.until) || (ph === 'dealer' && now >= (T.dAt || 0) + 800)
+    || (ph === 'done' && now >= (T.doneAt || 0) + (allIn ? DONE_FAST : DONE_MS));
+  if (!due || Date.now() - BJ.tickAt < 700) return;
+  BJ.tickAt = Date.now(); BJ.ticking = true;
+  srvCall('tisch', { tid }).catch(e => console.warn(e)).finally(() => { BJ.ticking = false; });
+}
 function reconcile(){
+  if (KASSE_ON) return bjClaim();
   if (!P || !T || !tid) return;
   withPlayer(d => { WHY = 'Blackjack';
     let changed = false;
@@ -2441,6 +2542,7 @@ function stuckHTML(){
 }
 setInterval(() => { if (tab === 'table' && game === 'bj' && tid){ const st = tableStuck(); if (st !== HOST.wasStuck){ HOST.wasStuck = st; lastTableHTML = ''; renderAll(); } else if (st) { const d = document.querySelector('.stuckbox .diag'); if (d) d.innerHTML = hostDiag().map(esc).join('<br>'); } } }, 1000);
 async function leaseLoop(){
+  if (KASSE_ON) return;   // 2.2: the server is the dealer
   if (!tid || !uid || !seats[uid]){ amHost=false; return; }
   const ref = doc(fs,'locks',tid);
   try {
@@ -2610,6 +2712,7 @@ function step(nt, now){
   return false;
 }
 async function hostTick(){
+  if (KASSE_ON) return bjTick();
   if (!amHost || hostBusy || !T || !tid) return;
   hostBusy = true;
   try {
@@ -2674,9 +2777,20 @@ function animateCards(root){
 /* =====================================================================
    v1.1 – Casino home, Glücksrad, Roulette, Automat, Pferderennen, Sportwetten
    ===================================================================== */
-const APP_VERSION = '2.0.6';
+const APP_VERSION = '2.1';
 const CL_TITLES = { '1.5.12': 'Technische Verbesserungen' };
 const CHANGELOGS = {
+  '2.1': [
+    'Alles, worum es Legats, Euro oder Fortschritt geht, läuft jetzt über die Server-Kasse. Das Handy kann deinen Kontostand, deine Kisten, Items, XP und Erfolge nicht mehr selbst ändern. Schummeln über die Konsole bringt nichts mehr',
+    'Fortschritt auf dem Server: XP, Level-Belohnungen, Tagesaufgaben, Wochen-Herausforderungen, Erfolge und Gratis-Kisten bucht der Server',
+    'Bank, Zinsen, Shop, Tellerwäscher-Schicht und Tipprunde laufen über die Server-Kasse',
+    'Blackjack: Der Server ist jetzt der Dealer. Er mischt, teilt aus und zahlt aus. Die verdeckte Karte des Dealers kennt bis zum Aufdecken niemand. Zur Fairness gibt es sofort einen Fingerabdruck der Mischung, die ganze Reihenfolge wird veröffentlicht, sobald der Schlitten aufgebraucht ist',
+    'Loono gegen Bots läuft komplett auf dem Server. Die Karten der Bots und den Stapel sieht niemand. Nach deinem Zug spielen die Bots wie gewohnt nacheinander',
+    'Loono mit Freunden: Die Einsätze sammelt der Server ein und zahlt den Topf an den Sieger aus. Der Topf besteht nur noch aus den Einsätzen der Menschen, Bots zahlen dort nichts mehr ein',
+    'Neu: Dein Bonuslink unter Konto. Tritt jemand darüber bei, bekommst du beim ersten eine Samt-Kiste, beim zweiten einen Tresor und danach für jeden weiteren eine Messing-Kiste. Wer über den Link beitritt, bekommt 2 Messing-Kisten geschenkt',
+    'Automat: Stoppst du den Auto-Spin mitten in einem Paket, merkt sich der Automat die restlichen Drehs. Beim nächsten Drehen kommen sie zuerst, danach wird neu gedreht',
+    'Das Tageslimit von 100.000 ℒ fällt weg. Was dort noch aussteht, zahlt der Server automatisch aus, jeden Tag bis zu 100.000 ℒ',
+  ],
   '2.0.6': [
     'Ein alter Tab kann deinen Spielstand nicht mehr zurücksetzen, auch nicht beim Betreiber-Konto',
   ],
@@ -2889,6 +3003,7 @@ const timeLabel = t => new Date(t).toLocaleString('de-DE', { weekday:'short', da
 
 /** book a finished bet in the stats (balance is handled by the caller) */
 function record(d, key, stake, pay){
+  if (KASSE_ON) return;
   const net = pay - stake;
   d.games ||= {};
   const g = d.games[key] ||= { n:0, net:0, best:0 };
@@ -2977,20 +3092,16 @@ async function spinWheel(){
   if (KASSE_ON){
     let r; try { r = await kasse('wheel', { noItem: !pool.length }); } catch (e){ wheelBusy = false; toast(e.message); renderAll(); return; }
     i = r.i; s = WHEEL[i]; addL = r.addL; addE = r.addE; W.streak = r.streak;
+    if (r.item){ itemKey = r.item; const [kd, id] = r.item.split(':'); const nm = kd === 'av' ? avText(id) : kd === 'felt' ? (SHOP.felt.find(x => x[0] === id)?.[1] || id) + ' (Filz)' : (SHOP.back.find(x => x[0] === id)?.[1] || id) + ' (Kartenrücken)'; txt = `🎁 ${nm} gewonnen!`; }
   } else {
     i = rnd(WHEEL.length); s = WHEEL[i]; const mult = streakMult(W.streak);
     if (s.k==='L' || s.k==='J') addL = Math.round(s.v * mult);
     if (s.k==='E') addE = Math.round(s.v * mult);
     if (s.k==='I' && !pool.length) addE = 2500;
   }
-  if (s.k==='I' && pool.length){ const it = pick(pool); itemKey = it[0]; txt = `🎁 ${it[2]} gewonnen!`; }
+  if (!KASSE_ON && s.k==='I' && pool.length){ const it = pick(pool); itemKey = it[0]; txt = `🎁 ${it[2]} gewonnen!`; }
   if (!txt) txt = addL ? `+${fmt(addL)} Legats` : `+${fmt(addE)} €`;
-  const ok = KASSE_ON ? withPlayer(d => { WHY = 'Glücksrad';
-    if (itemKey) d.owned = [...d.owned, itemKey];
-    if (s.k==='J') grant(d,'wheel');
-    if (W.streak >= 7) grant(d,'daily7');
-    return true;
-  }) || true : withPlayer(d => { WHY = 'Glücksrad';
+  const ok = KASSE_ON ? true : withPlayer(d => { WHY = 'Glücksrad';
     if (d.daily.last === dayId()) return false;
     d.daily = { last: dayId(), streak: W.streak };
     d.balance += addL; d.euro += addE;
@@ -3102,7 +3213,6 @@ async function rSpin(){
     R.busy = true; renderAll();
     try { ({ n, pay } = await kasse('roulette', { bets: R.bets })); } catch (e){ R.busy = false; renderAll(); return toast(e.message); }
     hold = pay; const bets = R.bets;
-    withPlayer(d => { record(d, 'roulette', total, pay); if (bets['n'+n]) grant(d,'r_num'); return true; }, 'Roulette');
   } else {
     n = rnd(37);
     for (const [k,v] of Object.entries(R.bets)) pay += v * rWins(k, n);
@@ -3152,7 +3262,7 @@ function renderSlots(){
     ${jpBar()}
     <div class="status" id="slotres">${res?.jp ? `<span class="jpwin">💥 JACKPOT! +${fmt(res.jp)} ℒ</span>` : res ? (res.pay ? `<span style="color:var(--win)">Gewonnen: ${fmt(res.pay)} ℒ</span>` : 'Leider nichts') : 'Drei gleiche auf der Mittellinie gewinnen'}</div>
     <div class="controls">
-      ${chipPicker(S.bet, 'sbet', 5000)}
+      ${slotQ() ? `<p class="muted small" style="margin:0">⏳ Noch ${slotQ().spins.length} vorbereitete ${slotQ().spins.length === 1 ? 'Dreh' : 'Drehs'} à ${fmt(slotQ().bet)} ℒ. Danach kannst du den Einsatz wieder ändern.</p>` : chipPicker(S.bet, 'sbet', 5000)}
       ${S.auto ? `<button class="btn gold spinbtn" data-act="sautostop">Auto stoppen · ${S.auto === Infinity ? `läuft (${S.spun || 0} Drehs)` : 'noch ' + S.auto}</button>`
         : `<button class="btn gold spinbtn" data-act="sspin" ${S.busy?'disabled':''}>Drehen · ${fmt(S.bet)} ℒ</button>
            <div class="row autorow"><span class="muted small">Auto-Spin</span>${[10,25,50].map(n => `<button class="btn sm" data-act="sauto" data-v="${n}" ${S.busy?'disabled':''}>${n}×</button>`).join('')}<button class="btn sm" data-act="sautoinf" ${S.busy?'disabled':''} aria-label="Endlos drehen bis Stopp oder großer Gewinn">∞</button></div>`}
@@ -3165,19 +3275,37 @@ function renderSlots(){
   if (el.innerHTML !== html) el.innerHTML = html;
 }
 /** server: one or more spins in one call. S.pk keeps track of what the header may already show */
+/* 2.1: spins the server already played but that were not shown (auto-spin stopped in the middle of a package).
+   They wait in P.slotq and come first next time; until then the header leaves their result out. */
+const slotQ = () => P?.slotq?.spins?.length ? P.slotq : null;
+const slotQNet = (q = slotQ()) => q ? q.spins.reduce((a, x) => a + x.pay - q.bet + (x.jp || 0), 0) : 0;
+// Firebase can't store lists inside lists: the three reels are kept as one flat list of nine symbols
+const slotFlat = x => x.reels ? { r: x.reels.flat(), pay: x.pay, mult: x.mult, ...(x.jp ? { jp: x.jp } : {}) } : x;
+const slotUnflat = x => x.r ? { reels: [x.r.slice(0, 3), x.r.slice(3, 6), x.r.slice(6, 9)], pay: x.pay, mult: x.mult, ...(x.jp ? { jp: x.jp } : {}) } : x;
+function slotQSave(q){ withPlayer(d => { d.slotq = q && q.spins.length ? { bet: q.bet, spins: q.spins.map(slotFlat) } : null; return true; }); }
+/** up to n spins from the waiting ones (no server call) */
+function slotTake(n){
+  const q = slotQ(); if (!q) return null;
+  const before = slotQNet(q), take = q.spins.slice(0, n).map(slotUnflat), rest = { bet: q.bet, spins: q.spins.slice(n) };
+  slotQSave(rest);
+  S.busy = true; S.bet = q.bet; S.fromQ = true;
+  S.pk = { B0: P.balance - before, Bf: P.balance - slotQNet(rest.spins.length ? rest : null), cum: 0, bet: q.bet };
+  return take;
+}
 async function slotFetch(n){
+  if (KASSE_ON && slotQ()) return slotTake(n);
+  S.fromQ = false;
   const err = betError(S.bet, 50, 5000); if (err){ toast(err); return null; }
   S.busy = true; renderAll();
   document.querySelectorAll('[data-act="sspin"],[data-act="sbet"],[data-act="sauto"],[data-act="sautoinf"]').forEach(x => x.disabled = true);
-  const B0 = P.balance, bet = S.bet;
-  try { const r = await kasse('slots', { bet, n, stop: S.stop }); S.pk = { B0, Bf: P.balance, cum: 0, bet }; return r.spins; }
+  const B0 = P.balance - slotQNet(), bet = S.bet;
+  try { const r = await kasse('slots', { bet, n, stop: S.stop }); S.pk = { B0, Bf: P.balance - slotQNet(), cum: 0, bet }; return r.spins; }
   catch (e){ S.busy = false; toast(e.message); renderAll(); return null; }
 }
 /** a spin the server already played: statistics, achievements, what the header shows */
 function slotBook(sp){
   const k = S.pk, c = sp.reels.map(r => r[1]);
   hold = k.Bf - (k.B0 + k.cum - k.bet);
-  withPlayer(d => { record(d, 'slots', k.bet, sp.pay); if (c.every(x => x === 5)) grant(d, 'jackpot'); if (sp.jp) grant(d, 'pjack'); return true; }, 'Automat');
   k.cum += sp.pay - k.bet + (sp.jp || 0);
   jpFeed(k.bet);
 }
@@ -3241,13 +3369,13 @@ async function slotAuto(n){
           if (r.mult >= 9999){ toast('Jackpot! Auto-Spin gestoppt.'); break out; }
           if (S.stop === 'x20' ? r.mult >= 20 : S.stop !== 'jp' && r.pay >= S.stop){ toast(`Großer Gewinn: ${fmt(r.pay)} ℒ! Auto-Spin gestoppt.`); break out; }
           if (S.auto > 0 && i < spins.length - 1){ renderAll(); await secs(500); }
-        } else {   // stopped: these spins were already played, show them at once
-          const rest = spins.slice(i); let net = 0;
-          for (const x of rest){ slotBook(x); net += x.pay - S.pk.bet + (x.jp || 0); S.reels = x.reels; }
-          toast(`Auto-Spin gestoppt. ${rest.length} ${rest.length === 1 ? 'Dreh war' : 'Drehs waren'} schon gestartet und ${rest.length === 1 ? 'wurde' : 'wurden'} direkt ausgewertet: ${sgn(net)} ℒ`); break out;
+        } else {   // stopped: the rest of the package waits for the next spin (already played on the server, not shown yet)
+          const rest = spins.slice(i), q = slotQ();
+          slotQSave({ bet: S.pk.bet, spins: [...rest, ...(q ? q.spins : [])] });
+          toast(`Auto-Spin gestoppt. ${rest.length} ${rest.length === 1 ? 'Dreh ist' : 'Drehs sind'} schon vorbereitet und ${rest.length === 1 ? 'kommt' : 'kommen'} beim nächsten Drehen zuerst.`); break out;
         }
       }
-      if (spins.length < want){ toast('Nicht genug Legats für den nächsten Dreh. Auto-Spin gestoppt.'); break; }
+      if (spins.length < want && !S.fromQ){ toast('Nicht genug Legats für den nächsten Dreh. Auto-Spin gestoppt.'); break; }
       if (S.auto > 0){ renderAll(); await secs(500); }
     }
     S.auto = 0; S.busy = false; hold = 0; renderAll(); if (SAVE.dirty) flushSave();
@@ -3316,7 +3444,6 @@ async function horseRun(){
     try { let nx; ({ order, pay, next: nx } = await kasse('horses', { id: H.raceId, pick: H.pickI, bet: H.bet })); H.next = nx; }
     catch (e){ H.busy = false; toast(e.message); newRace(); renderAll(); return; }
     won = order[0] === H.pickI; hold = pay;
-    withPlayer(d => { record(d, 'horses', H.bet, pay); if (won && h.odds >= 8) grant(d,'horse8'); return true; }, 'Pferderennen');
   } else {
     const left = H.race.map((h,i) => i);
     while (left.length){ let x = Math.random() * left.reduce((s,i)=>s+H.race[i].p, 0); let k = 0; for (; k<left.length-1; k++){ x -= H.race[left[k]].p; if (x <= 0) break; } order.push(left.splice(k,1)[0]); }
@@ -3493,7 +3620,7 @@ function settleBetsK(){
   SPB.busy = true; SPB.at = now;
   kasse('ssettle').then(r => {
     const done = r.done || []; let won = 0;
-    if (done.length) withPlayer(d => { for (const x of done){ if (x.st !== 'void') record(d, 'sports', x.stake, x.pay); if (x.st === 'won'){ won += x.pay - x.stake; if (x.odds >= 3) grant(d, 'sport3'); } } return true; }, 'Sportwette');
+    for (const x of done) if (x.st === 'won') won += x.pay - x.stake;
     if (won > 0){ SFX.coins(); toast(`Sportwette gewonnen: +${fmt(won)} ℒ`); }
   }).catch(e => console.warn(e)).finally(() => { SPB.busy = false; });
 }
@@ -3544,7 +3671,6 @@ function placeBet2(){
   if (KASSE_ON){
     if (SP.placing) return; SP.placing = true; const m = s.m;
     kasse('sbet', { src: m.src, mid: m.id, pick: s.pick, stake: SP.stake, sc: m.sc_ || null, season: m.season || null, lg: m.lg, odds: m.odds[s.pick] }).then(r => {
-      withPlayer(d => { taskBump(d, 'sports_bet', 1); return true; });
       savePref('sportstake', SP.stake); SP.slip = null; SFX.chip();
       toast(`Wette platziert: ${fmt(r.bet.stake)} ℒ, möglicher Gewinn ${fmt(Math.floor(r.bet.stake * r.bet.odds))} ℒ`); renderAll();
     }).catch(e => toast(e.message)).finally(() => { SP.placing = false; });
@@ -3995,7 +4121,7 @@ const lvlPill = p => { const L = levelOf(p?.xp || 0).L; return `<span class="lvl
 let WHY_EXTRA = '';
 const lvlUps = [];
 function gainXP(d, n){
-  if (!(n > 0)) return;
+  if (KASSE_ON || !(n > 0)) return;
   const before = levelOf(d.xp || 0).L; d.xp = (d.xp || 0) + Math.round(n);
   const after = levelOf(d.xp).L;
   for (let L = before + 1; L <= after; L++){
@@ -4076,13 +4202,22 @@ function todayTasks(day = dayId()){
 const weekTasks = (wk = weekId()) => taskCache['w|' + wk] ||= pickTasks(WEEKLY, 'week-' + wk, 3);
 function weekOf(d){ const wk = weekId(); if (!d.wch || d.wch.id !== wk) d.wch = { id: wk, p: {}, c: [], day: null }; return d.wch; }
 function taskBump(d, k, n){
-  if (!(n > 0) || !uid) return;
+  if (KASSE_ON || !(n > 0) || !uid) return;
   const day = dayId();
   if (!d.tasks || d.tasks.day !== day) d.tasks = { day, p: {}, c: [] };
   if (todayTasks(day).some(t => t.k === k)) d.tasks.p[k] = (d.tasks.p[k] || 0) + n;
   if (weekTasks().some(t => t.k === k)){ const w = weekOf(d); w.p[k] = (w.p[k] || 0) + n; }
 }
+async function taskClaimK(k){
+  try { const r = await kasse('taskclaim', { k }); SFX.coins(); toast(r.all ? `Alle fünf geschafft: +${fmt(r.amount)} ℒ` : `Aufgabe erledigt: +${fmt(TASK_L)} ℒ und ${TASK_XP} XP`); }
+  catch (e){ toast(e.message); }
+}
+async function weekClaimK(k){
+  try { const r = await kasse('weekclaim', { k }); SFX.coins(); if (r.all) celebrate(r.amount, 0, { title: 'Wochenheld', icons: '🏅' }); else toast(`Herausforderung geschafft: +${fmt(WEEK_L)} ℒ und ${WEEK_XP} XP`); }
+  catch (e){ toast(e.message); }
+}
 function taskClaim(k){
+  if (KASSE_ON) return taskClaimK(k);
   let all = false;
   const ok = withPlayer(d => {
     const t = todayTasks().find(x => x.k === k);
@@ -4094,6 +4229,7 @@ function taskClaim(k){
   if (ok){ SFX.coins(); toast(all ? `Alle fünf geschafft: +${fmt(TASK_L + TASK_ALL)} ℒ` : `Aufgabe erledigt: +${fmt(TASK_L)} ℒ und ${TASK_XP} XP`); }
 }
 function weekClaim(k){
+  if (KASSE_ON) return weekClaimK(k);
   let all = false;
   const ok = withPlayer(d => {
     const t = weekTasks().find(x => x.k === k), w = weekOf(d);
@@ -4303,7 +4439,7 @@ function kRoll(c){
 }
 
 /* ---------- free crates: tasks, achievements, weekly challenges, levels ---------- */
-const kGive = (d, id, n = 1) => { d.crates = { ...(d.crates || {}), [id]: ((d.crates || {})[id] || 0) + n }; KS.gift.push(id); };
+const kGive = (d, id, n = 1) => { if (KASSE_ON) return; d.crates = { ...(d.crates || {}), [id]: ((d.crates || {})[id] || 0) + n }; KS.gift.push(id); };
 const kFree = () => Object.values(P?.crates || {}).reduce((a, b) => a + b, 0);
 const KS = { tab: 'kisten', busy: false, fast: ls.get('kfast', false), last: null, gift: [], key: '', sheet: null };
 function kGiftToast(){ if (!KS.gift.length) return; const g = KS.gift.splice(0); const n = g.length, c = KCRATES.find(x => x.id === g[g.length - 1]);
@@ -4347,8 +4483,7 @@ async function kOpen(id){
     KS.busy = true; renderAll();
     let r; try { r = await kasse('kopen', { id, free }); } catch (e){ KS.busy = false; renderAll(); return toast(e.message); }
     win = r.win; def = KITEM[win.k]; KS.pend = win.money ? null : win.id;
-    ok = withPlayer(d => { d.kst = { n: (d.kst?.n || 0) + 1, best: Math.max(d.kst?.best || 0, r.value) };
-      grant(d, 'kiste1'); if (def.r === 'gold') grant(d, 'mythisch'); if ((d.items || []).length >= 20) grant(d, 'sammler'); return true; }, 'Kiste') || true;
+    ok = true;
   } else {
   win = kRoll(c); def = KITEM[win.k];
   KS.busy = true; KS.pend = win.money ? null : win.id;   // free crates won on the way are announced after the reveal; the item stays hidden until then
@@ -4398,7 +4533,7 @@ function kReveal(win){
   el.innerHTML = `<div class="krays"></div>${big || mid ? '<canvas></canvas>' : ''}<div class="kbox">
     <div class="rn">${KRN[d.r]}</div><div class="kbig">${d.ic}</div><div class="tn">${esc(d.n)}</div>
     ${it ? `<div class="muted">${KTYPE[d.t]} · ${c[1]} · Nr. ${it.nr}${kNr(it.nr) > 1 ? ' <b style="color:var(--brass)">(seltene Nummer!)</b>' : ''}</div>
-      <div class="num" style="color:var(--brass);font-size:20px">Wert heute: ${fmt(kValue(it))} ℒ</div>` : P.owed > 0 ? `<div class="muted">gutgeschrieben · wegen des Tageslimits kommen ${fmt(P.owed)} ℒ ab morgen dazu</div>` : '<div class="muted">sofort gutgeschrieben</div>'}
+      <div class="num" style="color:var(--brass);font-size:20px">Wert heute: ${fmt(kValue(it))} ℒ</div>` : P.owed > 0 && !KASSE_ON ? `<div class="muted">gutgeschrieben · wegen des Tageslimits kommen ${fmt(P.owed)} ℒ ab morgen dazu</div>` : '<div class="muted">sofort gutgeschrieben</div>'}
     <div class="row" style="justify-content:center">${it ? `<button class="btn gold" data-kx>In die Sammlung</button>${d.t !== 'deko' ? `<button class="btn" data-kxeq="${it.id}">Ausrüsten</button>` : ''}<button class="btn" data-kxsell="${it.id}">Verkaufen: ${fmt(kSellPrice(it))} ℒ</button>` : '<button class="btn gold" data-kx>Weiter</button>'}</div></div>`;
   document.body.appendChild(el);
   if (big || mid) kConfetti(el.querySelector('canvas'), d.r === 'gold' ? 220 : big ? 150 : 80);
@@ -4448,7 +4583,6 @@ async function kBuy(k){
   if (KASSE_ON){
     if (P.balance < p) return toast('Nicht genug Legats.');
     let r; try { r = await kasse('kbuy', { k }); } catch (e){ return toast(e.message); }
-    withPlayer(d => { if ((d.items || []).length >= 20) grant(d, 'sammler'); return true; });
     SFX.coins(); toast(`${def.n} gekauft (Nr. ${r.it.nr}) für ${fmt(r.price)} ℒ`); kGiftToast(); if ($('ksheet')) kMarketSheet(k); return;
   }
   if (unsavedMs() > 12000) return toast('Dein Spielstand wird gerade nicht gespeichert. Warte, bis die Verbindung wieder da ist.');
@@ -4668,13 +4802,63 @@ function trailerOpen(then){
     const a = b.dataset.tr; if (a === 'play'){ ac(); trPlay(); } else if (a === 'skip'){ trStop(); trShow(6); el.querySelector('[data-tr="skip"]').hidden = true; }
     else if (a === 'go'){ trClose(true); } else if (a === 'close') trClose(false); });
 }
+/* ---------- 2.1 trailer: the Bonuslink, once at the first start after the update (only on this device, costs nothing) ---------- */
+function trailer21Open(then){
+  if (TR.el) return; TR.then = then || null;
+  TR.go = () => { setTab('account'); setTimeout(() => document.querySelector('[data-act="copyinvite"]')?.scrollIntoView({ block: 'center', behavior: 'smooth' }), 300); };
+  const chest = (cls, id = '') => `<div class="kchest${cls}"${id}><div class="body"></div><div class="band l"></div><div class="band r"></div><div class="lid"></div><div class="gem"></div><div class="lock"></div></div>`;
+  const friend = (av, n) => `<div class="t-friend"><span>${av}</span>${n} ist beigetreten</div>`;
+  const code = esc(P?.code || 'XT9CUU');
+  const el = document.createElement('div'); el.className = 'trailer'; el.id = 'trailer';
+  el.innerHTML = `<div class="trstage">
+    <div class="sc" data-s="0"><div style="display:flex;flex-direction:column;align-items:center;gap:16px;width:100%"><div class="t-line"></div><div class="t-logo">Legat Casino</div><div class="t-up">präsentiert</div><div class="t-line"></div></div></div>
+    <div class="sc" data-s="1"><div><div class="t-ver">2.1</div></div><div class="t-cap">Das Bonuslink-Update</div></div>
+    <div class="sc" data-s="2"><div class="t-rays"></div><div class="t-link"><i>🔗</i>legat-casino/#ref-<b>${code}</b></div><div class="t-cap">Dein eigener Bonuslink<small>Zu finden unter Konto</small></div></div>
+    <div class="sc" data-s="3"><div class="t-join">${friend('🦊', 'Ein Freund')}${chest(' samt')}</div><div class="t-cap">1. Freund: Samt-Kiste</div></div>
+    <div class="sc" data-s="4"><div class="t-rays"></div><div class="t-join big">${friend('🐙', 'Noch einer')}${chest(' tresor', ' id="trchest"')}</div><div class="t-cap">2. Freund: ein Tresor</div></div>
+    <div class="sc" data-s="5"><div class="t-three">${chest('')}${chest('')}${chest('')}</div><div class="t-cap">Jeder weitere: Messing<small>ohne Obergrenze</small></div></div>
+    <div class="sc" data-s="6"><div class="t-gift"><div class="t-pair">${chest('')}${chest('')}</div></div><div class="t-cap">Und deine Freunde?<small>2 Messing-Kisten geschenkt zum Start</small></div></div>
+    <div class="sc" data-s="7"><div class="t-feats"><div><span>Blackjack</span>: der Server ist jetzt der Dealer</div><div><span>Loono</span> gegen Bots mit geheimen Karten</div><div>Der <span>Automat</span> merkt sich deine Drehs</div></div></div>
+    <div class="sc t-end" data-s="8"><div><h1>Lad deine Freunde ein</h1><p>Deinen Bonuslink findest du jederzeit unter Konto.</p><button class="btn gold" data-tr="go">Zum Bonuslink</button><div style="margin-top:12px"><button class="btn sm" data-tr="close">Später</button></div></div></div>
+    <canvas class="trcv"></canvas>
+    <button class="t-skip" data-tr="skip" hidden>Überspringen</button>
+    <div class="t-bar"></div>
+    <div class="t-start"><div style="text-align:center;padding:20px"><p class="t-up" style="margin:0 0 10px">Neu in Version 2.1</p><div class="t-logo" style="font-size:clamp(34px,9vw,60px)">Bonuslink</div><p class="muted" style="margin:10px 0 20px">Ein kurzer Trailer, etwa 18 Sekunden</p><button class="btn gold" data-tr="play">▶ Trailer ansehen</button><div style="margin-top:12px"><button class="btn sm" data-tr="close">Überspringen</button></div></div></div>
+  </div>`;
+  document.body.appendChild(el); TR.el = el; TR.last = 8; trShow(0);
+  el.addEventListener('click', e => { const b = e.target.closest('[data-tr]'); if (!b) return;
+    const a = b.dataset.tr; if (a === 'play'){ ac(); trPlay21(); } else if (a === 'skip'){ trStop(); trShow(8); el.querySelector('[data-tr="skip"]').hidden = true; }
+    else if (a === 'go'){ trClose(true); } else if (a === 'close') trClose(false); });
+}
+function trPlay21(){
+  const el = TR.el, at = (ms, f) => TR.timers.push(setTimeout(f, ms)); trStop();
+  const bar = el.querySelector('.t-bar'); bar.style.transition = 'none'; bar.style.width = '0'; void bar.offsetWidth; bar.style.transition = 'width 18000ms linear'; bar.style.width = '100%';
+  el.querySelector('.t-start').hidden = true; el.querySelector('[data-tr="skip"]').hidden = false;
+  for (const [t, i] of [[0, 0], [2600, 1], [4800, 2], [7000, 3], [9000, 4], [11400, 5], [13200, 6], [15000, 7], [17600, 8]]) at(t, () => trShow(i));
+  const fan = () => [523, 659, 784, 1047, 1319].forEach((f, i) => tone(f, .35, { type: 'triangle', vol: .07, at: i * .09 }));
+  const pop = () => { tone(880, .08, { type: 'triangle', vol: .06 }); tone(1320, .1, { type: 'triangle', vol: .05, at: .07 }); };
+  const thud = () => tone(80, .3, { vol: .28 });
+  at(300, () => tone(196, 1.6, { vol: .06 }));
+  at(2600, () => { tone(98, 1.2, { vol: .2 }); tone(392, .8, { type: 'triangle', vol: .05, at: .05 }); });
+  at(4900, () => { tone(587, .25, { type: 'triangle', vol: .06 }); tone(880, .4, { type: 'triangle', vol: .06, at: .15 }); });
+  at(7100, pop); at(7700, thud);
+  at(9100, pop); at(9700, thud);
+  at(10300, () => { el.querySelector('#trchest')?.classList.add('shake'); tone(220, .2, { type: 'triangle', vol: .08 }); });
+  at(10900, () => { el.querySelector('#trchest')?.classList.add('open'); noise(.45, { vol: .2, freq: 900 }); fan(); kConfetti(el.querySelector('.trcv'), 160); });
+  [11450, 11750, 12050].forEach(t => at(t, () => tone(90, .25, { vol: .22 })));
+  at(13300, () => { thud(); setTimeout(thud, 250); setTimeout(fan, 700); });
+  at(15000, () => [0, 500, 1000].forEach(d => setTimeout(() => tone(660, .12, { type: 'triangle', vol: .06 }), d)));
+  at(17600, () => { tone(523, .5, { type: 'triangle', vol: .06 }); tone(784, .7, { type: 'triangle', vol: .06, at: .1 }); });
+  at(18000, () => { const s = el.querySelector('[data-tr="skip"]'); if (s) s.hidden = true; });
+}
 function trShow(i){ TR.el?.querySelectorAll('.sc').forEach(s => s.classList.toggle('on', +s.dataset.s === i)); }
 function trStop(){ TR.timers.forEach(clearTimeout); TR.timers = []; }
 function trClose(go){
   trStop(); const el = TR.el; if (!el) return; TR.el = null;
   el.classList.add('out'); setTimeout(() => el.remove(), 400);
-  if (go){ setTab('table'); if (standUp('kisten')) openGame('kisten'); KS.tab = 'kisten'; }
+  if (go){ if (TR.go){ const f = TR.go; TR.go = null; f(); } else { setTab('table'); if (standUp('kisten')) openGame('kisten'); KS.tab = 'kisten'; } }
   else TR.then?.();
+  TR.go = null;
 }
 function trPlay(){
   const el = TR.el, at = (ms, f) => TR.timers.push(setTimeout(f, ms)); trStop();
@@ -4966,7 +5150,6 @@ async function mnStartK(){
   MN.busy = true; renderAll(); let r;
   try { r = await kasse('mnstart', { stake, n }); } catch (e){ MN.busy = false; renderAll(); return toast(e.message); }
   MN.busy = false;
-  if (r.forfeit) withPlayer(d => { record(d, 'mines', r.forfeit, 0); return true; }, 'Mines');
   MN.id++; MN.run = { stake, n, mines: new Set(), open: [], over: false, lost: false, boom: -1 };
   savePref('minesstake', stake); savePref('minesn', n); SFX.chip(); renderAll();
 }
@@ -4978,7 +5161,6 @@ async function mnPickK(i){
   MN.busy = false;
   if (r.mine){
     R_.mines = new Set(r.mines); R_.over = true; R_.lost = true; R_.boom = i; SFX.bust();
-    withPlayer(d => { record(d, 'mines', R_.stake, 0); taskBump(d, 'mines_safe', R_.open.length); return true; }, 'Mines');
     renderAll(); return;
   }
   R_.open = r.open; tone(660 + R_.open.length * 35, .09, { type: 'triangle', vol: .08 });
@@ -4993,8 +5175,6 @@ async function mnCashK(){
 }
 function mnCashDone(r){
   const R_ = MN.run; R_.over = true; R_.mult = r.mult; R_.pay = r.pay; R_.mines = new Set(r.mines);
-  withPlayer(d => { record(d, 'mines', R_.stake, R_.pay); taskBump(d, 'mines_safe', R_.open.length);
-    if (R_.n >= 5 && R_.open.length >= 10) grant(d, 'mines'); return true; }, 'Mines');
   SFX.win(); renderAll(); bigWin(R_.pay - R_.stake, R_.mult, '💎');
 }
 
@@ -5005,7 +5185,6 @@ async function hlStartK(){
   HL.busy = true; renderAll(); let r;
   try { r = await kasse('hlstart', { stake }); } catch (e){ HL.busy = false; renderAll(); return toast(e.message); }
   HL.busy = false;
-  if (r.forfeit) withPlayer(d => { record(d, 'hilo', r.forfeit, 0); return true; }, 'Höher oder Tiefer');
   savePref('hilostake', stake);
   HL.id++; HL.run = { stake, cards: [r.card], mult: 1, n: 0, over: false }; HL.msg = ''; SFX.chip(); renderAll();
 }
@@ -5019,7 +5198,6 @@ async function hlGuessK(dir){
   if (r.tie){ HL.msg = 'Gleich! Kein Verlust, rate nochmal.'; renderAll(); return; }
   if (r.lost){
     R_.over = true; R_.lost = true; HL.msg = `Leider ${dir === 'hi' ? 'tiefer' : 'höher'}. ${fmt(R_.stake)} ℒ verloren.`;
-    withPlayer(d => { record(d, 'hilo', R_.stake, 0); return true; }, 'Höher oder Tiefer');
     setTimeout(() => SFX.lose(), 450); renderAll(); return;
   }
   R_.mult = r.mult; R_.n = r.n; HL.msg = '';
@@ -5034,7 +5212,6 @@ async function hlCashK(){
 }
 function hlCashDone(r){
   const R_ = HL.run; R_.over = true; R_.mult = r.mult;
-  withPlayer(d => { record(d, 'hilo', R_.stake, r.pay); if (R_.n >= 10) grant(d, 'hilo10'); return true; }, 'Höher oder Tiefer');
   HL.msg = `Ausgezahlt: ${fmt(r.pay)} ℒ (${multFmt(r.mult)})`; SFX.win(); renderAll();
 }
 
@@ -5141,6 +5318,11 @@ function tpSet(mid, side, delta){
 function tpCommit(){
   clearTimeout(TP.timer);
   const dr = TP.draft; if (!Object.keys(dr).length) return;
+  if (KASSE_ON){   // tips are saved by the server, before kick-off only
+    TP.draft = {};
+    kasse('tipsave', { tips: dr }).catch(e => { toast(e.message); TP.draft = { ...dr, ...TP.draft }; });
+    return;
+  }
   const ms = bl1() || [];
   withPlayer(d => {
     d.tips ||= {}; let fresh = 0, any = false;
@@ -5159,6 +5341,11 @@ function tpPrize(){
     const key = seasonNow() + '-' + k; if (P.tipWon?.includes(key)) continue;
     const tb = tpTable(ms).filter(r => r.n > 0); if (tb.length < 2) continue;
     const me = tb.find(r => r.id === uid); if (!me || me.pts <= 0 || me.pts < tb[0].pts) continue;
+    if (KASSE_ON){
+      TP.asked ||= {}; if (TP.asked[key]) continue; TP.asked[key] = 1;
+      kasse('tipprize', { k: +k }).then(r => { if (r.won){ SFX.coins(); toast(`📋 Spieltagssieger in der Tipprunde (${k}. Spieltag): +${fmt(r.amount)} ℒ`); notify('📋', `Spieltagssieger in der Tipprunde (${k}. Spieltag): +${fmt(r.amount)} ℒ`, { tab: 'table', game: 'tipp' }); } }).catch(e => { TP.asked[key] = 0; console.warn(e); });
+      continue;
+    }
     if (withPlayer(d => { d.tipWon ||= []; if (d.tipWon.includes(key)) return false; d.tipWon = [...d.tipWon, key].slice(-60); d.balance += TP_PRIZE; grant(d, 'tipp'); return true; }, 'Tipprunde Spieltagssieger')){
       SFX.coins(); toast(`📋 Spieltagssieger in der Tipprunde (${k}. Spieltag): +${fmt(TP_PRIZE)} ℒ`); notify('📋', `Spieltagssieger in der Tipprunde (${k}. Spieltag): +${fmt(TP_PRIZE)} ℒ`, { tab: 'table', game: 'tipp' });
     }
@@ -5272,7 +5459,7 @@ function duelK(id, du, other, now, before){
   if (!DU.first && du.b === uid && du.st === 'open' && !before[id]){ SFX.pop(); const tx = `will wetten: ${du.t1} – ${du.t2}, ${fmt(du.stake)} ℒ`; islandNotice({ kind: 'duel', id, name: nameOf(du.a), icon: '🤝', text: tx }); notify('🤝', `${nameOf(du.a)} ${tx}`, { tab: 'table', game: 'sports', view: 'mine' }); }
   const mine = du.a === uid ? 'paidA' : 'paidB';
   const due = (du.st === 'accepted' && now > du.ko + 90 * 60e3)
-    || (du.st === 'done' && du.winner === uid && !du.paidW)
+    || (du.st === 'done' && ((du.winner === uid && !du.paidW) || !du['rec_' + uid]))
     || (du.st === 'void' && !du[mine])
     || (du.a === uid && !du.paidA && !du.refA && (du.st === 'declined' || du.st === 'cancelled' || (du.st === 'open' && now > du.ko)));
   DU.try ||= {};
@@ -5280,7 +5467,10 @@ function duelK(id, du, other, now, before){
   if (due && now - (DU.try[id] || 0) > wait){ DU.try[id] = now; kasse('duelpay', { id }).then(r => { if (r.amount && r.st !== 'done') SFX.coins(); }).catch(e => console.warn(e)); }
   if (du.st === 'done'){
     const won = du.winner === uid;
-    if (withPlayer(d => { if (!fdoneOnce(d, 'du:' + id + ':book')) return false; if (won) grant(d, 'duel'); record(d, 'duel', du.stake, won ? du.stake * 2 : 0); return true; }, 'Freundeswette')){
+    DU.told ||= new Set(JSON.parse(localStorage.getItem('duTold') || '[]'));
+    if (!DU.told.has(id)){ DU.told.add(id); try { localStorage.setItem('duTold', JSON.stringify([...DU.told].slice(-100))); } catch {} }
+    else return;
+    if (!DU.first && !(P.fdone || []).includes('du:' + id + ':book')){
       const tx = `${du.t1} – ${du.t2} ${du.score ? du.score[0] + ':' + du.score[1] : ''}: Wette gegen ${nameOf(other)} ${won ? `gewonnen, +${fmt(du.stake * 2)} ℒ` : 'verloren'}`;
       won ? SFX.win() : SFX.lose(); toast('🤝 ' + tx); notify('🤝', tx, { tab: 'table', game: 'sports', view: 'mine' });
     }
@@ -5450,7 +5640,7 @@ function loDeal(g){
   let top = null;
   while (!top){ const c = g.deck.pop(); if (c[0] === 'x' || 'srd'.includes(loVal(c))) g.deck.unshift(c); else top = c; }
   Object.assign(g, { pile: [top], color: top[0], dir: 1, turn: rnd(g.seats.length), pend: 0, ptype: null, drew: null, called: {}, expose: null,
-    st: 'play', open: true, winner: null, round: (g.round || 0) + 1, n: (g.n || 0) + 1, ev: { a: 'start' }, pot: (g.stake || 0) * g.seats.length, started: NOW() });
+    st: 'play', open: true, winner: null, round: (g.round || 0) + 1, n: (g.n || 0) + 1, ev: { a: 'start' }, pot: (g.stake || 0) * (KASSE_ON ? g.seats.filter(s => !s.bot).length : g.seats.length), started: NOW() });
   g.seats = g.seats.map(s => ({ ...s, to: 0 }));
   g.dl = NOW() + (g.seats[g.turn].bot ? 1800 : LO_TURN);
 }
@@ -5560,11 +5750,40 @@ async function loTx(fn, quiet, side){
   finally { LO[flag] = false; }
 }
 /** take a newer table state (own move or live update); an older one that arrives late is ignored */
-function loApply(g){
+function loApply(g, fromReplay){
+  if (LO.replay && !fromReplay){ if (!LO.snapLater || (g?.n || 0) >= (LO.snapLater.n || 0) || g?.round !== LO.snapLater.round) LO.snapLater = g; return false; }
   if (g && LO.g && g.round === LO.g.round && (g.n || 0) < (LO.g.n || 0)) return false;
   const before = LO.g; LO.g = g; loChanged(before, g); renderAll(); return true;
 }
+/* 2.2: games against bots run on the server (cards of the bots and the deck stay secret there) */
+const LO_STEP_MS = 1100;
+function loReplay(steps){
+  if (!steps?.length) return;
+  LO.replayQ = [...(LO.replayQ || []), ...steps];
+  if (LO.replay) return;
+  LO.replay = true;
+  const next = () => {
+    const g = LO.replayQ.shift();
+    if (g) loApply(g, true);
+    if (LO.replayQ.length) setTimeout(next, LO_STEP_MS);
+    else { LO.replay = false; const later = LO.snapLater; LO.snapLater = null; if (later) loApply(later); else if (LO.g) loBook(LO.g); }
+  };
+  next();
+}
+async function loSrv(op, extra = {}, side){
+  const flag = side ? 'sideBusy' : 'busy'; if (LO[flag]) return false;
+  LO[flag] = true;
+  try { const r = await kasse('lomove', { gid: LO.id, op, n: LO.g?.n, ...extra }); loReplay(r.steps); return true; }
+  catch (e){ toast(e.message); return false; }
+  finally { LO[flag] = false; renderAll(); }
+}
+function loSrvTick(){
+  const g = LO.g; if (!g?.srv || g.st !== 'play' || LO.replay || LO.tickBusy || Date.now() < (LO.tickHold || 0) || NOW() < g.dl) return;
+  LO.tickBusy = true; LO.tickHold = Date.now() + 1500;
+  srvCall('tisch', { lo: LO.id }).then(r => loReplay(r?.steps)).catch(e => console.warn(e)).finally(() => { LO.tickBusy = false; });
+}
 async function loTick(){
+  if (LO.g?.srv) return loSrvTick();
   const g = LO.g; if (!g || g.st !== 'play' || LO.tickBusy || Date.now() < (LO.tickHold || 0) || !uid || !g.seats.some(s => s.id === uid)) return;
   const late = loHostId(g) === uid ? 0 : 6000, now = NOW(), cur = g.seats[g.turn];
   if (g.expose && now - g.expose.t > LO_CATCH + late){
@@ -5589,6 +5808,10 @@ async function loCreate(bots){
   const err = LO.stake > 0 ? betError(LO.stake, 100) : null; if (err) return toast(err);
   if (P.loono && LO.g && LO.g.st === 'play' && LO.g.seats.some(s => s.id === uid && !s.left)) return toast('Du sitzt noch in einer laufenden Runde.');
   if (P.loono) await loLeave(true);
+  if (KASSE_ON && bots > 0){
+    try { const r = await kasse('losolo', { bots, stake: LO.stake, rules: { ...LO.rules } }); loWatch(); SFX.chip(); loReplay(r.steps); } catch (e){ toast(e.message); }
+    return;
+  }
   const seats = [loMySeat()];
   for (let i = 0; i < bots; i++) seats.push(loNewBot(seats));
   const g = { host: uid, name: P.name, st: 'lobby', open: true, stake: LO.stake, rules: { ...LO.rules }, seats, members: [uid], created: NOW(), round: 0, n: 0 };
@@ -5622,7 +5845,13 @@ async function loJoin(id){
 async function loLeave(silent){
   const id = P?.loono; if (!id) return;
   const g = LO.id === id ? LO.g : null;
-  if (g && g.st === 'play' && g.stake > 0 && g.seats.some(s => s.id === uid && !s.left))
+  if (KASSE_ON && g?.srv){
+    try { await kasse('loleave', { gid: id }); } catch (e){ console.warn(e); withPlayer(d => { if (!d.loono) return false; d.loono = null; return true; }); }
+    LO.ask = null; LO.invite = false; LO.replayQ = []; loWatch();
+    if (!silent) toast('Du hast die Runde verlassen.');
+    return;
+  }
+  if (!KASSE_ON && g && g.st === 'play' && g.stake > 0 && g.seats.some(s => s.id === uid && !s.left))
     withPlayer(d => { if (!fdoneOnce(d, 'lo:' + id + ':' + g.round + ':end')) return false; record(d, 'loono', g.stake, 0); return true; }, 'Loono');
   const ref = doc(fs, 'loono', id);
   try {
@@ -5655,7 +5884,9 @@ async function loStart(){
   }
   await loTx(x => { if (x.st !== 'lobby' || x.seats.length < 2) return false; loDeal(x); return true; });
 }
-async function loRematch(){ await loTx(x => {
+async function loRematch(){
+  if (KASSE_ON && LO.g?.srv){ try { const r = await kasse('lorematch', { gid: LO.id }); SFX.chip(); loReplay(r.steps); } catch (e){ toast(e.message); } return; }
+  await loTx(x => {
   if (x.st !== 'done' || x.host !== uid) return false;
   x.seats = x.seats.filter(s => !s.left).map(s => s.afk ? { ...s, bot: false, afk: false } : s);
   if (!x.seats.some(s => !s.bot)) return false;
@@ -5665,7 +5896,7 @@ async function loRematch(){ await loTx(x => {
 function loWatch(){
   const id = P?.loono || null;
   if (id === LO.id) return;
-  LO.unsub && LO.unsub(); LO.unsub = null; LO.id = id; LO.g = null; LO.ask = null; LO.animN = -1;
+  LO.unsub && LO.unsub(); LO.unsub = null; LO.id = id; LO.g = null; LO.ask = null; LO.animN = -1; LO.replayQ = []; LO.replay = false; LO.snapLater = null;
   if (!id){ renderAll(); return; }
   LO.unsub = onSnapshot(doc(fs, 'loono', id), s => { if (s.exists()) loApply(s.data()); else { LO.g = null; renderAll(); } }, e => console.warn(e));
 }
@@ -5696,6 +5927,14 @@ function loChanged(a, g){
 function loBook(g){
   const me = g.seats?.find(s => s.id === uid); if (!me || !g.round || !LO.id) return;
   const key = 'lo:' + LO.id + ':' + g.round;
+  if (KASSE_ON){
+    LO.bk ||= new Set();
+    const once = (k, a) => { if (LO.bk.has(k)) return; LO.bk.add(k); kasse(a, { gid: LO.id }).catch(e => { LO.bk.delete(k); console.warn(e); }); };
+    if (g.srv){ if (g.st === 'done' && !LO.replay) once(key + ':pay', 'lopay'); return; }
+    if (g.stake > 0 && (g.st === 'play' || g.st === 'done')) once(key + ':in', 'lofstake');
+    if (g.st === 'done' && !me.left) once(key + ':end', 'lofpay');
+    return;
+  }
   if (g.stake > 0 && (g.st === 'play' || g.st === 'done') && !P.fdone?.includes(key + ':in'))
     withPlayer(d => { if (!fdoneOnce(d, key + ':in')) return false; d.balance = Math.max(0, d.balance - g.stake); return true; }, 'Loono Einsatz');
   if (g.st === 'done' && !me.left && !P.fdone?.includes(key + ':end')){
@@ -5721,7 +5960,7 @@ async function loInvite(chatId){
 /* ---------- player actions ---------- */
 const loMyTurn = g => g && g.st === 'play' && g.seats[g.turn]?.id === uid;
 function loTap(c){
-  const g = LO.g; if (!loMyTurn(g) || LO.busy) return;
+  const g = LO.g; if (!loMyTurn(g) || LO.busy || LO.replay) return;
   if (!loCanPlay(g, c)){ toast(g.pend > 0 ? `Leg eine +2 oder +4 drauf oder zieh ${g.pend} Karten.` : 'Die Karte passt nicht. Gleiche Farbe, gleiche Zahl oder Farbwahl-Karte.'); return; }
   const twin = g.rules?.double && !g.drew && (g.hands[uid] || []).filter(x => x === c).length >= 2;
   if (twin) { LO.ask = { c, step: 'two' }; renderAll(); return; }
@@ -5731,17 +5970,19 @@ function loTap(c){
 async function loDo(cards, color){
   LO.ask = null; const n = LO.g?.n;
   LO.sending = cards[0]; renderAll();
+  if (LO.g?.srv){ await loSrv('play', { cards, color: color || null }); LO.sending = null; renderAll(); return; }
   const ok = await loTx(x => { if (x.n !== n || x.seats[x.turn]?.id !== uid) return false; x.seats[x.turn].to = 0; return loPlay(x, uid, cards, color); });
   LO.sending = null;
   if (!ok && LO.g?.st === 'play') toast(loMyTurn(LO.g) ? 'Die Karte ging gerade nicht durch. Tipp sie nochmal an.' : 'Zu spät: Deine Zeit war abgelaufen.');
   renderAll();
 }
-const loDrawBtn = async () => { const n = LO.g?.n; if (!loMyTurn(LO.g) || LO.busy) return;
+const loDrawBtn = async () => { const n = LO.g?.n; if (!loMyTurn(LO.g) || LO.busy || LO.replay) return;
+  if (LO.g.srv) return loSrv('draw');
   const ok = await loTx(x => x.n === n && x.seats[x.turn]?.id === uid ? (x.seats[x.turn].to = 0, loDrawAct(x, uid)) : false);
   if (!ok && LO.g?.st === 'play' && !loMyTurn(LO.g)) toast('Zu spät: Deine Zeit war abgelaufen.'); };
-const loKeepBtn = () => { const n = LO.g?.n; loTx(x => x.n === n && x.seats[x.turn]?.id === uid ? loKeep(x, uid) : false); };
-const loCallBtn = () => { SFX.pop(); loTx(x => loCall(x, uid), false, true); };
-const loCatchBtn = () => { const t = LO.g?.expose?.t; loTx(x => x.expose && x.expose.t === t ? loCatch(x, uid) : false, false, true); };
+const loKeepBtn = () => { const n = LO.g?.n; if (LO.g?.srv) return loSrv('keep'); loTx(x => x.n === n && x.seats[x.turn]?.id === uid ? loKeep(x, uid) : false); };
+const loCallBtn = () => { SFX.pop(); if (LO.g?.srv) return loSrv('call', {}, true); loTx(x => loCall(x, uid), false, true); };
+const loCatchBtn = () => { const t = LO.g?.expose?.t; if (LO.g?.srv) return loSrv('catch', {}, true); loTx(x => x.expose && x.expose.t === t ? loCatch(x, uid) : false, false, true); };
 
 /* ---------- screens ---------- */
 function loCard(c, cls = '', act = ''){
@@ -6379,7 +6620,9 @@ function dishStart(){
   if (!isBroke()) { closeModal(); return; }
   if (Date.now() < reviveAt()) return toast('Die Küche hat noch zu.');
   // the shift is written down first: a reload during the shift ends it with the minimum wage
-  if (!withPlayer(d => { if (!brokeDoc(d) || d.shift) return false; d.shift = { at: Date.now() }; return true; })) return;
+  if (KASSE_ON && !DISH.go){ dishStartK(); return; }   // the server writes the shift down first
+  DISH.go = false;
+  if (!KASSE_ON && !withPlayer(d => { if (!brokeDoc(d) || d.shift) return false; d.shift = { at: Date.now() }; return true; })) return;
   Object.assign(DISH, { phase:'run', n:0, gold:0, roach:0, end: Date.now() + DISH_MS, collected:false });
   $('sinkintro')?.remove();
   document.querySelector('#modal-card [data-act="closemodal"]')?.remove();
@@ -6418,7 +6661,16 @@ function dishStart(){
     if (Date.now() >= DISH.end){ clearInterval(tick); clearTimeout(DISH.timer); DISH.phase = 'done'; SFX.win(); renderModal(true); }
   }, 100);
 }
+async function dishStartK(){
+  if (DISH.starting) return; DISH.starting = true;
+  try { await kasse('shiftstart'); } catch (e){ DISH.starting = false; return toast(e.message); }
+  DISH.starting = false; DISH.phase = 'intro'; DISH.go = true; dishStart();
+}
 function finishRevive(earn, plates=0){
+  if (KASSE_ON){
+    kasse('shiftend', { n: DISH.n, gold: DISH.gold, roach: DISH.roach }).then(r => { if (r.earn){ bet = Math.min(bet, 1000); toast(`${fmt(r.earn)} € Lohn liegen auf deiner Bank. Heb sie ab, um zu spielen.`); } }).catch(e => toast(e.message));
+    return false;
+  }
   const now = Date.now();
   return withPlayer(d => { WHY = 'Tellerwäscher-Schicht';
     if (!brokeDoc(d)) { if (d.shift){ d.shift = null; return true; } return false; }
@@ -6440,7 +6692,7 @@ function dishCollect(){
 function checkAbortedShift(){
   if (!P?.shift || DISH.phase === 'run') return;
   if (brokeDoc(P)){ finishRevive(DISH_MIN); toast(`Deine letzte Schicht wurde abgebrochen. Mindestlohn: ${fmt(DISH_MIN)} € auf deine Bank`); }
-  else withPlayer(d => { d.shift = null; return true; });
+  else if (!KASSE_ON) withPlayer(d => { d.shift = null; return true; });
 }
 
 
@@ -6759,9 +7011,7 @@ function flipsChanged(before){
     if (f.st === 'done' && (f.a === uid || f.b === uid)){
       const won = f.winner === uid;
       if (KASSE_ON){   // the server pays the pot; here only statistics and the achievement
-        if (won && f.stake > 0 && !f.paidW) flipPay(id);
-        withPlayer(d => { const k = id + ':book'; if (d.fdone?.includes(k)) return false; d.fdone = [...(d.fdone || []), k].slice(-200);
-          if (won) grant(d, 'flip'); if (f.stake > 0) record(d, 'coinflip', f.stake, won ? f.stake * 2 : 0); return true; }, 'Coin Flip');
+        if ((won && f.stake > 0 && !f.paidW) || (f.srv && !f['rec_' + uid])) flipPay(id);
       }
       else if (f.stake > 0) withPlayer(d => { const k = id + ':book'; if (d.fdone?.includes(k)) return false; d.fdone = [...(d.fdone || []), k].slice(-200);
         if (won){ d.balance += f.stake * 2; grant(d, 'flip'); } record(d, 'coinflip', f.stake, won ? f.stake * 2 : 0); return true; }, 'Coin Flip');
@@ -6916,7 +7166,7 @@ function renderHome(){
     ${SRV.notice?.text ? `<div class="sitenote" role="status">📢 ${esc(SRV.notice.text)}</div>` : ''}
     <section class="hero">
       <div><p class="eyebrow">${greet}, ${esc(P?.name || '')}</p><h1>Legat <span>Casino</span></h1></div>
-      <div class="wallet"><div><small>Legats</small><b class="num">${fmt(P ? P.balance - hold : 0)} ℒ</b></div><div><small>Bank</small><b class="num">${fmt(P?.euro || 0)} €</b></div></div>
+      <div class="wallet"><div><small>Legats</small><b class="num">${fmt(P ? P.balance - hold - slotQNet() : 0)} ℒ</b></div><div><small>Bank</small><b class="num">${fmt(P?.euro || 0)} €</b></div></div>
     </section>
     ${isBroke() ? reviveBox() : needBank() ? bankBox() : ''}
     <button class="wheelbanner${W.ready ? '' : ' done'}" data-act="openwheel">
@@ -7040,13 +7290,13 @@ setInterval(() => { if (!uid) return; settleBets(); if (tab==='table' && (game==
 const RES = { win:'Gewonnen', bj:'Blackjack!', lose:'Verloren', push:'Unentschieden', surr:'Aufgegeben' };
 function renderTop(){
   const b = $('pbal');
-  const shown = P ? P.balance - hold : null;
+  const shown = P ? P.balance - hold - slotQNet() : null;
   if (P && lastBal !== null && shown !== lastBal){
     b.classList.remove('up','down'); void b.offsetWidth; b.classList.add(shown > lastBal ? 'up' : 'down');
     setTimeout(()=>b.classList.remove('up','down'), 1200);
   }
   lastBal = shown;
-  if (P) tweenBalance(P.balance - hold); else { b.textContent = '–'; BAL.shown = null; }
+  if (P) tweenBalance(P.balance - hold - slotQNet()); else { b.textContent = '–'; BAL.shown = null; }
   renderIsland();
   $('ver').textContent = `Legat Casino · Version ${APP_VERSION}`;
   { const h = P ? `${avH(P.avatar)} ${esc(P.name)}` : 'Konto'; if ($('pname').innerHTML !== h) $('pname').innerHTML = h; }
@@ -7124,7 +7374,7 @@ function renderTableView(){
   const seatHTML = ids.map(u => {
     const s = seats[u] || {}, me = u===uid, turn = T.phase==='playing' && T.turn?.u===u;
     let sub = '';
-    if (T.phase==='betting') sub = s.ready && s.round===T.round ? `Setzt <span class="num">${fmt(s.bet)}</span>` : 'Überlegt …';
+    if (T.phase==='betting') sub = escOf(u, T.round) ? `Setzt <span class="num">${fmt(escOf(u, T.round))}</span>` : 'Überlegt …';
     else if (T.phase==='insurance' && T.hands?.[u]) sub = T.insDone?.[u] ? (T.ins?.[u] ? 'Versichert' : 'Keine Versicherung') : 'Überlegt …';
     else if (!T.hands?.[u]) sub = 'Wartet auf die nächste Runde';
     const t = turn ? `<span class="timer">noch <span data-until="${T.turn.until}"></span> s</span>` : '';
@@ -7138,7 +7388,7 @@ function renderTableView(){
   if (isBroke()) controls = reviveBox();
   else if (T.phase==='betting'){
     const mySeat = seats[uid];
-    const ready = mySeat?.ready && mySeat.round===T.round;
+    const ready = !!escOf(uid, T.round);
     const max = Math.min(MAX_BET, P?.balance||0);
     if (lim?.hit) controls = `<div class="note">${lim.hit==='win'?'Dein Gewinnziel ist erreicht':'Dein Stop-Loss ist erreicht'} (${sgn(lim.profit)} ℒ). Im Konto kannst du eine neue Session starten oder das Limit ändern.</div>`;
     else if (P.balance < tableMin()) controls = `<div class="note">An diesem Tisch ist der Mindesteinsatz ${fmt(tableMin())} Legats. Du hast nur ${fmt(P.balance)}.${P.euro > 0 ? ` Auf der Bank liegen ${fmt(P.euro)} €. <button class="btn sm gold" data-tab="bank" style="margin-left:6px">Zur Bank</button>` : ''}</div>`;
@@ -7162,7 +7412,7 @@ function renderTableView(){
       ${canSurr ? `<button class="btn" data-act="surrender" ${dis}>Aufgeben</button>` : ''}</div>`;
   } else if (T.phase==='done' && T.history?.[T.round]?.[uid]){
     const r = T.history[T.round][uid], net = r.pay - r.bet, mySeat = seats[uid];
-    const pre = mySeat?.ready && mySeat.round === T.round + 1, again = ls.get('lastBet', bet), max = Math.min(MAX_BET, P?.balance||0);
+    const pre = !!escOf(uid, T.round + 1), again = ls.get('lastBet', bet), max = Math.min(MAX_BET, P?.balance||0);
     const next = lim?.hit || isBroke() ? '' : pre
       ? `<p class="muted small">Nächste Runde: <b class="num">${fmt(mySeat.bet)} ℒ</b> gesetzt</p><button class="btn sm" data-act="unbet">Zurückziehen</button>`
       : preChoose === T.round ? chipControls(max)
@@ -7310,6 +7560,8 @@ async function srvCall(name, data = {}){
   return (await SRV.fn.m.httpsCallable(SRV.fn.f, name)(data)).data;
 }
 /* ---------- 2.0: Server-Kasse. The server draws, books and saves; the app only shows it ---------- */
+/* 2.3: these fields of the player document only the Server-Kasse changes (the same list is in the Firebase rules) */
+const LOCKED_F = ['balance', 'euro', 'log', 'stats', 'lowMark', 'week', 'tasks', 'streaks', 'owned', 'hist', 'crash', 'brokeAt', 'shift', 'owed', 'owedDay', 'games', 'crates', 'bjOpen', 'bank', 'auc', 'ach', 'xp', 'wch', 'tips', 'tipWon', 'revives', 'kst', 'items', 'giftedTotal', 'db', 'd0', 'daily', 'bets', 'ref', 'ban', 'ledger', 'mines', 'hilo', 'hrace'];
 const KASSE_ON = true;   // false = everything is played on the device again, as in 1.7 (the way back)
 /** wake the Server-Kasse early (after login and when coming back), so the first crate or spin doesn't wait for a cold start. No database involved */
 function srvWarm(){
@@ -7326,17 +7578,22 @@ async function saveIdle(ms = 10000){
   }
 }
 /** one booking on the server. Returns what the game shows; balance, account book … are taken over from the server */
-async function kasse(a, p = {}){
+/** server calls wait for each other (zinsen, gifts and a game can happen at the same moment) */
+function kasse(a, p = {}){
+  const run = () => kasseRun(a, p), pr = (SRV.queue || Promise.resolve()).then(run, run);
+  SRV.queue = pr.catch(() => {});
+  return pr;
+}
+async function kasseRun(a, p = {}){
   if (!P || P.ban) throw new Error('Nicht angemeldet.');
-  if (SRV.busy) throw new Error('Einen Moment …');
   await saveIdle();
   SRV.busy = true;
   try {
     const r = await srvCall('kasse', { a, ...p, rev: P.rev || 0 });
     applySrv(r.doc);
-    if (r.settled){ const x = r.settled; withPlayer(d => { record(d, 'crash', x.bet, x.pay); if (x.out >= 10) grant(d, 'crash10'); return true; }, 'Crash'); }
+    if (r.prog) srvProg(r.prog);
+    if (r.owed){ const tx = `${fmt(r.owed)} ℒ aus dem alten Tageslimit gutgeschrieben${P.owed ? `, noch ${fmt(P.owed)} ℒ ausstehend` : ''}.`; setTimeout(() => toast(tx), 1500); }
     if (r.auc){ const x = r.auc, n = KITEM[x.k]?.n || 'Item';
-      if (x.sold) withPlayer(d => { grant(d, 'auktion'); return true; });
       if (!KS.aucOpen){ const tx = x.sold ? `${n} versteigert für ${fmt(x.price)} ℒ (+${fmt(x.net)} ℒ)` : `${n}: kein Gebot, das Item ist zurück`; toast('🔨 ' + tx); notify('🔨', tx, { tab: 'table', game: 'kisten' }); if (x.sold) SFX.coins(); }
       kGiftToast(); }
     return r.out;
@@ -7346,6 +7603,12 @@ async function kasse(a, p = {}){
     if (/internal|unavailable|deadline/.test(e?.code || '')) throw new Error('Die Kasse ist gerade nicht erreichbar. Prüfe deine Verbindung und versuch es nochmal.');
     throw new Error(e?.message || 'Die Kasse ist gerade nicht erreichbar.');
   } finally { SRV.busy = false; if (SAVE.dirty) queueSave(); }
+}
+/** the server reports new achievements, level-ups and free crates: show them like before */
+function srvProg(g){
+  (g.ach || []).forEach((k, i) => badgeLater(k, 400 + i * 2200));
+  (g.lvl || []).forEach((L, i) => levelLater(L, 900 + i * 2600));
+  if ((g.crates || []).length){ KS.gift.push(...g.crates); if (!KS.busy) kGiftToast(); }
 }
 function applySrv(doc){
   if (!doc || !Object.keys(doc).length) return;   // nothing in the player document changed (e.g. a safe field in Mines)
@@ -7404,6 +7667,9 @@ function renderAccount(){
     <div class="panel stack"><div class="row" style="justify-content:space-between"><h2>${avH(P.avatar)} ${esc(P.name)}</h2><button class="btn sm" data-act="logout">Abmelden</button></div>
       <p class="muted small">Angemeldet als ${esc(authUser?.email||'')} · Version ${APP_VERSION}</p><div id="acc-stats"></div></div>
     ${settingsHTML()}
+    ${KASSE_ON ? `<div class="panel stack"><h3>Dein Bonuslink</h3>
+      <p class="muted small">Wer sich über deinen Link neu im Casino anmeldet, bekommt <b>2 Messing-Kisten</b>. Du bekommst für den ersten Beitritt eine <b>Samt-Kiste</b>, für den zweiten einen <b>Tresor</b> und danach für jeden weiteren eine <b>Messing-Kiste</b>.</p>
+      <div class="row"><input readonly value="${esc(inviteLink())}" aria-label="Dein Bonuslink" style="flex:1 1 200px;min-width:0" onclick="this.select()"><button class="btn sm" data-act="copyinvite">Kopieren</button>${navigator.share ? '<button class="btn sm" data-act="shareinvite">Teilen</button>' : ''}</div></div>` : ''}
     ${adminServerHTML()}
     <div class="panel stack"><h3>Verlauf</h3>${chartHTML(P.hist)}${hist ? `<div class="hist">${hist}</div>` : ''}</div>
     ${Object.keys(P.games||{}).length ? `<div class="panel stack"><h3>Andere Spiele</h3><div class="statgrid">${Object.entries(P.games).map(([k,g]) => `<div class="stat"><small>${GAME_NAMES[k]||k}</small><b style="color:${g.net>=0?'var(--win)':'var(--lose)'}">${sgn(g.net)}</b><span class="muted small"> · ${g.n}×</span></div>`).join('')}</div></div>` : ''}
@@ -7513,7 +7779,25 @@ function profileHTML(id){
     : !me ? `<button class="btn gold" data-act="befriend" data-id="${esc(id)}">Als Freund hinzufügen</button>` : ''}
   </div>`;
 }
+function fairHTMLK(head){
+  const F = T?.fair, Pv = T?.fairPrev;
+  if (!F) return `<div class="stack">${head}<p class="muted">Ab dem nächsten Mischen gibt es hier den Prüfwert.</p></div>`;
+  let prev = '';
+  if (Pv?.orig){
+    const ok = sha256(Pv.orig) === Pv.hash, dealt = Pv.orig.match(/../g) || [];
+    const ranks = 'A23456789TJQK'.split(''), cnt = Object.fromEntries(ranks.map(r => [r, 0])); dealt.forEach(c => cnt[c[0]]++);
+    prev = `<div class="note ${ok ? '' : 'bad'}"><b>${ok ? `✓ Mischung Nr. ${Pv.n} geprüft: Die Reihenfolge passt genau zum vorher gezeigten Fingerabdruck` : `✗ Mischung Nr. ${Pv.n} passt nicht zum Fingerabdruck`}</b></div>
+      <div class="bars">${ranks.map(r => `<div style="height:${(cnt[r] / Math.max(1, ...Object.values(cnt)) * 100).toFixed(1)}%" title="${r === 'T' ? '10' : r}: ${cnt[r]}"></div>`).join('')}</div>
+      <div class="barlbl">${ranks.map(r => `<span>${r === 'T' ? '10' : r}</span>`).join('')}</div>`;
+  }
+  return `<div class="stack">${head}
+    <p class="muted">Der Server mischt alle 312 Karten und zeigt sofort einen Fingerabdruck (SHA-256) der Reihenfolge. Die Karten kommen nur in genau dieser Reihenfolge. Ist der Schlitten aufgebraucht, wird die ganze Reihenfolge veröffentlicht, und dein Browser rechnet selbst nach, dass sie zum Fingerabdruck passt. Vorher kennt niemand die nächsten Karten, auch kein Mitspieler.</p>
+    <div class="statgrid"><div class="stat"><small>Mischung Nr.</small><b>${F.n}</b></div><div class="stat"><small>Gemischt in Runde</small><b>${F.round}</b></div></div>
+    <p class="muted small">Fingerabdruck der laufenden Mischung: <span class="num" style="word-break:break-all">${F.hash}</span></p>
+    ${prev ? `<h3>Letzte Mischung</h3>${prev}` : '<p class="muted small">Die erste Prüfung gibt es, sobald dieser Schlitten aufgebraucht ist.</p>'}</div>`;
+}
 function fairHTML(){
+  if (KASSE_ON) return fairHTMLK(`<div class="row" style="justify-content:space-between"><h2>Fairness</h2><button class="btn sm" data-act="closemodal">Schließen</button></div>`);
   const head = `<div class="row" style="justify-content:space-between"><h2>Fairness</h2><button class="btn sm" data-act="closemodal">Schließen</button></div>`;
   if (!T?.fair) return `<div class="stack">${head}<p class="muted">Ab dem nächsten Mischen gibt es hier den Prüfwert.</p></div>`;
   const F = T.fair, hashOk = sha256(F.orig) === F.hash;
@@ -7662,8 +7946,8 @@ document.addEventListener('click', async e => {
       i.value = q===1 ? base : Math.floor(base*q/50)*50; bankInfo(); break; }
     case 'deposit': if (bankMove('deposit', +$('bdep').value)){ $('bdep').value=''; lastBankHTML=''; } document.activeElement?.blur(); renderAll(); break;
     case 'withdraw': if (bankMove('withdraw', +$('bwd').value)){ $('bwd').value=''; lastBankHTML=''; } document.activeElement?.blur(); renderAll(); break;
-    case 'copyinvite': copy(inviteLink(), 'Einladungslink'); break;
-    case 'shareinvite': navigator.share({ title:'Legat Casino', text:`Spiel mit mir Blackjack im Legat Casino! Mit meinem Link bekommst du ${fmt(REF_BONUS)} Legats extra.`, url: inviteLink() }).catch(()=>{}); break;
+    case 'copyinvite': copy(inviteLink(), 'Bonuslink'); break;
+    case 'shareinvite': navigator.share({ title:'Legat Casino', text: KASSE_ON ? 'Spiel mit mir im Legat Casino! Mit meinem Link bekommst du 2 Messing-Kisten geschenkt.' : `Spiel mit mir Blackjack im Legat Casino! Mit meinem Link bekommst du ${fmt(REF_BONUS)} Legats extra.`, url: inviteLink() }).catch(()=>{}); break;
     case 'chip': bet = Math.min(MAX_BET, P.balance, bet + +b.dataset.v); SFX.chip(); renderAll(); break;
     case 'betclear': bet = 0; renderAll(); break;
     case 'betmax': bet = Math.max(0, Math.min(MAX_BET, Math.floor(P.balance/50)*50)); SFX.chip(); renderAll(); break;
@@ -7737,6 +8021,12 @@ document.addEventListener('click', async e => {
         if (shopConfirm !== key){ shopConfirm = key; renderAll(); return; }
       }
       shopConfirm = null;
+      if (KASSE_ON){   // buying goes through the Server-Kasse, wearing it is up to the phone
+        const wear = () => withPlayer(d => { if (kind==='av') d.avatar = id; else d.sel = { ...d.sel, [kind]: id }; return true; });
+        if (owned){ wear(); break; }
+        kasse('shopbuy', { key }).then(() => { wear(); SFX.coins(); toast('Gekauft und ausgewählt'); }).catch(e => toast(e.message));
+        break;
+      }
       const ok = withPlayer(d => { WHY = 'Shop';
         if (!owned){ if (d.euro < price || d.owned.includes(key)) return false; d.euro -= price; d.owned = [...d.owned, key]; }
         if (kind==='av') d.avatar = id; else d.sel = { ...d.sel, [kind]: id };
