@@ -2777,9 +2777,12 @@ function animateCards(root){
 /* =====================================================================
    v1.1 – Casino home, Glücksrad, Roulette, Automat, Pferderennen, Sportwetten
    ===================================================================== */
-const APP_VERSION = '2.2.1';
+const APP_VERSION = '2.2.2';
 const CL_TITLES = { '1.5.12': 'Technische Verbesserungen' };
 const CHANGELOGS = {
+  '2.2.2': [
+    'Crash: Die Explosion erscheint jetzt schneller. Die Rakete fliegt bei dir nach der Explosion nur noch etwa halb so lang weiter, die Anzeige springt also weniger stark zurück. Sofort beim Start explodiert sie jetzt in 4 statt 5 von 100 Runden',
+  ],
   '2.2.1': [
     'Crash: Gehst du raus, während dein Einsatz noch gesetzt wird oder deine Runde noch läuft, sagt dir die App das jetzt. Hast du Crash schon verlassen, bevor der Einsatz losgeschickt wurde, wird er nicht mehr gesetzt. Nach jedem Einsatz siehst du kurz, wie viel gesetzt wurde',
     'Crash: Tippst du auf Auszahlen, während die Rakete bei dir noch fliegt, zählt das jetzt auch, wenn sie in Wahrheit gerade schon explodiert war. Du bekommst dann den Explosionswert statt „Zu spät“. Dafür explodiert die Rakete etwas öfter direkt beim Start',
@@ -5298,7 +5301,7 @@ function crashTick(){
   if (!watching && !mine && ISL.mode !== 'crash') return;
   const t = NOW(), r = CR.cur, since = Date.now() - CR.at;
   const go = !r || since > 30000 || t >= r.end || (t >= r.start && t < r.start + 50 && since > 2000)
-    || (t >= r.fly && r.boom === Infinity && since > 300);
+    || (t >= r.fly && r.boom === Infinity && since > 150);   // 2.2.2: twice as often while flying, so the explosion shows sooner
   if (go) crashFetch();
 }
 function crashBetK(){
