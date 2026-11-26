@@ -2777,9 +2777,14 @@ function animateCards(root){
 /* =====================================================================
    v1.1 – Casino home, Glücksrad, Roulette, Automat, Pferderennen, Sportwetten
    ===================================================================== */
-const APP_VERSION = '2.1';
+const APP_VERSION = '2.2';
 const CL_TITLES = { '1.5.12': 'Technische Verbesserungen' };
 const CHANGELOGS = {
+  '2.2': [
+    'Roulette: Die Kugel rollt jetzt richtig. Sie läuft außen gegen den Kessel, fällt, springt über ein paar Fächer und bleibt irgendwo im Kessel liegen, nicht mehr immer oben. Welche Zahl es wird, siehst du erst, wenn sie liegen bleibt',
+    'Crash: Beim Auszahlen zählt jetzt der Moment, in dem du tippst, nicht wann die Nachricht beim Server ankommt. Der Knopf zeigt sofort, bei welchem Multiplikator du ausgezahlt hast, und wartet nicht mehr auf andere Vorgänge. Tippst du kurz vor der Explosion, zählt das auch bei langsamem Netz',
+    'Roulette: Einmal am Tag eine Runde ohne 50.000-Limit. Setz einfach mehr als 50.000 ℒ, dafür gibt es größere Chips bis 1 Mio. Danach gilt bis morgen wieder das normale Limit',
+  ],
   '2.1': [
     'Alles, worum es Legats, Euro oder Fortschritt geht, läuft jetzt über die Server-Kasse. Das Handy kann deinen Kontostand, deine Kisten, Items, XP und Erfolge nicht mehr selbst ändern. Schummeln über die Konsole bringt nichts mehr',
     'Fortschritt auf dem Server: XP, Level-Belohnungen, Tagesaufgaben, Wochen-Herausforderungen, Erfolge und Gratis-Kisten bucht der Server',
@@ -3127,7 +3132,11 @@ async function spinWheel(){
 /* ---------- Roulette ---------- */
 const RED = new Set([1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]);
 const WHEEL_ORDER = [0,32,15,19,4,21,2,25,17,34,6,27,13,36,11,30,8,23,10,5,24,16,33,1,20,14,31,9,22,18,29,7,28,12,35,3,26];
-const R = { chip: 100, bets: {}, last: null, hist: ls.get('rhist', []), rot: 0, busy: false, res: null };
+const R = { chip: 100, bets: {}, last: null, hist: ls.get('rhist', []), rot: 0, ballA: ls.get('rballa', 0), ballR: 104, busy: false, res: null };
+/* 2.2: once a day one round without the 50.000 limit (the server checks it) */
+const rMaxOk = () => KASSE_ON && !!P && P.rmax !== dayId();
+const rCap = () => P ? Math.min(rMaxOk() ? Infinity : MAX_BET, P.balance) : 0;
+const R_BIG = [[10000, '10K'], [50000, '50K'], [100000, '100K'], [500000, '500K'], [1000000, '1 Mio']];
 const numCol = n => n===0 ? 'green' : RED.has(n) ? 'red' : 'black';
 function rWins(key, n){
   if (key[0]==='n') return +key.slice(1)===n ? 36 : 0;
@@ -3158,7 +3167,7 @@ function rouletteWheel(){
       <circle cx="150" cy="150" r="${r*0.62}" fill="#5a3a22" stroke="#d1ad62" stroke-width="2"/>
       ${[0,45,90,135].map(a => `<rect x="146" y="${150-r*0.55}" width="8" height="${r*1.1}" rx="4" fill="#d1ad62" transform="rotate(${a} 150 150)"/>`).join('')}
       <circle cx="150" cy="150" r="14" fill="#d1ad62"/></g>
-    <circle id="rball" cx="150" cy="${150 - r*0.74}" r="6" fill="#fbf8f1" stroke="#999" stroke-width=".5" style="transform-origin:150px 150px"/>
+    <circle id="rball" cx="${(150 + R.ballR * Math.sin(R.ballA * Math.PI / 180)).toFixed(2)}" cy="${(150 - R.ballR * Math.cos(R.ballA * Math.PI / 180)).toFixed(2)}" r="6" fill="#fbf8f1" stroke="#999" stroke-width=".5"/>
   </svg>`;
 }
 function rCell(key, label, cls, style){
@@ -3192,9 +3201,11 @@ function renderRoulette(force){
     <div class="rboard">${cells}</div>
     <div class="controls">
       ${chipPicker(R.chip, 'rchip', 0)}
+      ${rMaxOk() && P.balance > MAX_BET ? `<div class="chips small-chips rbig">${R_BIG.filter(([v]) => v <= P.balance).map(([v, l]) => `<button class="chip ch5k${R.chip === v ? ' on' : ''}" data-act="rchip" data-v="${v}" aria-pressed="${R.chip === v}">${l}</button>`).join('')}</div>` : ''}
+      <p class="muted small rmaxnote" style="margin:0">${total > MAX_BET ? '🔥 <b>Runde ohne Limit:</b> Einmal am Tag darfst du mehr als 50.000 ℒ setzen. Danach erst morgen wieder.' : rMaxOk() ? '🔥 Heute noch frei: <b>1 Runde ohne 50.000-Limit</b>. Setz einfach mehr als 50.000 ℒ.' : KASSE_ON ? 'Runde ohne Limit: morgen gibt es wieder eine.' : ''}</p>
       <div class="betline"><button class="btn sm" data-act="rclear" ${R.busy?'disabled':''}>Löschen</button><button class="btn sm" data-act="rdouble" ${R.busy?'disabled':''}>Verdoppeln</button><button class="btn sm" data-act="rrepeat" ${R.busy||!R.last?'disabled':''}>Wiederholen</button>
       <span class="betval">${fmt(total)}</span></div>
-      <button class="btn gold" data-act="rspin" ${R.busy||!total?'disabled':''}>${R.busy ? 'Kugel rollt …' : 'Drehen'}</button>
+      <button class="btn gold" data-act="rspin" ${R.busy||!total?'disabled':''}>${R.busy ? 'Kugel rollt …' : total > MAX_BET ? '🔥 Drehen ohne Limit' : 'Drehen'}</button>
     </div>
   </div>`;
   if (el.innerHTML !== html){ el.innerHTML = html; }
@@ -3202,33 +3213,69 @@ function renderRoulette(force){
 function rAdd(key){
   if (R.busy) return;
   const v = R.chip, total = rTotal(R.bets);
-  if (total + v > Math.min(MAX_BET, P.balance)) return toast(total + v > MAX_BET ? 'Höchsteinsatz pro Dreh: 50.000 Legats.' : 'Nicht genug Legats.');
+  if (total + v > rCap()) return toast(total + v > MAX_BET && !rMaxOk() ? `Höchsteinsatz pro Dreh: 50.000 Legats.${KASSE_ON ? ' Deine Runde ohne Limit gibt es morgen wieder.' : ''}` : 'Nicht genug Legats.');
   R.bets = { ...R.bets, [key]: (R.bets[key]||0) + v }; SFX.chip(); renderAll();
 }
 async function rSpin(){
   if (R.busy) return; const total = rTotal(R.bets);
-  const err = betError(total); if (err) return toast(err);
+  const over = KASSE_ON && total > MAX_BET && rMaxOk();
+  const err = betError(total, 50, over ? Infinity : MAX_BET); if (err) return toast(err);
   let n, pay = 0;
   if (KASSE_ON){
     R.busy = true; renderAll();
-    try { ({ n, pay } = await kasse('roulette', { bets: R.bets })); } catch (e){ R.busy = false; renderAll(); return toast(e.message); }
-    hold = pay; const bets = R.bets;
+    try { ({ n, pay } = await kasse('roulette', { bets: R.bets, max: over })); } catch (e){ R.busy = false; renderAll(); return toast(e.message); }
+    hold = pay;
   } else {
     n = rnd(37);
     for (const [k,v] of Object.entries(R.bets)) pay += v * rWins(k, n);
     if (!playInstant('roulette', total, pay, d => { if (R.bets['n'+n]) grant(d,'r_num'); })) return;
   }
   R.last = { ...R.bets }; R.busy = true; R.res = null; renderRoulette(true);
-  const idx = WHEEL_ORDER.indexOf(n), seg = 360/37;
-  R.rot += 360*5 + ((360 - idx*seg) - (R.rot % 360) + 360) % 360;
-  const g = $('rwheelg'), ball = $('rball');
-  if (g){ g.style.transition = 'transform 5s cubic-bezier(.15,.7,.2,1)'; g.style.transform = `rotate(${R.rot}deg)`; }
-  if (ball && !reduceMotion) ball.animate([{ transform:'rotate(0deg)' }, { transform:'rotate(-1440deg)' }], { duration:5000, easing:'cubic-bezier(.2,.6,.3,1)' });
-  for (let k=0;k<30;k++) setTimeout(() => noise(.02, { vol:.12, freq:5000 }), 5000 * Math.pow(k/30, 0.6));
-  await secs(5100);
+  await rAnimate(n);
   R.busy = false; R.res = { n, net: pay - total }; R.hist = [n, ...R.hist].slice(0, 14); ls.set('rhist', R.hist); R.bets = {};
   release(); if (pay > total) SFX.win(); else if (pay < total) SFX.lose(); else SFX.push();
   if (game === 'roulette' && tab === 'table') bigWin(pay - total, pay / total, '🎯');
+}
+/** the wheel and the ball (angles in degrees, 0 = top, clockwise) */
+const R_T = 7600, R_DROP = .5, R_SET = .8, R_OUT = 143, R_IN = 104;
+function rAnimate(n){
+  const seg = 360 / 37, idx = WHEEL_ORDER.indexOf(n), mod = x => ((x % 360) + 360) % 360;
+  // where the winning pocket stops: anywhere around the wheel, so it stays open until the ball rests
+  const end = rnd(360), rot0 = R.rot, rotEnd = rot0 + 360 * 3 + mod(end - idx * seg - rot0);
+  const W = u => rot0 + (rotEnd - rot0) * (1 - Math.pow(1 - u, 3));          // wheel: slows down to a stop
+  const L = u => W(u) + idx * seg;                                            // the winning pocket
+  const lock = L(R_SET), K = 360 * 6 + mod(R.ballA - lock);                   // the ball starts where it lay and runs the other way
+  const hops = [1.6, -1.1, .6, -.25].map(x => x * seg);                       // it jumps over a few pockets before it stays
+  const ballAt = u => {
+    if (u >= R_SET) return [L(u), R_IN];
+    const free = lock + K * Math.pow(1 - u / R_SET, 2.2);
+    if (u < R_DROP) return [free, R_OUT];
+    const v = (u - R_DROP) / (R_SET - R_DROP), h = Math.min(3, Math.floor(v * 4)), f = v * 4 - h;
+    const jump = hops[h] * (1 - f) + (hops[h + 1] ?? 0) * f;
+    const r = R_IN + (R_OUT - R_IN) * Math.pow(1 - v, 2) * Math.abs(Math.cos(v * Math.PI * 3.5));
+    return [free + jump * Math.min(1, v * 6) * (1 - v), r];
+  };
+  const g = $('rwheelg'), ball = $('rball');
+  const place = u => {
+    const [a, r] = ballAt(u);
+    if (g){ g.style.transition = 'none'; g.style.transform = `rotate(${W(u)}deg)`; }
+    if (ball){ ball.setAttribute('cx', (150 + r * Math.sin(a * Math.PI / 180)).toFixed(2)); ball.setAttribute('cy', (150 - r * Math.cos(a * Math.PI / 180)).toFixed(2)); }
+    return [a, r];
+  };
+  const finish = () => { R.rot = rotEnd % 360; const [a] = ballAt(1); R.ballA = mod(a); R.ballR = R_IN; ls.set('rballa', R.ballA); };
+  if (reduceMotion || !g || !ball){ place(1); finish(); return secs(reduceMotion ? 1200 : 0); }
+  // sound: the ball rolling (slower and slower), then the clacks when it hits the pockets
+  for (let k = 0; k < 26; k++) setTimeout(() => noise(.02, { vol: .1, freq: 5000 }), R_T * R_DROP * Math.pow(k / 26, .7));
+  [.143, .429, .714, .93].forEach(v => setTimeout(() => noise(.035, { vol: .22, freq: 2600 }), R_T * (R_DROP + v * (R_SET - R_DROP))));
+  setTimeout(() => noise(.05, { vol: .28, freq: 1800 }), R_T * R_SET);
+  return new Promise(res => {
+    const t0 = performance.now();
+    const step = now => {
+      const u = Math.min(1, (now - t0) / R_T); place(u);
+      if (u < 1 && $('rball') === ball) requestAnimationFrame(step); else { finish(); setTimeout(res, 250); }
+    };
+    requestAnimationFrame(step);
+  });
 }
 
 /* ---------- Automat ---------- */
@@ -5014,7 +5061,7 @@ function renderCrash(){
   if (P?.crash && P.crash.out == null) crashSettle();
   const mine = P?.crash && s.r && P.crash.r === s.r.id ? P.crash : null;
   const ps = crashPlayers(s);
-  const key = [s.phase, s.r?.id, mine ? mine.out : '-', CR.bet, CR.auto, CR.busy, ps.map(([id, c]) => id + c.out).join(), P ? P.balance - hold : 0].join('|');
+  const key = [s.phase, s.r?.id, mine ? mine.out : '-', CR.bet, CR.auto, CR.busy, CR.cashing?.at, ps.map(([id, c]) => id + c.out).join(), P ? P.balance - hold : 0].join('|');
   if (el.innerHTML && key === CR.key) return crashFrame(s);
   CR.key = key;
   const hist = crashHistory(14).map(r => `<span class="crh ${r.cp < 2 ? 'lo' : r.cp >= 10 ? 'hi' : 'mid'}">${crFmt(r.cp)}</span>`).join('');
@@ -5022,6 +5069,7 @@ function renderCrash(){
   if (s.phase === 'bet' && CR.busy && !mine) btn = `<button class="btn gold spinbtn" disabled>Wird gesetzt …</button>`;
   else if (s.phase === 'bet') btn = mine ? `<button class="btn gold spinbtn" disabled>Gesetzt: ${fmt(mine.bet)} ℒ${mine.auto ? ` · Auto bei ${crFmt(mine.auto)}` : ''}</button>`
     : `<button class="btn gold spinbtn" data-act="crgo">Setzen · ${fmt(CR.bet)} ℒ</button>`;
+  else if (mine && mine.out == null && CR.cashing?.r === mine.r) btn = `<button class="btn spinbtn" disabled>Ausgezahlt bei ${crFmt(CR.cashing.m)} · +${fmt(CR.cashing.pay)} ℒ</button>`;
   else if (s.phase === 'fly' && mine && mine.out == null) btn = `<button class="btn gold spinbtn crcash" data-act="crcash" id="crbtn">Auszahlen</button>`;
   else if (mine && mine.out > 0) btn = `<button class="btn spinbtn" disabled>Ausgezahlt bei ${crFmt(mine.out)} · +${fmt(mine.pay)} ℒ</button>`;
   else btn = `<button class="btn spinbtn" disabled id="crbtn">${s.phase === 'idle' ? 'Kurze Pause bis zur vollen Stunde' : 'Nächste Runde gleich'}</button>`;
@@ -5063,7 +5111,7 @@ function crashFrame(s = crashAt()){
   rk.style.transform = `translate(-50%,-50%) rotate(${s.phase === 'boom' ? 0 : Math.max(-45, Math.min(45, 45 + Math.atan2(y - y0, x - x0) * 180 / Math.PI))}deg)`;
   mult.textContent = crFmt(s.m);
   const mine = P?.crash && P.crash.r === s.r.id ? P.crash : null;
-  sub.textContent = s.phase === 'boom' ? 'Explodiert!' : mine && mine.out == null ? `Auszahlen: ${fmt(Math.floor(mine.bet * s.m))} ℒ` : 'fliegt …';
+  sub.textContent = s.phase === 'boom' ? 'Explodiert!' : mine && mine.out == null && !CR.cashing ? `Auszahlen: ${fmt(Math.floor(mine.bet * s.m))} ℒ` : 'fliegt …';
   const b = $('crbtn'); if (b && b.dataset.act === 'crcash') b.textContent = `Auszahlen · ${fmt(Math.floor(mine.bet * s.m))} ℒ`;
   if (s.phase === 'fly' && Math.floor(s.m) > CR.beep){ CR.beep = Math.floor(s.m); tone(500 + Math.min(CR.beep, 20) * 45, .06, { type: 'triangle', vol: .05 }); }
   if (s.phase === 'boom' && CR.boom !== s.r.id){ CR.boom = s.r.id; SFX.bust(); }
@@ -5246,7 +5294,7 @@ function crashTick(){
   if (!watching && !mine && ISL.mode !== 'crash') return;
   const t = NOW(), r = CR.cur, since = Date.now() - CR.at;
   const go = !r || since > 30000 || t >= r.end || (t >= r.start && t < r.start + 50 && since > 2000)
-    || (t >= r.fly && r.boom === Infinity && since > 800);
+    || (t >= r.fly && r.boom === Infinity && since > 300);
   if (go) crashFetch();
 }
 function crashBetK(){
@@ -5259,11 +5307,18 @@ function crashBetK(){
   kasse('crbet', { r: s.r.id, bet: stake, auto }).then(() => { savePref('crashbet', stake); SFX.chip(); })
     .catch(e => toast(e.message)).finally(() => { CR.busy = false; CR.key = ''; renderAll(); });
 }
+/* 2.2: the tap counts. The time of the tap goes to the server at once (no waiting for other calls or saves),
+   the button shows the result right away, the server confirms it */
 function crashCashK(){
-  const c = P?.crash; if (!c || c.out != null || CR.busy) return;
-  CR.busy = true; const b = $('crbtn'); if (b) b.disabled = true;
-  kasse('crcash', { r: c.r }).then(o => { if (game === 'crash' && tab === 'table'){ SFX.win(); bigWin(o.pay - c.bet, o.out, '🚀'); } })
-    .catch(e => toast(e.message)).finally(() => { CR.busy = false; CR.key = ''; renderAll(); });
+  const c = P?.crash; if (!c || c.out != null || CR.cashing) return;
+  const at = NOW(), s = crashAt(at); if (s.phase !== 'fly' || s.r?.id !== c.r) return;
+  let m = s.m; if (c.auto && c.auto <= m) m = c.auto;
+  CR.cashing = { r: c.r, at, m, pay: Math.floor(c.bet * m) }; CR.key = ''; SFX.chip(); renderAll();
+  kasseNow('crcash', { r: c.r, at })
+    .then(o => { CR.cashing = null;
+      if (P?.crash?.r === c.r && P.crash.out == null) P = { ...P, crash: { ...P.crash, out: o.out, pay: o.pay } };   // until the live update brings the booking
+      if (game === 'crash' && tab === 'table'){ SFX.win(); bigWin(o.pay - c.bet, o.out, '🚀'); } })
+    .catch(e => { CR.cashing = null; toast(e.message); }).finally(() => { CR.key = ''; renderAll(); });
 }
 /** the server decides a waiting bet (crashed, or auto cash-out reached); asked once the app sees it is due */
 function crashSettleK(){
@@ -6296,6 +6351,7 @@ const TUTS = {
     [tvis('<span class="tutemo">🎡</span>'), 'Setzen', 'Wähl einen Chip und tipp auf Zahlen oder Felder. Du kannst beliebig viele Einsätze verteilen, dann drehen.'],
     [tvis(tbox('Zahl 35:1'), tbox('Dutzend 2:1'), tbox('Rot 1:1')), 'Auszahlungen', 'Eine einzelne Zahl zahlt 35:1, Dutzend und Kolonne 2:1, Rot/Schwarz, Gerade/Ungerade und 1-18/19-36 zahlen 1:1.'],
     [tvis(tbox('0', ' green')), 'Die Null', 'Kommt die grüne 0, verlieren alle Einsätze außer einem direkten Tipp auf die 0. Mit „Wiederholen“ und „Verdoppeln“ geht’s schnell weiter.'],
+    [tvis('<span class="tutemo">🔥</span>'), 'Runde ohne Limit', 'Normal sind höchstens 50.000 ℒ pro Dreh erlaubt. Einmal am Tag darfst du eine Runde ohne diese Grenze spielen: Setz einfach mehr als 50.000 ℒ. Dafür gibt es dann auch größere Chips.'],
   ]},
   slots: { t: 'Automat', steps: [
     [tvis('<div class="minislots"><span>7️⃣</span><span>7️⃣</span><span>7️⃣</span></div>'), 'Die Mittellinie', 'Nur die <b>rote Mittellinie</b> zählt. Drei gleiche Symbole gewinnen, 7-7-7 zahlt ×500. Kirschen zählen von links.'],
@@ -7261,8 +7317,8 @@ document.addEventListener('click', e => {
     case 'rchip': R.chip = v; renderAll(); break;
     case 'rbet': rAdd(b.dataset.k); break;
     case 'rclear': R.bets = {}; renderAll(); break;
-    case 'rdouble': { const t = rTotal(R.bets); if (t*2 > Math.min(MAX_BET, P.balance)) { toast('Nicht genug Legats.'); break; } R.bets = Object.fromEntries(Object.entries(R.bets).map(([k,x]) => [k, x*2])); SFX.chip(); renderAll(); break; }
-    case 'rrepeat': if (R.last && rTotal(R.last) <= Math.min(MAX_BET, P.balance)){ R.bets = { ...R.last }; SFX.chip(); renderAll(); } else toast('Nicht genug Legats.'); break;
+    case 'rdouble': { const t = rTotal(R.bets); if (t*2 > rCap()) { toast('Nicht genug Legats.'); break; } R.bets = Object.fromEntries(Object.entries(R.bets).map(([k,x]) => [k, x*2])); SFX.chip(); renderAll(); break; }
+    case 'rrepeat': if (R.last && rTotal(R.last) <= rCap()){ R.bets = { ...R.last }; SFX.chip(); renderAll(); } else toast('Nicht genug Legats.'); break;
     case 'rspin': if (confirmBig(rTotal(R.bets), 'roulette')) rSpin(); break;
     case 'sbet': S.bet = v; savePref('slotbet', v); renderAll(); break;
     case 'sspin': if (confirmBig(S.bet, 'slots')) slotSpin(); break;
@@ -7561,7 +7617,7 @@ async function srvCall(name, data = {}){
 }
 /* ---------- 2.0: Server-Kasse. The server draws, books and saves; the app only shows it ---------- */
 /* 2.3: these fields of the player document only the Server-Kasse changes (the same list is in the Firebase rules) */
-const LOCKED_F = ['balance', 'euro', 'log', 'stats', 'lowMark', 'week', 'tasks', 'streaks', 'owned', 'hist', 'crash', 'brokeAt', 'shift', 'owed', 'owedDay', 'games', 'crates', 'bjOpen', 'bank', 'auc', 'ach', 'xp', 'wch', 'tips', 'tipWon', 'revives', 'kst', 'items', 'giftedTotal', 'db', 'd0', 'daily', 'bets', 'ref', 'ban', 'ledger', 'mines', 'hilo', 'hrace'];
+const LOCKED_F = ['balance', 'euro', 'log', 'stats', 'lowMark', 'week', 'tasks', 'streaks', 'owned', 'hist', 'crash', 'brokeAt', 'shift', 'owed', 'owedDay', 'games', 'crates', 'bjOpen', 'bank', 'auc', 'ach', 'xp', 'wch', 'tips', 'tipWon', 'revives', 'kst', 'items', 'giftedTotal', 'db', 'd0', 'daily', 'bets', 'ref', 'ban', 'ledger', 'mines', 'hilo', 'hrace', 'rmax'];
 const KASSE_ON = true;   // false = everything is played on the device again, as in 1.7 (the way back)
 /** wake the Server-Kasse early (after login and when coming back), so the first crate or spin doesn't wait for a cold start. No database involved */
 function srvWarm(){
@@ -7583,6 +7639,19 @@ function kasse(a, p = {}){
   const run = () => kasseRun(a, p), pr = (SRV.queue || Promise.resolve()).then(run, run);
   SRV.queue = pr.catch(() => {});
   return pr;
+}
+async function kasseNow(a, p = {}){
+  if (!P || P.ban) throw new Error('Nicht angemeldet.');
+  try {
+    const r = await srvCall('kasse', { a, ...p, rev: P.rev || 0 });
+    if (!SRV.busy && !SAVE.pending.size && (r.doc?.rev || 0) > (P.rev || 0)) applySrv(r.doc);   // otherwise the live update brings it
+    if (r.prog) srvProg(r.prog);
+    return r.out;
+  } catch (e){
+    console.warn(e);
+    if (/internal|unavailable|deadline/.test(e?.code || '')) throw new Error('Die Kasse ist gerade nicht erreichbar. Prüfe deine Verbindung und versuch es nochmal.');
+    throw new Error(e?.message || 'Die Kasse ist gerade nicht erreichbar.');
+  }
 }
 async function kasseRun(a, p = {}){
   if (!P || P.ban) throw new Error('Nicht angemeldet.');
