@@ -2777,9 +2777,13 @@ function animateCards(root){
 /* =====================================================================
    v1.1 – Casino home, Glücksrad, Roulette, Automat, Pferderennen, Sportwetten
    ===================================================================== */
-const APP_VERSION = '2.2';
+const APP_VERSION = '2.2.1';
 const CL_TITLES = { '1.5.12': 'Technische Verbesserungen' };
 const CHANGELOGS = {
+  '2.2.1': [
+    'Crash: Gehst du raus, während dein Einsatz noch gesetzt wird oder deine Runde noch läuft, sagt dir die App das jetzt. Hast du Crash schon verlassen, bevor der Einsatz losgeschickt wurde, wird er nicht mehr gesetzt. Nach jedem Einsatz siehst du kurz, wie viel gesetzt wurde',
+    'Crash: Tippst du auf Auszahlen, während die Rakete bei dir noch fliegt, zählt das jetzt auch, wenn sie in Wahrheit gerade schon explodiert war. Du bekommst dann den Explosionswert statt „Zu spät“. Dafür explodiert die Rakete etwas öfter direkt beim Start',
+  ],
   '2.2': [
     'Roulette: Die Kugel rollt jetzt richtig. Sie läuft außen gegen den Kessel, fällt, springt über ein paar Fächer und bleibt irgendwo im Kessel liegen, nicht mehr immer oben. Welche Zahl es wird, siehst du erst, wenn sie liegen bleibt',
     'Crash: Beim Auszahlen zählt jetzt der Moment, in dem du tippst, nicht wann die Nachricht beim Server ankommt. Der Knopf zeigt sofort, bei welchem Multiplikator du ausgezahlt hast, und wartet nicht mehr auf andere Vorgänge. Tippst du kurz vor der Explosion, zählt das auch bei langsamem Netz',
@@ -5303,9 +5307,11 @@ function crashBetK(){
   const err = betError(CR.bet); if (err) return toast(err);
   if (s.r.fly - NOW() < 400) return toast('Zu spät, die Rakete startet.');
   const stake = CR.bet, auto = CR.auto || null;
-  CR.busy = true; CR.key = ''; renderAll();
-  kasse('crbet', { r: s.r.id, bet: stake, auto }).then(() => { savePref('crashbet', stake); SFX.chip(); })
-    .catch(e => toast(e.message)).finally(() => { CR.busy = false; CR.key = ''; renderAll(); });
+  CR.busy = { bet: stake }; CR.key = ''; renderAll();
+  // 2.2.1: only sent while the player is still in Crash and the round still takes bets (it may wait behind other calls)
+  const stillOk = () => game === 'crash' && tab === 'table' && !document.hidden && NOW() < s.r.fly - 300;
+  kasse('crbet', { r: s.r.id, bet: stake, auto }, stillOk).then(() => { savePref('crashbet', stake); SFX.chip(); toast(`Crash: ${fmt(stake)} ℒ gesetzt.`); })
+    .catch(e => toast(e.skipped ? `Crash: Einsatz nicht gesetzt, du hattest das Spiel schon verlassen.` : e.message)).finally(() => { CR.busy = false; CR.key = ''; renderAll(); });
 }
 /* 2.2: the tap counts. The time of the tap goes to the server at once (no waiting for other calls or saves),
    the button shows the result right away, the server confirms it */
@@ -5644,7 +5650,15 @@ document.addEventListener('pointerdown', e => {
   const b = e.target.closest('[data-act="crcash"]'); if (!b || b.disabled || e.button > 0) return;
   e.preventDefault(); CR.pdown = Date.now(); crashCash();
 });
-setInterval(() => { if (KASSE_ON) crashTick(); if (P?.crash && P.crash.out == null) crashSettle(); }, 250);
+setInterval(() => { if (KASSE_ON) crashTick(); if (P?.crash && P.crash.out == null) crashSettle(); crashLeaveCheck(); }, 250);
+/** 2.2.1: leaving Crash while a bet is being placed or still flying: say so, so the booking later is no surprise */
+function crashLeaveCheck(){
+  const here = game === 'crash' && tab === 'table', was = CR.here; CR.here = here;
+  if (!was || here || !P) return;
+  if (CR.busy?.bet) return toast(`Dein Crash-Einsatz von ${fmt(CR.busy.bet)} ℒ wird gerade noch gesetzt. Die Runde siehst du oben in der Leiste.`);
+  const c = P.crash, r = c && c.out == null && crashRound(c.r);
+  if (r && NOW() < r.boom) toast(`Dein Crash-Einsatz von ${fmt(c.bet)} ℒ läuft noch. Die Runde siehst du oben in der Leiste.`);
+}
 setInterval(() => { if (!uid || !P) return; duelsChanged(); tpPrize(); }, 60e3);
 
 
@@ -7635,8 +7649,8 @@ async function saveIdle(ms = 10000){
 }
 /** one booking on the server. Returns what the game shows; balance, account book … are taken over from the server */
 /** server calls wait for each other (zinsen, gifts and a game can happen at the same moment) */
-function kasse(a, p = {}){
-  const run = () => kasseRun(a, p), pr = (SRV.queue || Promise.resolve()).then(run, run);
+function kasse(a, p = {}, stillOk){
+  const run = () => kasseRun(a, p, stillOk), pr = (SRV.queue || Promise.resolve()).then(run, run);
   SRV.queue = pr.catch(() => {});
   return pr;
 }
@@ -7653,9 +7667,10 @@ async function kasseNow(a, p = {}){
     throw new Error(e?.message || 'Die Kasse ist gerade nicht erreichbar.');
   }
 }
-async function kasseRun(a, p = {}){
+async function kasseRun(a, p = {}, stillOk){
   if (!P || P.ban) throw new Error('Nicht angemeldet.');
   await saveIdle();
+  if (stillOk && !stillOk()) throw Object.assign(new Error('Abgebrochen.'), { skipped: true });   // 2.2.1: e.g. a Crash bet whose player has left before it was sent
   SRV.busy = true;
   try {
     const r = await srvCall('kasse', { a, ...p, rev: P.rev || 0 });
