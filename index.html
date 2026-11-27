@@ -1464,7 +1464,9 @@ html.stkopen body{overflow:hidden}
 .pkgo{width:100%}
 .pkresult{background:rgba(121,216,162,.08);border:1px solid rgba(121,216,162,.35);border-radius:14px;padding:10px 12px;font-size:13px;line-height:1.5;margin-top:12px}
 .pkresult.lose{background:rgba(236,138,120,.08);border-color:rgba(236,138,120,.35)}
-.pkrebuy{margin-top:12px}.pkrebuy summary{cursor:pointer}
+.pkrebuy{margin-top:12px}
+.pkbots{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px;padding:10px 12px;border:1px solid var(--hair);border-radius:14px;color:var(--muted);font-size:13px}
+.pkbotn{gap:6px}.pkbotn .pill{cursor:pointer;font-size:13px;padding:6px 12px;background:none}.pkbotn .pill.on{background:var(--brass);color:#1b140a;border-color:var(--brass)}.pkrebuy summary{cursor:pointer}
 .pklog{font-size:12px;color:var(--muted);line-height:1.55;max-height:120px;overflow:auto;border-top:1px solid var(--hair);padding-top:8px;margin-top:12px}
 .pkfelt-lobby{display:flex;flex-direction:column;gap:14px;align-items:center}
 .pkfelt-lobby .arc{text-align:center;font:600 12px var(--f-body);letter-spacing:.1em;text-transform:uppercase;color:var(--brass)}
@@ -1545,6 +1547,33 @@ html.stkopen body{overflow:hidden}
 .on .t-heute>div:nth-child(2){transition-delay:.4s}.on .t-heute>div:nth-child(3){transition-delay:.8s}
 .t-heute small{display:block;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
 .t-heute b{font:600 clamp(20px,5vw,28px) var(--f-num);color:var(--brass)}
+
+/* ---------- 2.4.1: games in categories ---------- */
+.tiles2{display:flex;flex-direction:column;gap:22px}
+.gsec h4{margin:0 0 10px;font:600 12px var(--f-body);letter-spacing:.12em;text-transform:uppercase;color:var(--brass);display:flex;justify-content:space-between;align-items:baseline}
+.gsec h4 small{color:var(--muted);letter-spacing:.02em;text-transform:none;font-weight:500;display:none}
+.grow3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.grow2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.gone{display:grid}
+.grow3 .tile,.grow2 .tile{grid-column:auto;flex-direction:column}
+.grow3 .tile .art,.grow2 .tile .art{width:auto;height:120px;min-height:0;flex:none;border-right:0;border-bottom:1px solid var(--line)}
+.grow3 .tile .tinfo,.grow2 .tile .tinfo{justify-content:flex-start}
+.gone .tile{grid-column:auto}
+.slotlogo{width:132px;height:auto;filter:drop-shadow(0 8px 14px rgba(0,0,0,.45))}
+.slotlogo .sl-l{fill:#ffe9a8;animation:sllight .75s steps(1) infinite}
+@keyframes sllight{50%{fill:#6b4a12}}
+@media (prefers-reduced-motion:reduce){.slotlogo .sl-l{animation:none}}
+.tile-slots .art{background:radial-gradient(110% 120% at 50% 10%,#6b1a1e,#2a0a0c)}
+.hlar{display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:.9;font-size:22px}
+.hlar i{font-style:normal;display:block;width:1em;text-align:center}
+@media (max-width:760px){
+  .gsec h4 small{display:inline}
+  .grow3{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:12px;margin:0 -16px;padding:0 16px 6px;scroll-padding:0 16px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .grow3::-webkit-scrollbar{display:none}
+  .grow3 .tile{flex:0 0 72%;scroll-snap-align:start}
+  .grow3 .tile .art,.grow2 .tile .art{height:104px}
+  .grow2{gap:12px}
+}
 </style>
 </head>
 <body>
@@ -3040,9 +3069,14 @@ function animateCards(root){
 /* =====================================================================
    v1.1 – Casino home, Glücksrad, Roulette, Automat, Pferderennen, Sportwetten
    ===================================================================== */
-const APP_VERSION = '2.4';
+const APP_VERSION = '2.4.1';
 const CL_TITLES = { '1.5.12': 'Technische Verbesserungen', '2.4': 'Version 2.4: alles Neue seit 2.2.2' };
 const CHANGELOGS = {
+  '2.4.1': [
+    'Poker gegen Bots: In der Poker-Lobby kannst du gegen 1 bis 5 Bots spielen, ohne auf Freunde zu warten. An einen Tisch mit Freunden holst du Bots mit „Bot dazu“. Die Bots spielen mit Chips vom Casino, was du ihnen abnimmst, gehört dir',
+    'Neue Startseite: Die Spiele sind jetzt nach Kategorien sortiert. Auf dem Handy wischst du jede Reihe zur Seite',
+    'Der Automat hat ein neues Logo, und „Höher oder Tiefer“ heißt jetzt Higher Lower',
+  ],
   '2.4': [
     'Neu: Texas Hold\'em Poker mit deinen Freunden. Eröffne einen Tisch, gib den 5-stelligen Code weiter, und bis zu 6 Spieler setzen sich mit Chips von ihrem Konto hin. Der Server mischt und gibt, deine zwei Karten sieht nur dein Handy. Erhöhen geht mit − und + in 100er-Schritten oder mit dem Schieberegler, und die Regeln stehen hinter dem Knopf „Regeln“',
     'Neu: Namens-Designs im Shop, von Gold über Neon und Regenbogen bis Legat. Alle sehen deinen Namen so, am Pokertisch, in der Rangliste, im Profil und auf der Startseite',
@@ -3275,7 +3309,7 @@ const verNum = v => (v||'0').split('.').map(Number).reduce((a,x,i) => a + x * Ma
 let seenBefore = null;
 let game = null;            // null = Casino-Startseite, 'bj', 'roulette', 'slots', 'horses', 'sports'
 let hold = 0;               // Gewinn, der erst nach der Animation im Kontostand erscheint
-const GAME_NAMES = { bj:'Blackjack', roulette:'Roulette', slots:'Automat', horses:'Pferderennen', sports:'Sportwette', wheel:'Glücksrad', hilo:'Höher oder Tiefer', coinflip:'Coin Flip', crash:'Crash', mines:'Mines', tipp:'Tipprunde', duel:'Freundeswette', loono:'Loono', kisten:'Kisten', poker:'Poker' };
+const GAME_NAMES = { bj:'Blackjack', roulette:'Roulette', slots:'Automat', horses:'Pferderennen', sports:'Sportwette', wheel:'Glücksrad', hilo:'Higher Lower', coinflip:'Coin Flip', crash:'Crash', mines:'Mines', tipp:'Tipprunde', duel:'Freundeswette', loono:'Loono', kisten:'Kisten', poker:'Poker' };
 ACH.splice(ACH.length - 2, 0,
   ['r_num','🎯','Volltreffer','Beim Roulette eine einzelne Zahl getroffen'],
   ['jackpot','7️⃣','Jackpot','Am Automaten drei Siebenen gedreht'],
@@ -3283,7 +3317,7 @@ ACH.splice(ACH.length - 2, 0,
   ['sport3','⚽','Wettkönig','Eine Sportwette mit Quote 3 oder höher gewonnen'],
   ['wheel','🎡','Glückspilz','Den Hauptgewinn am Glücksrad gedreht'],
   ['dish40','🧽','Spülmeister','40 Teller in einer Tellerwäscher-Schicht'],
-  ['hilo10','🔮','Hellseher','Bei Höher oder Tiefer 10-mal in Folge richtig'],
+  ['hilo10','🔮','Hellseher','Bei Higher Lower 10-mal in Folge richtig'],
   ['flip','🪙','Kopf oder Zahl','Einen Coin Flip gegen einen Freund gewonnen'],
   ['crash10','🚀','Zum Mond','Bei Crash ab ×10 ausgezahlt'],
   ['mines','💣','Minenräumer','Bei Mines mit 5 oder mehr Minen 10 Diamanten aufgedeckt'],
@@ -4506,7 +4540,7 @@ const TASKS = [
   ['roulette_n', n => `Spiel ${n} Runden Roulette`, [5, 10]],
   ['roulette_win', n => `Gewinn ${n}-mal beim Roulette`, [3, 5]],
   ['horses_n', n => `Wette auf ${n} Pferderennen`, [3, 5]],
-  ['hilo_cash', n => `Zahl bei Höher oder Tiefer ${n}-mal mit Gewinn aus`, [2, 3]],
+  ['hilo_cash', n => `Zahl bei Higher Lower ${n}-mal mit Gewinn aus`, [2, 3]],
   ['sports_bet', n => `Platzier ${n} Sportwetten`, [2, 3]],
   ['crash_n', n => `Spiel ${n} Runden Crash`, [5, 10]],
   ['crash_2x', n => `Zahl bei Crash ${n}-mal ab ×2 aus`, [2, 3]],
@@ -6671,7 +6705,7 @@ const TUTS = {
     [tvis('<span class="tutemo">🏇</span>'), 'Sechs Pferde', 'Jedes Rennen hat sechs Pferde mit eigener Quote. Wähl eins aus und setz deinen Einsatz.'],
     [tvis(tbox('2,1 Favorit'), tbox('9,5 Außenseiter', ' gold')), 'Quoten', 'Eine kleine Quote heißt Favorit: gewinnt oft, zahlt wenig. Außenseiter gewinnen selten, zahlen aber viel. Gewinn = Einsatz × Quote.'],
   ]},
-  hilo: { t: 'Höher oder Tiefer', steps: [
+  hilo: { t: 'Higher Lower', steps: [
     [tvis(tmini('7', '♣'), '<span class="tutemo">▲▼</span>'), 'Raten', 'Eine Karte liegt offen. Rate, ob die nächste <b>höher</b> oder <b>tiefer</b> ist. Ass ist die höchste Karte.'],
     [tvis(tbox('▲ ×1,62'), tbox('▼ ×2,43')), 'Multiplikator', 'Jede richtige Antwort erhöht deinen Multiplikator. Auf den Knöpfen steht, um wie viel, je unwahrscheinlicher, desto mehr. Gleich zählt nicht, dann rätst du nochmal.'],
     [tvis(tbox('Auszahlen', ' gold')), 'Auszahlen', 'Du kannst jederzeit auszahlen. Eine falsche Antwort kostet den Einsatz. Bei ×100 wird automatisch ausgezahlt.'],
@@ -7147,7 +7181,7 @@ function renderHilo(){
   const playing = R_ && !R_.over;
   const hiF = cur ? hlFactor(cur.r, 'hi') : 0, loF = cur ? hlFactor(cur.r, 'lo') : 0;
   const pct = (r, d) => Math.round(hlP(r, d) * 100);
-  const html = `${backBar('Höher oder Tiefer', '<span class="muted small">Gleich zählt nicht · Ass ist hoch</span>')}
+  const html = `${backBar('Higher Lower', '<span class="muted small">Gleich zählt nicht · Ass ist hoch</span>')}
   <div class="felt hlfelt" style="${feltStyle(uid)}">
     <div class="hlhist cards">${hist || '<span class="muted small">Bisher gezogen</span>'}</div>
     <div class="hlmain">
@@ -7519,6 +7553,7 @@ document.addEventListener('click', e => {
 });
 
 /* ---------- Casino home ---------- */
+const SLOT_LOGO = `<svg class="slotlogo" viewBox="0 0 150 102" aria-hidden="true"><defs><linearGradient id="slgld" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff1b8"/><stop offset=".45" stop-color="#e2b64a"/><stop offset="1" stop-color="#a7802b"/></linearGradient><linearGradient id="slreel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9a958c"/><stop offset=".22" stop-color="#fbf8f1"/><stop offset=".78" stop-color="#fbf8f1"/><stop offset="1" stop-color="#9a958c"/></linearGradient><linearGradient id="slcab" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b3262c"/><stop offset="1" stop-color="#5e1216"/></linearGradient><radialGradient id="slball" cx=".35" cy=".35" r=".7"><stop offset="0" stop-color="#ff9b9b"/><stop offset=".5" stop-color="#e02b2b"/><stop offset="1" stop-color="#7a0f12"/></radialGradient></defs><rect x="3" y="3" width="144" height="96" rx="14" fill="#1b0b0c" stroke="url(#slgld)" stroke-width="4"/><circle class="sl-l" style="animation-delay:0s" cx="12" cy="9" r="2.6"/><circle class="sl-l" style="animation-delay:0.25s" cx="23.5" cy="9" r="2.6"/><circle class="sl-l" style="animation-delay:0.5s" cx="35" cy="9" r="2.6"/><circle class="sl-l" style="animation-delay:0s" cx="46.5" cy="9" r="2.6"/><circle class="sl-l" style="animation-delay:0.25s" cx="58" cy="9" r="2.6"/><circle class="sl-l" style="animation-delay:0.5s" cx="69.5" cy="9" r="2.6"/><circle class="sl-l" style="animation-delay:0s" cx="81" cy="9" r="2.6"/><circle class="sl-l" style="animation-delay:0.25s" cx="92.5" cy="9" r="2.6"/><circle class="sl-l" style="animation-delay:0.5s" cx="104" cy="9" r="2.6"/><circle class="sl-l" style="animation-delay:0s" cx="115.5" cy="9" r="2.6"/><circle class="sl-l" style="animation-delay:0.25s" cx="127" cy="9" r="2.6"/><circle class="sl-l" style="animation-delay:0.5s" cx="138.5" cy="9" r="2.6"/><circle class="sl-l" style="animation-delay:0s" cx="12" cy="93" r="2.6"/><circle class="sl-l" style="animation-delay:0.25s" cx="23.5" cy="93" r="2.6"/><circle class="sl-l" style="animation-delay:0.5s" cx="35" cy="93" r="2.6"/><circle class="sl-l" style="animation-delay:0s" cx="46.5" cy="93" r="2.6"/><circle class="sl-l" style="animation-delay:0.25s" cx="58" cy="93" r="2.6"/><circle class="sl-l" style="animation-delay:0.5s" cx="69.5" cy="93" r="2.6"/><circle class="sl-l" style="animation-delay:0s" cx="81" cy="93" r="2.6"/><circle class="sl-l" style="animation-delay:0.25s" cx="92.5" cy="93" r="2.6"/><circle class="sl-l" style="animation-delay:0.5s" cx="104" cy="93" r="2.6"/><circle class="sl-l" style="animation-delay:0s" cx="115.5" cy="93" r="2.6"/><circle class="sl-l" style="animation-delay:0.25s" cx="127" cy="93" r="2.6"/><circle class="sl-l" style="animation-delay:0.5s" cx="138.5" cy="93" r="2.6"/><rect x="12" y="18" width="126" height="66" rx="8" fill="#0b0405"/><rect x="16" y="21" width="36" height="60" rx="5" fill="url(#slreel)"/><rect x="57" y="21" width="36" height="60" rx="5" fill="url(#slreel)"/><rect x="98" y="21" width="36" height="60" rx="5" fill="url(#slreel)"/><g transform="translate(34 51) scale(1.05)"><path d="M-11 -14 H11 V-9 Q2 0 -1 15 H-8 Q-5 1 4 -8 H-11 Z" fill="#d7262b" stroke="#7a0f12" stroke-width="1.6" stroke-linejoin="round"/><path d="M-9 -12.5 H8" stroke="#ff8a8a" stroke-width="1.4" stroke-linecap="round" opacity=".7"/></g><g transform="translate(75 51) scale(1.05)"><path d="M-11 -14 H11 V-9 Q2 0 -1 15 H-8 Q-5 1 4 -8 H-11 Z" fill="#d7262b" stroke="#7a0f12" stroke-width="1.6" stroke-linejoin="round"/><path d="M-9 -12.5 H8" stroke="#ff8a8a" stroke-width="1.4" stroke-linecap="round" opacity=".7"/></g><g transform="translate(116 51) scale(1.05)"><path d="M-11 -14 H11 V-9 Q2 0 -1 15 H-8 Q-5 1 4 -8 H-11 Z" fill="#d7262b" stroke="#7a0f12" stroke-width="1.6" stroke-linejoin="round"/><path d="M-9 -12.5 H8" stroke="#ff8a8a" stroke-width="1.4" stroke-linecap="round" opacity=".7"/></g><path d="M10 51 H140" stroke="#ffd34d" stroke-width="1.5" opacity=".8"/><path d="M6 45 L12 51 L6 57Z M144 45 L138 51 L144 57Z" fill="#ffd34d"/></svg>`;
 function renderHome(){
   const el = $('home');
   const W = P ? wheelState() : { ready:false };
@@ -7528,6 +7563,20 @@ function renderHome(){
   const next = allMatches().find(m => m.src==='oldb' && m.t > Date.now());
   const hour = new Date().getHours(), greet = hour < 11 ? 'Guten Morgen' : hour < 18 ? 'Hallo' : 'Guten Abend';
   const tile = (g, title, sub, art, extra='') => `<button class="tile tile-${g}" data-act="game" data-g="${g}"><div class="art" aria-hidden="true">${art}</div><div class="tinfo"><b>${title}</b><span>${sub}</span>${extra}</div></button>`;
+  const TL = {
+    bj: () => tile('bj', 'Blackjack', 'Mit Freunden am Tisch, bis zu 5 Spieler', `<div class="minicards"><div class="mc">A<i>♠</i></div><div class="mc red">K<i>♥</i></div></div>`, atTables ? `<span class="pill good">${atTables} ${atTables===1?'Freund':'Freunde'} am Tisch</span>` : tid ? '<span class="pill good">Du sitzt am Tisch</span>' : ''),
+    poker: () => tile('poker', 'Poker<span class="newtag">Neu</span>', "Texas Hold'em mit Freunden oder gegen Bots", `<div class="minipk">${pkCard('AS')}${pkCard('KH')}${pkCard('back')}</div>`, pkTileExtra()),
+    sports: () => tile('sports', 'Sportwetten', 'Bundesliga · Champions League · Darts', `<div class="minisports"><span>⚽</span><span>🎯</span></div>`, duIncoming() ? `<span class="pill good">🤝 ${duIncoming()} ${duIncoming() === 1 ? 'Herausforderung' : 'Herausforderungen'}</span>` : next ? `<span class="small muted">Nächstes: ${esc(next.t1)} – ${esc(next.t2)}, ${timeLabel(next.t)}</span>` : '<span class="small muted">Plus fiktive Turniere alle 15 Minuten</span>'),
+    kisten: () => tile('kisten', 'Kisten', 'Öffnen, sammeln, handeln: Items mit Zustand und Nummer, Markt und Auktionen', kChest(KCRATES[2]), kisTileExtra()),
+    loono: () => tile('loono', 'Loono', 'Kartenspiel mit Freunden und Bots, 2 bis 8 Spieler, mit oder ohne Einsatz', `<div class="miniloono">${['r7','gs','yd','xf'].map(c => loCard(c)).join('')}</div>`, loTileExtra()),
+    crash: () => tile('crash', 'Crash', 'Zahl aus, bevor die Rakete explodiert', `<div class="minicrash"><svg viewBox="0 0 120 70" aria-hidden="true"><path d="M5 65 Q70 62 105 12" fill="none" stroke="#ff5a4f" stroke-width="4" stroke-linecap="round"/></svg><span>🚀</span><b class="num">2,47×</b></div>`, crashFriends()),
+    mines: () => tile('mines', 'Mines', 'Diamanten finden, Minen meiden', `<div class="minimines">${[...'💎💎💣💎💎💣💎💎💎'].map(x => `<i>${x}</i>`).join('')}</div>`),
+    tipp: () => tile('tipp', 'Tipprunde', 'Bundesliga-Ergebnisse tippen gegen Freunde', `<div class="minitipp"><b class="num">2:1</b><small>dein Tipp</small></div>`, tippExtra()),
+    roulette: () => tile('roulette', 'Roulette', 'Europäisch, 0 bis 36', `<div class="miniwheel">${rouletteWheel().replace('id="rwheelg"','').replace('id="rball"','')}</div>`),
+    slots: () => tile('slots', 'Automat', 'Drei Walzen, bis ×500', SLOT_LOGO, `<span class="pill jp">Jackpot ${fmt(JP.pot ?? JP_SEED)} ℒ</span>`),
+    horses: () => tile('horses', 'Pferderennen', 'Sechs Pferde, ein Sieger', `<div class="minihorses"><span>🏇</span><span>🏇</span><span>🏇</span></div>`),
+    hilo: () => tile('hilo', 'Higher Lower', 'Errate die nächste Karte, zahl aus, wann du willst', `<div class="minihl"><div class="mc">7<i>♣</i></div><span class="hlar"><i>▲</i><i>▼</i></span><div class="mc red">?<i>♥</i></div></div>`),
+  };
   const html = `<div class="stack">
     ${SRV.notice?.text ? `<div class="sitenote" role="status">📢 ${esc(SRV.notice.text)}</div>` : ''}
     <section class="hero">
@@ -7540,19 +7589,12 @@ function renderHome(){
       <span><b>${W.ready ? 'Glücksrad: einmal am Tag gratis drehen' : 'Glücksrad: morgen wieder'}</b><br><span class="muted small">${W.ready ? `Tag ${W.streak} in Folge · Legats, Euro oder Shop-Sachen` : `Heute schon gedreht · Serie: ${P?.daily?.streak || 0} Tage`}</span></span>
     </button>
     ${P ? progressCard() : ''}
-    <div class="tiles">
-      ${tile('bj', 'Blackjack', 'Mit Freunden am Tisch, bis zu 5 Spieler', `<div class="minicards"><div class="mc">A<i>♠</i></div><div class="mc red">K<i>♥</i></div></div>`, atTables ? `<span class="pill good">${atTables} ${atTables===1?'Freund':'Freunde'} am Tisch</span>` : tid ? '<span class="pill good">Du sitzt am Tisch</span>' : '')}
-      ${tile('poker', 'Poker<span class="newtag">Neu</span>', "Texas Hold'em mit Freunden, bis zu 6 Spieler", `<div class="minipk">${pkCard('AS')}${pkCard('KH')}${pkCard('back')}</div>`, pkTileExtra())}
-      ${tile('sports', 'Sportwetten', 'Bundesliga · Champions League · Darts', `<div class="minisports"><span>⚽</span><span>🎯</span></div>`, duIncoming() ? `<span class="pill good">🤝 ${duIncoming()} ${duIncoming() === 1 ? 'Herausforderung' : 'Herausforderungen'}</span>` : next ? `<span class="small muted">Nächstes: ${esc(next.t1)} – ${esc(next.t2)}, ${timeLabel(next.t)}</span>` : '<span class="small muted">Plus fiktive Turniere alle 15 Minuten</span>')}
-      ${tile('kisten', 'Kisten', 'Öffnen, sammeln, handeln: Items mit Zustand und Nummer, Markt und Auktionen', kChest(KCRATES[2]), kisTileExtra())}
-      ${tile('loono', 'Loono', 'Kartenspiel mit Freunden und Bots, 2 bis 8 Spieler, mit oder ohne Einsatz', `<div class="miniloono">${['r7','gs','yd','xf'].map(c => loCard(c)).join('')}</div>`, loTileExtra())}
-      ${tile('crash', 'Crash', 'Zahl aus, bevor die Rakete explodiert', `<div class="minicrash"><svg viewBox="0 0 120 70" aria-hidden="true"><path d="M5 65 Q70 62 105 12" fill="none" stroke="#ff5a4f" stroke-width="4" stroke-linecap="round"/></svg><span>🚀</span><b class="num">2,47×</b></div>`, crashFriends())}
-      ${tile('mines', 'Mines', 'Diamanten finden, Minen meiden', `<div class="minimines">${[...'💎💎💣💎💎💣💎💎💎'].map(x => `<i>${x}</i>`).join('')}</div>`)}
-      ${tile('tipp', 'Tipprunde', 'Bundesliga-Ergebnisse tippen gegen Freunde', `<div class="minitipp"><b class="num">2:1</b><small>dein Tipp</small></div>`, tippExtra())}
-      ${tile('roulette', 'Roulette', 'Europäisch, 0 bis 36', `<div class="miniwheel">${rouletteWheel().replace('id="rwheelg"','').replace('id="rball"','')}</div>`)}
-      ${tile('slots', 'Automat', 'Drei Walzen, bis ×500', `<div class="minislots"><span>7️⃣</span><span>7️⃣</span><span>7️⃣</span></div>`, `<span class="pill jp">Jackpot ${fmt(JP.pot ?? JP_SEED)} ℒ</span>`)}
-      ${tile('horses', 'Pferderennen', 'Sechs Pferde, ein Sieger', `<div class="minihorses"><span>🏇</span><span>🏇</span><span>🏇</span></div>`)}
-      ${tile('hilo', 'Höher oder Tiefer', 'Errate die nächste Karte, zahl aus, wann du willst', `<div class="minihl"><div class="mc">7<i>♣</i></div>▲▼<div class="mc red">?<i>♥</i></div></div>`)}
+    <div class="tiles2">
+      <section class="gsec"><h4>Mit Freunden am Tisch<small>3 Spiele · wischen</small></h4><div class="grow3">${TL.bj() + TL.poker() + TL.loono()}</div></section>
+      <section class="gsec"><h4>Kisten</h4><div class="gone">${TL.kisten()}</div></section>
+      <section class="gsec"><h4>Schnell und spannend<small>3 Spiele · wischen</small></h4><div class="grow3">${TL.crash() + TL.mines() + TL.hilo()}</div></section>
+      <section class="gsec"><h4>Klassiker<small>3 Spiele · wischen</small></h4><div class="grow3">${TL.roulette() + TL.slots() + TL.horses()}</div></section>
+      <section class="gsec"><h4>Wetten</h4><div class="grow2">${TL.sports() + TL.tipp()}</div></section>
     </div>
     ${P ? heuteHTML() : ''}
     ${onl.length ? `<div class="panel"><h3>Freunde online</h3><div class="row">${onl.map(id => `<span class="fon"><button class="pill" data-act="profile" data-id="${esc(id)}">${avH(avOf(id))} ${nameH(id)}${players[id].table ? ' · am Blackjack-Tisch' : loOpenOf(id) ? ' · wartet bei Loono' : pkOpenOf(id) ? ' · am Pokertisch' : players[id].playing && players[id].playing !== 'bj' ? ' · spielt ' + (GAME_NAMES[players[id].playing] || '') : ''}</button>${players[id].table && players[id].table !== tid ? `<button class="btn sm gold" data-act="fjoin" data-g="bj" data-id="${esc(players[id].table)}">Mitspielen</button>` : loOpenOf(id) ? `<button class="btn sm gold" data-act="fjoin" data-g="loono" data-id="${esc(loOpenOf(id))}">Mitspielen</button>` : pkOpenOf(id) && pkOpenOf(id) !== PK.id ? `<button class="btn sm gold" data-act="fjoinpk" data-id="${esc(pkOpenOf(id))}">Mitspielen</button>` : ''}</span>`).join('')}</div></div>` : ''}
@@ -8712,7 +8754,7 @@ function financeHTML(p){
    kommen aus pokerhand/{tisch}_{uid}, das nur man selbst lesen kann.
    ===================================================================== */
 const PK_SB = 50, PK_BB = 100, PK_BUY_MIN = 2000, PK_BUY_MAX = 50000;
-const PK = { id: null, t: null, mine: null, lobby: {}, unsubT: null, unsubH: null, unsubL: null, buy: ls.get('pkbuy', 10000), raise: false, raiseTo: 0, busy: false,
+const PK = { nbots: ls.get('pkbots', 3), id: null, t: null, mine: null, lobby: {}, unsubT: null, unsubH: null, unsubL: null, buy: ls.get('pkbuy', 10000), raise: false, raiseTo: 0, busy: false,
   tickAt: 0, ticking: false, seen: new Set(), seenHand: 0, lastSig: '', claimTried: null, hist: { hand: 0, phase: '' }, code: '' };
 const PK_RV = { T: 10, J: 11, Q: 12, K: 13, A: 14 };
 const pkRv = c => PK_RV[c[0]] || +c[0];
@@ -8812,9 +8854,9 @@ function pkSync(){
 /** the phones at the table move it on: time limit over, next hand */
 function pkTick(){
   const t = PK.t; if (!t || !PK.id || document.hidden || PK.ticking || !uid) return;
-  const now = NOW(), ready = Object.values(t.seats || {}).filter(s => s.sit !== false && s.stack > 0 && !s.left).length;
-  const due = (t.phase === 'play' && t.turn && now > t.turn.until + 300) || (t.phase === 'show' && now >= (t.showUntil || 0) + 200) || (t.phase === 'wait' && ready >= 2);
-  if (!due || Date.now() - PK.tickAt < 1200) return;
+  const now = NOW(), rs = Object.values(t.seats || {}).filter(s => s.sit !== false && s.stack > 0 && !s.left), ready = rs.length;
+  const due = (t.phase === 'play' && t.turn && now > t.turn.until + (t.seats?.[t.turn.u]?.bot ? 100 : 300)) || (t.phase === 'show' && now >= (t.showUntil || 0) + 200) || (t.phase === 'wait' && ready >= 2 && rs.some(s => !s.bot));
+  if (!due || Date.now() - PK.tickAt < (t.phase === 'play' && t.seats?.[t.turn?.u]?.bot ? 700 : 1200)) return;
   PK.tickAt = Date.now(); PK.ticking = true;
   srvCall('tisch', { pk: PK.id }).catch(e => console.warn(e)).finally(() => { PK.ticking = false; });
 }
@@ -8873,6 +8915,10 @@ document.addEventListener('click', e => {
       pkDo('pkleave', { pid: PK.id }, r => { const pid = PK.id; pkUnwatch(); PK.claimTried = pid; toast(r.out ? `Aufgestanden. ${fmt(r.out)} ℒ sind zurück auf deinem Konto.` : 'Aufgestanden.'); if (r.out) SFX.coins(); }); break;
     case 'pkrebuy': { const me = pkMe(); if (!me) break; const rb = pkRebuyAmt(me); if (confirmBig(rb, 'poker')) pkDo('pkrebuy', { pid: PK.id, buy: rb }, () => { SFX.chip(); toast(`${fmt(rb)} ℒ nachgekauft.`); }); break; }
     case 'pkback': pkDo('pkback', { pid: PK.id }); break;
+    case 'pkbotsn': PK.nbots = Math.max(1, Math.min(5, v || 3)); ls.set('pkbots', PK.nbots); renderAll(); break;
+    case 'pkbots': if (confirmBig(PK.buy, 'poker')) pkDo('pkcreate', { buy: PK.buy, bots: PK.nbots }, r => { pkWatch(r.pid); SFX.chip(); toast(`Du sitzt mit ${PK.nbots} ${PK.nbots === 1 ? 'Bot' : 'Bots'} am Tisch. Gleich geht es los.`); }); break;
+    case 'pkbotadd': pkDo('pkbot', { pid: PK.id, add: true }, r => toast(`${r.name} (Bot) setzt sich dazu.`)); break;
+    case 'pkbotdel': pkDo('pkbot', { pid: PK.id, bot: b.dataset.id || '' }, r => toast(`${r.name} (Bot) steht auf.`)); break;
     case 'pkfold': pkAct('fold'); break;
     case 'pkcall': pkAct('call'); break;
     case 'pkraiseopen': PK.raise = !PK.raise; PK.raiseTo = 0; haptic('light'); renderAll(); break;
@@ -8925,6 +8971,8 @@ function pkRules(){
       <h4>Rangfolge der Hände (beste zuerst)</h4>
       <div class="pkrank">${[['Royal Flush', 'A K Q J 10 gleiche Farbe'], ['Straight Flush', '5 in Folge, gleiche Farbe'], ['Vierling', '9 9 9 9'], ['Full House', 'K K K + 4 4'], ['Flush', '5 Karten gleiche Farbe'], ['Straße', '5 6 7 8 9'], ['Drilling', '7 7 7'], ['Zwei Paare', 'J J + 3 3'], ['Ein Paar', 'A A'], ['Höchste Karte', 'nichts davon']].map(([h, x], i) => `<span class="n">${i + 1}</span><span class="h">${h}</span><span class="ex">${x}</span>`).join('')}</div>
       <p>Bei Gleichstand entscheiden die höheren Beikarten. Ist auch das gleich, wird der Pot geteilt. Das Ass zählt hoch und bei der Straße A 2 3 4 5 auch niedrig.</p>
+      <h4>Bots</h4>
+      <p>Du kannst auch gegen Bots spielen oder Bots an einen Tisch mit Freunden holen („Bot dazu“). Die Bots spielen mit Chips vom Casino und kaufen nach, wenn sie pleite sind. Was du ihnen abnimmst, gehört dir.</p>
       <h4>Chips und Legats</h4>
       <p>Beim Hinsetzen kaufst du Chips mit deinen Legats (${fmt(PK_BUY_MIN)} bis ${fmt(PK_BUY_MAX)}). Stehst du auf, kommen alle deine Chips zurück auf dein Konto. Gehst du nur aus dem Spiel raus, bleibst du sitzen.</p>
       </div></div>`;
@@ -8966,7 +9014,7 @@ function pkLobbyHTML(){
   const tables = Object.entries(PK.lobby).filter(([, t]) => t.n > 0).sort((a, b) => (b[1].created || 0) - (a[1].created || 0));
   const fr = new Set(friendIds());
   const row = ([id, t]) => { const who = Object.entries(t.seats || {}).filter(([, s]) => !s.left); const full = who.length >= 6;
-    return `<div class="lobby-item"><span><b>${esc(t.name || 'Pokertisch')}</b> <span class="muted small">· ${id}</span><br><span class="small">${who.map(([u, s]) => `${fr.has(u) || u === uid ? '★ ' : ''}${esc(s.name)}`).join(', ') || 'leer'} · ${who.length}/6 · ${t.phase === 'play' ? 'Hand läuft' : 'wartet'}</span></span>
+    return `<div class="lobby-item"><span><b>${esc(t.name || 'Pokertisch')}</b> <span class="muted small">· ${id}</span><br><span class="small">${who.map(([u, s]) => `${s.bot ? '🤖 ' : fr.has(u) || u === uid ? '★ ' : ''}${esc(s.name)}`).join(', ') || 'leer'} · ${who.length}/6 · ${t.phase === 'play' ? 'Hand läuft' : 'wartet'}</span></span>
       <button class="btn sm gold" data-act="pkjoin" data-id="${esc(id)}" ${full || PK.busy || !P ? 'disabled' : ''}>${full ? 'Voll' : 'Hinsetzen'}</button></div>`; };
   return `${backBar('Poker', '<button class="btn sm" data-act="pkrules">Regeln</button>')}<div class="stack">
     <div class="felt pkfelt-lobby" style="${feltStyle(uid)}"><div class="arc">Texas Hold'em · Blinds ${PK_SB} / ${PK_BB} · bis zu 6 Spieler</div>
@@ -8976,8 +9024,11 @@ function pkLobbyHTML(){
     <div class="panel stack"><h3>Mit wie viel setzt du dich hin?</h3>
       <div class="stakebox">${stakeStepper(PK.buy, 'pkbuy', PK_BUY_MAX, PK_BUY_MIN)}</div>
       <p class="muted small" style="text-align:center;margin:0">${fmt(PK_BUY_MIN)} bis ${fmt(PK_BUY_MAX)} ℒ. Das kommt von deinem Konto auf den Tisch.</p></div>
+    <div class="panel stack pkbotp"><h3>Gegen Bots spielen</h3><p class="muted" style="margin:0">Sofort loslegen, ohne auf Freunde zu warten. Die Bots spielen mit Chips vom Casino, deine Chips kommen wie immer von deinem Konto.</p>
+      <div class="row pkbotn" role="group" aria-label="Anzahl Bots">${[1, 2, 3, 4, 5].map(n => `<button class="pill${PK.nbots === n ? ' on' : ''}" data-act="pkbotsn" data-v="${n}" aria-pressed="${PK.nbots === n}">${n} ${n === 1 ? 'Bot' : 'Bots'}</button>`).join('')}</div>
+      <div><button class="btn gold" data-act="pkbots" ${!P || PK.busy || (P.balance || 0) < PK.buy ? 'disabled' : ''}>Gegen ${PK.nbots} ${PK.nbots === 1 ? 'Bot' : 'Bots'} spielen</button></div></div>
     <div class="grid2">
-      <div class="panel stack"><h3>Neuer Tisch</h3><p class="muted">Du bekommst einen 5-stelligen Code für deine Freunde.</p>
+      <div class="panel stack"><h3>Neuer Tisch mit Freunden</h3><p class="muted">Du bekommst einen 5-stelligen Code für deine Freunde.</p>
         <div><button class="btn gold" data-act="pkcreate" ${!P || PK.busy || (P.balance || 0) < PK.buy ? 'disabled' : ''}>Tisch eröffnen</button></div></div>
       <div class="panel stack"><h3>Mit Code beitreten</h3>
         <div class="row"><div class="field" style="flex:1"><label for="pkcode">Tisch-Code</label><input id="pkcode" maxlength="5" value="${esc(PK.code || '')}" placeholder="z. B. K7QXM" autocomplete="off" autocapitalize="characters" style="text-transform:uppercase"></div>
@@ -9005,8 +9056,8 @@ function pkTableHTML(){
     return `<div class="pkseat p${p}${turn ? ' turn' : ''}${won ? ' win' : ''}${folded || s.left || s.sit === false ? ' folded' : ''}${u === uid ? ' me' : ''}">
       ${bet > 0 ? `<div class="pkbet num">${fmt(bet)}</div>` : ''}
       <div class="pkhc">${cards}</div>
-      <div class="pkplate">${badge}${blind}<div class="pknm">${avH(avOf(u))} ${nameH(u, s.name)}</div><div class="pkst num">${fmt(s.stack)} ℒ</div>
-      <div class="pkact">${turn ? `<span data-pkuntil="${t.turn.until}"></span>` : esc(act) || '&nbsp;'}</div></div></div>`;
+      <div class="pkplate">${badge}${blind}<div class="pknm">${s.bot ? '🤖' : avH(avOf(u))} ${s.bot ? esc(s.name) : nameH(u, s.name)}</div><div class="pkst num">${fmt(s.stack)} ℒ</div>
+      <div class="pkact">${turn ? (s.bot ? 'denkt …' : `<span data-pkuntil="${t.turn.until}"></span>`) : esc(act) || '&nbsp;'}</div></div></div>`;
   };
   let board = ''; for (let k = 0; k < 5; k++) board += pkCard(t.board?.[k]);
   const pot = pkPot(t);
@@ -9055,6 +9106,7 @@ function pkTableHTML(){
   ${res}${acts}
   ${me?.sit === false && !me.left ? `<div class="note row" style="justify-content:space-between">Du setzt gerade aus.<button class="btn sm gold" data-act="pkback">Weiter spielen</button></div>` : ''}
   ${canRebuy ? `<details class="panel pkrebuy"${me.stack <= 0 ? ' open' : ''}><summary><b>${me.stack <= 0 ? 'Keine Chips mehr: nachkaufen' : 'Chips nachkaufen'}</b></summary><div class="stack" style="margin-top:10px;align-items:center">${stakeStepper(rb, 'pkbuy', PK_BUY_MAX - me.stack, PK_BUY_MIN)}<button class="btn gold" data-act="pkrebuy" ${PK.busy || (P?.balance || 0) < rb ? 'disabled' : ''}>${fmt(rb)} ℒ nachkaufen</button></div></details>` : ''}
+  ${me && !me.left ? (() => { const bots = seats.filter(([, x]) => x.bot && !x.left); return `<div class="pkbots"><span>🤖 ${bots.length ? `${bots.length} ${bots.length === 1 ? 'Bot' : 'Bots'} am Tisch` : 'Keine Bots am Tisch'}</span><span class="row">${bots.length ? `<button class="btn sm" data-act="pkbotdel" ${PK.busy ? 'disabled' : ''}>Bot weg</button>` : ''}${seats.length < 6 ? `<button class="btn sm" data-act="pkbotadd" ${PK.busy ? 'disabled' : ''}>Bot dazu</button>` : ''}</span></div>`; })() : ''}
   <div class="pklog">${(t.log || []).slice().reverse().map(l => `<div>${esc(l)}</div>`).join('')}</div>`;
 }
 
