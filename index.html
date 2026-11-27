@@ -1344,9 +1344,9 @@ html.stkopen body{overflow:hidden}
 @keyframes stkup{from{transform:translateY(100%)}to{transform:none}}
 @keyframes stkfade{from{opacity:0}to{opacity:1}}
 /* ---------- 2.3.1: croupier subtitles, at the bottom like in a game ---------- */
-.croupier{position:fixed;left:50%;bottom:calc(64px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:55;width:min(calc(100% - 24px),720px);text-align:center;pointer-events:none;animation:crpin .25s ease-out}
+.croupier{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:55;width:min(calc(100% - 24px),640px);text-align:center;pointer-events:none;animation:crpin .25s ease-out}
 .croupier.out{animation:crpout .25s ease-in forwards}
-.crpline{margin:0;font:700 clamp(17px,4.6vw,24px)/1.3 var(--f-body);color:#fff;letter-spacing:.01em;
+.crpline{margin:0;font:700 clamp(14px,3.8vw,19px)/1.3 var(--f-body);color:#fff;letter-spacing:.01em;
   text-shadow:0 0 2px #000,0 0 3px #000,1.5px 1.5px 0 #000,-1.5px 1.5px 0 #000,1.5px -1.5px 0 #000,-1.5px -1.5px 0 #000,0 2px 8px rgba(0,0,0,.8)}
 .crpwho{color:#f2c94c}
 @keyframes crpin{from{opacity:0}to{opacity:1}}
@@ -2869,9 +2869,12 @@ function animateCards(root){
 /* =====================================================================
    v1.1 – Casino home, Glücksrad, Roulette, Automat, Pferderennen, Sportwetten
    ===================================================================== */
-const APP_VERSION = '2.3.0.1';
+const APP_VERSION = '2.3.0.2';
 const CL_TITLES = { '1.5.12': 'Technische Verbesserungen' };
 const CHANGELOGS = {
+  '2.3.0.2': [
+    'Croupier: Die Untertitel sind etwas kleiner und stehen weiter unten',
+  ],
   '2.3.0.1': [
     'Blackjack: Meldete der Server „Du bist gerade nicht dran“, obwohl du dran warst, holt die App jetzt sofort den aktuellen Tisch und schickt deinen Zug nochmal. Solange dein Zug unterwegs ist, bleiben die Knöpfe gesperrt, damit nichts doppelt ankommt',
     'Croupier: Die Sprüche stehen jetzt unten als echte Untertitel, weiße Schrift mit schwarzem Rand und dem Namen in Gelb',
