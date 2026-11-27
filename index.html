@@ -1308,6 +1308,81 @@ body.isclosed{overflow:hidden}
 @keyframes sweep{to{transform:translateX(100%)}}
 @keyframes introout{to{opacity:0;transform:scale(1.15);filter:blur(6px);visibility:hidden}}
 @media (prefers-reduced-motion:reduce){.intro{display:none}}
+
+/* ---------- 2.3: stake stepper + iOS slider sheet ---------- */
+.stepper{display:flex;align-items:stretch;gap:0;background:rgba(0,0,0,.28);border:1px solid var(--line);border-radius:14px;padding:4px;width:min(100%,300px)}
+.stepper .stp{flex:0 0 48px;height:48px;border:0;border-radius:11px;background:rgba(242,235,221,.08);color:var(--ink);font-size:26px;font-weight:600;line-height:1;display:grid;place-items:center;transition:background .15s,transform .1s;touch-action:manipulation}
+.stepper .stp:active:not(:disabled){transform:scale(.92);background:rgba(242,235,221,.16)}
+.stepper .stp:disabled{opacity:.3;cursor:default}
+.stepper .stpval{flex:1;min-width:0;border:0;background:none;color:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;padding:0 6px;border-radius:10px;touch-action:manipulation}
+.stepper .stpval small{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.stepper .stpval b{font-size:19px;color:var(--brass);white-space:nowrap}
+.stepper .stpval:active{background:rgba(242,235,221,.06)}
+.stksheet{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.45);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);display:flex;align-items:flex-end;justify-content:center;animation:stkfade .22s ease-out}
+.stksheet.out{animation:stkfade .2s ease-in reverse forwards}
+.stksheet.out .stkcard{animation:stkup .2s ease-in reverse forwards}
+.stkcard{width:min(100%,520px);background:rgba(44,36,30,.96);-webkit-backdrop-filter:blur(20px) saturate(1.4);backdrop-filter:blur(20px) saturate(1.4);border-radius:22px 22px 0 0;padding:8px 20px calc(22px + env(safe-area-inset-bottom,0px));box-shadow:0 -10px 40px rgba(0,0,0,.5);animation:stkup .3s cubic-bezier(.2,.9,.3,1)}
+.stkcard .grab{width:38px;height:5px;border-radius:3px;background:rgba(242,235,221,.3);margin:0 auto 6px}
+.stkhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.stkhead b{font-size:16px}
+.stklink{background:none;border:0;color:var(--brass);font-size:16px;padding:8px 0;min-width:80px;text-align:left}
+.stklink.strong{font-weight:700;text-align:right}
+.stkbig{display:flex;align-items:baseline;justify-content:center;gap:8px;margin:6px 0 14px}
+.stkbig input{width:7.5ch;text-align:right;font:600 40px/1.1 var(--f-num);color:var(--ink);background:none;border:0;border-bottom:2px solid transparent;padding:0;outline:none;border-radius:0}
+.stkbig input:focus{border-bottom-color:var(--brass)}
+.stkbig span{font:600 28px var(--f-num);color:var(--brass)}
+.stkrange{-webkit-appearance:none;appearance:none;width:100%;height:30px;background:transparent;margin:0;--p:0%}
+.stkrange::-webkit-slider-runnable-track{height:6px;border-radius:3px;background:linear-gradient(90deg,var(--brass) var(--p),rgba(242,235,221,.18) var(--p))}
+.stkrange::-moz-range-track{height:6px;border-radius:3px;background:linear-gradient(90deg,var(--brass) var(--p),rgba(242,235,221,.18) var(--p))}
+.stkrange::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;border-radius:50%;background:#fff;margin-top:-11px;box-shadow:0 2px 6px rgba(0,0,0,.35),0 0 0 .5px rgba(0,0,0,.1)}
+.stkrange::-moz-range-thumb{width:28px;height:28px;border-radius:50%;background:#fff;border:0;box-shadow:0 2px 6px rgba(0,0,0,.35)}
+.stkscale{display:flex;justify-content:space-between;font:12px var(--f-num);color:var(--muted);margin-top:2px}
+.stkquick{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:14px}
+.stkquick button{border:0;border-radius:999px;padding:7px 13px;background:rgba(242,235,221,.1);color:var(--ink);font:600 13px var(--f-num)}
+.stkquick button[aria-pressed="true"]{background:var(--brass);color:#231a14}
+html.stkopen body{overflow:hidden}
+@keyframes stkup{from{transform:translateY(100%)}to{transform:none}}
+@keyframes stkfade{from{opacity:0}to{opacity:1}}
+/* ---------- 2.3: croupier banner ---------- */
+.croupier{position:fixed;left:50%;top:calc(10px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:55;width:min(calc(100% - 24px),460px);display:flex;align-items:center;gap:12px;padding:10px 14px 10px 10px;border-radius:18px;background:rgba(35,26,20,.92);-webkit-backdrop-filter:blur(16px) saturate(1.3);backdrop-filter:blur(16px) saturate(1.3);border:1px solid var(--line);box-shadow:0 10px 30px rgba(0,0,0,.45);animation:crpin .35s cubic-bezier(.2,.9,.3,1.2);cursor:pointer}
+.croupier.out{animation:crpout .25s ease-in forwards}
+.croupier .crpav{flex:0 0 40px;height:40px;border-radius:50%;display:grid;place-items:center;font-size:24px;background:radial-gradient(circle at 35% 30%,#f0d48f,#9c7838);box-shadow:inset 0 -2px 4px rgba(0,0,0,.25)}
+.croupier .crptx{display:flex;flex-direction:column;min-width:0}
+.croupier .crptx small{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--brass)}
+.croupier #crptext{font-weight:600;font-size:15px;line-height:1.3}
+@keyframes crpin{from{opacity:0;transform:translate(-50%,-30px) scale(.96)}to{opacity:1;transform:translate(-50%,0)}}
+@keyframes crpout{to{opacity:0;transform:translate(-50%,-24px)}}
+/* ---------- 2.3: finances ---------- */
+.fin{display:flex;flex-direction:column;gap:14px}
+.finhero{display:flex;flex-direction:column;gap:6px;padding:16px;border-radius:16px;background:linear-gradient(150deg,rgba(209,173,98,.22),rgba(209,173,98,.04));border:1px solid var(--line)}
+.finhero>small{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.finhero>b{font:600 32px/1.1 var(--f-num);color:var(--ink)}
+.finbar{height:10px;border-radius:5px;background:#5b8fd6;overflow:hidden;margin-top:6px}
+.finbar i{display:block;height:100%;background:var(--brass);border-radius:5px 0 0 5px}
+.finleg{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 14px;font-size:13px;color:var(--muted)}
+.finleg b{color:var(--ink);margin-left:4px}
+.fdot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:0}
+.fdot.l{background:var(--brass)} .fdot.e{background:#5b8fd6}
+.fincards{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.fincards>div{display:flex;flex-direction:column;gap:2px;overflow:hidden;padding:10px;border-radius:12px;background:rgba(0,0,0,.22);border:1px solid var(--hair,rgba(242,235,221,.08));min-width:0}
+.fincards small{font-size:11px;color:var(--muted);line-height:1.2}
+.fincards b{font-size:clamp(13px,3.9vw,16px);white-space:nowrap}
+@media (max-width:380px){.fincards{gap:6px}.fincards>div{padding:8px 7px}}
+.finsec h4{margin:0 0 8px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.finrows{display:flex;flex-direction:column;border-radius:12px;background:rgba(0,0,0,.18);overflow:hidden}
+.finrow{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(60px,1fr) auto;align-items:center;gap:10px;padding:9px 12px}
+.finrow+.finrow{border-top:1px solid rgba(242,235,221,.07)}
+.finrow .fn{display:flex;flex-direction:column;min-width:0}
+.finrow .fn b{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.finrow .fn small{font-size:11px;color:var(--muted)}
+.fbar{position:relative;height:8px;border-radius:4px;background:rgba(242,235,221,.07)}
+.fbar::after{content:"";position:absolute;left:50%;top:-3px;bottom:-3px;width:1px;background:rgba(242,235,221,.25)}
+.fbar i{position:absolute;top:0;bottom:0;border-radius:4px}
+.fbar i.pos{left:50%;background:var(--win)} .fbar i.neg{right:50%;background:var(--lose)}
+.finrow .fv{font-size:14px;min-width:70px;text-align:right}
+.finbj{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.finbj span{display:flex;flex-direction:column;align-items:center;padding:8px 4px;border-radius:10px;background:rgba(0,0,0,.18)}
+.finbj b{font-size:17px} .finbj small{font-size:11px;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -2106,8 +2181,8 @@ setInterval(() => { if (uid && P?.bets?.some(b => b.st==='open' && b.src==='oldb
 /* ---------- bank: euros are safe from the table ---------- */
 function accrueInterest(){
   if (KASSE_ON){
-    if (!P || P.bank?.last === dayId() || SRV.zins === dayId()) return; SRV.zins = dayId();
-    kasse('zinsen').then(r => { if (r.got){ SFX.coins(); toast(`Zinsen von der Bank: +${fmt(r.got)} €`); } }).catch(e => { SRV.zins = null; console.warn(e); });
+    if (!P || P.bank?.last === dayId() || SRV.zins === dayId() || Date.now() - (SRV.zinsFail || 0) < 60e3) return; SRV.zins = dayId();
+    kasse('zinsen').then(r => { if (r.got){ SFX.coins(); toast(`Zinsen von der Bank: +${fmt(r.got)} €`); } }).catch(e => { SRV.zins = null; SRV.zinsFail = Date.now(); console.warn(e); });   // 2.3: after an error try again in a minute, not with every update
     return;
   }
   if (!P) return; const today = dayId(); let got = 0;
@@ -2273,7 +2348,7 @@ function openTable(id){
     if (!s.exists()){ if (!s.metadata.fromCache && tid===id){ T=null; renderAll(); } return; }
     T = s.data(); pendingAct = false;
     { const sig = [T.phase, T.round, T.turn?.u, T.turn?.h, T.betUntil, Object.keys(T.hands || {}).length].join('|'); if (sig !== HOST.sig){ HOST.sig = sig; HOST.progress = Date.now(); } }
-    reconcile(); afterTable(); renderAll();
+    reconcile(); afterTable(); try { crpTable(); } catch (e){ console.warn(e); } renderAll();
   }, e => console.warn(e));
   unsubS = onSnapshot(query(collection(fs,'seats'), where('table','==',id)), s => {
     const n = {}; s.docs.forEach(d => n[d.id] = d.data()); seats = n;
@@ -2355,7 +2430,7 @@ function canBet(amount){
 }
 const chipControls = max => `
       <div class="chips">${CHIPS.map(([v,cl,l])=>`<button class="chip ${cl}" data-act="chip" data-v="${v}" ${bet+v>max?'disabled':''} aria-label="${fmt(v)} hinzufügen">${l}</button>`).join('')}</div>
-      <div class="betline"><button class="btn sm" data-act="betclear">Löschen</button><span class="betval">${fmt(bet)}</span><button class="btn sm" data-act="betmax">Max</button></div>
+      ${stakeStepper(bet, 'betset', max, tableMin())}${bet ? '<button class="linkbtn small" data-act="betclear">Einsatz löschen</button>' : ''}
       <button class="btn gold" data-act="bet" ${bet<tableMin()||bet>max?'disabled':''}>Setzen</button>
       ${autoSwitch()}
       <p class="muted small">Einsatz ${fmt(tableMin())} – 50.000 Legats</p>`;
@@ -2777,9 +2852,16 @@ function animateCards(root){
 /* =====================================================================
    v1.1 – Casino home, Glücksrad, Roulette, Automat, Pferderennen, Sportwetten
    ===================================================================== */
-const APP_VERSION = '2.2.2';
+const APP_VERSION = '2.3';
 const CL_TITLES = { '1.5.12': 'Technische Verbesserungen' };
 const CHANGELOGS = {
+  '2.3': [
+    'Neuer Croupier: Kalle kommentiert Blackjack und Roulette, immer mit Untertitel und auf Wunsch mit Stimme. Bei einem Blackjack gibt es Kasalla, und auch Torsten Legat kommt öfter vor. Abschalten geht unter Konto → Einstellungen',
+    'Neue Einsatz-Auswahl: Statt ½, 2× und Max gibt es jetzt − und + (in 100er-Schritten). Tippst du auf den Betrag, kommt ein Schieberegler bis 50.000 ℒ mit runden Werten. Du kannst den Betrag dort auch eintippen',
+    'Haptisches Feedback: Beim Setzen und Auszahlen gibt es ein kurzes Klicken, jetzt auch auf dem iPhone (ab iOS 18)',
+    'Deine Finanzen unter Konto sind neu: Gesamtvermögen mit Aufteilung Legats und Bank, Gewinn gesamt und diese Woche, und für jedes Spiel auf einen Blick, wo du im Plus oder Minus bist',
+    'Neue Titel ab Level 50: Kasalla-König, Goldene Wade, Tischlegende, Casino-Titan, Unantastbar und ganz oben Torsten Legat persönlich',
+  ],
   '2.2.2': [
     'Crash: Die Explosion erscheint jetzt schneller. Die Rakete fliegt bei dir nach der Explosion nur noch etwa halb so lang weiter, die Anzeige springt also weniger stark zurück. Sofort beim Start explodiert sie jetzt in 4 statt 5 von 100 Runden',
   ],
@@ -3050,8 +3132,7 @@ function chipPicker(sel, act, max = MAX_BET){
   const chips = `<div class="chips small-chips">${[[50,'ch50','50'],[100,'ch100','100'],[500,'ch500','500'],[1000,'ch1k','1K'],[5000,'ch5k','5K']].map(([v,c,l]) =>
     `<button class="chip ${c}${sel===v?' on':''}" data-act="${act}" data-v="${v}" aria-pressed="${sel===v}">${l}</button>`).join('')}</div>`;
   if (!max || !P) return chips;
-  const top = Math.max(50, Math.min(max, Math.floor(P.balance))), half = Math.max(50, Math.round(sel / 2)), dbl = Math.min(top, sel * 2);
-  return `<div class="stakebox">${chips}<div class="qstake"><button data-act="${act}" data-v="${half}" ${half === sel ? 'disabled' : ''}>½</button><span class="num qcur">${fmt(sel)} ℒ</span><button data-act="${act}" data-v="${dbl}" ${dbl === sel ? 'disabled' : ''}>2×</button><button data-act="${act}" data-v="${top}" ${top === sel ? 'disabled' : ''}>Max</button></div></div>`;
+  return `<div class="stakebox">${chips}${stakeStepper(sel, act, max)}</div>`;
 }
 function backBar(title, extra=''){
   return `<div class="gamebar"><button class="btn sm" data-act="home">← Casino</button><h2>${title}</h2>${tutBtn(game)}${extra}</div>`;
@@ -3238,10 +3319,12 @@ async function rSpin(){
     if (!playInstant('roulette', total, pay, d => { if (R.bets['n'+n]) grant(d,'r_num'); })) return;
   }
   R.last = { ...R.bets }; R.busy = true; R.res = null; renderRoulette(true);
+  if (game === 'roulette') crpSay(pick(CRP_L.rspin), { force: true });
+  const betsNow = { ...R.bets };
   await rAnimate(n);
   R.busy = false; R.res = { n, net: pay - total }; R.hist = [n, ...R.hist].slice(0, 14); ls.set('rhist', R.hist); R.bets = {};
   release(); if (pay > total) SFX.win(); else if (pay < total) SFX.lose(); else SFX.push();
-  if (game === 'roulette' && tab === 'table') bigWin(pay - total, pay / total, '🎯');
+  if (game === 'roulette' && tab === 'table'){ bigWin(pay - total, pay / total, '🎯'); crpRoulette(n, pay, total, betsNow); }
 }
 /** the wheel and the ball (angles in degrees, 0 = top, clockwise) */
 const R_T = 7600, R_DROP = .5, R_SET = .8, R_OUT = 143, R_IN = 104;
@@ -3456,7 +3539,7 @@ function newRace(){
     const r = H.next;
     if (r){ H.race = raceOf(r); H.raceId = r.id; H.next = null; return; }
     H.race = null;
-    if (!H.loading && P){ H.loading = true; kasse('hnew').then(o => { H.race = raceOf(o.race); H.raceId = o.race.id; }).catch(e => toast(e.message)).finally(() => { H.loading = false; renderAll(); }); }
+    if (!H.loading && P && Date.now() - (H.failAt || 0) > 5000){ H.loading = true; kasse('hnew').then(o => { H.race = raceOf(o.race); H.raceId = o.race.id; H.failAt = 0; }).catch(e => { H.failAt = Date.now(); toast(e.message); setTimeout(renderAll, 5100); }).finally(() => { H.loading = false; renderAll(); }); }   // 2.3: after an error wait 5 s instead of asking again right away
     return;
   }
   const names = [...HORSE_NAMES].sort(() => rnd(1000) - 500).slice(0, 6);
@@ -4166,7 +4249,7 @@ document.addEventListener('click', e => {
 
 
 /* ---------- v1.4: Level, Erfahrung und Titel ---------- */
-const TITLES = [[1,'Neuling'],[3,'Stammgast'],[5,'Zocker'],[8,'Kartenhai'],[12,'High Roller'],[16,'Croupier-Schreck'],[20,'Casino-Legende'],[30,'Legat-Baron'],[40,'Legat-Kaiser']];
+const TITLES = [[1,'Neuling'],[3,'Stammgast'],[5,'Zocker'],[8,'Kartenhai'],[12,'High Roller'],[16,'Croupier-Schreck'],[20,'Casino-Legende'],[30,'Legat-Baron'],[40,'Legat-Kaiser'],[50,'Kasalla-König'],[60,'Goldene Wade'],[70,'Tischlegende'],[80,'Casino-Titan'],[90,'Unantastbar'],[99,'Torsten Legat persönlich']];
 const xpFor = stake => stake > 0 ? Math.round(10 + Math.sqrt(stake) / 2) : 0;     // 100 ℒ → 15 XP, 1.000 → 26, 50.000 → 122
 function levelOf(xp = 0){ let L = 1, need = 100; while (xp >= need && L < 99){ xp -= need; L++; need = 100 * L; } return { L, cur: xp, need }; }
 const titleOf = L => TITLES.filter(t => t[0] <= L).pop()[1];
@@ -5651,7 +5734,7 @@ document.addEventListener('click', e => {
 /* the cash-out button reacts when it is pressed, not when it is let go: with a trackpad or mouse there is a moment in between */
 document.addEventListener('pointerdown', e => {
   const b = e.target.closest('[data-act="crcash"]'); if (!b || b.disabled || e.button > 0) return;
-  e.preventDefault(); CR.pdown = Date.now(); crashCash();
+  e.preventDefault(); CR.pdown = Date.now(); haptic('strong'); crashCash();
 });
 setInterval(() => { if (KASSE_ON) crashTick(); if (P?.crash && P.crash.out == null) crashSettle(); crashLeaveCheck(); }, 250);
 /** 2.2.1: leaving Crash while a bet is being placed or still flying: say so, so the booking later is no surprise */
@@ -6431,7 +6514,7 @@ document.addEventListener('click', e => {
 
 /* ================= v1.5.4: Komfort ================= */
 /* ---------- Vibration (getrennt vom Ton) ---------- */
-const buzz = ms => { if (ls.get('vib', true)) try { navigator.vibrate?.(ms); } catch {} };
+const buzz = ms => { if (!ls.get('vib', true)) return; if (navigator.vibrate) try { navigator.vibrate(ms); } catch {} else iosTick(); };   // 2.3: the iPhone ticks too
 
 /* ---------- Mitteilungszentrale ---------- */
 const NOTE = { list: ls.get('notes', []), seen: ls.get('notesSeen', 0) };
@@ -6620,7 +6703,9 @@ function tweenBalance(to){
 function settingsHTML(){
   return `<div class="panel stack"><h3>Einstellungen</h3>
     <label class="setrow"><span><b>Ton</b><small class="muted">Kartengeräusche, Gewinne und Hinweise</small></span><input type="checkbox" data-act="setsound" ${snd.on ? 'checked' : ''}></label>
-    <label class="setrow"><span><b>Vibration</b><small class="muted">Kurzes Feedback bei Gesten und Gewinnen${/iPhone|iPad|Macintosh/.test(navigator.userAgent) && !('vibrate' in navigator) ? ' · iPhone und iPad unterstützen das im Browser leider nicht' : ''}</small></span><input type="checkbox" data-act="setvib" ${ls.get('vib', true) ? 'checked' : ''}></label>
+    <label class="setrow"><span><b>Vibration</b><small class="muted">Kurzes Feedback beim Setzen, Auszahlen und bei Gewinnen${IOS && !('vibrate' in navigator) ? ' · auf dem iPhone ab iOS 18 als leichtes Klicken' : ''}</small></span><input type="checkbox" data-act="setvib" ${ls.get('vib', true) ? 'checked' : ''}></label>
+    <label class="setrow"><span><b>Croupier</b><small class="muted">Sprüche mit Untertiteln bei Blackjack und Roulette</small></span><input type="checkbox" data-act="setcrp" ${CRP.on ? 'checked' : ''}></label>
+    ${'speechSynthesis' in window ? `<label class="setrow"><span><b>Croupier-Stimme</b><small class="muted">Der Croupier spricht laut (nur wenn Ton an ist)</small></span><input type="checkbox" data-act="setcrpvoice" ${CRP.voice ? 'checked' : ''} ${CRP.on ? '' : 'disabled'}></label>` : ''}
   </div>`;
 }
 document.addEventListener('click', e => {
@@ -7752,14 +7837,14 @@ function renderAccount(){
   el.innerHTML = `<div class="stack">
     ${isBroke() ? reviveBox() : needBank() ? bankBox() : ''}
     <div class="panel stack"><div class="row" style="justify-content:space-between"><h2>${avH(P.avatar)} ${esc(P.name)}</h2><button class="btn sm" data-act="logout">Abmelden</button></div>
-      <p class="muted small">Angemeldet als ${esc(authUser?.email||'')} · Version ${APP_VERSION}</p><div id="acc-stats"></div></div>
+      <p class="muted small">Angemeldet als ${esc(authUser?.email||'')} · Version ${APP_VERSION}</p></div>
+    <div class="panel stack"><h3>Deine Finanzen</h3><div id="acc-stats"></div></div>
     ${settingsHTML()}
     ${KASSE_ON ? `<div class="panel stack"><h3>Dein Bonuslink</h3>
       <p class="muted small">Wer sich über deinen Link neu im Casino anmeldet, bekommt <b>2 Messing-Kisten</b>. Du bekommst für den ersten Beitritt eine <b>Samt-Kiste</b>, für den zweiten einen <b>Tresor</b> und danach für jeden weiteren eine <b>Messing-Kiste</b>.</p>
       <div class="row"><input readonly value="${esc(inviteLink())}" aria-label="Dein Bonuslink" style="flex:1 1 200px;min-width:0" onclick="this.select()"><button class="btn sm" data-act="copyinvite">Kopieren</button>${navigator.share ? '<button class="btn sm" data-act="shareinvite">Teilen</button>' : ''}</div></div>` : ''}
     ${adminServerHTML()}
     <div class="panel stack"><h3>Verlauf</h3>${chartHTML(P.hist)}${hist ? `<div class="hist">${hist}</div>` : ''}</div>
-    ${Object.keys(P.games||{}).length ? `<div class="panel stack"><h3>Andere Spiele</h3><div class="statgrid">${Object.entries(P.games).map(([k,g]) => `<div class="stat"><small>${GAME_NAMES[k]||k}</small><b style="color:${g.net>=0?'var(--win)':'var(--lose)'}">${sgn(g.net)}</b><span class="muted small"> · ${g.n}×</span></div>`).join('')}</div></div>` : ''}
     <div class="panel stack"><h3>Erfolge · ${Object.keys(P.ach).length} von ${ACH.length}</h3>${badgesHTML(P.ach, true)}</div>
     ${iOwe.length || owedToMe.length ? `<div class="panel stack"><h3>Schulden</h3>
       ${iOwe.map(([c,v]) => `<div class="lobby-item"><span>Du schuldest <b>${avH(avOf(c))+' '+esc(nameOf(c))}</b> <b class="num">${fmt(v)} ℒ</b></span><button class="btn sm gold" data-act="repay" data-id="${esc(c)}" data-v="${v}" ${P.balance<100?'disabled':''}>Zurückzahlen</button></div>`).join('')}
@@ -7801,7 +7886,7 @@ function statsHTML(p){
     <div class="stat"><small>Pleiten (Niederlagen)</small><b style="color:${s.bankrupts?'var(--lose)':'inherit'}">${s.bankrupts||0}</b></div>
   </div>`;
 }
-function renderAccountStats(){ const box = $('acc-stats'); if (box && P) box.innerHTML = statsHTML(P); }
+function renderAccountStats(){ const box = $('acc-stats'); if (box && P) box.innerHTML = financeHTML(P); }
 
 /* ---------- modal: player profile & fairness ---------- */
 function openModal(kind, id){ modalKind = kind; modalId = id; $('modal').classList.remove('closing'); $('modal').hidden = false; renderModal(true); if (kind === 'flip') requestAnimationFrame(animateFlip); }
@@ -8145,6 +8230,270 @@ document.addEventListener('keydown', e => {
   if (e.target.id==='tcode') joinByCode(e.target.value);
   if (e.target.id==='fcode') document.querySelector('[data-act="addfriend"]')?.click();
 });
+
+/* =====================================================================
+   2.3 – Einsatz mit − / + und Schieberegler, Croupier, Haptik, Finanzen
+   ===================================================================== */
+/* ---------- haptic feedback: Android vibrates, the iPhone ticks through a hidden iOS switch ---------- */
+const IOS = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+let hapEl = null;
+function iosTick(){
+  if (!IOS || !document.body) return;
+  if (!hapEl){
+    hapEl = document.createElement('label'); hapEl.setAttribute('aria-hidden', 'true');
+    hapEl.style.cssText = 'position:fixed;left:-200px;top:0;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none';
+    const i = document.createElement('input'); i.type = 'checkbox'; i.setAttribute('switch', ''); i.tabIndex = -1;
+    hapEl.appendChild(i); document.body.appendChild(hapEl);
+  }
+  try { hapEl.click(); } catch {}
+}
+function haptic(kind = 'light'){
+  if (!ls.get('vib', true)) return;
+  if (navigator.vibrate){ try { navigator.vibrate(kind === 'strong' ? [18, 50, 30] : kind === 'mid' ? 22 : 10); } catch {} return; }
+  iosTick();
+  if (kind === 'strong') setTimeout(iosTick, 110);
+}
+const HAP_BET = new Set(['bet', 'betagain', 'rspin', 'sspin', 'sauto', 'sautoinf', 'hrun', 'splace', 'crgo', 'mnstart', 'hlstart']);
+const HAP_CASH = new Set(['crcash', 'mncash', 'hlcash']);
+const HAP_TAP = new Set(['chip', 'rchip', 'rbet', 'stkset', 'sbet', 'hbet', 'sstake', 'crbet', 'mnstake', 'hlstake', 'betset']);
+document.addEventListener('click', e => {
+  if (!e.isTrusted) return;
+  const b = e.target.closest?.('[data-act]'); if (!b || b.disabled) return;
+  const a = b.dataset.act;
+  if (HAP_BET.has(a)) haptic('mid');
+  else if (HAP_CASH.has(a)){ if (a !== 'crcash' || Date.now() - (CR.pdown || 0) > 800) haptic('strong'); }
+  else if (HAP_TAP.has(a)) haptic('light');
+}, true);
+
+/* ---------- stake: − / + in steps of 100, tap the amount for a slider up to 50.000 in round values ---------- */
+function stakeTop(max, min){ return Math.max(min, Math.min(max || MAX_BET, Math.floor(P?.balance || 0))); }
+function stakeStepper(sel, act, max = MAX_BET, min = 50){
+  const top = stakeTop(max, min);
+  const dn = Math.max(min, Math.ceil(sel / 100) * 100 - 100), up = Math.min(top, Math.max(min, Math.floor(sel / 100) * 100 + 100));
+  return `<div class="stepper" role="group" aria-label="Einsatz">
+    <button type="button" class="stp" data-act="stkset" data-a="${act}" data-v="${dn}" ${sel <= min ? 'disabled' : ''} aria-label="100 weniger">−</button>
+    <button type="button" class="stpval" data-act="stkopen" data-a="${act}" data-v="${sel}" data-min="${min}" data-max="${top}" aria-label="Einsatz ${fmt(sel)} Legats. Tippen zum Einstellen"><small>Einsatz</small><b class="num">${fmt(sel)} ℒ</b></button>
+    <button type="button" class="stp" data-act="stkset" data-a="${act}" data-v="${up}" ${sel >= top ? 'disabled' : ''} aria-label="100 mehr">+</button>
+  </div>`;
+}
+/** set a stake through the game's own handler (as if one of its chips had been tapped) */
+function setStake(act, v){
+  const x = document.createElement('button'); x.hidden = true; x.dataset.act = act; x.dataset.v = String(v);
+  document.body.appendChild(x); x.click(); x.remove();
+}
+function stakeLadder(min, top){
+  const out = [];
+  const add = (a, b, s) => { for (let v = a; v <= b; v += s) out.push(v); };
+  add(100, 1000, 100); add(1500, 5000, 500); add(6000, 10000, 1000); add(12500, 25000, 2500); add(30000, 50000, 5000);
+  const L = [...new Set([min, ...out])].filter(v => v >= min && v <= top).sort((a, b) => a - b);
+  return L.length ? L : [min];
+}
+const STK = { act: null, min: 50, top: MAX_BET, ladder: [], v: 0 };
+function stkSheet(){
+  let s = $('stksheet'); if (s) return s;
+  s = document.createElement('div'); s.id = 'stksheet'; s.className = 'stksheet'; s.hidden = true;
+  s.innerHTML = `<div class="stkcard" role="dialog" aria-modal="true" aria-labelledby="stkh">
+    <div class="grab" aria-hidden="true"></div>
+    <div class="stkhead"><button type="button" class="stklink" data-stk="cancel">Abbrechen</button><b id="stkh">Einsatz</b><button type="button" class="stklink strong" data-stk="done">Fertig</button></div>
+    <label class="stkbig"><input id="stkin" type="text" inputmode="numeric" autocomplete="off" aria-label="Einsatz in Legats"><span>ℒ</span></label>
+    <input id="stkrange" class="stkrange" type="range" min="0" max="1" step="1" aria-label="Einsatz-Schieberegler">
+    <div class="stkscale"><span id="stklo"></span><span id="stkhi"></span></div>
+    <div class="stkquick" id="stkquick"></div>
+  </div>`;
+  document.body.appendChild(s);
+  const range = s.querySelector('#stkrange'), inp = s.querySelector('#stkin');
+  s.addEventListener('click', e => {
+    if (e.target === s) return stkClose(true);
+    const k = e.target.closest('[data-stk]')?.dataset.stk;
+    if (k === 'cancel') stkClose(false);
+    else if (k === 'done') stkClose(true);
+    else if (k === 'q'){ stkShow(+e.target.closest('[data-stk]').dataset.v); haptic('light'); }
+  });
+  range.addEventListener('input', () => { const v = STK.ladder[+range.value]; if (v !== STK.v){ STK.v = v; inp.value = fmt(v); stkMarks(); haptic('light'); } });
+  range.addEventListener('change', () => stkApply());
+  inp.addEventListener('input', () => { const v = parseInt(inp.value.replace(/\D/g, ''), 10); if (v > 0){ STK.v = v; stkRangeTo(v); } });
+  inp.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); stkClose(true); } });
+  inp.addEventListener('focus', () => setTimeout(() => inp.select(), 0));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !s.hidden) stkClose(false); });
+  return s;
+}
+function stkRangeTo(v){
+  const r = $('stkrange'); let best = 0;
+  STK.ladder.forEach((x, i) => { if (Math.abs(x - v) < Math.abs(STK.ladder[best] - v)) best = i; });
+  r.value = best; r.style.setProperty('--p', (STK.ladder.length > 1 ? best / (STK.ladder.length - 1) * 100 : 100) + '%');
+  stkMarks();
+}
+function stkMarks(){
+  const r = $('stkrange'); if (r) r.style.setProperty('--p', (STK.ladder.length > 1 ? r.value / (STK.ladder.length - 1) * 100 : 100) + '%');
+  for (const b of document.querySelectorAll('#stkquick [data-v]')) b.setAttribute('aria-pressed', String(+b.dataset.v === STK.v));
+}
+function stkShow(v){ STK.v = v; $('stkin').value = fmt(v); stkRangeTo(v); }
+function stkOpen(act, v, min, top){
+  const s = stkSheet();
+  Object.assign(STK, { act, min, top, ladder: stakeLadder(min, top), orig: v });
+  const r = $('stkrange'); r.max = STK.ladder.length - 1;
+  $('stklo').textContent = fmt(STK.ladder[0]) + ' ℒ'; $('stkhi').textContent = fmt(STK.ladder[STK.ladder.length - 1]) + ' ℒ';
+  $('stkquick').innerHTML = [100, 500, 1000, 5000, 10000, 25000, 50000].filter(x => x >= min && x <= top)
+    .map(x => `<button type="button" data-stk="q" data-v="${x}">${x >= 1000 ? x / 1000 + 'K' : x}</button>`).join('');
+  stkShow(v);
+  s.classList.remove('out'); s.hidden = false;
+  document.documentElement.classList.add('stkopen');
+}
+function stkClamp(v){ return Math.max(STK.min, Math.min(STK.top, Math.round(v) || STK.min)); }
+function stkApply(){ if (!STK.act) return; const v = stkClamp(STK.v); STK.v = v; setStake(STK.act, v); }
+function stkClose(apply){
+  const s = $('stksheet'); if (!s || s.hidden) return;
+  if (apply){
+    const typed = parseInt(($('stkin').value || '').replace(/\D/g, ''), 10);
+    if (typed > 0) STK.v = typed;
+    if (STK.v > STK.top && STK.top < MAX_BET) toast(`Du hast nur ${fmt(STK.top)} ℒ. Der Einsatz ist jetzt ${fmt(STK.top)} ℒ.`);
+    stkApply();
+  } else if (STK.orig != null) setStake(STK.act, STK.orig);
+  STK.act = null; $('stkin').blur();
+  document.documentElement.classList.remove('stkopen');
+  if (reduceMotion){ s.hidden = true; return; }
+  s.classList.add('out'); setTimeout(() => { s.classList.remove('out'); if (!STK.act) s.hidden = true; }, 220);
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-act]'); if (!b || b.disabled) return;
+  switch (b.dataset.act){
+    case 'stkset': setStake(b.dataset.a, +b.dataset.v); break;
+    case 'stkopen': stkOpen(b.dataset.a, +b.dataset.v, +b.dataset.min, +b.dataset.max); break;
+    case 'betset': bet = Math.max(0, Math.min(MAX_BET, Math.floor(P?.balance || 0), +b.dataset.v || 0)); SFX.chip(); renderAll(); break;
+    case 'setcrp': CRP.on = b.checked; ls.set('crp', CRP.on); if (CRP.on) crpSay(pick(CRP_L.hello), { force: true }); else crpHide(); renderAll(); break;
+    case 'setcrpvoice': CRP.voice = b.checked; ls.set('crpvoice', CRP.voice); if (CRP.voice){ crpUnlock(); crpSay(pick(CRP_L.hello), { force: true }); } else try { speechSynthesis.cancel(); } catch {} break;
+  }
+});
+
+/* ---------- Croupier: funny lines with subtitles, read aloud if wanted (Blackjack and Roulette) ---------- */
+const CRP = { on: ls.get('crp', true), voice: ls.get('crpvoice', true), last: 0, timer: 0, unlocked: false, bj: { tid: null, round: -1, phase: '', sig: '' } };
+const CRP_NAME = 'Croupier Kalle';
+const CRP_L = {
+  hello: ['Guten Abend! Ich bin Kalle, euer Croupier. Heute gibt es Kasalla!', 'Kalle hier. Setzt euch, nehmt euch ein Getränk, verliert ein bisschen Geld.'],
+  betting: ['Einsätze bitte! Wer nicht setzt, kann nicht gewinnen.', 'Neue Runde, neues Glück. Das alte hab ich leider schon eingesammelt.', 'Chips raus, Nerven behalten!', 'Torsten Legat setzt immer alles. Auf sich selbst.', 'Bitte setzen. Torsten Legat wartet auch nicht gerne.', 'Na, wer traut sich?'],
+  deal: ['Die Karten fliegen!', 'Ich mische nicht, ich zaubere.', 'Torsten Legat zählt keine Karten. Die Karten zählen ihn.', 'Augen auf, jetzt wird es spannend.', 'Frisch vom Schlitten, noch warm.'],
+  insurance: ['Ass beim Dealer! Möchte sich jemand versichern?', 'Oha, ein Ass. Versicherung gefällig?'],
+  bj: ['Blackjack! Kasalla!', 'Kasalla! Einundzwanzig mit zwei Karten!', 'Blackjack! Das gibt Kasalla, und zwar drei zu zwei.', 'Kasalla! Genau so hätte Torsten Legat das auch gemacht.', 'Kasalla, Kasalla! Blackjack!'],
+  bust: ['Überkauft. Das tat weh.', 'Zweiundzwanzig. Knapp daneben ist auch vorbei.', 'Überkauft! Torsten Legat hätte da gehalten. Vielleicht.', 'Eine Karte zu viel. Passiert den Besten.'],
+  dealerBust: ['Ich hab mich überkauft! Kasalla für euch!', 'Dealer überkauft. Mein Pech ist euer Glück.', 'Zu viel gezogen. Der Chef wird mich hassen.'],
+  dealerBj: ['Dealer hat Blackjack. Tut mir leid. Ein bisschen.', 'Blackjack für die Bank. Das war fies, ich weiß.'],
+  win: ['Glückwunsch, das geht an dich!', 'Gewonnen! Torsten Legat wäre stolz auf dich.', 'Sauber gespielt. Die Bank weint leise.', 'Gewonnen! Kauf dir was Schönes. Oder setz es gleich wieder.', 'Schön! So sieht Gewinnen aus.'],
+  bigWin: ['Wahnsinn! Das ist Kasalla de luxe!', 'Was für ein Gewinn! Torsten Legat würde dir jetzt die Hand schütteln. Vorsicht, fester Händedruck.', 'Riesengewinn! Ich hol schon mal den Schubkarren.'],
+  lose: ['Die Bank gewinnt. Wie fast immer.', 'Verloren. Kopf hoch, auch Torsten Legat hat mal ein Spiel verloren. Einmal.', 'Das war nix. Die nächste Runde wird besser.', 'Leider verloren. Ich nehme das gerne für dich in Verwahrung.'],
+  push: ['Unentschieden. Keiner jubelt, keiner weint.', 'Gleichstand. Geld zurück, Puls bleibt oben.'],
+  rspin: ['Rien ne va plus! Nichts geht mehr.', 'Die Kugel rollt! Torsten Legat könnte sie mit bloßen Händen anhalten.', 'Nichts geht mehr. Ab jetzt hilft nur noch Daumen drücken.', 'Rien ne va plus! Und ab die Kugel.'],
+  rwin: ['Treffer! Kasalla!', 'Gewonnen, Glückwunsch!', 'Da klingelt die Kasse!'],
+  rnum: ['Volltreffer auf die Zahl! Kasalla!', 'Genau die Zahl! Das gibt richtig Kasalla!'],
+  rlose: ['Leider daneben.', 'Die Kugel mag dich heute nicht.', 'Knapp vorbei ist auch daneben.', 'Nicht getroffen. Torsten Legat hätte die Kugel einfach umgedreht.'],
+  rpush: ['Plus minus null. Immerhin.'],
+};
+function crpEl(){
+  let e = $('croupier'); if (e) return e;
+  e = document.createElement('div'); e.id = 'croupier'; e.className = 'croupier'; e.hidden = true; e.setAttribute('role', 'status'); e.setAttribute('aria-live', 'polite');
+  e.innerHTML = `<span class="crpav" aria-hidden="true">🤵</span><span class="crptx"><small>${CRP_NAME}</small><span id="crptext"></span></span>`;
+  e.addEventListener('click', crpHide);
+  document.body.appendChild(e); return e;
+}
+function crpHide(){ const e = $('croupier'); if (e && !e.hidden){ e.classList.add('out'); setTimeout(() => { e.classList.remove('out'); e.hidden = true; }, 250); } clearTimeout(CRP.timer); }
+function crpVoice(){
+  const vs = (speechSynthesis.getVoices?.() || []).filter(v => /^de(-|_|$)/i.test(v.lang));
+  return vs.find(v => /Markus|Yannick|Viktor|Martin|Helena|Anna|Petra/i.test(v.name) && v.localService) || vs.find(v => v.localService) || vs[0] || null;
+}
+function crpUnlock(){
+  if (CRP.unlocked || !('speechSynthesis' in window)) return;
+  CRP.unlocked = true;
+  try { const u = new SpeechSynthesisUtterance(' '); u.volume = 0; u.lang = 'de-DE'; speechSynthesis.speak(u); } catch {}
+}
+for (const ev of ['pointerdown', 'keydown']) document.addEventListener(ev, () => { if (CRP.voice && CRP.on) crpUnlock(); }, { passive: true, capture: true });
+try { speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged = () => {}; } catch {}
+function crpSpeak(text){
+  if (!CRP.voice || !snd.on || !('speechSynthesis' in window)) return;
+  try {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text.replace(/[^\p{L}\p{N}\s.,!?'’:;-]/gu, ''));
+    u.lang = 'de-DE'; const v = crpVoice(); if (v) u.voice = v; u.rate = 1.05; u.pitch = 1;
+    speechSynthesis.speak(u);
+  } catch {}
+}
+function crpSay(text, { force = false, chance = 1 } = {}){
+  if (!CRP.on || !text || document.hidden) return;
+  if (!force && (Math.random() > chance || Date.now() - CRP.last < 7000)) return;
+  CRP.last = Date.now();
+  const e = crpEl(); $('crptext').textContent = text;
+  e.classList.remove('out'); e.hidden = false; e.style.animation = 'none'; void e.offsetWidth; e.style.animation = '';
+  clearTimeout(CRP.timer); CRP.timer = setTimeout(crpHide, Math.max(3500, 1600 + text.length * 70));
+  crpSpeak(text);
+}
+/** Blackjack: comment on what changed at the table */
+function crpTable(){
+  const st = CRP.bj;
+  if (!T || !tid || !uid) return;
+  const hs = T.hands?.[uid] || [], sig = hs.map(h => h.st || '').join(',');
+  if (st.tid !== tid){ Object.assign(st, { tid, round: T.round, phase: T.phase, sig, said: '' }); return; }   // just sat down: nothing to say yet
+  const prev = { ...st }; Object.assign(st, { round: T.round, phase: T.phase, sig });
+  if (game !== 'bj' || tab !== 'table') return;
+  const newBj = hs.some((h, i) => h.st === 'bj' && (prev.sig.split(',')[i] || '') !== 'bj' && prev.round === T.round || h.st === 'bj' && prev.round !== T.round);
+  const newBust = hs.some((h, i) => h.st === 'bust' && (prev.round !== T.round || (prev.sig.split(',')[i] || '') !== 'bust'));
+  const key = T.round + ':';
+  if (newBj && st.said !== key + 'bj'){ st.said = key + 'bj'; return crpSay(pick(CRP_L.bj), { force: true }); }
+  if (newBust && T.phase !== 'done'){ st.said = key + 'bust'; return crpSay(pick(CRP_L.bust), { force: true }); }
+  if (T.phase === 'done' && prev.phase !== 'done'){
+    const r = T.history?.[T.round]?.[uid]; if (!r) return;
+    const net = r.pay - r.bet, d = score(T.dealer).t, dbj = T.dealer.length === 2 && d === 21;
+    if (st.said === key + 'bj' && net > 0) return;                       // Kasalla was already said
+    if (net >= 10000) return crpSay(pick(CRP_L.bigWin), { force: true });
+    if (net > 0) return crpSay(pick(d > 21 ? CRP_L.dealerBust : CRP_L.win), { force: true });
+    if (net < 0){ if (st.said === key + 'bust') return; return crpSay(pick(dbj ? CRP_L.dealerBj : CRP_L.lose), { force: true }); }
+    return crpSay(pick(CRP_L.push), { force: true });
+  }
+  if (T.phase === 'insurance' && prev.phase !== 'insurance' && T.hands?.[uid]) return crpSay(pick(CRP_L.insurance), { force: true });
+  if (prev.phase === 'betting' && T.phase !== 'betting' && T.hands?.[uid]) return crpSay(pick(CRP_L.deal), { chance: .3 });
+  if (T.phase === 'betting' && (prev.phase !== 'betting' || prev.round !== T.round)) return crpSay(pick(CRP_L.betting), { chance: .3 });
+}
+function crpRoulette(n, pay, total, bets){
+  const col = n === 0 ? 'Zero' : `${n}, ${RED.has(n) ? 'rot' : 'schwarz'}`;
+  const L = pay > total ? (bets?.['n' + n] ? CRP_L.rnum : CRP_L.rwin) : pay < total ? CRP_L.rlose : CRP_L.rpush;
+  crpSay(`${col}. ${pick(pay - total >= 10000 ? CRP_L.bigWin : L)}`, { force: true });
+}
+document.addEventListener('visibilitychange', () => { if (document.hidden){ try { speechSynthesis.cancel(); } catch {} } });
+
+/* ---------- 2.3: your finances at a glance ---------- */
+function financeHTML(p){
+  const s = p.stats || {}, g = p.games || {}, bal = Math.max(0, p.balance || 0), eur = Math.max(0, euroOf(p)), tot = bal + eur;
+  const other = Object.entries(g).filter(([k]) => k !== 'bj').reduce((a, [, x]) => a + (x.net || 0), 0);
+  const rows = [...(g.bj ? [] : [['bj', { n: s.hands || 0, net: (s.net || 0) - other }]]), ...Object.entries(g)].filter(([, x]) => x.n > 0).sort((a, b) => b[1].net - a[1].net);
+  const big = Math.max(1, ...rows.map(([, x]) => Math.abs(x.net)));
+  const lp = tot > 0 ? Math.round(bal / tot * 1000) / 10 : 0;
+  const wk = p.week?.id === weekId() ? (p.week.net || 0) : 0;
+  const col = v => v > 0 ? 'var(--win)' : v < 0 ? 'var(--lose)' : 'var(--ink)';
+  const q = s.hands ? Math.round((s.wins / s.hands) * 100) : 0;
+  const rowH = ([k, x]) => { const w = Math.max(x.net ? 2 : 0, Math.abs(x.net) / big * 50);
+    return `<div class="finrow"><span class="fn"><b>${esc(GAME_NAMES[k] || k)}</b><small>${fmt(x.n)} ${k === 'bj' ? (x.n === 1 ? 'Hand' : 'Hände') : (x.n === 1 ? 'Runde' : 'Runden')}</small></span>
+      <span class="fbar" aria-hidden="true"><i class="${x.net >= 0 ? 'pos' : 'neg'}" style="width:${w.toFixed(1)}%"></i></span>
+      <b class="num fv" style="color:${col(x.net)}">${sgn(x.net)}</b></div>`; };
+  return `<div class="fin">
+    <div class="finhero"><small>Gesamtvermögen</small><b class="num">${fmt(tot)}</b>
+      <div class="finbar" role="img" aria-label="${lp.toLocaleString('de-DE')} Prozent Legats, der Rest Euro auf der Bank"><i style="width:${lp}%"></i></div>
+      <div class="finleg"><span><i class="fdot l"></i>Legats <b class="num">${fmt(p.balance || 0)} ℒ</b></span><span><i class="fdot e"></i>Bank <b class="num">${fmt(euroOf(p))} €</b></span></div>
+    </div>
+    <div class="fincards">
+      <div><small>Insgesamt</small><b class="num" style="color:${col(s.net || 0)}">${sgn(s.net || 0)}</b></div>
+      <div><small>Diese Woche</small><b class="num" style="color:${col(wk)}">${sgn(wk)}</b></div>
+      <div><small>Bester Gewinn</small><b class="num">${fmt(s.best || 0)}</b></div>
+    </div>
+    ${rows.length ? `<div class="finsec"><h4>Gewinn und Verlust nach Spiel</h4><div class="finrows">${rows.map(rowH).join('')}</div></div>` : ''}
+    ${s.hands ? `<div class="finsec"><h4>Blackjack</h4><div class="finbj">
+      <span><b class="num">${fmt(s.hands)}</b><small>Hände</small></span>
+      <span><b class="num">${q} %</b><small>gewonnen</small></span>
+      <span><b class="num" style="color:var(--win)">${fmt(s.wins || 0)}</b><small>Siege</small></span>
+      <span><b class="num" style="color:var(--lose)">${fmt(s.losses || 0)}</b><small>Niederlagen</small></span>
+      <span><b class="num">${fmt(s.pushes || 0)}</b><small>Unentschieden</small></span>
+      <span><b class="num">${fmt(s.bj || 0)}</b><small>Blackjacks</small></span>
+    </div></div>` : ''}
+    ${s.bankrupts ? `<p class="muted small" style="margin:0">Pleiten bisher: <b class="num" style="color:var(--lose)">${s.bankrupts}</b></p>` : ''}
+  </div>`;
+}
+
 </script>
 </body>
 </html>
