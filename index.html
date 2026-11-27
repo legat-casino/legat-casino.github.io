@@ -1343,15 +1343,14 @@ body.isclosed{overflow:hidden}
 html.stkopen body{overflow:hidden}
 @keyframes stkup{from{transform:translateY(100%)}to{transform:none}}
 @keyframes stkfade{from{opacity:0}to{opacity:1}}
-/* ---------- 2.3: croupier banner ---------- */
-.croupier{position:fixed;left:50%;top:calc(10px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:55;width:min(calc(100% - 24px),460px);display:flex;align-items:center;gap:12px;padding:10px 14px 10px 10px;border-radius:18px;background:rgba(35,26,20,.92);-webkit-backdrop-filter:blur(16px) saturate(1.3);backdrop-filter:blur(16px) saturate(1.3);border:1px solid var(--line);box-shadow:0 10px 30px rgba(0,0,0,.45);animation:crpin .35s cubic-bezier(.2,.9,.3,1.2);cursor:pointer}
+/* ---------- 2.3.1: croupier subtitles, at the bottom like in a game ---------- */
+.croupier{position:fixed;left:50%;bottom:calc(64px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:55;width:min(calc(100% - 24px),720px);text-align:center;pointer-events:none;animation:crpin .25s ease-out}
 .croupier.out{animation:crpout .25s ease-in forwards}
-.croupier .crpav{flex:0 0 40px;height:40px;border-radius:50%;display:grid;place-items:center;font-size:24px;background:radial-gradient(circle at 35% 30%,#f0d48f,#9c7838);box-shadow:inset 0 -2px 4px rgba(0,0,0,.25)}
-.croupier .crptx{display:flex;flex-direction:column;min-width:0}
-.croupier .crptx small{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--brass)}
-.croupier #crptext{font-weight:600;font-size:15px;line-height:1.3}
-@keyframes crpin{from{opacity:0;transform:translate(-50%,-30px) scale(.96)}to{opacity:1;transform:translate(-50%,0)}}
-@keyframes crpout{to{opacity:0;transform:translate(-50%,-24px)}}
+.crpline{margin:0;font:700 clamp(17px,4.6vw,24px)/1.3 var(--f-body);color:#fff;letter-spacing:.01em;
+  text-shadow:0 0 2px #000,0 0 3px #000,1.5px 1.5px 0 #000,-1.5px 1.5px 0 #000,1.5px -1.5px 0 #000,-1.5px -1.5px 0 #000,0 2px 8px rgba(0,0,0,.8)}
+.crpwho{color:#f2c94c}
+@keyframes crpin{from{opacity:0}to{opacity:1}}
+@keyframes crpout{to{opacity:0}}
 /* ---------- 2.3: finances ---------- */
 .fin{display:flex;flex-direction:column;gap:14px}
 .finhero{display:flex;flex-direction:column;gap:6px;padding:16px;border-radius:16px;background:linear-gradient(150deg,rgba(209,173,98,.22),rgba(209,173,98,.04));border:1px solid var(--line)}
@@ -2346,7 +2345,7 @@ function openTable(id){
   setTimeout(leaseLoop, 300);
   unsubT = onSnapshot(doc(fs,'tables',id), s => {
     if (!s.exists()){ if (!s.metadata.fromCache && tid===id){ T=null; renderAll(); } return; }
-    T = s.data(); pendingAct = false;
+    T = s.data(); if (!ACT.busy) pendingAct = false;   // 2.3.1: while my move is on its way the buttons stay locked
     { const sig = [T.phase, T.round, T.turn?.u, T.turn?.h, T.betUntil, Object.keys(T.hands || {}).length].join('|'); if (sig !== HOST.sig){ HOST.sig = sig; HOST.progress = Date.now(); } }
     reconcile(); afterTable(); try { crpTable(); } catch (e){ console.warn(e); } renderAll();
   }, e => console.warn(e));
@@ -2455,12 +2454,30 @@ function placeBet(amount = bet){
 function unBet(){
   if (KASSE_ON){ kasse('bjunbet', { tid }).then(() => seatWrite({ ready:false })).catch(e => toast(e.message)); return; }
   seatWrite({ ready:false }); }
+/** 2.3.1: send a Blackjack move. If the server says it isn't my turn, the table on this device may be out of date:
+    load it fresh from the server, and if it really is still my turn, send the move once more */
+const ACT = { busy: false };
+async function bjActK(type, at, retry = false){
+  const t0 = tid; ACT.busy = true;
+  try { await kasse('bjact', { tid: t0, type, h: at.h, round: at.round }); }
+  catch (e){
+    if (!/nicht dran/.test(e.message || '') || retry || tid !== t0){ toast(e.message); }
+    else {
+      let fresh = null;
+      try { const s = await getDocFromServer(doc(fs, 'tables', t0)); if (s.exists() && tid === t0) fresh = s.data(); } catch (x){ console.warn(x); }
+      if (fresh){ T = fresh; reconcile(); afterTable(); }
+      const mine = fresh && fresh.phase === 'playing' && fresh.turn?.u === uid;
+      if (mine && (fresh.turn.h !== at.h || fresh.round !== at.round)){ /* the table moved on: just show the new state */ }
+      else if (mine){ return await bjActK(type, { h: fresh.turn.h, round: fresh.round }, true); }
+    }
+  } finally { ACT.busy = false; pendingAct = false; renderAll(); }
+}
 function act(type){
   if (!T || T.phase!=='playing' || !T.turn || T.turn.u!==uid || pendingAct) return;
   const H = T.hands[uid][T.turn.h];
   if ((type==='double' || type==='split') && P.balance < H.bet) return toast('Nicht genug Legats für '+(type==='double'?'Verdoppeln':'Teilen')+'.');
   pendingAct = true; renderAll();
-  if (KASSE_ON){ kasse('bjact', { tid, type, h: T.turn.h, round: T.round }).catch(e => toast(e.message)).finally(() => { pendingAct = false; renderAll(); }); return; }
+  if (KASSE_ON){ bjActK(type, { h: T.turn.h, round: T.round }); return; }
   seatWrite({ act: { type, h:T.turn.h, round:T.round, seq:Date.now() } });
   setTimeout(()=>{ if(pendingAct){ pendingAct=false; renderAll(); } }, 4000);
 }
@@ -2852,9 +2869,13 @@ function animateCards(root){
 /* =====================================================================
    v1.1 – Casino home, Glücksrad, Roulette, Automat, Pferderennen, Sportwetten
    ===================================================================== */
-const APP_VERSION = '2.3';
+const APP_VERSION = '2.3.0.1';
 const CL_TITLES = { '1.5.12': 'Technische Verbesserungen' };
 const CHANGELOGS = {
+  '2.3.0.1': [
+    'Blackjack: Meldete der Server „Du bist gerade nicht dran“, obwohl du dran warst, holt die App jetzt sofort den aktuellen Tisch und schickt deinen Zug nochmal. Solange dein Zug unterwegs ist, bleiben die Knöpfe gesperrt, damit nichts doppelt ankommt',
+    'Croupier: Die Sprüche stehen jetzt unten als echte Untertitel, weiße Schrift mit schwarzem Rand und dem Namen in Gelb',
+  ],
   '2.3': [
     'Neuer Croupier: Kalle kommentiert Blackjack und Roulette, immer mit Untertitel und auf Wunsch mit Stimme. Bei einem Blackjack gibt es Kasalla, und auch Torsten Legat kommt öfter vor. Abschalten geht unter Konto → Einstellungen',
     'Neue Einsatz-Auswahl: Statt ½, 2× und Max gibt es jetzt − und + (in 100er-Schritten). Tippst du auf den Betrag, kommt ein Schieberegler bis 50.000 ℒ mit runden Werten. Du kannst den Betrag dort auch eintippen',
@@ -8390,7 +8411,7 @@ const CRP_L = {
 function crpEl(){
   let e = $('croupier'); if (e) return e;
   e = document.createElement('div'); e.id = 'croupier'; e.className = 'croupier'; e.hidden = true; e.setAttribute('role', 'status'); e.setAttribute('aria-live', 'polite');
-  e.innerHTML = `<span class="crpav" aria-hidden="true">🤵</span><span class="crptx"><small>${CRP_NAME}</small><span id="crptext"></span></span>`;
+  e.innerHTML = `<p class="crpline"><b class="crpwho">Kalle:</b> <span id="crptext"></span></p>`;
   e.addEventListener('click', crpHide);
   document.body.appendChild(e); return e;
 }
