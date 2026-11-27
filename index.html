@@ -272,7 +272,7 @@ table.board{width:100%;border-collapse:collapse;font-size:14px}
 .tiles{display:grid;grid-template-columns:repeat(6,1fr);gap:14px}
 .tile{grid-column:span 2;display:flex;flex-direction:column;text-align:left;padding:0;border-radius:14px;border:1px solid var(--line);background:var(--rail-2);color:var(--ink);overflow:hidden;min-width:0;transition:transform .15s,border-color .15s}
 .tile:hover{transform:translateY(-2px);border-color:var(--brass-dim)}
-.tile-bj{grid-column:span 3}.tile-sports{grid-column:span 3}
+.tile-bj{grid-column:span 2}.tile-sports{grid-column:span 2}
 .tile .art{height:120px;display:grid;place-items:center;background:radial-gradient(110% 120% at 50% 0%,#175a45,#0f3d2f 55%,#0a2a20);border-bottom:1px solid var(--line);overflow:hidden;position:relative}
 .tile-roulette .art{background:radial-gradient(110% 120% at 50% 0%,#5e1626,#3a0d17)}
 .tile-slots .art{background:radial-gradient(110% 120% at 50% 0%,#3d2266,#261443)}
@@ -1383,6 +1383,8 @@ html.stkopen body{overflow:hidden}
 .finbj span{display:flex;flex-direction:column;align-items:center;padding:8px 4px;border-radius:10px;background:rgba(0,0,0,.18)}
 .finbj b{font-size:17px} .finbj small{font-size:11px;color:var(--muted)}
 /* ---------- 2.4: Texas Hold'em ---------- */
+/* 2.4.0.1: Blackjack, Poker and Sportwetten share the first row; on the phone Blackjack and Poker sit side by side, Sportwetten gets its own row */
+@media (max-width:760px){.tiles .tile-sports{grid-column:span 2}}
 .tile-poker .art{background:radial-gradient(110% 120% at 50% 20%,#175a45,#0a2a20)}
 .minipk{display:flex;justify-content:center;align-items:center;height:100%;gap:0}
 .minipk .pc{transform:rotate(-10deg)}.minipk .pc+.pc{transform:rotate(6deg) translateY(-4px);margin-left:-14px}.minipk .pc+.pc+.pc{transform:rotate(18deg);margin-left:-14px}
@@ -3037,9 +3039,12 @@ function animateCards(root){
 /* =====================================================================
    v1.1 – Casino home, Glücksrad, Roulette, Automat, Pferderennen, Sportwetten
    ===================================================================== */
-const APP_VERSION = '2.4';
+const APP_VERSION = '2.4.0.1';
 const CL_TITLES = { '1.5.12': 'Technische Verbesserungen', '2.4': 'Version 2.4: alles Neue seit 2.2.2' };
 const CHANGELOGS = {
+  '2.4.0.1': [
+    'Casino: Die Spiele sind neu angeordnet. Blackjack, Poker und Sportwetten stehen zusammen oben, auf dem Handy Blackjack und Poker nebeneinander',
+  ],
   '2.4': [
     'Neu: Texas Hold\'em Poker mit deinen Freunden. Eröffne einen Tisch, gib den 5-stelligen Code weiter, und bis zu 6 Spieler setzen sich mit Chips von ihrem Konto hin. Der Server mischt und gibt, deine zwei Karten sieht nur dein Handy. Erhöhen geht mit − und + in 100er-Schritten oder mit dem Schieberegler, und die Regeln stehen hinter dem Knopf „Regeln“',
     'Neu: Namens-Designs im Shop, von Gold über Neon und Regenbogen bis Legat. Alle sehen deinen Namen so, am Pokertisch, in der Rangliste, im Profil und auf der Startseite',
@@ -7539,8 +7544,8 @@ function renderHome(){
     ${P ? progressCard() : ''}
     <div class="tiles">
       ${tile('bj', 'Blackjack', 'Mit Freunden am Tisch, bis zu 5 Spieler', `<div class="minicards"><div class="mc">A<i>♠</i></div><div class="mc red">K<i>♥</i></div></div>`, atTables ? `<span class="pill good">${atTables} ${atTables===1?'Freund':'Freunde'} am Tisch</span>` : tid ? '<span class="pill good">Du sitzt am Tisch</span>' : '')}
-      ${tile('sports', 'Sportwetten', 'Bundesliga · Champions League · Darts', `<div class="minisports"><span>⚽</span><span>🎯</span></div>`, duIncoming() ? `<span class="pill good">🤝 ${duIncoming()} ${duIncoming() === 1 ? 'Herausforderung' : 'Herausforderungen'}</span>` : next ? `<span class="small muted">Nächstes: ${esc(next.t1)} – ${esc(next.t2)}, ${timeLabel(next.t)}</span>` : '<span class="small muted">Plus fiktive Turniere alle 15 Minuten</span>')}
       ${tile('poker', 'Poker<span class="newtag">Neu</span>', "Texas Hold'em mit Freunden, bis zu 6 Spieler", `<div class="minipk">${pkCard('AS')}${pkCard('KH')}${pkCard('back')}</div>`, pkTileExtra())}
+      ${tile('sports', 'Sportwetten', 'Bundesliga · Champions League · Darts', `<div class="minisports"><span>⚽</span><span>🎯</span></div>`, duIncoming() ? `<span class="pill good">🤝 ${duIncoming()} ${duIncoming() === 1 ? 'Herausforderung' : 'Herausforderungen'}</span>` : next ? `<span class="small muted">Nächstes: ${esc(next.t1)} – ${esc(next.t2)}, ${timeLabel(next.t)}</span>` : '<span class="small muted">Plus fiktive Turniere alle 15 Minuten</span>')}
       ${tile('kisten', 'Kisten', 'Öffnen, sammeln, handeln: Items mit Zustand und Nummer, Markt und Auktionen', kChest(KCRATES[2]), kisTileExtra())}
       ${tile('loono', 'Loono', 'Kartenspiel mit Freunden und Bots, 2 bis 8 Spieler, mit oder ohne Einsatz', `<div class="miniloono">${['r7','gs','yd','xf'].map(c => loCard(c)).join('')}</div>`, loTileExtra())}
       ${tile('crash', 'Crash', 'Zahl aus, bevor die Rakete explodiert', `<div class="minicrash"><svg viewBox="0 0 120 70" aria-hidden="true"><path d="M5 65 Q70 62 105 12" fill="none" stroke="#ff5a4f" stroke-width="4" stroke-linecap="round"/></svg><span>🚀</span><b class="num">2,47×</b></div>`, crashFriends())}
