@@ -1382,6 +1382,166 @@ html.stkopen body{overflow:hidden}
 .finbj{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .finbj span{display:flex;flex-direction:column;align-items:center;padding:8px 4px;border-radius:10px;background:rgba(0,0,0,.18)}
 .finbj b{font-size:17px} .finbj small{font-size:11px;color:var(--muted)}
+/* ---------- 2.4: Texas Hold'em ---------- */
+.tile-poker .art{background:radial-gradient(110% 120% at 50% 20%,#175a45,#0a2a20)}
+.minipk{display:flex;justify-content:center;align-items:center;height:100%;gap:0}
+.minipk .pc{transform:rotate(-10deg)}.minipk .pc+.pc{transform:rotate(6deg) translateY(-4px);margin-left:-14px}.minipk .pc+.pc+.pc{transform:rotate(18deg);margin-left:-14px}
+.pkstats{display:flex;gap:8px}
+.pkstats .stat{flex:1 1 0;min-width:0;background:var(--rail-2);border-color:var(--hair);border-radius:12px;padding:8px 10px}
+.pkstats .stat small{display:block;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.pkstats .stat b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pktable{--f1:#175a45;--f2:#0f3d2f;--f3:#0a2a20;--b1:#7d2a22;--b2:#6a221c;position:relative;height:500px;margin-top:10px;border-radius:200px;background:radial-gradient(ellipse at 50% 42%,var(--f1) 0%,var(--f2) 45%,var(--f3) 100%);border:10px solid #3a2617;box-shadow:inset 0 0 0 2px var(--brass-dim),inset 0 0 40px rgba(0,0,0,.45),0 12px 30px rgba(0,0,0,.5)}
+.pktable::after{content:"LEGAT CASINO";position:absolute;left:0;right:0;top:66%;text-align:center;font:700 12px var(--f-display);letter-spacing:.35em;color:rgba(209,173,98,.2);pointer-events:none}
+.pkhead{position:absolute;left:50%;top:-44px;transform:translateX(-50%);width:calc(100% + 20px);display:flex;justify-content:space-between;align-items:center;gap:8px}
+.pktable{margin-top:52px}
+.pkcenter{position:absolute;left:50%;top:47%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:7px;width:86%}
+.pkboard{display:flex;gap:4px;justify-content:center;min-height:64px}
+.pkpot{font:600 13px var(--f-num);background:rgba(0,0,0,.35);border:1px solid var(--line);color:var(--brass);padding:4px 12px;border-radius:999px}
+.pkstreet{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.pkseat{position:absolute;width:90px;display:flex;flex-direction:column;align-items:center;gap:3px;transition:opacity .3s}
+.pkplate{width:100%;background:rgba(10,8,6,.84);border:1px solid var(--hair);border-radius:12px;padding:5px 5px 4px;text-align:center;position:relative;transition:box-shadow .3s,border-color .3s}
+.pkseat.turn .pkplate{border-color:var(--brass);box-shadow:0 0 0 2px rgba(209,173,98,.35),0 0 18px rgba(209,173,98,.35)}
+.pkseat.win .pkplate{border-color:var(--win);box-shadow:0 0 0 2px rgba(121,216,162,.35),0 0 18px rgba(121,216,162,.4)}
+.pkseat.me .pkplate{background:rgba(35,26,20,.92)}
+.pkseat.folded{opacity:.45}
+.pknm{font-weight:700;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pknm .avimg,.pknm img{width:16px;height:16px;vertical-align:-3px}
+.pkst{font:500 12px var(--f-num);color:var(--brass)}
+.pkact{font-size:10px;color:var(--muted);min-height:13px;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pkseat.turn .pkact{color:var(--brass);font:600 11px var(--f-num)}
+.pkhc{display:flex;gap:3px;min-height:37px}
+.pkbadge{position:absolute;top:-8px;right:-6px;width:20px;height:20px;border-radius:50%;background:var(--card);color:var(--card-ink);font:700 11px var(--f-body);display:grid;place-items:center;box-shadow:0 1px 3px rgba(0,0,0,.5)}
+.pkblind{position:absolute;top:-8px;left:-6px;font:600 9px var(--f-body);background:var(--brass-dim);color:var(--rail);padding:2px 5px;border-radius:6px}
+.pkbet{position:absolute;font:600 11px var(--f-num);background:rgba(0,0,0,.5);color:var(--ink);border:1px solid var(--line);border-radius:999px;padding:2px 8px 2px 4px;display:flex;align-items:center;gap:4px;white-space:nowrap;z-index:1}
+.pkbet::before{content:"";width:12px;height:12px;border-radius:50%;background:radial-gradient(circle,var(--brass) 35%,#7d2a22 36%,#7d2a22 60%,var(--brass) 61%)}
+.pkseat.p0{left:50%;bottom:8px;transform:translateX(-50%)} .p0 .pkbet{top:-26px}
+.pkseat.p1{left:2px;top:57%} .p1 .pkbet{bottom:-24px;left:24px}
+.pkseat.p2{left:5%;top:28px} .p2 .pkbet{top:calc(100% + 4px);left:20px}
+.pkseat.p3{left:50%;top:4px;transform:translateX(-50%)} .p3 .pkbet{top:calc(100% + 4px)}
+.pkseat.p4{right:5%;top:28px} .p4 .pkbet{top:calc(100% + 4px);right:20px}
+.pkseat.p5{right:2px;top:57%} .p5 .pkbet{bottom:-24px;right:24px}
+.pkseat.p0 .pkhc{display:none}
+.pc{width:42px;height:61px;border-radius:6px;background:var(--card);color:var(--card-ink);position:relative;box-shadow:0 2px 5px rgba(0,0,0,.45);font-family:var(--f-num);flex:none;transition:transform .3s,box-shadow .3s}
+.pc .r{position:absolute;left:4px;top:2px;font-weight:600;font-size:15px;line-height:1}
+.pc .su{position:absolute;left:4px;top:18px;font-size:13px;line-height:1}
+.pc .big{position:absolute;right:4px;bottom:2px;font-size:23px;line-height:1}
+.pc.red{color:var(--suit-red)}
+.pc.back{background:repeating-linear-gradient(45deg,var(--b1,#7d2a22) 0 4px,var(--b2,#6a221c) 4px 8px);border:2px solid var(--card)}
+.pc.back::after{content:"ℒ";position:absolute;inset:0;display:grid;place-items:center;color:var(--brass);font:700 15px var(--f-display)}
+.pc.sm{width:26px;height:37px;border-radius:4px}
+.pc.sm .r{font-size:11px;left:3px;top:2px}.pc.sm .su{font-size:10px;left:3px;top:14px}.pc.sm .big{display:none}
+.pc.sm.back::after{font-size:11px}
+.pc.lg{width:66px;height:95px;border-radius:9px}
+.pc.lg .r{font-size:22px;left:6px;top:4px}.pc.lg .su{font-size:18px;left:6px;top:28px}.pc.lg .big{font-size:36px;right:6px;bottom:4px}
+.pc.slot{background:rgba(0,0,0,.18);box-shadow:none;border:1px dashed rgba(209,173,98,.25)}
+.pc.hi{box-shadow:0 0 0 2px var(--win),0 2px 8px rgba(0,0,0,.4);transform:translateY(-4px)}
+.pc.dim{filter:brightness(.6)}
+.pc.new{animation:pkdeal .38s var(--spring) both}
+@keyframes pkdeal{from{transform:translateY(-30px) rotate(-8deg) scale(.7);opacity:0}to{transform:none;opacity:1}}
+.pkme{display:flex;align-items:center;gap:14px;background:var(--rail-2);border:1px solid var(--hair);border-radius:16px;padding:12px;margin-top:12px}
+.pkmycards{display:flex;gap:6px}
+.pkinfo{min-width:0;flex:1}
+.pklbl{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.pkhand{font-family:var(--f-display);font-size:21px;font-weight:700;color:var(--brass);margin-top:2px;text-wrap:balance}
+.pkodds{font-size:12px;color:var(--muted);margin-top:4px}
+.pkacts{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px}
+.pkbtn{border:none;border-radius:14px;padding:14px 6px;min-height:56px;font:700 15px var(--f-body);color:var(--ink);background:var(--fill-2);transition:transform .12s;touch-action:manipulation}
+.pkbtn:active:not(:disabled){transform:scale(.96)}
+.pkbtn small{display:block;font:500 12px var(--f-num);opacity:.85;margin-top:2px}
+.pkbtn.fold{background:#4a2420}.pkbtn.call{background:#1d5a44}.pkbtn.raise{background:var(--brass);color:var(--rail)}
+.pkbtn:disabled{opacity:.35;cursor:default}
+.pkwait{text-align:center;color:var(--muted);padding:14px;border:1px dashed var(--hair);border-radius:14px;margin-top:12px}
+.pkraise{background:var(--rail-2);border:1px solid var(--line);border-radius:16px;padding:12px;display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:10px}
+.pkraise .stepper{width:100%;max-width:340px}
+.pkraise .stpval b{font-size:21px}
+.pkraise .stkrange,.pkraise .stkscale{width:100%}
+.pkraise .stkscale{display:flex;justify-content:space-between;font:500 11px var(--f-num);color:var(--muted)}
+.pkquick{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;width:100%}
+.pkquick button{border:1px solid var(--hair);background:var(--fill);color:var(--ink);border-radius:10px;padding:9px 2px;font:600 12px var(--f-body)}
+.pkgo{width:100%}
+.pkresult{background:rgba(121,216,162,.08);border:1px solid rgba(121,216,162,.35);border-radius:14px;padding:10px 12px;font-size:13px;line-height:1.5;margin-top:12px}
+.pkresult.lose{background:rgba(236,138,120,.08);border-color:rgba(236,138,120,.35)}
+.pkrebuy{margin-top:12px}.pkrebuy summary{cursor:pointer}
+.pklog{font-size:12px;color:var(--muted);line-height:1.55;max-height:120px;overflow:auto;border-top:1px solid var(--hair);padding-top:8px;margin-top:12px}
+.pkfelt-lobby{display:flex;flex-direction:column;gap:14px;align-items:center}
+.pkfelt-lobby .arc{text-align:center;font:600 12px var(--f-body);letter-spacing:.1em;text-transform:uppercase;color:var(--brass)}
+.pklobbycards{display:flex;gap:5px;justify-content:center}
+.pkrules{max-height:88vh;overflow:auto}
+.pkrtext{line-height:1.55;font-size:14px}.pkrtext p,.pkrtext li{color:#d9d2c3}
+.pkrtext h4{margin:16px 0 4px;font-size:15px;color:var(--ink)}
+.pkrtext ol,.pkrtext ul{padding-left:20px;margin:4px 0}
+.pkrank{display:grid;grid-template-columns:24px 1fr auto;gap:4px 10px;align-items:center;margin-top:6px}
+.pkrank .n{font:600 12px var(--f-num);color:var(--muted)}.pkrank .h{font-weight:700}.pkrank .ex{font:500 12px var(--f-num);color:var(--brass);white-space:nowrap}
+@media (max-width:420px){
+  .pktable{height:480px;border-width:8px;border-radius:160px}
+  .pktable::after{display:none}
+  .pkseat{width:80px}
+  .pkseat.p2{left:2%}.pkseat.p4{right:2%}
+  .pc{width:38px;height:55px}.pc .big{font-size:19px}.pc .r{font-size:14px}
+  .pc.lg{width:58px;height:84px}.pc.lg .big{font-size:30px}
+  .pkhand{font-size:18px}
+}
+@media (max-width:350px){.pkseat{width:72px}.pc{width:34px;height:50px}.pc .big{display:none}}
+@media (prefers-reduced-motion:reduce){.pc.new{animation:none}}
+/* ---------- 2.4: name designs ---------- */
+.pname{font-weight:inherit}
+.nm-gold{background:linear-gradient(180deg,#fff1b8,#e2b64a 55%,#a7802b);-webkit-background-clip:text;background-clip:text;color:transparent}
+.nm-eis{background:linear-gradient(180deg,#ffffff,#a8e4ff 50%,#4fa8e0);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 3px rgba(120,200,255,.45))}
+.nm-neon{color:#ff6ae6;text-shadow:0 0 4px #ff2fd2,0 0 10px rgba(255,47,210,.7)}
+.nm-feuer{background:linear-gradient(0deg,#c1121f,#ff5a1f 40%,#ffd34d 80%);background-size:100% 200%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:nmfire 1.4s ease-in-out infinite alternate}
+.nm-gift{color:#8dff5a;text-shadow:0 0 6px rgba(120,255,60,.6)}
+.nm-regenbogen{background:linear-gradient(90deg,#ff5a5a,#ffb84d,#fff35a,#6dff8a,#5ad1ff,#a17bff,#ff5a5a);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:nmshine 3s linear infinite}
+.nm-royal{background:linear-gradient(180deg,#e7c8ff,#a66bff 60%,#6e3bd1);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 2px rgba(242,201,76,.8))}
+.nm-diamant{background:linear-gradient(100deg,#9fe8ff 20%,#ffffff 40%,#b9f3ff 50%,#ffffff 60%,#9fe8ff 80%);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:nmshine 2.2s linear infinite;filter:drop-shadow(0 0 4px rgba(160,232,255,.55))}
+.nm-legat{font-family:var(--f-display);letter-spacing:.02em;background:linear-gradient(100deg,#8f7643 20%,#fff3c4 45%,#d1ad62 55%,#8f7643 80%);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:nmshine 2.4s linear infinite;filter:drop-shadow(0 0 3px rgba(209,173,98,.6))}
+@keyframes nmshine{to{background-position:-250% 0}}
+@keyframes nmfire{to{background-position:0 100%}}
+@media (prefers-reduced-motion:reduce){.nm-feuer,.nm-regenbogen,.nm-diamant,.nm-legat{animation:none}}
+.nmprev{font:700 17px/1.2 var(--f-body);display:block;padding:14px 4px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+/* ---------- 2.4: today in the casino ---------- */
+.heute{display:flex;flex-direction:column;gap:12px}
+.heute h3{margin:0;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.heute h3 small{font:500 12px var(--f-body);color:var(--muted)}
+.htcards{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.htcards>div{display:flex;flex-direction:column;gap:2px;padding:10px;border-radius:12px;background:rgba(0,0,0,.22);border:1px solid var(--hair);min-width:0}
+.htcards small{font-size:11px;color:var(--muted);line-height:1.2}
+.htcards b{font-size:clamp(13px,3.9vw,17px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.htsec h4{margin:0 0 6px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.httop{display:flex;flex-direction:column;border-radius:12px;background:rgba(0,0,0,.18);overflow:hidden}
+.httop>div{display:grid;grid-template-columns:28px minmax(0,1fr) auto;align-items:center;gap:8px;padding:8px 12px}
+.httop>div+div{border-top:1px solid rgba(242,235,221,.07)}
+.httop .rk{font-size:18px;text-align:center}
+.httop .nm{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.httop .nm small{display:block;font-weight:500;color:var(--muted);font-size:11px}
+.htnews{display:flex;flex-direction:column;gap:2px}
+.htnews .feed-i{width:100%}
+/* ---------- 2.4: trailer ---------- */
+.t-pkcards{display:flex;gap:8px;justify-content:center;perspective:600px}
+.t-pkcards .pc{width:clamp(54px,15vw,100px);height:clamp(78px,21.5vw,145px);border-radius:10px;opacity:0;transform:translateY(-60px) rotateY(180deg) scale(.6);transition:all .7s var(--spring)}
+.t-pkcards .pc .r{font-size:clamp(18px,4.6vw,30px);left:8%;top:4%}.t-pkcards .pc .su{font-size:clamp(14px,3.8vw,24px);left:8%;top:28%}.t-pkcards .pc .big{font-size:clamp(28px,8vw,56px);right:8%;bottom:4%}
+.on .t-pkcards .pc{opacity:1;transform:none}
+.on .t-pkcards .pc:nth-child(2){transition-delay:.25s}.on .t-pkcards .pc:nth-child(3){transition-delay:.5s}.on .t-pkcards .pc:nth-child(4){transition-delay:.75s}.on .t-pkcards .pc:nth-child(5){transition-delay:1s}
+.t-pkcards.glow .pc{box-shadow:0 0 0 3px var(--brass),0 0 30px rgba(242,201,76,.6)}
+.t-chips{position:relative;width:240px;height:180px}
+.t-chips i{position:absolute;left:50%;bottom:0;width:60px;height:60px;margin-left:-30px;border-radius:50%;background:radial-gradient(circle,var(--brass) 33%,#7d2a22 34%,#7d2a22 58%,var(--brass) 59%,var(--brass) 66%,#7d2a22 67%);box-shadow:0 4px 0 #3a1410,0 8px 16px rgba(0,0,0,.5);opacity:0;transform:translateY(-300px)}
+.on .t-chips i{animation:tchip .5s cubic-bezier(.5,0,.75,0) forwards}
+@keyframes tchip{to{opacity:1;transform:translateY(calc(var(--k) * -14px)) translateX(var(--x,0))}}
+.t-allin{font:800 clamp(48px,14vw,120px)/1 var(--f-display);color:var(--brass);opacity:0;transform:scale(2.2);transition:all .5s cubic-bezier(.2,1.4,.4,1) 1.5s;text-shadow:0 0 40px rgba(242,201,76,.5)}
+.on .t-allin{opacity:1;transform:scale(1)}
+.t-sub{position:absolute;left:0;right:0;bottom:calc(22% + env(safe-area-inset-bottom));text-align:center;padding:0 16px;font:700 clamp(15px,3.8vw,22px)/1.3 var(--f-body);color:#fff;text-shadow:0 0 2px #000,1.5px 1.5px 0 #000,-1.5px 1.5px 0 #000,1.5px -1.5px 0 #000,-1.5px -1.5px 0 #000;opacity:0;transition:opacity .3s 2.2s}
+.on .t-sub{opacity:1}
+.t-sub b{color:#f2c94c}
+.t-names{display:flex;flex-direction:column;gap:10px;align-items:center}
+.t-names span{font:700 clamp(26px,7vw,54px)/1.1 var(--f-body);opacity:0;transform:translateX(-40px);transition:all .6s var(--spring)}
+.on .t-names span{opacity:1;transform:none}
+.on .t-names span:nth-child(2){transition-delay:.35s}.on .t-names span:nth-child(3){transition-delay:.7s}.on .t-names span:nth-child(4){transition-delay:1.05s}
+.t-names .nm-legat{font-family:var(--f-display)}
+.t-heute{width:min(86vw,380px);display:flex;flex-direction:column;gap:10px;text-align:left}
+.t-heute>div{background:rgba(35,26,20,.9);border:1px solid var(--line);border-radius:14px;padding:12px 14px;opacity:0;transform:translateY(24px);transition:all .6s}
+.on .t-heute>div{opacity:1;transform:none}
+.on .t-heute>div:nth-child(2){transition-delay:.4s}.on .t-heute>div:nth-child(3){transition-delay:.8s}
+.t-heute small{display:block;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.t-heute b{font:600 clamp(20px,5vw,28px) var(--f-num);color:var(--brass)}
 </style>
 </head>
 <body>
@@ -1451,6 +1611,7 @@ html.stkopen body{overflow:hidden}
     <div id="g-mines" hidden></div>
     <div id="g-tipp" hidden></div>
     <div id="g-loono" hidden></div>
+    <div id="g-poker" hidden></div>
     <div id="g-kisten" hidden><div id="kopen" class="panel kopenp" hidden></div><div id="kmain"></div></div>
     <div id="chat" class="panel chat" hidden>
       <div class="emojis" id="emojis"></div>
@@ -1495,6 +1656,7 @@ const SHOP = {
          ['purple','Samt Violett',20000,'#5a3590','#3d2266','#261443'],['black','Mitternacht',30000,'#3a3a3a','#222222','#121212'],['gold','Goldrausch',100000,'#a07d2a','#6e541a','#45340f']],
   back: [['red','Rot',0,'#7d2a22','#6a221c'],['brown','Holz',1000,'#7a5230','#5e3e22'],['teal','Petrol',1500,'#1f6b6b','#165252'],['blue','Blau',5000,'#1f3f7a','#183263'],['green','Grün',5000,'#1f5a3a','#174a2f'],
          ['purple','Violett',15000,'#4b2a78','#3b2060'],['black','Schwarz-Gold',15000,'#1a1a1a','#6b5520'],['gold','Gold',50000,'#c99a35','#8f6c1f']],
+  nm: [['plain','Normal',0],['gold','Gold',5000],['eis','Eis',7500],['neon','Neon',10000],['feuer','Feuer',15000],['gift','Giftgrün',15000],['regenbogen','Regenbogen',25000],['royal','Royal',40000],['diamant','Diamant',60000],['legat','Legat',100000]],
 };
 const ACH = [
   ['first_win','🥇','Erster Sieg','Deine erste gewonnene Hand'],
@@ -1792,7 +1954,7 @@ const PUB_SKIP = ['rev', 'tasks', 'wch', 'claimed', 'fdone', 'prefs', 'mines', '
 function pubOf(d){ const o = {}; for (const k in d) if (!PUB_SKIP.includes(k)) o[k] = d[k]; o.seen = Date.now();
   const a = SAVE.ack; if (a) for (const k of ['balance', 'euro', 'log', 'owed', 'db', 'd0']) if (a[k] !== undefined) o[k] = a[k]; else delete o[k];   // the rules only take what the server already has
   delete o.ban; return o; }
-const pubSig = d => JSON.stringify([d.name, d.avatar, d.code, d.friends, d.table, d.loono, d.playing, d.crash?.r, d.crash?.out]);
+const pubSig = d => JSON.stringify([d.name, d.avatar, d.code, d.friends, d.table, d.loono, d.playing, d.crash?.r, d.crash?.out, d.sel?.nm, d.pkOpen?.pid]);
 function pubSync(now){
   if (!P || !uid || P.ban || !SAVE.ack) return;   // a new account: only once it is really saved (the rules compare with it)
   const sig = pubSig(P), urgent = sig !== PUB.sig, wait = PUB_EVERY - (Date.now() - PUB.last);
@@ -2165,7 +2327,8 @@ function afterLogin(){
   if (seen !== APP_VERSION){ seenBefore = seen; ls.set('seenVersion', APP_VERSION);
     if (P.created && Date.now() - P.created > 60e3){
       // first start since the crate update: the trailer first (once per device), then the news
-      if (KASSE_ON && verNum(seen) < verNum('2.1') && !ls.get('trailer21', false)){ ls.set('trailer21', true); const go = () => $('intro') ? setTimeout(go, 300) : trailer21Open(() => openModal('news')); go(); }
+      if (KASSE_ON && verNum(seen) < verNum('2.4') && !ls.get('trailer24', false)){ ls.set('trailer24', true); const go = () => $('intro') ? setTimeout(go, 300) : trailer24Open(() => openModal('news')); go(); }
+      else if (KASSE_ON && verNum(seen) < verNum('2.1') && !ls.get('trailer21', false)){ ls.set('trailer21', true); const go = () => $('intro') ? setTimeout(go, 300) : trailer21Open(() => openModal('news')); go(); }
       else if (verNum(seen) < verNum('1.7') && !ls.get('trailer17', false)){ ls.set('trailer17', true); const go = () => $('intro') ? setTimeout(go, 300) : trailerOpen(() => openModal('news')); go(); }
       else openModal('news');
     }
@@ -2874,9 +3037,19 @@ function animateCards(root){
 /* =====================================================================
    v1.1 – Casino home, Glücksrad, Roulette, Automat, Pferderennen, Sportwetten
    ===================================================================== */
-const APP_VERSION = '2.3.0.3';
-const CL_TITLES = { '1.5.12': 'Technische Verbesserungen' };
+const APP_VERSION = '2.4';
+const CL_TITLES = { '1.5.12': 'Technische Verbesserungen', '2.4': 'Version 2.4: alles Neue seit 2.2.2' };
 const CHANGELOGS = {
+  '2.4': [
+    'Neu: Texas Hold\'em Poker mit deinen Freunden. Eröffne einen Tisch, gib den 5-stelligen Code weiter, und bis zu 6 Spieler setzen sich mit Chips von ihrem Konto hin. Der Server mischt und gibt, deine zwei Karten sieht nur dein Handy. Erhöhen geht mit − und + in 100er-Schritten oder mit dem Schieberegler, und die Regeln stehen hinter dem Knopf „Regeln“',
+    'Neu: Namens-Designs im Shop, von Gold über Neon und Regenbogen bis Legat. Alle sehen deinen Namen so, am Pokertisch, in der Rangliste, im Profil und auf der Startseite',
+    'Neu auf der Startseite: „Heute im Casino“ statt „Bei deinen Freunden“. Du siehst den Umsatz des Tages, ob das Casino gewinnt oder verliert, wer heute am meisten gewonnen hat, und unter Aktuelles große Gewinne und was deine Freunde machen',
+    'Croupier Kalle kommentiert Blackjack, Roulette und jetzt auch Poker, mit Untertiteln unten wie im Film und auf Wunsch mit Stimme. Kasalla und Torsten Legat kommen oft vor. Abschalten geht unter Konto → Einstellungen',
+    'Neue Einsatz-Auswahl in allen Spielen: − und + in 100er-Schritten, und tippst du auf den Betrag, kommt ein Schieberegler bis 50.000 ℒ, oder du tippst den Betrag ein',
+    'Haptisches Feedback auch auf dem iPhone beim Setzen und Auszahlen',
+    'Deine Finanzen unter Konto sind neu und übersichtlicher, und ab Level 50 gibt es neue Titel bis hin zu „Torsten Legat persönlich“',
+    'Blackjack: Gegen den Fehler „Du bist gerade nicht dran“, obwohl du dran warst: Die App lädt dann den Tisch neu und schickt deinen Zug nochmal, und der Server vergleicht Runde und Hand jetzt zuverlässiger. Kommt die Meldung trotzdem, steht der genaue Grund dabei',
+  ],
   '2.3.0.3': [
     'Blackjack: Lehnt der Server einen Zug ab, obwohl du dran bist, zeigt die Meldung jetzt genauer, was der Server sieht. Das hilft beim Finden des Fehlers',
   ],
@@ -3099,7 +3272,7 @@ const verNum = v => (v||'0').split('.').map(Number).reduce((a,x,i) => a + x * Ma
 let seenBefore = null;
 let game = null;            // null = Casino-Startseite, 'bj', 'roulette', 'slots', 'horses', 'sports'
 let hold = 0;               // Gewinn, der erst nach der Animation im Kontostand erscheint
-const GAME_NAMES = { bj:'Blackjack', roulette:'Roulette', slots:'Automat', horses:'Pferderennen', sports:'Sportwette', wheel:'Glücksrad', hilo:'Höher oder Tiefer', coinflip:'Coin Flip', crash:'Crash', mines:'Mines', tipp:'Tipprunde', duel:'Freundeswette', loono:'Loono', kisten:'Kisten' };
+const GAME_NAMES = { bj:'Blackjack', roulette:'Roulette', slots:'Automat', horses:'Pferderennen', sports:'Sportwette', wheel:'Glücksrad', hilo:'Höher oder Tiefer', coinflip:'Coin Flip', crash:'Crash', mines:'Mines', tipp:'Tipprunde', duel:'Freundeswette', loono:'Loono', kisten:'Kisten', poker:'Poker' };
 ACH.splice(ACH.length - 2, 0,
   ['r_num','🎯','Volltreffer','Beim Roulette eine einzelne Zahl getroffen'],
   ['jackpot','7️⃣','Jackpot','Am Automaten drei Siebenen gedreht'],
@@ -3211,13 +3384,13 @@ function wheelHTML(){
 async function spinWheel(){
   const W = wheelState(); if (!W.ready || wheelBusy) return;
   wheelBusy = true;   // keeps the modal from re-rendering mid-spin
-  const pool = [...SHOP.av.map(([e,p]) => ['av:'+e, p, avText(e)]), ...SHOP.felt.map(x => ['felt:'+x[0], x[2], x[1]+' (Filz)']), ...SHOP.back.map(x => ['back:'+x[0], x[2], x[1]+' (Kartenrücken)'])]
+  const pool = [...SHOP.av.map(([e,p]) => ['av:'+e, p, avText(e)]), ...SHOP.felt.map(x => ['felt:'+x[0], x[2], x[1]+' (Filz)']), ...SHOP.back.map(x => ['back:'+x[0], x[2], x[1]+' (Kartenrücken)']), ...SHOP.nm.map(x => ['nm:'+x[0], x[2], x[1]+' (Namens-Design)'])]
     .filter(([k,p]) => p > 0 && p <= 25000 && !P.owned.includes(k));
   let i, s, itemKey = null, txt = '', addL = 0, addE = 0;
   if (KASSE_ON){
     let r; try { r = await kasse('wheel', { noItem: !pool.length }); } catch (e){ wheelBusy = false; toast(e.message); renderAll(); return; }
     i = r.i; s = WHEEL[i]; addL = r.addL; addE = r.addE; W.streak = r.streak;
-    if (r.item){ itemKey = r.item; const [kd, id] = r.item.split(':'); const nm = kd === 'av' ? avText(id) : kd === 'felt' ? (SHOP.felt.find(x => x[0] === id)?.[1] || id) + ' (Filz)' : (SHOP.back.find(x => x[0] === id)?.[1] || id) + ' (Kartenrücken)'; txt = `🎁 ${nm} gewonnen!`; }
+    if (r.item){ itemKey = r.item; const [kd, id] = r.item.split(':'); const nm = kd === 'av' ? avText(id) : kd === 'nm' ? 'Namens-Design ' + (SHOP.nm.find(x => x[0] === id)?.[1] || id) : kd === 'felt' ? (SHOP.felt.find(x => x[0] === id)?.[1] || id) + ' (Filz)' : (SHOP.back.find(x => x[0] === id)?.[1] || id) + ' (Kartenrücken)'; txt = `🎁 ${nm} gewonnen!`; }
   } else {
     i = rnd(WHEEL.length); s = WHEEL[i]; const mult = streakMult(W.streak);
     if (s.k==='L' || s.k==='J') addL = Math.round(s.v * mult);
@@ -4639,7 +4812,7 @@ function kEquip(id){
   });
   tone(1200, .08, { type: 'triangle', vol: .06 }); toast(on ? `${def.n} abgelegt` : `${def.n} ausgerüstet`);
 }
-const nameStyle = id => { const c = pl(id)?.ncol; return c ? ` style="color:${esc(c)}"` : ''; };
+const nameStyle = id => { const n = NM_ON(id); if (n) return ` class="pname nm-${n}"`; const c = pl(id)?.ncol; return c ? ` style="color:${esc(c)}"` : ''; };
 
 /* ---------- open a crate ---------- */
 async function kOpen(id){
@@ -7367,7 +7540,8 @@ function renderHome(){
     <div class="tiles">
       ${tile('bj', 'Blackjack', 'Mit Freunden am Tisch, bis zu 5 Spieler', `<div class="minicards"><div class="mc">A<i>♠</i></div><div class="mc red">K<i>♥</i></div></div>`, atTables ? `<span class="pill good">${atTables} ${atTables===1?'Freund':'Freunde'} am Tisch</span>` : tid ? '<span class="pill good">Du sitzt am Tisch</span>' : '')}
       ${tile('sports', 'Sportwetten', 'Bundesliga · Champions League · Darts', `<div class="minisports"><span>⚽</span><span>🎯</span></div>`, duIncoming() ? `<span class="pill good">🤝 ${duIncoming()} ${duIncoming() === 1 ? 'Herausforderung' : 'Herausforderungen'}</span>` : next ? `<span class="small muted">Nächstes: ${esc(next.t1)} – ${esc(next.t2)}, ${timeLabel(next.t)}</span>` : '<span class="small muted">Plus fiktive Turniere alle 15 Minuten</span>')}
-      ${tile('kisten', 'Kisten<span class="newtag">Neu</span>', 'Öffnen, sammeln, handeln: Items mit Zustand und Nummer, Markt und Auktionen', kChest(KCRATES[2]), kisTileExtra())}
+      ${tile('poker', 'Poker<span class="newtag">Neu</span>', "Texas Hold'em mit Freunden, bis zu 6 Spieler", `<div class="minipk">${pkCard('AS')}${pkCard('KH')}${pkCard('back')}</div>`, pkTileExtra())}
+      ${tile('kisten', 'Kisten', 'Öffnen, sammeln, handeln: Items mit Zustand und Nummer, Markt und Auktionen', kChest(KCRATES[2]), kisTileExtra())}
       ${tile('loono', 'Loono', 'Kartenspiel mit Freunden und Bots, 2 bis 8 Spieler, mit oder ohne Einsatz', `<div class="miniloono">${['r7','gs','yd','xf'].map(c => loCard(c)).join('')}</div>`, loTileExtra())}
       ${tile('crash', 'Crash', 'Zahl aus, bevor die Rakete explodiert', `<div class="minicrash"><svg viewBox="0 0 120 70" aria-hidden="true"><path d="M5 65 Q70 62 105 12" fill="none" stroke="#ff5a4f" stroke-width="4" stroke-linecap="round"/></svg><span>🚀</span><b class="num">2,47×</b></div>`, crashFriends())}
       ${tile('mines', 'Mines', 'Diamanten finden, Minen meiden', `<div class="minimines">${[...'💎💎💣💎💎💣💎💎💎'].map(x => `<i>${x}</i>`).join('')}</div>`)}
@@ -7377,8 +7551,8 @@ function renderHome(){
       ${tile('horses', 'Pferderennen', 'Sechs Pferde, ein Sieger', `<div class="minihorses"><span>🏇</span><span>🏇</span><span>🏇</span></div>`)}
       ${tile('hilo', 'Höher oder Tiefer', 'Errate die nächste Karte, zahl aus, wann du willst', `<div class="minihl"><div class="mc">7<i>♣</i></div>▲▼<div class="mc red">?<i>♥</i></div></div>`)}
     </div>
-    ${P ? feedHTML() : ''}
-    ${onl.length ? `<div class="panel"><h3>Freunde online</h3><div class="row">${onl.map(id => `<span class="fon"><button class="pill" data-act="profile" data-id="${esc(id)}">${avH(avOf(id))} ${esc(nameOf(id))}${players[id].table ? ' · am Blackjack-Tisch' : loOpenOf(id) ? ' · wartet bei Loono' : players[id].playing && players[id].playing !== 'bj' ? ' · spielt ' + (GAME_NAMES[players[id].playing] || '') : ''}</button>${players[id].table && players[id].table !== tid ? `<button class="btn sm gold" data-act="fjoin" data-g="bj" data-id="${esc(players[id].table)}">Mitspielen</button>` : loOpenOf(id) ? `<button class="btn sm gold" data-act="fjoin" data-g="loono" data-id="${esc(loOpenOf(id))}">Mitspielen</button>` : ''}</span>`).join('')}</div></div>` : ''}
+    ${P ? heuteHTML() : ''}
+    ${onl.length ? `<div class="panel"><h3>Freunde online</h3><div class="row">${onl.map(id => `<span class="fon"><button class="pill" data-act="profile" data-id="${esc(id)}">${avH(avOf(id))} ${nameH(id)}${players[id].table ? ' · am Blackjack-Tisch' : loOpenOf(id) ? ' · wartet bei Loono' : pkOpenOf(id) ? ' · am Pokertisch' : players[id].playing && players[id].playing !== 'bj' ? ' · spielt ' + (GAME_NAMES[players[id].playing] || '') : ''}</button>${players[id].table && players[id].table !== tid ? `<button class="btn sm gold" data-act="fjoin" data-g="bj" data-id="${esc(players[id].table)}">Mitspielen</button>` : loOpenOf(id) ? `<button class="btn sm gold" data-act="fjoin" data-g="loono" data-id="${esc(loOpenOf(id))}">Mitspielen</button>` : pkOpenOf(id) && pkOpenOf(id) !== PK.id ? `<button class="btn sm gold" data-act="fjoinpk" data-id="${esc(pkOpenOf(id))}">Mitspielen</button>` : ''}</span>`).join('')}</div></div>` : ''}
   </div>`;
   if (el.innerHTML !== html) el.innerHTML = html;
 }
@@ -7420,10 +7594,11 @@ function openGame(g){
   if (g==='sports'){ loadSports(); SP.detail = null; }
   if (g==='tipp'){ loadSports(); TP.md = null; }
   if (g==='crash'){ CR.key = ''; crashStart(); }
+  if (g==='poker'){ pkLastHTML = ''; if (!ls.get('pkrules0', false)){ ls.set('pkrules0', true); setTimeout(() => { if (game === 'poker') pkRules(); }, 400); } }
   window.scrollTo(0, 0); renderAll();
 }
 function renderCasino(){
-  const views = { home: game===null, tv: game==='bj', 'g-roulette': game==='roulette', 'g-slots': game==='slots', 'g-horses': game==='horses', 'g-sports': game==='sports', 'g-hilo': game==='hilo', 'g-crash': game==='crash', 'g-mines': game==='mines', 'g-tipp': game==='tipp', 'g-loono': game==='loono', 'g-kisten': game==='kisten' };
+  const views = { home: game===null, tv: game==='bj', 'g-roulette': game==='roulette', 'g-slots': game==='slots', 'g-horses': game==='horses', 'g-sports': game==='sports', 'g-hilo': game==='hilo', 'g-crash': game==='crash', 'g-mines': game==='mines', 'g-tipp': game==='tipp', 'g-loono': game==='loono', 'g-kisten': game==='kisten', 'g-poker': game==='poker' };
   for (const [id, show] of Object.entries(views)) $(id).hidden = !show;
   $('chat').hidden = !(game==='bj' && tid && T);
   const typing = el => { const a=document.activeElement; return a && (a.tagName==='INPUT' || a.tagName==='SELECT' || a.tagName==='TEXTAREA') && a.type!=='checkbox' && el.contains(a); };
@@ -7439,6 +7614,7 @@ function renderCasino(){
   else if (game==='tipp') renderTipp();
   else if (game==='loono') renderLoono();
   else if (game==='kisten') renderKisten();
+  else if (game==='poker') renderPoker();
 }
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-act]'); if (!b || b.disabled) return;
@@ -7729,7 +7905,7 @@ function renderShop(){
   if (!P){ el.innerHTML = `<div class="panel"><p class="muted">Lädt …</p></div>`; return; }
   const item = (kind, id, price, inner, label) => {
     const key = kind+':'+id, owned = price===0 || P.owned.includes(key);
-    const selected = kind==='av' ? P.avatar===id : P.sel[kind]===id;
+    const selected = kind==='av' ? P.avatar===id : (P.sel?.[kind] || (kind==='nm' ? 'plain' : ''))===id;
     const pending = shopConfirm===key;
     return `<button class="item${selected?' sel':''}" data-act="shop" data-kind="${kind}" data-id="${esc(id)}" data-price="${price}">${inner}${label?`<small>${esc(label)}</small>`:''}
       <span class="price">${selected ? 'Ausgewählt' : owned ? 'Auswählen' : pending ? `Für ${fmt(price)} € kaufen?` : fmt(price)+' €'}</span></button>`;
@@ -7739,6 +7915,7 @@ function renderShop(){
     <div class="panel stack"><h3>Avatar</h3><div class="shopgrid">${SHOP.av.map(([e,p]) => item('av', e, p, `<span class="big" title="${esc(avText(e))}">${avH(e)}</span>`)).join('')}</div></div>
     <div class="panel stack"><h3>Tischfilz</h3><div class="shopgrid">${SHOP.felt.map(([id,l,p,a,b]) => item('felt', id, p, `<span class="sw" style="background:radial-gradient(circle at 50% 20%,${a},${b})"></span>`, l)).join('')}</div></div>
     <div class="panel stack"><h3>Kartenrücken</h3><div class="shopgrid">${SHOP.back.map(([id,l,p,a,b]) => item('back', id, p, `<span class="bk" style="background:repeating-linear-gradient(45deg,${a} 0 6px,${b} 6px 12px)"></span>`, l)).join('')}</div></div>
+    <div class="panel stack"><h3>Namens-Design<span class="newtag">Neu</span></h3><p class="muted small" style="margin:0">So sehen alle deinen Namen: am Pokertisch, in der Rangliste, im Profil und bei „Heute im Casino“.</p><div class="shopgrid">${SHOP.nm.map(([id,l,p]) => item('nm', id, p, `<span class="nmprev${id === 'plain' ? '' : ' nm-' + id}">${esc(P.name || 'Dein Name')}</span>`, l)).join('')}</div></div>
   </div>`;
   if (el.innerHTML !== html) el.innerHTML = html;
 }
@@ -7945,7 +8122,7 @@ function renderModal(force){
   if (keep && $('gamt')) $('gamt').value = keep;
 }
 function newsHTML(){
-  const vs = Object.keys(CHANGELOGS).filter(v => verNum(v) > verNum(seenBefore)).sort((a,b) => verNum(b) - verNum(a));
+  const vs = Object.keys(CHANGELOGS).filter(v => verNum(v) > verNum(seenBefore)).filter(v => !(verNum(v) >= verNum('2.3') && verNum(v) < verNum('2.4'))).sort((a,b) => verNum(b) - verNum(a));
   return `<div class="stack"><div class="row" style="justify-content:space-between"><h2>Neu in Version ${APP_VERSION}</h2><button class="btn sm" data-act="closemodal">Schließen</button></div>
     ${(vs.length ? vs : [APP_VERSION]).map(v => `${vs.length > 1 ? `<h3>${CL_TITLES[v] || 'Version ' + v}</h3>` : ''}<ul class="news">${CHANGELOGS[v].map(x => `<li>${esc(x)}</li>`).join('')}</ul>`).join('')}
     <button class="btn gold" data-act="closemodal">Los geht's</button></div>`;
@@ -8526,6 +8703,452 @@ function financeHTML(p){
   </div>`;
 }
 
+
+/* =====================================================================
+   2.4 – Texas Hold'em mit Freunden. Der Server ist der Dealer (pk.js); die eigenen zwei Karten
+   kommen aus pokerhand/{tisch}_{uid}, das nur man selbst lesen kann.
+   ===================================================================== */
+const PK_SB = 50, PK_BB = 100, PK_BUY_MIN = 2000, PK_BUY_MAX = 50000;
+const PK = { id: null, t: null, mine: null, lobby: {}, unsubT: null, unsubH: null, unsubL: null, buy: ls.get('pkbuy', 10000), raise: false, raiseTo: 0, busy: false,
+  tickAt: 0, ticking: false, seen: new Set(), seenHand: 0, lastSig: '', claimTried: null, hist: { hand: 0, phase: '' }, code: '' };
+const PK_RV = { T: 10, J: 11, Q: 12, K: 13, A: 14 };
+const pkRv = c => PK_RV[c[0]] || +c[0];
+const PK_SU = { S: 0, H: 1, D: 2, C: 3 };
+function pkMk(cat, t){ let s = cat; for (let i = 0; i < 5; i++) s = s * 15 + (t[i] || 0); return { score: s, cat, t }; }
+function pkStraight(has){ for (let h = 14; h >= 5; h--){ let ok = true; for (let k = 0; k < 5; k++){ let r = h - k; if (r === 1) r = 14; if (!has[r]){ ok = false; break; } } if (ok) return h; } return 0; }
+function pkEval(cards){
+  const cnt = new Array(15).fill(0), sc = [0, 0, 0, 0], bs = [[], [], [], []];
+  for (const c of cards){ const r = pkRv(c), s = PK_SU[c[1]]; cnt[r]++; sc[s]++; bs[s].push(r); }
+  let fs = -1; for (let s = 0; s < 4; s++) if (sc[s] >= 5) fs = s;
+  if (fs >= 0){ const has = []; bs[fs].forEach(r => has[r] = true); const sf = pkStraight(has); if (sf) return pkMk(8, [sf]); }
+  const ranks = []; for (let r = 14; r >= 2; r--) if (cnt[r]) ranks.push(r);
+  const g = ranks.map(r => ({ r, c: cnt[r] })).sort((a, b) => b.c - a.c || b.r - a.r);
+  const oth = ex => ranks.filter(r => !ex.includes(r));
+  if (!g.length) return pkMk(0, []);
+  if (g[0].c === 4) return pkMk(7, [g[0].r, oth([g[0].r])[0]]);
+  if (g[0].c === 3){ const p = g.slice(1).filter(x => x.c >= 2).map(x => x.r).sort((a, b) => b - a)[0]; if (p) return pkMk(6, [g[0].r, p]); }
+  if (fs >= 0) return pkMk(5, bs[fs].sort((a, b) => b - a).slice(0, 5));
+  const has = []; ranks.forEach(r => has[r] = true); const st = pkStraight(has); if (st) return pkMk(4, [st]);
+  if (g[0].c === 3) return pkMk(3, [g[0].r, ...oth([g[0].r]).slice(0, 2)]);
+  if (g[0].c === 2 && g[1]?.c === 2) return pkMk(2, [g[0].r, g[1].r, oth([g[0].r, g[1].r])[0]]);
+  if (g[0].c === 2) return pkMk(1, [g[0].r, ...oth([g[0].r]).slice(0, 3)]);
+  return pkMk(0, ranks.slice(0, 5));
+}
+const PK_PL = { 2: 'Zweien', 3: 'Dreien', 4: 'Vieren', 5: 'Fünfen', 6: 'Sechsen', 7: 'Siebenen', 8: 'Achten', 9: 'Neunen', 10: 'Zehnen', 11: 'Buben', 12: 'Damen', 13: 'Könige', 14: 'Asse' };
+const PK_RN = { 2: 'Zwei', 3: 'Drei', 4: 'Vier', 5: 'Fünf', 6: 'Sechs', 7: 'Sieben', 8: 'Acht', 9: 'Neun', 10: 'Zehn', 11: 'Bube', 12: 'Dame', 13: 'König', 14: 'Ass' };
+function pkHandName(e){
+  const t = e.t;
+  switch (e.cat){
+    case 8: return t[0] === 14 ? 'Royal Flush' : 'Straight Flush';
+    case 7: return 'Vierling ' + PK_PL[t[0]];
+    case 6: return 'Full House, ' + PK_PL[t[0]] + ' und ' + PK_PL[t[1]];
+    case 5: return 'Flush';
+    case 4: return 'Straße bis ' + PK_RN[t[0]];
+    case 3: return 'Drilling ' + PK_PL[t[0]];
+    case 2: return 'Zwei Paare, ' + PK_PL[t[0]] + ' und ' + PK_PL[t[1]];
+    case 1: return 'Paar ' + PK_PL[t[0]];
+    default: return t[0] ? 'Höchste Karte ' + PK_RN[t[0]] : '–';
+  }
+}
+/** rough chance to win against n random hands (on the phone only, a hint for beginners) */
+function pkEquity(hole, board, nOpp, iters = 300){
+  if (nOpp <= 0) return 1;
+  const used = new Set([...hole, ...board]), base = [];
+  for (const r of '23456789TJQKA') for (const s of 'SHDC') if (!used.has(r + s)) base.push(r + s);
+  const need = nOpp * 2 + (5 - board.length); let w = 0;
+  for (let it = 0; it < iters; it++){
+    const d = base.slice();
+    for (let i = 0; i < need; i++){ const j = i + Math.floor(Math.random() * (d.length - i)); [d[i], d[j]] = [d[j], d[i]]; }
+    const b = board.concat(d.slice(nOpp * 2, need)), my = pkEval(hole.concat(b)).score;
+    let best = 0, ties = 0;
+    for (let o = 0; o < nOpp; o++){ const s = pkEval([d[o * 2], d[o * 2 + 1], ...b]).score; if (s > best){ best = s; ties = 1; } else if (s === best) ties++; }
+    if (my > best) w++; else if (my === best) w += 1 / (ties + 1);
+  }
+  return w / iters;
+}
+const PK_SUIT = { S: '♠', H: '♥', D: '♦', C: '♣' };
+function pkCard(c, size = '', extra = ''){
+  if (!c) return `<div class="pc slot ${size}"></div>`;
+  if (c === 'back') return `<div class="pc back ${size} ${extra}"></div>`;
+  const r = c[0] === 'T' ? '10' : c[0], s = PK_SUIT[c[1]], red = c[1] === 'H' || c[1] === 'D';
+  const key = (PK.t?.hand || 0) + c + size; let cls = `pc ${size} ${extra}${red ? ' red' : ''}`;
+  if (!PK.seen.has(key)){ cls += ' new'; PK.seen.add(key); }
+  if (PK.t?.phase === 'show' && PK.t.result?.best?.includes(c)) cls += ' hi';
+  return `<div class="${cls}" aria-label="${r}${s}"><span class="r">${r}</span><span class="su">${s}</span><span class="big">${s}</span></div>`;
+}
+const pkPot = t => Object.values(t?.tot || {}).reduce((a, b) => a + b, 0);
+const pkMe = () => PK.t?.seats?.[uid];
+const pkInHand = t => (t?.order || []).filter(u => !t.fold?.[u]);
+const pkRebuyAmt = me => Math.max(PK_BUY_MIN, Math.min(PK.buy, PK_BUY_MAX - me.stack));
+const pkMyCards = () => PK.mine && PK.t && PK.mine.hand === PK.t.hand && PK.t.order?.includes(uid) ? PK.mine.c : null;
+
+/* ---------- watching ---------- */
+function pkWatch(pid){
+  if (PK.id === pid && PK.unsubT) return;
+  pkUnwatch(); PK.id = pid; PK.t = null; PK.mine = null; PK.seen = new Set(); PK.raise = false;
+  PK.unsubT = onSnapshot(doc(fs, 'poker', pid), s => {
+    if (PK.id !== pid) return;
+    PK.t = s.exists() ? s.data() : null;
+    if (PK.t && !PK.t.seats?.[uid] && P?.pkOpen?.pid === pid && PK.claimTried !== pid){ PK.claimTried = pid; kasse('pkleave', { pid }).catch(e => console.warn(e)); }
+    pkCroupier(); renderAll();
+  }, e => console.warn(e));
+  PK.unsubH = onSnapshot(doc(fs, 'pokerhand', pid + '_' + uid), s => { if (PK.id === pid){ PK.mine = s.exists() ? s.data() : null; renderAll(); } }, e => console.warn(e));
+}
+function pkUnwatch(){ PK.unsubT?.(); PK.unsubH?.(); PK.unsubT = PK.unsubH = null; PK.id = null; PK.t = null; PK.mine = null; }
+function pkLobbyWatch(on){
+  if (on && !PK.unsubL) PK.unsubL = onSnapshot(query(collection(fs, 'poker'), where('open', '==', true), limit(20)), s => { const o = {}; s.docs.forEach(d => o[d.id] = d.data()); PK.lobby = o; renderAll(); }, e => console.warn(e));
+  if (!on && PK.unsubL){ PK.unsubL(); PK.unsubL = null; }
+}
+/** the table I sit at (also after a reload): watch it; leave the lobby list when not needed */
+function pkSync(){
+  const pid = P?.pkOpen?.pid || null;
+  if (pid && PK.id !== pid) pkWatch(pid);
+  if (!pid && PK.id && !PK.t?.seats?.[uid]) pkUnwatch();
+  pkLobbyWatch(game === 'poker' && tab === 'table' && !PK.id);
+}
+/** the phones at the table move it on: time limit over, next hand */
+function pkTick(){
+  const t = PK.t; if (!t || !PK.id || document.hidden || PK.ticking || !uid) return;
+  const now = NOW(), ready = Object.values(t.seats || {}).filter(s => s.sit !== false && s.stack > 0 && !s.left).length;
+  const due = (t.phase === 'play' && t.turn && now > t.turn.until + 300) || (t.phase === 'show' && now >= (t.showUntil || 0) + 200) || (t.phase === 'wait' && ready >= 2);
+  if (!due || Date.now() - PK.tickAt < 1200) return;
+  PK.tickAt = Date.now(); PK.ticking = true;
+  srvCall('tisch', { pk: PK.id }).catch(e => console.warn(e)).finally(() => { PK.ticking = false; });
+}
+setInterval(() => { pkSync(); pkTick(); if (game === 'poker' && tab === 'table' && PK.t?.phase === 'play') pkTimer(); }, 700);
+function pkTimer(){ const el = document.querySelector('#g-poker [data-pkuntil]'); if (el) el.textContent = Math.max(0, Math.ceil((+el.dataset.pkuntil - NOW()) / 1000)) + ' s'; }
+
+/* ---------- croupier at the poker table ---------- */
+Object.assign(CRP_L, {
+  pkStart: ['Karten sind raus. Viel Glück!', 'Neue Hand, neues Glück.', 'Mischen, geben, los geht’s.', 'Torsten Legat sagt immer: Wer nicht setzt, kann nicht gewinnen.', 'Pokerface auf, Freunde!'],
+  pkAllin: ['All-in! Jetzt gibt es Kasalla.', 'Alles in die Mitte. Mutig!', 'All-in. Da hätte sogar Torsten Legat kurz geschluckt.'],
+  pkWin: ['Sauber gespielt. Torsten Legat wäre stolz.', 'Der Pot gehört dir!', 'Abgeräumt. Das war Legat-Niveau.', 'Kasalla! Der Pot ist deiner.'],
+  pkLose: ['Bitter. Die nächste Hand wird besser.', 'Das tut weh. Kopf hoch!', 'Knapp daneben ist auch vorbei.'],
+  pkBig: ['Was für eine Hand! Kasalla!', 'Das sieht man nicht alle Tage.'],
+  pkFlop: ['Der Flop!', 'Drei Karten in die Mitte.'], pkTurn: ['Der Turn.', 'Karte Nummer vier.'], pkRiver: ['Der River. Jetzt wird abgerechnet.', 'Die letzte Karte.'],
+});
+function pkCroupier(){
+  const t = PK.t, h = PK.hist; if (!t) return;
+  const first = !h.init; h.init = true;
+  const prevHand = h.hand, prevPhase = h.phase, prevStreet = h.street, prevAllin = h.allin || 0;
+  h.hand = t.hand; h.phase = t.phase; h.street = t.street; h.allin = Object.keys(t.allin || {}).length;
+  if (first || game !== 'poker' || tab !== 'table') return;
+  const mineIn = t.order?.includes(uid);
+  if (t.phase === 'show' && prevPhase !== 'show' && t.result){
+    const won = t.result.win?.[uid] || 0;
+    if (mineIn && won > 0){ haptic('strong'); return crpSay(pick(t.result.big ? CRP_L.pkBig : CRP_L.pkWin), { force: true }); }
+    if (mineIn && !t.fold?.[uid]) return crpSay(pick(CRP_L.pkLose), { chance: .7 });
+    return;
+  }
+  if (t.phase === 'play' && t.hand !== prevHand) return crpSay(pick(CRP_L.pkStart), { chance: .4 });
+  if (t.phase === 'play' && h.allin > prevAllin && t.hand === prevHand) return crpSay(pick(CRP_L.pkAllin), { force: true });
+  if (t.phase === 'play' && t.street !== prevStreet && t.hand === prevHand) return crpSay(pick([null, CRP_L.pkFlop, CRP_L.pkTurn, CRP_L.pkRiver][t.street] || CRP_L.pkFlop), { chance: .35 });
+  if (t.phase === 'play' && t.turn?.u === uid && h.turnKey !== `${t.hand}-${t.street}-${t.turn.until}`){ h.turnKey = `${t.hand}-${t.street}-${t.turn.until}`; haptic('light'); }
+}
+
+/* ---------- actions ---------- */
+async function pkDo(a, p = {}, ok){
+  if (PK.busy) return; PK.busy = true; renderAll();
+  try { const r = await kasse(a, p); ok?.(r); return r; }
+  catch (e){ toast(e.message); }
+  finally { PK.busy = false; renderAll(); }
+}
+function pkAct(type, to){
+  const t = PK.t; if (!t || t.turn?.u !== uid) return;
+  PK.raise = false; haptic(type === 'fold' ? 'light' : 'mid');
+  pkDo('pkact', { pid: PK.id, type, to: to || 0, hand: t.hand }, r => { if (r?.stale) toast('Der Tisch war schon weiter. Schau nochmal.'); });
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-act]'); if (!b || b.disabled) return;
+  const v = +b.dataset.v;
+  switch (b.dataset.act){
+    case 'pkbuy': PK.buy = Math.max(PK_BUY_MIN, Math.min(PK_BUY_MAX, v || PK_BUY_MIN)); ls.set('pkbuy', PK.buy); renderAll(); break;
+    case 'pkcreate': if (confirmBig(PK.buy, 'poker')) pkDo('pkcreate', { buy: PK.buy }, r => { pkWatch(r.pid); SFX.chip(); toast(`Pokertisch ${r.pid} eröffnet. Gib den Code an deine Freunde weiter.`); }); break;
+    case 'pkjoin': { const pid = b.dataset.id || String($('pkcode')?.value || '').trim().toUpperCase(); if (!/^[A-Z0-9]{5}$/.test(pid)) { toast('Der Code hat 5 Zeichen.'); break; }
+      if (confirmBig(PK.buy, 'poker')) pkDo('pkjoin', { pid, buy: PK.buy }, () => { pkWatch(pid); SFX.chip(); }); break; }
+    case 'pkleave': if (PK.leaveAsk !== PK.t?.hand + ':' + PK.id && PK.t?.phase === 'play' && PK.t.order?.includes(uid) && !PK.t.fold?.[uid]){ PK.leaveAsk = PK.t.hand + ':' + PK.id; toast('Deine Hand läuft noch. Tippe nochmal, dann steigst du aus und stehst auf.'); renderAll(); break; }
+      pkDo('pkleave', { pid: PK.id }, r => { const pid = PK.id; pkUnwatch(); PK.claimTried = pid; toast(r.out ? `Aufgestanden. ${fmt(r.out)} ℒ sind zurück auf deinem Konto.` : 'Aufgestanden.'); if (r.out) SFX.coins(); }); break;
+    case 'pkrebuy': { const me = pkMe(); if (!me) break; const rb = pkRebuyAmt(me); if (confirmBig(rb, 'poker')) pkDo('pkrebuy', { pid: PK.id, buy: rb }, () => { SFX.chip(); toast(`${fmt(rb)} ℒ nachgekauft.`); }); break; }
+    case 'pkback': pkDo('pkback', { pid: PK.id }); break;
+    case 'pkfold': pkAct('fold'); break;
+    case 'pkcall': pkAct('call'); break;
+    case 'pkraiseopen': PK.raise = !PK.raise; PK.raiseTo = 0; haptic('light'); renderAll(); break;
+    case 'pkraisego': pkAct('raise', PK.raiseTo); break;
+    case 'pkq': { const r = pkRaiseRange(); if (!r) break; const q = b.dataset.q, pot = pkPot(PK.t), need = r.need;
+      PK.raiseTo = q === 'min' ? r.min : q === 'all' ? r.max : Math.round((PK.t.cur + (pot + need) * (q === 'half' ? .5 : 1)) / 50) * 50; pkRaiseUpd(); haptic('light'); break; }
+    case 'pkrstep': { const r = pkRaiseRange(); if (!r) break; PK.raiseTo = (PK.raiseTo || r.min) + v; pkRaiseUpd(); haptic('light'); break; }
+    case 'pkrules': pkRules(); break;
+    case 'pkcopy': copy(PK.id, 'Tisch-Code'); break;
+  }
+});
+document.addEventListener('input', e => { if (e.target.id === 'pkcode') PK.code = e.target.value.toUpperCase(); if (e.target.id === 'pkslider'){ const r = pkRaiseRange(); if (!r) return; let v = +e.target.value; if (v < r.max && v > r.min) v = Math.round(v / 100) * 100; if (v !== PK.raiseTo) haptic('light'); PK.raiseTo = v; pkRaiseUpd(true); } });
+function pkRaiseRange(){
+  const t = PK.t, s = pkMe(); if (!t || !s || t.turn?.u !== uid) return null;
+  const bet = t.bet?.[uid] || 0, max = bet + s.stack, need = Math.max(0, t.cur - bet);
+  if (max <= t.cur) return null;
+  return { min: Math.min(t.cur + (t.minR || PK_BB), max), max, need, word: t.cur === 0 ? 'Setzen' : 'Erhöhen' };
+}
+function pkRaiseUpd(fromSlider){
+  const r = pkRaiseRange(); if (!r) return;
+  PK.raiseTo = Math.max(r.min, Math.min(PK.raiseTo || r.min, r.max));
+  const a = $('pkramt'), go = $('pkrgo'), sl = $('pkslider');
+  if (a) a.textContent = fmt(PK.raiseTo) + ' ℒ';
+  if (go) go.textContent = PK.raiseTo >= r.max ? `All-in: ${fmt(r.max)} ℒ` : `${r.word} auf ${fmt(PK.raiseTo)} ℒ`;
+  if (sl && !fromSlider) sl.value = PK.raiseTo;
+  if (sl) sl.style.setProperty('--p', ((PK.raiseTo - r.min) / Math.max(1, r.max - r.min) * 100) + '%');
+}
+
+/* ---------- rules ---------- */
+function pkRules(){
+  let s = $('pkrulesheet');
+  if (!s){
+    s = document.createElement('div'); s.id = 'pkrulesheet'; s.className = 'stksheet';
+    s.innerHTML = `<div class="stkcard pkrules" role="dialog" aria-modal="true" aria-labelledby="pkrh"><div class="grab" aria-hidden="true"></div>
+      <div class="stkhead"><span></span><b id="pkrh">So geht Texas Hold'em</b><button type="button" class="stklink strong" data-pkr="x">Fertig</button></div>
+      <div class="pkrtext">
+      <p>Jeder bekommt <b>2 verdeckte Karten</b>. In die Mitte kommen nach und nach <b>5 offene Karten</b>, die alle benutzen dürfen. Wer aus seinen 2 Karten und den 5 Tischkarten die besten 5 Karten bauen kann, gewinnt den Pot. Oder du gewinnst früher, wenn alle anderen aussteigen.</p>
+      <h4>Ablauf einer Hand</h4>
+      <ol><li><b>Blinds:</b> Die zwei Spieler links vom Dealer-Knopf (D) setzen Pflichteinsätze: Small Blind ${PK_SB}, Big Blind ${PK_BB}.</li>
+      <li><b>Vor dem Flop:</b> Jeder sieht seine 2 Karten. Erste Setzrunde.</li><li><b>Flop:</b> 3 Karten kommen in die Mitte. Setzrunde.</li>
+      <li><b>Turn:</b> die 4. Karte. Setzrunde.</li><li><b>River:</b> die 5. Karte. Letzte Setzrunde.</li>
+      <li><b>Showdown:</b> Wer noch drin ist, zeigt die Karten. Die beste Hand gewinnt.</li></ol>
+      <p>Nach jeder Hand wandert der Dealer-Knopf einen Platz weiter.</p>
+      <h4>Was du tun kannst, wenn du dran bist</h4>
+      <ul><li><b>Check:</b> schieben, ohne etwas zu setzen. Geht nur, wenn noch keiner gesetzt hat.</li><li><b>Call:</b> den Einsatz mitgehen.</li>
+      <li><b>Setzen / Erhöhen:</b> mehr setzen. Die anderen müssen mitgehen oder aussteigen. Mit − und + gehst du in 100er-Schritten, der Regler geht bis zu deinem ganzen Stack.</li>
+      <li><b>Fold:</b> aussteigen. Was du schon gesetzt hast, ist weg.</li>
+      <li><b>All-in:</b> alles setzen. Du kannst dann nur den Teil des Pots gewinnen, den du auch abgedeckt hast.</li></ul>
+      <p>Du hast pro Zug 30 Sekunden. Läuft die Zeit ab, wird für dich gecheckt oder ausgestiegen. Passiert das zweimal hintereinander, setzt du ab der nächsten Hand aus, bis du auf „Weiter spielen“ tippst.</p>
+      <h4>Rangfolge der Hände (beste zuerst)</h4>
+      <div class="pkrank">${[['Royal Flush', 'A K Q J 10 gleiche Farbe'], ['Straight Flush', '5 in Folge, gleiche Farbe'], ['Vierling', '9 9 9 9'], ['Full House', 'K K K + 4 4'], ['Flush', '5 Karten gleiche Farbe'], ['Straße', '5 6 7 8 9'], ['Drilling', '7 7 7'], ['Zwei Paare', 'J J + 3 3'], ['Ein Paar', 'A A'], ['Höchste Karte', 'nichts davon']].map(([h, x], i) => `<span class="n">${i + 1}</span><span class="h">${h}</span><span class="ex">${x}</span>`).join('')}</div>
+      <p>Bei Gleichstand entscheiden die höheren Beikarten. Ist auch das gleich, wird der Pot geteilt. Das Ass zählt hoch und bei der Straße A 2 3 4 5 auch niedrig.</p>
+      <h4>Chips und Legats</h4>
+      <p>Beim Hinsetzen kaufst du Chips mit deinen Legats (${fmt(PK_BUY_MIN)} bis ${fmt(PK_BUY_MAX)}). Stehst du auf, kommen alle deine Chips zurück auf dein Konto. Gehst du nur aus dem Spiel raus, bleibst du sitzen.</p>
+      </div></div>`;
+    s.addEventListener('click', e => { if (e.target === s || e.target.closest('[data-pkr]')){ s.classList.add('out'); setTimeout(() => { s.classList.remove('out'); s.hidden = true; }, 200); } });
+    document.body.appendChild(s);
+  }
+  s.hidden = false;
+}
+
+/* ---------- rendering ---------- */
+const PK_STREETS = ['Vor dem Flop', 'Flop', 'Turn', 'River', 'Showdown'];
+let pkLastHTML = '', pkRaiseKey = '';
+function renderPoker(){
+  const el = $('g-poker'); if (!el) return;
+  let main = el.querySelector('#pkmain'), rp = el.querySelector('#pkraisep');
+  if (!main){ el.innerHTML = '<div id="pkmain"></div><div id="pkraisep"></div>'; main = el.querySelector('#pkmain'); rp = el.querySelector('#pkraisep'); pkLastHTML = ''; pkRaiseKey = ''; }
+  const html = PK.id && PK.t ? pkTableHTML() : PK.id ? `${backBar('Poker')}<div class="panel"><p class="muted">Tisch ${esc(PK.id)} wird geladen …</p></div>` : pkLobbyHTML();
+  if (html !== pkLastHTML){
+    const typing = document.activeElement?.id === 'pkcode';
+    if (typing && pkLastHTML && !PK.id) return;   // don't pull the field away while typing a code
+    pkLastHTML = html; main.innerHTML = html; pkTimer();
+  }
+  // the raise panel is drawn separately, so a new snapshot doesn't stop the slider in your hand
+  const r = PK.raise ? pkRaiseRange() : null, key = r ? `${PK.t.hand}-${PK.t.street}-${r.min}-${r.max}` : '';
+  if (key !== pkRaiseKey){
+    pkRaiseKey = key;
+    rp.innerHTML = r ? `<div class="pkraise">
+      <div class="stepper pkstep"><button type="button" class="stp" data-act="pkrstep" data-v="-100" aria-label="100 weniger">−</button>
+        <div class="stpval" aria-live="polite"><small>${r.word} auf</small><b class="num" id="pkramt"></b></div>
+        <button type="button" class="stp" data-act="pkrstep" data-v="100" aria-label="100 mehr">+</button></div>
+      <input type="range" id="pkslider" class="stkrange" min="${r.min}" max="${r.max}" step="50" value="${r.min}" aria-label="Betrag">
+      <div class="stkscale"><span>${fmt(r.min)} ℒ</span><span>${fmt(r.max)} ℒ</span></div>
+      <div class="pkquick"><button type="button" data-act="pkq" data-q="min">Min</button><button type="button" data-act="pkq" data-q="half">½ Pot</button><button type="button" data-act="pkq" data-q="pot">Pot</button><button type="button" data-act="pkq" data-q="all">All-in</button></div>
+      <button type="button" class="btn gold pkgo" id="pkrgo" data-act="pkraisego"></button></div>` : '';
+    if (r){ PK.raiseTo = PK.raiseTo || r.min; pkRaiseUpd(); }
+  }
+}
+function pkLobbyHTML(){
+  const tables = Object.entries(PK.lobby).filter(([, t]) => t.n > 0).sort((a, b) => (b[1].created || 0) - (a[1].created || 0));
+  const fr = new Set(friendIds());
+  const row = ([id, t]) => { const who = Object.entries(t.seats || {}).filter(([, s]) => !s.left); const full = who.length >= 6;
+    return `<div class="lobby-item"><span><b>${esc(t.name || 'Pokertisch')}</b> <span class="muted small">· ${id}</span><br><span class="small">${who.map(([u, s]) => `${fr.has(u) || u === uid ? '★ ' : ''}${esc(s.name)}`).join(', ') || 'leer'} · ${who.length}/6 · ${t.phase === 'play' ? 'Hand läuft' : 'wartet'}</span></span>
+      <button class="btn sm gold" data-act="pkjoin" data-id="${esc(id)}" ${full || PK.busy || !P ? 'disabled' : ''}>${full ? 'Voll' : 'Hinsetzen'}</button></div>`; };
+  return `${backBar('Poker', '<button class="btn sm" data-act="pkrules">Regeln</button>')}<div class="stack">
+    <div class="felt pkfelt-lobby" style="${feltStyle(uid)}"><div class="arc">Texas Hold'em · Blinds ${PK_SB} / ${PK_BB} · bis zu 6 Spieler</div>
+      <div class="pklobbycards" aria-hidden="true">${['AS', 'KH', 'QD', 'JC', 'TS'].map(c => pkCard(c)).join('')}</div>
+      <p class="muted" style="text-align:center;max-width:46ch;margin:0 auto">Setz dich mit Freunden an einen Tisch. Du kaufst Chips mit deinen Legats, beim Aufstehen bekommst du alle Chips zurück. Gespielt wird ab 2 Spielern.</p></div>
+    ${isBroke() ? reviveBox() : ''}
+    <div class="panel stack"><h3>Mit wie viel setzt du dich hin?</h3>
+      <div class="stakebox">${stakeStepper(PK.buy, 'pkbuy', PK_BUY_MAX, PK_BUY_MIN)}</div>
+      <p class="muted small" style="text-align:center;margin:0">${fmt(PK_BUY_MIN)} bis ${fmt(PK_BUY_MAX)} ℒ. Das kommt von deinem Konto auf den Tisch.</p></div>
+    <div class="grid2">
+      <div class="panel stack"><h3>Neuer Tisch</h3><p class="muted">Du bekommst einen 5-stelligen Code für deine Freunde.</p>
+        <div><button class="btn gold" data-act="pkcreate" ${!P || PK.busy || (P.balance || 0) < PK.buy ? 'disabled' : ''}>Tisch eröffnen</button></div></div>
+      <div class="panel stack"><h3>Mit Code beitreten</h3>
+        <div class="row"><div class="field" style="flex:1"><label for="pkcode">Tisch-Code</label><input id="pkcode" maxlength="5" value="${esc(PK.code || '')}" placeholder="z. B. K7QXM" autocomplete="off" autocapitalize="characters" style="text-transform:uppercase"></div>
+        <button class="btn" data-act="pkjoin" style="align-self:flex-end" ${!P || PK.busy ? 'disabled' : ''}>Hinsetzen</button></div></div>
+    </div>
+    <div class="panel stack"><h3>Offene Tische</h3>${tables.length ? tables.map(row).join('') : '<p class="muted">Gerade ist kein Pokertisch offen. Eröffne einen!</p>'}</div>
+  </div>`;
+}
+function pkTableHTML(){
+  const t = PK.t, me = pkMe(), mine = pkMyCards(), show = t.phase === 'show';
+  const seats = Object.entries(t.seats || {}).sort((a, b) => a[1].i - b[1].i);
+  // spread the players around the table: 0 = you at the bottom, then clockwise (2 players face each other, 3 make a triangle …)
+  const n = seats.length, m = Math.max(0, seats.findIndex(([u]) => u === uid));
+  const slot = {}; seats.forEach(([u], k) => { slot[u] = n ? Math.round(((k - m + n) % n) * 6 / n) % 6 : 0; });
+  const pos = (s, u) => slot[u] ?? 0;
+  const inHand = pkInHand(t), opp = inHand.filter(u => u !== uid).length;
+  const seatH = ([u, s]) => {
+    const p = pos(s, u), turn = t.phase === 'play' && t.turn?.u === u, won = show && t.result?.win?.[u] > 0, folded = t.order?.includes(u) && t.fold?.[u];
+    const shown = show && t.result?.show?.[u];
+    const cards = u === uid || !t.order?.includes(u) || folded || t.phase === 'wait' ? '' : shown ? shown.map(c => pkCard(c, 'sm')).join('') : pkCard('back', 'sm') + pkCard('back', 'sm');
+    const bet = t.bet?.[u] || 0;
+    const badge = t.phase !== 'wait' && t.btn === u ? '<span class="pkbadge">D</span>' : '';
+    const blind = t.phase === 'play' && t.street === 0 ? (t.sbU === u ? '<span class="pkblind">SB</span>' : t.bbU === u ? '<span class="pkblind">BB</span>' : '') : '';
+    const act = s.left ? 'Steht auf' : s.sit === false ? 'Pause' : show && t.result?.hands?.[u] ? t.result.hands[u] : (t.last?.[u] || '');
+    return `<div class="pkseat p${p}${turn ? ' turn' : ''}${won ? ' win' : ''}${folded || s.left || s.sit === false ? ' folded' : ''}${u === uid ? ' me' : ''}">
+      ${bet > 0 ? `<div class="pkbet num">${fmt(bet)}</div>` : ''}
+      <div class="pkhc">${cards}</div>
+      <div class="pkplate">${badge}${blind}<div class="pknm">${avH(avOf(u))} ${nameH(u, s.name)}</div><div class="pkst num">${fmt(s.stack)} ℒ</div>
+      <div class="pkact">${turn ? `<span data-pkuntil="${t.turn.until}"></span>` : esc(act) || '&nbsp;'}</div></div></div>`;
+  };
+  let board = ''; for (let k = 0; k < 5; k++) board += pkCard(t.board?.[k]);
+  const pot = pkPot(t);
+  // your hand
+  let myHand = '–', odds = '';
+  if (mine){
+    const e = pkEval([...mine, ...(t.board || [])]);
+    myHand = t.fold?.[uid] ? 'Ausgestiegen' : pkHandName(e);
+    if (!t.fold?.[uid] && t.phase === 'play'){
+      const k = `${t.hand}-${(t.board || []).length}-${opp}`;
+      if (PK.eqKey !== k){ PK.eqKey = k; PK.eq = pkEquity(mine, t.board || [], opp, 350); }
+      odds = `Gewinnchance gegen ${opp} ${opp === 1 ? 'Gegner' : 'Gegner'}: ca. ${Math.round(PK.eq * 100)} %`;
+    }
+  }
+  // what you can do
+  let acts = '';
+  const waitTxt = t.phase === 'wait' ? (seats.length < 2 ? 'Warte auf Mitspieler. Gib deinen Freunden den Code ' + esc(PK.id) + '.' : 'Gleich geht es los …')
+    : t.phase === 'show' ? 'Gleich kommt die nächste Hand …'
+    : !t.order?.includes(uid) ? 'Du bist ab der nächsten Hand dabei.'
+    : t.fold?.[uid] ? 'Du bist ausgestiegen. Die Hand läuft noch …'
+    : t.allin?.[uid] ? 'Du bist all-in. Daumen drücken!'
+    : `${esc(t.seats[t.turn?.u]?.name || 'Jemand')} ist dran …`;
+  if (me && t.phase === 'play' && t.turn?.u === uid){
+    const need = Math.max(0, t.cur - (t.bet?.[uid] || 0)), call = Math.min(need, me.stack), r = pkRaiseRange(), dis = PK.busy ? 'disabled' : '';
+    acts = `<div class="pkacts">
+      <button class="pkbtn fold" data-act="pkfold" ${dis}>Fold</button>
+      <button class="pkbtn call" data-act="pkcall" ${dis}>${need <= 0 ? 'Check' : call >= me.stack ? 'All-in' : 'Call'}${need > 0 ? `<small class="num">${fmt(call)} ℒ</small>` : ''}</button>
+      <button class="pkbtn raise" data-act="pkraiseopen" ${r && !PK.busy ? '' : 'disabled'}>${PK.raise ? 'Zurück' : r?.word || 'Erhöhen'}</button></div>`;
+  } else acts = `<div class="pkwait">${waitTxt}</div>`;
+  if (PK.raise && !(t.phase === 'play' && t.turn?.u === uid)) PK.raise = false;
+  const canRebuy = me && !me.left && !(t.phase === 'play' && t.order?.includes(uid) && !t.fold?.[uid]) && me.stack + PK_BUY_MIN <= PK_BUY_MAX, rb = me ? pkRebuyAmt(me) : 0;
+  const res = show && t.result ? `<div class="pkresult${t.result.win?.[uid] ? '' : t.order?.includes(uid) ? ' lose' : ''}">${t.result.lines.map(l => esc(l)).join('<br>')}</div>` : '';
+  const net = me ? me.stack + (t.phase === 'play' ? t.tot?.[uid] || 0 : 0) - (me.buy || 0) : 0;
+  const leaveTxt = PK.leaveAsk === t.hand + ':' + PK.id && t.phase === 'play' && t.order?.includes(uid) && !t.fold?.[uid] ? 'Wirklich? Hand wird abgegeben' : 'Aufstehen';
+  return `${backBar('Poker', '<button class="btn sm" data-act="pkrules">Regeln</button>')}
+  <div class="pkstats"><div class="stat"><small>Deine Chips</small><b class="num">${fmt(me?.stack || 0)} ℒ</b></div><div class="stat"><small>Bilanz am Tisch</small><b class="num" style="color:${net > 0 ? 'var(--win)' : net < 0 ? 'var(--lose)' : 'inherit'}">${sgn(net)}</b></div><div class="stat"><small>Hand</small><b class="num">${t.hand || 0}</b></div></div>
+  <div class="pktable" style="${feltStyle(t.owner)}">
+    <div class="pkhead"><span class="tcode">Tisch <b>${esc(PK.id)}</b> <button class="btn sm" data-act="pkcopy">Kopieren</button></span><button class="btn sm" data-act="pkleave" ${PK.busy ? 'disabled' : ''}>${leaveTxt}</button></div>
+    <div class="pkcenter"><div class="pkstreet">${t.phase === 'wait' ? 'Warten auf Spieler' : show ? (Object.keys(t.result?.show || {}).length ? 'Showdown' : 'Hand vorbei') : PK_STREETS[Math.min(t.street || 0, 4)]}</div>
+      <div class="pkboard">${board}</div>
+      <div class="pkpot num">${show ? 'Pot verteilt' : `Pot ${fmt(pot)} ℒ`}</div></div>
+    ${seats.map(seatH).join('')}
+  </div>
+  <div class="pkme"><div class="pkmycards">${mine ? mine.map(c => pkCard(c, 'lg', t.fold?.[uid] ? 'dim' : '')).join('') : pkCard(null, 'lg') + pkCard(null, 'lg')}</div>
+    <div class="pkinfo"><div class="pklbl">Deine Hand</div><div class="pkhand">${esc(myHand)}</div><div class="pkodds">${odds}</div></div></div>
+  ${res}${acts}
+  ${me?.sit === false && !me.left ? `<div class="note row" style="justify-content:space-between">Du setzt gerade aus.<button class="btn sm gold" data-act="pkback">Weiter spielen</button></div>` : ''}
+  ${canRebuy ? `<details class="panel pkrebuy"${me.stack <= 0 ? ' open' : ''}><summary><b>${me.stack <= 0 ? 'Keine Chips mehr: nachkaufen' : 'Chips nachkaufen'}</b></summary><div class="stack" style="margin-top:10px;align-items:center">${stakeStepper(rb, 'pkbuy', PK_BUY_MAX - me.stack, PK_BUY_MIN)}<button class="btn gold" data-act="pkrebuy" ${PK.busy || (P?.balance || 0) < rb ? 'disabled' : ''}>${fmt(rb)} ℒ nachkaufen</button></div></details>` : ''}
+  <div class="pklog">${(t.log || []).slice().reverse().map(l => `<div>${esc(l)}</div>`).join('')}</div>`;
+}
+
+/* =====================================================================
+   2.4 – Namens-Designs, „Heute im Casino“ und der Trailer
+   ===================================================================== */
+const NM_ON = id => { const n = pl(id)?.sel?.nm; return n && n !== 'plain' && SHOP.nm.some(x => x[0] === n) ? n : ''; };
+/** a player's name with the name design they wear */
+function nameH(u, text){ const n = NM_ON(u); return `<span class="pname${n ? ' nm-' + n : ''}">${esc(text ?? nameOf(u))}</span>`; }
+
+/* ---------- today in the casino: the server adds every round to meta/heute ---------- */
+const HT = { d: null, at: 0, busy: false };
+function heuteLoad(){
+  if (!P || HT.busy || document.hidden || Date.now() - HT.at < 60e3) return;   // at most once a minute, only on the home screen
+  HT.busy = true; HT.at = Date.now();
+  getDoc(doc(fs, 'meta', 'heute')).then(s => { HT.d = s.exists() ? s.data() : null; renderAll(); }).catch(e => { console.warn(e); quotaHit(e); }).finally(() => { HT.busy = false; });
+}
+function heuteHTML(){
+  heuteLoad();
+  const h = HT.d && HT.d.day === dayId() ? HT.d : null;
+  const house = h ? -(h.net || 0) : 0;
+  const top = h ? Object.entries(h.pl || {}).filter(([, p]) => p.net > 0).sort((a, b) => b[1].net - a[1].net).slice(0, 3) : [];
+  const gn = g => GAME_NAMES[g] || (g === 'bj' ? 'Blackjack' : g || '');
+  const news = [
+    ...(h?.big || []).map(b => ({ t: b.t, id: b.u, name: b.n, ic: '💰', txt: `gewinnt ${fmt(b.a)} ℒ${b.g ? ' bei ' + gn(b.g) : ''}` })),
+    ...(P ? feedItems() : []).filter(x => !(h?.big || []).some(b => b.u === x.id && Math.abs(b.t - x.t) < 120e3)).map(x => ({ ...x, name: nameOf(x.id) })),
+  ].sort((a, b) => b.t - a.t).slice(0, 6);
+  return `<div class="panel heute">
+    <h3>Heute im Casino <small>${h?.at ? 'Stand ' + new Date(h.at).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) : ''}</small></h3>
+    <div class="htcards">
+      <div><small>Umsatz heute</small><b class="num">${fmt(h?.wager || 0)} ℒ</b></div>
+      <div><small>Casino ${house >= 0 ? 'gewinnt' : 'verliert'}</small><b class="num" style="color:${house > 0 ? 'var(--win)' : house < 0 ? 'var(--lose)' : 'inherit'}">${fmt(Math.abs(house))} ℒ</b></div>
+      <div><small>Runden</small><b class="num">${fmt(h?.n || 0)}</b></div>
+    </div>
+    <div class="htsec"><h4>Wer heute am meisten gewinnt</h4>${top.length ? `<div class="httop">${top.map(([u, p], i) => `<div><span class="rk">${['🥇', '🥈', '🥉'][i]}</span><span class="nm">${nameH(u, p.n)}<small>${fmt(p.r)} ${p.r === 1 ? 'Runde' : 'Runden'}</small></span><b class="num" style="color:var(--win)">+${fmt(p.net)} ℒ</b></div>`).join('')}</div>` : '<p class="muted small" style="margin:0">Heute hat noch keiner im Plus gespielt. Deine Chance!</p>'}</div>
+    <div class="htsec"><h4>Aktuelles</h4>${news.length ? `<div class="htnews">${news.map(x => `<button class="feed-i" data-act="profile" data-id="${esc(x.id)}"><span class="feed-av">${avH(avOf(x.id))}<i>${x.ic}</i></span><span class="feed-tx"><b>${nameH(x.id, x.name)}</b> ${esc(x.txt)}<small>${ago(x.t)}</small></span></button>`).join('')}</div>` : '<p class="muted small" style="margin:0">Noch nichts los heute. Große Gewinne ab 10.000 ℒ und was deine Freunde machen, steht hier.</p>'}</div>
+  </div>`;
+}
+
+/* ---------- 2.4 trailer: once per device on the first start after the update ---------- */
+function trailer24Open(then){
+  if (TR.el) return; TR.then = then || null;
+  TR.go = () => { setTab('table'); if (standUp('poker')) openGame('poker'); };
+  const myName = esc(P?.name || 'Du');
+  const el = document.createElement('div'); el.className = 'trailer'; el.id = 'trailer';
+  const card = c => { const red = c[1] === 'H' || c[1] === 'D', s = PK_SUIT[c[1]], r = c[0] === 'T' ? '10' : c[0]; return `<div class="pc${red ? ' red' : ''}"><span class="r">${r}</span><span class="su">${s}</span><span class="big">${s}</span></div>`; };
+  el.innerHTML = `<div class="trstage">
+    <div class="sc" data-s="0"><div style="display:flex;flex-direction:column;align-items:center;gap:16px;width:100%"><div class="t-line"></div><div class="t-logo">Legat Casino</div><div class="t-up">präsentiert</div><div class="t-line"></div></div></div>
+    <div class="sc" data-s="1"><div><div class="t-ver">2.4</div></div><div class="t-cap">Das Poker-Update</div></div>
+    <div class="sc" data-s="2"><div class="t-rays"></div><div class="t-pkcards" id="trpk">${['AS', 'KS', 'QS', 'JS', 'TS'].map(card).join('')}</div><div class="t-cap">Texas Hold'em<small>Mit deinen Freunden an einem Tisch, bis zu 6 Spieler</small></div></div>
+    <div class="sc" data-s="3"><div style="display:flex;flex-direction:column;align-items:center;gap:10px"><div class="t-chips">${[0, 1, 2, 3, 4, 5, 6].map(k => `<i style="--k:${k};--x:${(k % 2 ? 3 : -3)}px;animation-delay:${k * .12}s"></i>`).join('')}</div><div class="t-allin">All-in!</div></div><div class="t-sub"><b>Kalle:</b> Alles in die Mitte. Jetzt gibt es Kasalla!</div></div>
+    <div class="sc" data-s="4"><div class="t-names"><span class="nm-gold">${myName}</span><span class="nm-neon">${myName}</span><span class="nm-regenbogen">${myName}</span><span class="nm-legat">${myName}</span></div><div class="t-cap">Namens-Designs im Shop<small>Von Gold bis Legat, alle sehen es</small></div></div>
+    <div class="sc" data-s="5"><div class="t-heute"><div><small>Umsatz heute</small><b>1.284.500 ℒ</b></div><div><small>Wer am meisten gewinnt</small><b>🥇 +48.200 ℒ</b></div><div><small>Aktuelles</small><b style="font-size:18px">💰 gewinnt 25.000 ℒ bei Crash</b></div></div><div class="t-cap">Heute im Casino<small>Neu auf der Startseite</small></div></div>
+    <div class="sc" data-s="6"><div class="t-feats"><div><span>Croupier Kalle</span> mit Untertiteln</div><div><span>Einsatz</span> mit − / + und Schieberegler</div><div><span>Haptik</span> auf dem iPhone</div></div></div>
+    <div class="sc t-end" data-s="7"><div><h1>Ab an den Tisch</h1><p>Eröffne einen Pokertisch und gib den Code an deine Freunde.</p><button class="btn gold" data-tr="go">Poker spielen</button><div style="margin-top:12px"><button class="btn sm" data-tr="close">Später</button></div></div></div>
+    <canvas class="trcv"></canvas>
+    <button class="t-skip" data-tr="skip" hidden>Überspringen</button>
+    <div class="t-bar"></div>
+    <div class="t-start"><div style="text-align:center;padding:20px"><p class="t-up" style="margin:0 0 10px">Neu in Version 2.4</p><div class="t-logo" style="font-size:clamp(34px,9vw,60px)">Poker</div><p class="muted" style="margin:10px 0 20px">Ein kurzer Trailer, etwa 20 Sekunden</p><button class="btn gold" data-tr="play">▶ Trailer ansehen</button><div style="margin-top:12px"><button class="btn sm" data-tr="close">Überspringen</button></div></div></div>
+  </div>`;
+  document.body.appendChild(el); TR.el = el; TR.last = 7; trShow(0);
+  el.addEventListener('click', e => { const b = e.target.closest('[data-tr]'); if (!b) return;
+    const a = b.dataset.tr; if (a === 'play'){ ac(); trPlay24(); } else if (a === 'skip'){ trStop(); trShow(7); el.querySelector('[data-tr="skip"]').hidden = true; }
+    else if (a === 'go'){ trClose(true); } else if (a === 'close') trClose(false); });
+}
+function trPlay24(){
+  const el = TR.el, at = (ms, f) => TR.timers.push(setTimeout(f, ms)); trStop();
+  const bar = el.querySelector('.t-bar'); bar.style.transition = 'none'; bar.style.width = '0'; void bar.offsetWidth; bar.style.transition = 'width 20000ms linear'; bar.style.width = '100%';
+  el.querySelector('.t-start').hidden = true; el.querySelector('[data-tr="skip"]').hidden = false;
+  for (const [t, i] of [[0, 0], [2600, 1], [4800, 2], [8000, 3], [11600, 4], [14400, 5], [17000, 6], [19600, 7]]) at(t, () => trShow(i));
+  const fan = () => [523, 659, 784, 1047, 1319].forEach((f, i) => tone(f, .35, { type: 'triangle', vol: .07, at: i * .09 }));
+  const flick = () => noise(.06, { vol: .12, freq: 2400 });
+  const clack = () => { tone(1800, .03, { type: 'square', vol: .05 }); tone(1200, .04, { type: 'triangle', vol: .05, at: .02 }); };
+  at(300, () => tone(196, 1.6, { vol: .06 }));
+  at(2600, () => { tone(98, 1.2, { vol: .2 }); tone(392, .8, { type: 'triangle', vol: .05, at: .05 }); });
+  [4900, 5150, 5400, 5650, 5900].forEach(t => at(t, flick));
+  at(6500, () => { el.querySelector('#trpk')?.classList.add('glow'); fan(); kConfetti(el.querySelector('.trcv'), 120); });
+  [0, 1, 2, 3, 4, 5, 6].forEach(k => at(8100 + k * 120 + 450, clack));
+  at(9600, () => { tone(80, .35, { vol: .3 }); tone(523, .4, { type: 'triangle', vol: .07, at: .05 }); });
+  at(10300, () => { if (CRP.voice) crpSpeak?.('Alles in die Mitte. Jetzt gibt es Kasalla!'); });
+  [11700, 12050, 12400, 12750].forEach(t => at(t, () => tone(660 + (t - 11700) / 2, .14, { type: 'triangle', vol: .06 })));
+  [14500, 14900, 15300].forEach(t => at(t, () => tone(440, .12, { type: 'triangle', vol: .06 })));
+  at(17100, () => [0, 500, 1000].forEach(d => setTimeout(() => tone(660, .12, { type: 'triangle', vol: .06 }), d)));
+  at(19600, () => { tone(523, .5, { type: 'triangle', vol: .06 }); tone(784, .7, { type: 'triangle', vol: .06, at: .1 }); });
+  at(20000, () => { const s = el.querySelector('[data-tr="skip"]'); if (s) s.hidden = true; });
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-act]'); if (!b || b.disabled) return;
+  if (b.dataset.act === 'fjoinpk'){ if (standUp('poker')) openGame('poker'); if (!PK.id){ PK.code = b.dataset.id; renderAll(); setTimeout(() => { const i = $('pkcode'); if (i){ i.value = PK.code; i.scrollIntoView({ block: 'center', behavior: 'smooth' }); } }, 80); toast('Wähle, mit wie viel du dich hinsetzt, und tippe „Hinsetzen“.'); } }
+});
+
+function pkOpenOf(id){ const o = pl(id)?.pkOpen; return o?.pid && isOnline(id) ? o.pid : null; }
+function pkTileExtra(){
+  if (PK.id && PK.t?.seats?.[uid]) return `<span class="pill good">Du sitzt am Tisch${PK.t.phase === 'play' && PK.t.turn?.u === uid ? ' · du bist dran' : ''}</span>`;
+  const fr = friendIds().filter(id => pkOpenOf(id)).length;
+  return fr ? `<span class="pill good">${fr} ${fr === 1 ? 'Freund sitzt' : 'Freunde sitzen'} am Pokertisch</span>` : '<span class="small muted">Blinds 50 / 100 · Chips von deinem Konto</span>';
+}
 </script>
 </body>
 </html>
