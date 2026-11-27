@@ -2461,7 +2461,12 @@ async function bjActK(type, at, retry = false){
   const t0 = tid; ACT.busy = true;
   try { await kasse('bjact', { tid: t0, type, h: at.h, round: at.round }); }
   catch (e){
-    if (!/nicht dran/.test(e.message || '') || retry || tid !== t0){ toast(e.message); }
+    if (retry && /nicht dran/.test(e.message || '')){   // 2.3.0.3: still refused although the server's table says it's my turn: show what both sides see
+      let f = null; try { const s = await getDocFromServer(doc(fs, 'tables', t0)); f = s.data() || null; } catch (x){ console.warn(x); }
+      const info = `Tisch ${t0} · Server: ${f ? `${f.phase}, Runde ${f.round}, dran ${f.turn ? (f.turn.u === uid ? 'du' : nameOf(f.turn.u)) + ' Hand ' + f.turn.h : 'niemand'}` : 'nicht lesbar'} · gesendet: Runde ${at.round}, Hand ${at.h}`;
+      console.warn('bjact refused', info, f); toast(`${e.message} (${info})`);
+    }
+    else if (!/nicht dran/.test(e.message || '') || retry || tid !== t0){ toast(e.message); }
     else {
       let fresh = null;
       try { const s = await getDocFromServer(doc(fs, 'tables', t0)); if (s.exists() && tid === t0) fresh = s.data(); } catch (x){ console.warn(x); }
@@ -2869,9 +2874,12 @@ function animateCards(root){
 /* =====================================================================
    v1.1 – Casino home, Glücksrad, Roulette, Automat, Pferderennen, Sportwetten
    ===================================================================== */
-const APP_VERSION = '2.3.0.2';
+const APP_VERSION = '2.3.0.3';
 const CL_TITLES = { '1.5.12': 'Technische Verbesserungen' };
 const CHANGELOGS = {
+  '2.3.0.3': [
+    'Blackjack: Lehnt der Server einen Zug ab, obwohl du dran bist, zeigt die Meldung jetzt genauer, was der Server sieht. Das hilft beim Finden des Fehlers',
+  ],
   '2.3.0.2': [
     'Croupier: Die Untertitel sind etwas kleiner und stehen weiter unten',
   ],
